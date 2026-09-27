@@ -180,7 +180,8 @@ void TopfdPara::createSqlDb(const std::string& sql_db_name) {
 }
 
 std::string TopfdPara::getTopfdParaStr(const std::string& prefix,
-                                       const std::string& sep) const {
+                                       const std::string& sep,
+                                       const std::string& msalign_ext) const {
   std::stringstream output;
   const int w = para_label_width_;
   auto kv = [&](const char* label) -> std::ostream& {
@@ -188,6 +189,10 @@ std::string TopfdPara::getTopfdParaStr(const std::string& prefix,
   };
 
   kv("File name:") << mzml_file_name_ << std::endl;
+  if (!msalign_ext.empty()) {
+    kv("Msalign file name:") << output_base_name_ << "_" << msalign_ext
+                             << std::endl;
+  }
   if (is_faims_) {
     kv("FAIMS data:") << "Yes" << std::endl;
     kv("FAIMS voltage:") << faims_volt_ << std::endl;
@@ -215,6 +220,10 @@ std::string TopfdPara::getTopfdParaStr(const std::string& prefix,
            << banner(prefix, "MS1 spectral deconvolution parameters")
            << std::endl;
     kv("MS1 signal/noise ratio:") << ms_one_sn_ratio_ << std::endl;
+    if (run_filter_by_mz_) {
+      kv("Precursor envelope ranking window:")
+          << ms1_rank_peak_distance_ << " Dalton" << std::endl;
+    }
 
     output << std::endl
            << banner(prefix, "MS1 feature detection parameters") << std::endl;
@@ -244,18 +253,32 @@ std::string TopfdPara::getTopfdParaStr(const std::string& prefix,
       << (sort_use_msdeconv_ ? "MS-Deconv score" : "EnvCNN score") << std::endl;
   kv("Fragment envelope EnvCNN score cutoff:")
       << ms2_env_cnn_score_cutoff_ << std::endl;
+  // both steps belong to TopFD's own MS/MS deconvolution: the FLASHDeconv
+  // path (--ms2-flashdeconv) does not run them, and the ranking window has no
+  // meaning when the filtering-by-mz step is disabled
+  if (!use_flashdeconv_) {
+    if (run_filter_by_mz_) {
+      kv("Fragment envelope ranking window:")
+          << ms2_rank_peak_distance_ << " Dalton" << std::endl;
+    }
+    kv("Fragment harmonic check:")
+        << (ms2_harmonic_check_ ? "Yes" : "No") << std::endl;
+  }
   kv("Filtering fragments using estimated fragment number:")
       << (aa_num_based_filter_ ? "Yes" : "No") << std::endl;
+  kv("Reported precursor and fragment masses:")
+      << (output_avg_mass_ ? "Average" : "Monoisotopic") << std::endl;
 
   return output.str();
 }
 
 std::string TopfdPara::getParaStr(const std::string& prefix,
-                                  const std::string& sep) const {
+                                  const std::string& sep,
+                                  const std::string& msalign_ext) const {
   std::stringstream output;
   output << prefix << "Timestamp: " << time_util::getTimeStr() << std::endl;
   output << banner(prefix, "Parameters") << std::endl;
-  output << getTopfdParaStr(prefix, sep);
+  output << getTopfdParaStr(prefix, sep, msalign_ext);
   output << banner(prefix, "Parameters") << std::endl;
   return output.str();
 }

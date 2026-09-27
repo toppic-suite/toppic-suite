@@ -19,8 +19,11 @@ paths must be at most 200 characters long.
 
 ## 1. Input
 
-**Protein database.** A FASTA file (`.fasta`, `.fa`, `.FASTA` or `.FA`)
-with unique protein accessions.
+**Protein database.** A FASTA file (`.fasta`, `.fa`, `.FASTA` or `.FA`).
+If two records share an accession (the header text up to the first
+space), the tool writes `<database>_dedup.fasta` next to the input,
+keeping the first record of each accession, prints a notice, and searches
+that file instead; its indexes go to `<database>_dedup.fasta_idx/`.
 
 **Modification file (required).** TopMG has no built-in list of
 modifications: the variable modifications used to build the proteoform
@@ -48,7 +51,9 @@ TopDIA, searched one after another with the same parameters.
 of one proteoform and to report abundances; a missing feature file is an
 error, and PrSMs whose spectrum has no feature are discarded at the
 clustering step. `--no-topfd-feature` (`-x`) runs without it, clustering
-proteoforms by protein and precursor mass instead. If `sample.sqlite`
+proteoforms by protein, precursor mass and sequence overlap instead (two
+PrSMs share a proteoform only if their proteoform sequences overlap by at
+least 70% of the shorter one). If `sample.sqlite`
 exists, the identifications are also written into it; it is not required.
 
 **Database indexes.** `topindex` is optional. TopMG prepares the database in
@@ -87,7 +92,10 @@ is given; `sample_ms2.topmg_raw_prsm` is always kept.
    one proteoform; proteoforms of the same protein whose precursor masses
    agree within `--proteoform-error-tolerance` are merged; proteoforms are
    then grouped by protein.
-10. **FDR computation** (only with `--decoy`).
+10. **FDR computation** (only with `--decoy`). Spectrum-, proteoform- and
+    protein-level false discovery rates are estimated from the decoy hits;
+    the decoy identifications are then removed unless `--keep-decoy-ids`
+    is given.
 11. **Filtering and output at three levels.** PrSMs by the spectrum-level
     cutoff, the best PrSM per proteoform by the proteoform-level cutoff, and
     the best PrSM per protein by the protein-level cutoff.
@@ -106,7 +114,7 @@ For an input `sample_ms2.msalign`:
 | `sample_ms2_topmg_prsm.tsv`, `..._prsm_single.tsv` | All PrSMs that pass the spectrum-level cutoff. |
 | `sample_ms2_topmg_proteoform.tsv`, `..._proteoform_single.tsv` | One PrSM per identified proteoform, passing the proteoform-level cutoff. |
 | `sample_ms2_topmg_protein.tsv`, `..._protein_single.tsv` | One PrSM per identified protein, passing the protein-level cutoff. |
-| `sample_ms2_topmg_prsm.xml`, `..._proteoform.xml`, `..._protein.xml` | The same three sets in XML, read by TopDiff and the visualization tools. |
+| `sample_ms2_topmg_prsm.xml`, `..._proteoform.xml`, `..._protein.xml` | The same three sets in XML, read by TopDiff and the visualization tools. Every PrSM records the TopPIC Suite version that wrote it, and TopDiff reads only the files of its own version. |
 | `sample.sqlite` | Updated with the identification tables when it exists. |
 | `sample_ms2.topmg_raw_prsm` | The PrSMs before recounting and cutoffs. Always kept, even without `--keep-temp-files`; a later combined run (`-c`) reads it. |
 
@@ -148,8 +156,9 @@ Spectra and tolerances:
 | Option | Default | Meaning |
 |---|---|---|
 | `-a`, `--activation <CID\|ETD\|HCD\|UVPD\|FILE>` | FILE | Fragmentation method; `FILE` takes it from each spectrum. |
-| `-e`, `--mass-error-tolerance <int>` | 10 | Error tolerance of precursor and fragment masses (ppm). |
-| `-F`, `--filter-by-env-cnn <0..1>` | 0.2 | Masses with an EnvCNN score below this are ignored during filtering, search and E-value computation. |
+| `-e`, `--frag-error-tolerance <int>` | 10 | Error tolerance of fragment masses (ppm). |
+| `-E`, `--prec-error-tolerance <int>` | 10 | Error tolerance of precursor masses (ppm). |
+| `-F`, `--filter-by-env-cnn <0..1>` | 0.4 | Masses with an EnvCNN score below this are ignored during filtering, search and E-value computation. |
 | `-p`, `--proteoform-error-tolerance <number>` | 1.2 | Precursor mass tolerance (Da) for grouping PrSMs into proteoforms. |
 | `-x`, `--no-topfd-feature` | off | Run without the TopFD feature file. |
 
@@ -161,7 +170,7 @@ Cutoffs and output:
 | `-T`, `--proteoform-cutoff-type <EVALUE\|FDR>`, `-V`, `--proteoform-cutoff-value <number>` | EVALUE, 0.01 | Cutoff for proteoforms. |
 | `-y`, `--protein-cutoff-type <EVALUE\|FDR>`, `-Y`, `--protein-cutoff-value <number>` | EVALUE, 0.01 | Cutoff for proteins; with `FDR` a protein is represented by its best proteoform. |
 | `-c`, `--combined-file-name <name>` | none | Combine fractions: after the files are searched, their spectra, features (unless `-x`) and raw PrSMs are merged into `<name>_ms2.msalign`, `<name>_ms2.feature` and `<name>_ms2.topmg_raw_prsm`, and the post-search steps are repeated on them, giving `<name>_ms2_topmg_*` results. A relative `<name>` is placed in the directory of the first spectrum file and must differ from the input file names. No SQLite database is written for the combined results. |
-| `-u`, `--thread-number <int>` | 1 | Number of threads. The filtering steps may use fewer, depending on the available memory. |
+| `-u`, `--thread-number <int>` | 1 | Number of threads; must not exceed the number of hardware threads. Each protein filtering step may use fewer: it fits its thread number to the memory available when it starts (about 1 GiB per thread for ASF-One PTM filtering, 0.5 GiB for ASF-Diagonal filtering). The run starts with a warning listing the filtering steps that will use fewer threads and how many, and a step prints its number again if the memory available when it starts gives a different one. All other steps use the full number. |
 | `-k`, `--keep-temp-files` | off | Keep the intermediate files. |
 | `-K`, `--keep-decoy-ids` | off | Keep decoy identifications in the result tables. |
 

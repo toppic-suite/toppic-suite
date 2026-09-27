@@ -16,6 +16,7 @@
 #ifndef TOPPIC_FILTER_ZEROPTM_ZERO_PTM_FILTER_HPP_
 #define TOPPIC_FILTER_ZEROPTM_ZERO_PTM_FILTER_HPP_
 
+#include "filter/massmatch/filter_spec.hpp"
 #include "filter/massmatch/mass_match.hpp"
 #include "filter/mng/zero_ptm_filter_mng.hpp"
 #include "ms/spec/extend_ms.hpp"
@@ -28,6 +29,12 @@ class ZeroPtmFilter {
   ZeroPtmFilter(const ProteoformPtrVec& proteo_ptrs,
                 const ZeroPtmFilterMngPtr& mng_ptr, std::string block_str);
   void computeBestMatch(const ExtendMsPtrVec& ms_ptr_vec);
+
+  // the block independent part of a spectrum set, computed once per stage
+  static FilterSpecPtr geneFilterSpec(const ExtendMsPtrVec& ms_ptr_vec,
+                                      const ZeroPtmFilterMngPtr& mng_ptr);
+
+  void computeBestMatch(const FilterSpecPtr& spec_ptr);
 
   SimplePrsmPtrVec getCompMatchPtrs() { return comp_match_ptrs_; }
   SimplePrsmPtrVec getPrefMatchPtrs() { return pref_match_ptrs_; }

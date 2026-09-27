@@ -42,12 +42,6 @@ MatchEnvPtrVec addUnusedMasses(MatchEnvPtrVec& envs, std::vector<PeakPtr>& ms,
 
 MatchEnvPtr getNewMatchEnv(PeakPtrVec& ms, int idx, double tolerance);
 
-// For one envelope, if we cannot determine its
-// charge state and monoisotopic mass, we will
-// add several envelopes with two consecutive charges
-// and envelopes with -1 and +1 Dalton shift
-MatchEnvPtrVec addMultipleMass(MatchEnvPtrVec& envs, MatchEnvPtr2D& candidates,
-                               const EnvParaPtr& env_para_ptr);
 
 DeconvMsPtr getDeconvMsPtr(const MsHeaderPtr& header_ptr, MatchEnvPtrVec& envs);
 

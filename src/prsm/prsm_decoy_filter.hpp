@@ -13,19 +13,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef TOPPIC_FILTER_INDEX_DIAG_INDEX_HPP_
-#define TOPPIC_FILTER_INDEX_DIAG_INDEX_HPP_
+#ifndef TOPPIC_PRSM_PRSM_DECOY_FILTER_HPP_
+#define TOPPIC_PRSM_PRSM_DECOY_FILTER_HPP_
 
-#include "filter/mng/diag_filter_mng.hpp"
+#include <string>
 
 namespace toppic {
 
-namespace diag_index {
+namespace prsm_decoy_filter {
 
-void process(const DiagFilterMngPtr& mng_ptr);
+// Reads the PrSMs of <base_name>.<input_file_ext>, drops those matched to a
+// decoy protein (sequence name starting with "DECOY_") and writes the rest
+// to <base_name>.<output_file_ext>. base_name is the spectrum file name
+// without its extension.
+void process(const std::string& base_name,
+             const std::string& input_file_ext,
+             const std::string& output_file_ext);
 
-}
+}  // namespace prsm_decoy_filter
 
-} /* namespace toppic */
+}  // namespace toppic
 
-#endif /* DIAG_INDEX_PROCESSOR_HPP_ */
+#endif

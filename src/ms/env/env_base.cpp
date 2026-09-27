@@ -15,6 +15,7 @@
 
 #include "ms/env/env_base.hpp"
 
+#include <cmath>
 #include <fstream>
 #include <memory>
 #include <string>
@@ -29,10 +30,11 @@ EnvBasePtr EnvBase::env_base_ptr_;
 
 EnvBase::EnvBase(std::string file_name, int entry_num, double mass_interval)
     : entry_num_(entry_num), mass_interval_(mass_interval) {
+  file_util::checkResourceFile(file_name);
   std::ifstream input;
   input.open(file_name.c_str(), std::ios::in);
   if (!input.is_open()) {
-    LOG_ERROR("Env file  " << file_name << " does not exist.");
+    LOG_ERROR("Env file  " << file_name << " cannot be opened.");
     exit(EXIT_FAILURE);
   }
   for (int i = 0; i < entry_num_; i++) {
@@ -148,6 +150,31 @@ double EnvBase::convertMonoMassToRefMass(double mass) {
 }
 
 // Ref mass is the monoisotopic mass of the highest peak in the envelope
+double EnvBase::convertAvgMassToMonoMass(double avg_mass) {
+  // avg = mono + diff(mono), where diff is the average-minus-monoisotopic
+  // difference of the table entry of mono, a step function of mono with
+  // steps of about 0.006 Da; iterate mono = avg - diff(mono) to a fixed
+  // point, which the first step almost always reaches.
+  double mono_mass = avg_mass;
+  for (int i = 0; i < 10; i++) {
+    EnvPtr env_ptr = env_base_ptr_->getBaseEnvByMonoMass(mono_mass);
+    if (env_ptr == nullptr) {
+      return avg_mass;
+    }
+    double diff =
+        env_ptr->getAvgNeutralMass() - env_ptr->getMonoNeutralMass();
+    double next_mass = avg_mass - diff;
+    if (next_mass < 0) {
+      next_mass = 0;
+    }
+    if (std::abs(next_mass - mono_mass) < 1e-9) {
+      return next_mass;
+    }
+    mono_mass = next_mass;
+  }
+  return mono_mass;
+}
+
 double EnvBase::convertRefMassToMonoMass(double mass) {
   EnvPtr env_ptr = env_base_ptr_->getBaseEnvByRefMass(mass);
   if (env_ptr == nullptr) {

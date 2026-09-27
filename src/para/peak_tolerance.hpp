@@ -17,20 +17,13 @@
 #define TOPPIC_PARA_PEAK_TOLERANCE_HPP_
 
 #include <memory>
-#include <string>
 #include <vector>
 
-#include "common/xml/xml_dom_element.hpp"
-
 namespace toppic {
-
-class XmlDOMDocument;
 
 class PeakTolerance {
  public:
   explicit PeakTolerance(double ppo);
-
-  explicit PeakTolerance(XmlDOMElement element);
 
   double compStrictErrorTole(double mass) const;
 
@@ -52,10 +45,6 @@ class PeakTolerance {
   }
 
   void setMinTolerance(double min_tolerance) { min_tolerance_ = min_tolerance; }
-
-  void appendXml(XmlDOMDocument* xml_doc, XmlDOMElement parent) const;
-
-  static std::string getXmlElementName() { return "peak_tolerance"; }
 
  private:
   double ppo_;

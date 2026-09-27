@@ -3,6 +3,22 @@
 This document explains how to build the command-line and GUI tools of the
 TopPIC Suite on Windows with [MSYS2](https://www.msys2.org).
 
+## System requirements
+
+* The MSYS2 UCRT64 environment
+* GCC (the MSYS2 `mingw-w64-ucrt-x86_64-gcc` package), not clang: the
+  MSYS2 libraries are built with GCC, and mixing compilers fails at link time
+* CMake >= 3.16 and Ninja
+* Boost >= 1.74 (filesystem, iostreams, thread, chrono, serialization,
+  program_options)
+* pugixml, SQLite3 and zlib development libraries
+* ONNX Runtime from MSYS2 (the vendored library under `ext/onnx/` is for
+  Linux only)
+* Qt6 (Core, Gui, Widgets) for the GUI tools
+* Git LFS, for the model files under `res/`
+
+The packages in step 2 provide all of these.
+
 ## 1. Install MSYS2
 
 Follow the instructions on the MSYS2 website to install MSYS2 and to update
@@ -17,7 +33,9 @@ TopDIA need, only for its UCRT64 and CLANG64 environments, not for MINGW64.
 ## 2. Install the required packages
 
 ```sh
-# version control (Git LFS is needed for the model files under res/)
+# version control (Git LFS is needed for the model files under res/; the
+# vendored Linux ONNX Runtime library under ext/onnx/ is LFS-tracked too but
+# not used on Windows)
 pacman -S git mingw-w64-ucrt-x86_64-git-lfs
 
 # compiler and build tools
@@ -39,8 +57,8 @@ and built automatically.
 
 ```sh
 git lfs install
-git clone https://github.com/toppic_suite/toppic_suite.git
-cd toppic_suite
+git clone https://github.com/toppic-suite/toppic-suite.git
+cd toppic-suite
 ```
 
 If the clone was made before installing Git LFS, run `git lfs pull` inside the
@@ -93,7 +111,7 @@ installed files again.
 
 `scripts\win_release.bat` bundles a finished build into a self-contained
 `toppic-windows-<version>.zip` in the repository root (default version
-`1.9.0.0`; pass another as the first argument). Run it from a Windows
+`2.0.0.0`; pass another as the first argument). Run it from a Windows
 command prompt or PowerShell in the repository root after building:
 
 ```bat

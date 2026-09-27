@@ -387,7 +387,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
        <rect>
         <x>480</x>
         <y>90</y>
-        <width>391</width>
+        <width>190</width>
         <height>31</height>
        </rect>
       </property>
@@ -407,12 +407,50 @@ li.checked::marker { content: &quot;\2612&quot;; }
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="horizontalLayoutWidget_11">
+     <widget class="QWidget" name="horizontalLayoutWidget_precTole">
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>170</y>
+        <y>130</y>
         <width>401</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <layout class="QHBoxLayout" name="horizontalLayout_precTole">
+       <item>
+        <widget class="QLabel" name="label_precTole">
+         <property name="minimumSize">
+          <size>
+           <width>200</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>200</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>Precursor tolerance (PPM):</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="precErrorToleranceEdit">
+         <property name="text">
+          <string>10</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="horizontalLayoutWidget_11">
+      <property name="geometry">
+       <rect>
+        <x>480</x>
+        <y>130</y>
+        <width>391</width>
         <height>31</height>
        </rect>
       </property>
@@ -432,7 +470,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
           </size>
          </property>
          <property name="text">
-          <string>Mass error tolerance (PPM):</string>
+          <string>Fragment tolerance (PPM):</string>
          </property>
         </widget>
        </item>
@@ -449,7 +487,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
       <property name="geometry">
        <rect>
         <x>480</x>
-        <y>210</y>
+        <y>170</y>
         <width>294</width>
         <height>31</height>
        </rect>
@@ -475,7 +513,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>210</y>
+        <y>170</y>
         <width>401</width>
         <height>33</height>
        </rect>
@@ -507,44 +545,6 @@ li.checked::marker { content: &quot;\2612&quot;; }
          </property>
          <property name="readOnly">
           <bool>false</bool>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </widget>
-     <widget class="QWidget" name="horizontalLayoutWidget_envcnn">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>130</y>
-        <width>401</width>
-        <height>31</height>
-       </rect>
-      </property>
-      <layout class="QHBoxLayout" name="horizontalLayout_envcnn">
-       <item>
-        <widget class="QLabel" name="label_envCnn">
-         <property name="minimumSize">
-          <size>
-           <width>200</width>
-           <height>0</height>
-          </size>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>200</width>
-           <height>16777215</height>
-          </size>
-         </property>
-         <property name="text">
-          <string>EnvCNN score cutoff:</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLineEdit" name="envCnnCutoffEdit">
-         <property name="text">
-          <string>0.2</string>
          </property>
         </widget>
        </item>
@@ -633,11 +633,39 @@ li.checked::marker { content: &quot;\2612&quot;; }
        </item>
       </layout>
      </widget>
+     <widget class="QWidget" name="horizontalLayoutWidget_30">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>210</y>
+        <width>451</width>
+        <height>33</height>
+       </rect>
+      </property>
+      <layout class="QHBoxLayout" name="horizontalLayout_30">
+       <item>
+        <widget class="QCheckBox" name="postMassMatchCheckBox">
+         <property name="minimumSize">
+          <size>
+           <width>120</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="toolTip">
+          <string>After the search, match the theoretical fragment masses of each PrSM that no deconvoluted mass matched against the centroided MS/MS peaks in the TopFD SQLite database (run TopFD with the SQLite database output enabled), and add the matched masses to the spectra.</string>
+         </property>
+         <property name="text">
+          <string>Post mass matching (needs the TopFD SQLite database)</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
      <widget class="QWidget" name="horizontalLayoutWidget_25">
       <property name="geometry">
        <rect>
         <x>480</x>
-        <y>130</y>
+        <y>210</y>
         <width>391</width>
         <height>33</height>
        </rect>
@@ -661,9 +689,9 @@ li.checked::marker { content: &quot;\2612&quot;; }
      <widget class="QWidget" name="horizontalLayoutWidget_26">
       <property name="geometry">
        <rect>
-        <x>480</x>
-        <y>170</y>
-        <width>391</width>
+        <x>680</x>
+        <y>90</y>
+        <width>191</width>
         <height>31</height>
        </rect>
       </property>
@@ -1245,9 +1273,9 @@ level:</string>
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>210</y>
+        <y>184</y>
         <width>341</width>
-        <height>33</height>
+        <height>30</height>
        </rect>
       </property>
       <layout class="QHBoxLayout" name="horizontalLayout_24">
@@ -1266,18 +1294,18 @@ level:</string>
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="horizontalLayoutWidget_30">
+     <widget class="QWidget" name="horizontalLayoutWidget_32">
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>348</y>
+        <y>216</y>
         <width>451</width>
-        <height>33</height>
+        <height>30</height>
        </rect>
       </property>
-      <layout class="QHBoxLayout" name="horizontalLayout_30">
+      <layout class="QHBoxLayout" name="horizontalLayout_32">
        <item>
-        <widget class="QCheckBox" name="postMassMatchCheckBox">
+        <widget class="QCheckBox" name="averageMassCheckBox">
          <property name="minimumSize">
           <size>
            <width>120</width>
@@ -1285,45 +1313,10 @@ level:</string>
           </size>
          </property>
          <property name="toolTip">
-          <string>After the search, match the theoretical fragment masses of each PrSM that no deconvoluted mass matched against the centroided MS/MS peaks in the TopFD SQLite database (run TopFD with the SQLite database output enabled), and add the matched masses to the spectra.</string>
+          <string>The spectrum files report average masses of precursor and fragment ions (TopFD run with --average-mass). Before the search, each file is converted to &lt;name&gt;_mono_ms2.msalign with monoisotopic masses, which is then searched.</string>
          </property>
          <property name="text">
-          <string>Post mass matching (needs the TopFD SQLite database)</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </widget>
-     <widget class="QWidget" name="horizontalLayoutWidget_31">
-      <property name="geometry">
-       <rect>
-        <x>500</x>
-        <y>348</y>
-        <width>361</width>
-        <height>33</height>
-       </rect>
-      </property>
-      <layout class="QHBoxLayout" name="horizontalLayout_31">
-       <item>
-        <widget class="QLabel" name="label_30">
-         <property name="minimumSize">
-          <size>
-           <width>200</width>
-           <height>0</height>
-          </size>
-         </property>
-         <property name="text">
-          <string>Minimum isotopic peak number:</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLineEdit" name="postMinPeakNumEdit">
-         <property name="toolTip">
-          <string>Minimum number of observed isotopic peaks of a fragment mass matched by the post mass matching.</string>
-         </property>
-         <property name="text">
-          <string>1</string>
+          <string>Spectrum files with average masses (TopFD --average-mass)</string>
          </property>
         </widget>
        </item>

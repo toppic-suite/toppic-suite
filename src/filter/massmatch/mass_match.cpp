@@ -18,7 +18,10 @@
 #include <boost/archive/binary_iarchive.hpp>
 #include <boost/archive/binary_oarchive.hpp>
 #include <boost/serialization/vector.hpp>
+#include <algorithm>
 #include <cmath>
+#include <cstdint>
+#include <cstring>
 #include <fstream>
 #include <iostream>
 
@@ -26,6 +29,7 @@
 #include "common/util/logger.hpp"
 
 namespace toppic {
+
 
 /* proteo_minus_water_masses[i]: the mass (minus water) of the ith proteoform
  * mass_2d[i]: a vector containing prefix residue masses of the ith proteoform
@@ -54,6 +58,7 @@ MassMatch::MassMatch(std::vector<double>& proteo_minus_water_masses,
 
   LOG_DEBUG("init indexes");
   initIndexes(mass_2d, float_shift_2d, pos_2d);
+  initColIndexBounds();
 }
 
 void MassMatch::serializeMassMatch(std::string file_name,
@@ -109,6 +114,7 @@ void MassMatch::deserializeMassMatch(std::string new_file,
     ia >> col_indexes_;
 
     file_to_read.close();
+    initColIndexBounds();
   } else {
     LOG_ERROR("Failed to open the index file:" << file_path);
     exit(EXIT_FAILURE);
@@ -196,11 +202,115 @@ void MassMatch::fillColumnIndex(std::vector<std::vector<int>>& mass_2d,
   }
 }
 
+// The column index built range by range. Row r = (proteoform i, shift s)
+// contributes the entries (mass + shift, r) for its masses from the start
+// position on while 0 < mass + shift < col_num, in the order of the masses;
+// with nondecreasing masses those entries are one run of the row's masses,
+// and the part of the run that falls into a range of columns [c0, c1)
+// starts where the part for the previous range ended. The columns are
+// therefore processed in ranges of kColRangeWidth: a count pass and a fill
+// pass over the rows' runs in that range, whose counts and write pointers
+// stay in cache, and the running total of the entries gives the begins
+// and ends. The result is the same as two passes over all columns at once
+// (compColumnMatchNums, fillColumnIndex), whose random accesses to arrays
+// of col_num entries miss the cache on every entry.
+namespace {
+const int kColRangeWidth = 1 << 16;
+
+void buildColumnIndexByRange(const std::vector<std::vector<int>>& mass_2d,
+                             const std::vector<std::vector<int>>& shift_2d,
+                             const std::vector<std::vector<int>>& pos_2d,
+                             int col_num, int row_num,
+                             const std::vector<int>& proteo_row_begins,
+                             std::vector<int>& col_index_begins,
+                             std::vector<int>& col_index_ends,
+                             std::vector<int>& col_indexes) {
+  // each row's run: its current position and its end
+  std::vector<int> row_cur(row_num);
+  std::vector<int> row_end(row_num);
+  size_t entry_num = 0;
+  for (size_t i = 0; i < mass_2d.size(); i++) {
+    const std::vector<int>& masses = mass_2d[i];
+    for (size_t s = 0; s < shift_2d[i].size(); s++) {
+      int r = proteo_row_begins[i] + s;
+      int shift = shift_2d[i][s];
+      auto begin = masses.begin() + pos_2d[i][s];
+      // mass + shift > 0 and mass + shift < col_num
+      auto lo = std::lower_bound(begin, masses.end(), 1 - shift);
+      auto hi = std::lower_bound(lo, masses.end(), col_num - shift);
+      row_cur[r] = lo - masses.begin();
+      row_end[r] = hi - masses.begin();
+      entry_num += hi - lo;
+    }
+  }
+  col_index_begins.resize(col_num);
+  col_index_ends.resize(col_num);
+  col_indexes.resize(entry_num);
+
+  std::vector<int> counts(kColRangeWidth);
+  std::vector<int> pnts(kColRangeWidth);
+  std::vector<int> range_end(row_num);
+  int base = 0;
+  for (int c0 = 0; c0 < col_num; c0 += kColRangeWidth) {
+    int c1 = std::min(c0 + kColRangeWidth, col_num);
+    std::fill(counts.begin(), counts.begin() + (c1 - c0), 0);
+    for (size_t i = 0; i < mass_2d.size(); i++) {
+      const int* masses = mass_2d[i].data();
+      for (size_t s = 0; s < shift_2d[i].size(); s++) {
+        int r = proteo_row_begins[i] + s;
+        int shift = shift_2d[i][s];
+        int cur = row_cur[r];
+        int end = row_end[r];
+        while (cur < end && masses[cur] + shift < c1) {
+          counts[masses[cur] + shift - c0]++;
+          cur++;
+        }
+        range_end[r] = cur;
+      }
+    }
+    for (int c = c0; c < c1; c++) {
+      col_index_begins[c] = base;
+      pnts[c - c0] = base;
+      col_index_ends[c] = base + counts[c - c0] - 1;
+      base += counts[c - c0];
+    }
+    for (size_t i = 0; i < mass_2d.size(); i++) {
+      const int* masses = mass_2d[i].data();
+      for (size_t s = 0; s < shift_2d[i].size(); s++) {
+        int r = proteo_row_begins[i] + s;
+        int shift = shift_2d[i][s];
+        int end = range_end[r];
+        for (int cur = row_cur[r]; cur < end; cur++) {
+          col_indexes[pnts[masses[cur] + shift - c0]++] = r;
+        }
+        row_cur[r] = end;
+      }
+    }
+  }
+}
+}  // namespace
+
 void MassMatch::initIndexes(std::vector<std::vector<int>>& mass_2d,
                             std::vector<std::vector<double>>& float_shift_2d,
                             std::vector<std::vector<int>>& pos_2d) {
   std::vector<std::vector<int>> shift_2d = convertToInt(float_shift_2d, scale_);
   LOG_DEBUG("column num " << col_num_);
+  rows_nondecreasing_ = true;
+  for (size_t i = 0; i < mass_2d.size(); i++) {
+    if (!std::is_sorted(mass_2d[i].begin(), mass_2d[i].end())) {
+      rows_nondecreasing_ = false;
+      break;
+    }
+  }
+  if (rows_nondecreasing_) {
+    buildColumnIndexByRange(mass_2d, shift_2d, pos_2d, col_num_, row_num_,
+                            proteo_row_begins_, col_index_begins_,
+                            col_index_ends_, col_indexes_);
+    LOG_DEBUG("indexes size: " << col_indexes_.size());
+    return;
+  }
+  // masses that are not nondecreasing (no index of the suite makes them):
+  // the two passes over all columns
   std::vector<int> col_match_nums(col_num_, 0);
   // no need to initialize
   std::vector<int> col_index_pnts(col_num_);
@@ -220,6 +330,33 @@ void MassMatch::initIndexes(std::vector<std::vector<int>>& mass_2d,
   col_indexes_.resize(pnt, 0);
   LOG_DEBUG("indexes size: " << pnt);
   fillColumnIndex(mass_2d, shift_2d, pos_2d, col_index_pnts);
+}
+
+void MassMatch::initColIndexBounds() {
+  col_index_bounds_ = col_index_begins_;
+  col_index_bounds_.push_back(static_cast<int>(col_indexes_.size()));
+}
+
+bool MassMatch::canTruncateColumns(double max_proteoform_mass) const {
+  int col_num = max_proteoform_mass * scale_;
+  return rows_nondecreasing_ && col_num >= 0 && col_num <= col_num_;
+}
+
+void MassMatch::truncateColumns(double max_proteoform_mass) {
+  if (!canTruncateColumns(max_proteoform_mass)) {
+    LOG_ERROR("The index cannot be truncated to the proteoform mass "
+              << max_proteoform_mass);
+    exit(EXIT_FAILURE);
+  }
+  // the same conversion as the constructor's
+  int col_num = max_proteoform_mass * scale_;
+  // the entries of the columns below col_num come first
+  int entry_num = col_index_bounds_[col_num];
+  col_index_begins_.resize(col_num);
+  col_index_ends_.resize(col_num);
+  col_indexes_.resize(entry_num);
+  col_num_ = col_num;
+  initColIndexBounds();
 }
 
 void MassMatch::compScores(
@@ -257,8 +394,128 @@ void MassMatch::compScores(
   }
 }
 
-void MassMatch::updatePrecScore(const std::pair<int, int> mass_error,
-                                std::vector<short>& scores) {
+// The anchor loop of DiagFilter::compute for the anchors [anchor_begin,
+// anchor_end) with the score array of the current anchor in Score. The rows
+// whose score reaches the threshold are noted by the increment loop itself
+// (a rarely taken branch) and only they are folded into max_scores after the
+// anchor, and the array is cleared with memset, so the per-anchor work on
+// the whole array is one sequential write instead of a fill, a read and a
+// read-modify-write of 16-bit scores. The column bounds and the first
+// entries of the next pairs are prefetched: each pair reads them from memory
+// the hardware prefetcher cannot predict.
+template <typename Score>
+void MassMatch::compDiagMaxScoresImpl(
+    const std::vector<std::pair<int, int>>& pref_mass_errors, int anchor_begin,
+    int anchor_end, int threshold, std::vector<Score>& scores,
+    std::vector<int>& hot_rows, std::vector<short>& max_scores) {
+  scores.assign(row_num_, 0);
+  const int* bounds = col_index_bounds_.data();
+  const int* entries = col_indexes_.data();
+  Score* s = scores.data();
+  short* mx = max_scores.data();
+  const int n = static_cast<int>(pref_mass_errors.size());
+  const int col_num = col_num_;
+  const int row_num = row_num_;
+  const int pf_bound = 8;  // pairs ahead for the column bound prefetch
+  const int pf_entry = 3;  // pairs ahead for the entry prefetch
+  const Score t = static_cast<Score>(threshold);
+  for (int i = anchor_begin; i < anchor_end; i++) {
+    if (i > anchor_begin) {
+      std::memset(s, 0, sizeof(Score) * row_num);
+    }
+    hot_rows.clear();
+    int shift = -pref_mass_errors[i].first;
+    for (int k = i; k < n; k++) {
+      if (k + pf_bound < n) {
+        int m2 = pref_mass_errors[k + pf_bound].first + shift;
+        int left2 = m2 - pref_mass_errors[k + pf_bound].second;
+        int right2 = m2 + pref_mass_errors[k + pf_bound].second;
+        if (left2 < 0) {
+          left2 = 0;
+        }
+        if (right2 >= 0 && right2 < col_num) {
+          __builtin_prefetch(bounds + left2);
+          __builtin_prefetch(bounds + right2 + 1);
+        }
+      }
+      if (k + pf_entry < n) {
+        int m2 = pref_mass_errors[k + pf_entry].first + shift;
+        int left2 = m2 - pref_mass_errors[k + pf_entry].second;
+        int right2 = m2 + pref_mass_errors[k + pf_entry].second;
+        if (left2 < 0) {
+          left2 = 0;
+        }
+        if (right2 >= 0 && right2 < col_num) {
+          int begin2 = bounds[left2];
+          __builtin_prefetch(entries + begin2);
+          __builtin_prefetch(entries + begin2 + 16);
+        }
+      }
+      int m = pref_mass_errors[k].first + shift;
+      int left = m - pref_mass_errors[k].second;
+      if (left < 0) {
+        left = 0;
+      }
+      int right = m + pref_mass_errors[k].second;
+      if (right < 0 || right >= col_num) {
+        continue;
+      }
+      int begin_index = bounds[left];
+      int end_index = bounds[right + 1];
+      for (int j = begin_index; j < end_index; j++) {
+        int row = entries[j];
+        if (++s[row] == t) {
+          hot_rows.push_back(row);
+        }
+      }
+    }
+    for (size_t h = 0; h < hot_rows.size(); h++) {
+      int row = hot_rows[h];
+      if (s[row] > mx[row]) {
+        mx[row] = static_cast<short>(s[row]);
+      }
+    }
+  }
+}
+
+// An anchor's score for a row is at most the number of pairs of the anchor
+// that hit the row, and a row is hit at most once by a pair when the column
+// windows are narrower than the smallest residue mass (a row's entries are
+// at least one residue mass apart). So the anchors with at most 255 later
+// peaks are scored with 8-bit arrays and the earlier ones with 16-bit arrays.
+void MassMatch::compDiagMaxScores(
+    const std::vector<std::pair<int, int>>& pref_mass_errors, int threshold,
+    std::vector<short>& max_scores) {
+  // scratch arrays, kept per thread across spectrum sets and blocks
+  static thread_local std::vector<uint8_t> scores8;
+  static thread_local std::vector<uint16_t> scores16;
+  static thread_local std::vector<int> hot_rows;
+  max_scores.assign(row_num_, 0);
+  const int n = static_cast<int>(pref_mass_errors.size());
+  int max_error = 0;
+  for (int k = 0; k < n; k++) {
+    max_error = std::max(max_error, pref_mass_errors[k].second);
+  }
+  // glycine, 57.02 Da, scaled by the index scale
+  const int min_residue_mass = static_cast<int>(57.0 * scale_);
+  int first8 = n;
+  if (2 * max_error + 1 < min_residue_mass) {
+    first8 = std::max(0, n - 255);
+  }
+  if (first8 > 0) {
+    compDiagMaxScoresImpl(pref_mass_errors, 0, first8, threshold, scores16,
+                          hot_rows, max_scores);
+  }
+  if (first8 < n) {
+    compDiagMaxScoresImpl(pref_mass_errors, first8, n, threshold, scores8,
+                          hot_rows, max_scores);
+  }
+}
+
+template <bool TrackPrecRows>
+void MassMatch::updatePrecScoreImpl(const std::pair<int, int>& mass_error,
+                                    std::vector<short>& scores,
+                                    std::vector<int>* prec_rows) {
   // precursor mass
   int begin_index, end_index;
   int m = mass_error.first;
@@ -278,11 +535,20 @@ void MassMatch::updatePrecScore(const std::pair<int, int> mass_error,
     begin_index = col_index_begins_[left];
     end_index = col_index_ends_[right];
     for (int j = begin_index; j <= end_index; j++) {
-      if (scores[col_indexes_[j]] < getPrecursorMatchScore()) {
-        scores[col_indexes_[j]] += getPrecursorMatchScore();
+      int row = col_indexes_[j];
+      if (scores[row] < getPrecursorMatchScore()) {
+        scores[row] += getPrecursorMatchScore();
+        if (TrackPrecRows) {
+          prec_rows->push_back(row);
+        }
       }
     }
   }
+}
+
+void MassMatch::updatePrecScore(const std::pair<int, int> mass_error,
+                                std::vector<short>& scores) {
+  updatePrecScoreImpl<false>(mass_error, scores, nullptr);
 }
 
 void MassMatch::compMatchScores(
@@ -302,6 +568,17 @@ void MassMatch::compMatchScores(
   for (size_t i = 0; i < prec_minus_water_mass_errors.size(); i++) {
     std::pair<int, int> mass_error = prec_minus_water_mass_errors[i];
     updatePrecScore(mass_error, scores);
+  }
+}
+
+void MassMatch::compMatchScores(
+    const std::vector<std::pair<int, int>>& pref_mass_errors,
+    const std::vector<std::pair<int, int>>& prec_minus_water_mass_errors,
+    std::vector<short>& scores, std::vector<int>& prec_rows) {
+  compScores(pref_mass_errors, 0, 0.0, scores);
+  for (size_t i = 0; i < prec_minus_water_mass_errors.size(); i++) {
+    updatePrecScoreImpl<true>(prec_minus_water_mass_errors[i], scores,
+                              &prec_rows);
   }
 }
 

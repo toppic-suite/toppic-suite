@@ -38,6 +38,7 @@ void initModel(const std::string& dir_name, int thread_num) {
   std::string file_name = dir_name + file_util::getFileSeparator() +
                           "ecscore_models" + file_util::getFileSeparator() +
                           "ecscore_seven_attr.onnx";
+  file_util::checkResourceFile(file_name);
 
   env = new Ort::Env(ORT_LOGGING_LEVEL_WARNING, "ecsore");
   session_options = new Ort::SessionOptions();

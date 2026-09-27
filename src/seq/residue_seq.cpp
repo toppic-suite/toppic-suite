@@ -21,13 +21,15 @@
 #include <iterator>
 #include <sstream>
 #include <string>
+#include <utility>
 
 #include "common/base/mod_base.hpp"
 #include "common/util/logger.hpp"
 
 namespace toppic {
 
-ResidueSeq::ResidueSeq(const ResiduePtrVec& residues) : residues_(residues) {
+ResidueSeq::ResidueSeq(ResiduePtrVec residues)
+    : residues_(std::move(residues)) {
   // get residue mass sum
   residue_mass_sum_ = 0;
   for (size_t i = 0; i < residues_.size(); i++) {

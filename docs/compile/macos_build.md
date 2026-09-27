@@ -6,6 +6,20 @@ and [Homebrew](https://brew.sh/) provides everything else. Both Apple Silicon
 (Homebrew in `/opt/homebrew`) and Intel Macs (Homebrew in `/usr/local`) are
 supported.
 
+## System requirements
+
+* A C++17 compiler: the Apple clang of the Xcode Command Line Tools
+* CMake >= 3.16
+* Boost >= 1.74 (filesystem, iostreams, thread, chrono, serialization,
+  program_options)
+* pugixml, SQLite3 and zlib development libraries
+* ONNX Runtime from Homebrew (the vendored library under `ext/onnx/` is for
+  Linux only)
+* Qt6 (Core, Gui, Widgets) for the GUI tools
+* Git LFS, for the model files under `res/`
+
+Steps 1 and 2 install all of these.
+
 ## 1. Install the compiler and Homebrew
 
 ```sh
@@ -48,8 +62,10 @@ Notes:
 - The other third-party code (htslib, ProteoWizard) is vendored under `ext/`
   and built automatically.
 - [Git LFS](https://git-lfs.com/) is required: the EnvCNN / ECScore model
-  files and the isotope-pattern table under `res/` are stored with Git LFS,
-  and without it `git clone` leaves small text pointer files in their place.
+  files and the isotope-pattern table under `res/` are stored with Git LFS
+  (as is the vendored Linux ONNX Runtime library under `ext/onnx/`, which
+  macOS does not use), and without it `git clone` leaves small text pointer
+  files in their place.
   It is installed by the `brew install git-lfs` above; then register the Git
   hooks/filters for your user (one time per machine):
 
@@ -61,8 +77,8 @@ Notes:
 
 ```sh
 git lfs install
-git clone https://github.com/toppic_suite/toppic_suite.git
-cd toppic_suite
+git clone https://github.com/toppic-suite/toppic-suite.git
+cd toppic-suite
 ```
 
 If the clone was made before installing Git LFS, run `git lfs pull` inside the

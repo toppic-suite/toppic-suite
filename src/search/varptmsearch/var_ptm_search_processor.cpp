@@ -70,13 +70,19 @@ int findMatchedPos(const ProteoformPtr& proteo_ptr, double n_term_trunc) {
 
 std::function<void()> geneTask(const SpectrumSetPtr& spec_set_ptr,
                                const SimplePrsmPtrVec& simple_prsm_ptr_vec,
-                               const FastaIndexReaderPtr& reader_ptr,
+                               const std::string& db_file_name,
                                const VarPtmSearchMngPtr& mng_ptr,
                                const ProteoformTypePtr& type_ptr,
                                const SimpleThreadPoolPtr& pool_ptr,
                                const PrsmXmlWriterPtrVec& writer_ptr_vec) {
-  return [spec_set_ptr, simple_prsm_ptr_vec, reader_ptr, mng_ptr, type_ptr,
+  return [spec_set_ptr, simple_prsm_ptr_vec, db_file_name, mng_ptr, type_ptr,
           pool_ptr, writer_ptr_vec]() {
+    // one indexed FASTA reader per worker thread, so that the candidate
+    // fetches of the threads do not serialize on one reader
+    static thread_local FastaIndexReaderPtr reader_ptr;
+    if (reader_ptr == nullptr) {
+      reader_ptr = std::make_shared<FastaIndexReader>(db_file_name);
+    }
     ModPtrVec fix_mod_list = mng_ptr->prsm_para_ptr_->getFixModPtrVec();
     ProtModPtrVec prot_mod_ptr_vec =
         mng_ptr->prsm_para_ptr_->getProtModPtrVec();
@@ -166,7 +172,7 @@ std::function<void()> geneTask(const SpectrumSetPtr& spec_set_ptr,
       }
     }
     std::sort(prsms.begin(), prsms.end(),
-              Prsm::cmpMatchFragDecMatchPeakDecProtInc);
+              Prsm::cmpMatchTheoFragDecMatchExpFragDecProtInc);
     PrsmPtrVec selected_prsms =
         prsm_util::getTopPrsms(prsms, mng_ptr->n_report_);
 
@@ -227,9 +233,6 @@ void VarPtmSearchProcessor::process() {
 
   // init variables
   std::string db_file_name = prsm_para_ptr->getSearchDbFileNameWithFolder();
-
-  FastaIndexReaderPtr reader_ptr =
-      std::make_shared<FastaIndexReader>(db_file_name);
   int spectrum_num = msalign_util::getSpNum(sp_file_name);
   SpParaPtr sp_para_ptr = prsm_para_ptr->getSpParaPtr();
   ModPtrVec fix_mod_ptr_vec = prsm_para_ptr->getFixModPtrVec();
@@ -237,7 +240,8 @@ void VarPtmSearchProcessor::process() {
   int group_spec_num = prsm_para_ptr->getGroupSpecNum();
   MsAlignReaderPtr msalign_reader_ptr = std::make_shared<MsAlignReader>(
       sp_file_name, group_spec_num, sp_para_ptr->getActivationPtr(),
-      sp_para_ptr->getEnvCnnCutoff());
+      sp_para_ptr->getEnvCnnCutoff(),
+        sp_para_ptr->getFragDedupPpo());
   int cnt = 0;
   DeconvMsPtrVec deconv_ms_ptr_vec = msalign_reader_ptr->getNextMsPtrVec();
   std::vector<double> prec_error_vec =
@@ -265,13 +269,18 @@ void VarPtmSearchProcessor::process() {
         if (comp_selected_prsm_ptrs.size() > 0) {
           // LOG_DEBUG("start processing one spectrum.");
           for (size_t k = 0; k < spec_set_vec.size(); k++) {
+            // the tasks average ~26 ms, so the 16 workers drain the whole
+            // queue in far less than the previous 100 ms polling sleep and
+            // starved while the producer overslept; poll at 1 ms and keep
+            // enough tasks queued to cover the producer's reading bursts
             while (pool_ptr->getQueueSize() >=
-                   static_cast<std::size_t>(mng_ptr_->thread_num_) * 2) {
-              std::this_thread::sleep_for(std::chrono::milliseconds(100));
+                   static_cast<std::size_t>(mng_ptr_->thread_num_) * 8) {
+              std::this_thread::sleep_for(std::chrono::milliseconds(1));
             }
             pool_ptr->enqueue(geneTask(
-                spec_set_vec[k], comp_selected_prsm_ptrs, reader_ptr, mng_ptr_,
-                ProteoformType::COMPLETE, pool_ptr, comp_writer_ptr_vec));
+                spec_set_vec[k], comp_selected_prsm_ptrs, db_file_name,
+                mng_ptr_, ProteoformType::COMPLETE, pool_ptr,
+                comp_writer_ptr_vec));
           }
         }
 
@@ -286,13 +295,18 @@ void VarPtmSearchProcessor::process() {
         if (pref_selected_prsm_ptrs.size() > 0) {
           // LOG_DEBUG("start processing one spectrum.");
           for (size_t k = 0; k < spec_set_vec.size(); k++) {
+            // the tasks average ~26 ms, so the 16 workers drain the whole
+            // queue in far less than the previous 100 ms polling sleep and
+            // starved while the producer overslept; poll at 1 ms and keep
+            // enough tasks queued to cover the producer's reading bursts
             while (pool_ptr->getQueueSize() >=
-                   static_cast<std::size_t>(mng_ptr_->thread_num_) * 2) {
-              std::this_thread::sleep_for(std::chrono::milliseconds(100));
+                   static_cast<std::size_t>(mng_ptr_->thread_num_) * 8) {
+              std::this_thread::sleep_for(std::chrono::milliseconds(1));
             }
             pool_ptr->enqueue(geneTask(
-                spec_set_vec[k], pref_selected_prsm_ptrs, reader_ptr, mng_ptr_,
-                ProteoformType::PREFIX, pool_ptr, pref_writer_ptr_vec));
+                spec_set_vec[k], pref_selected_prsm_ptrs, db_file_name,
+                mng_ptr_, ProteoformType::PREFIX, pool_ptr,
+                pref_writer_ptr_vec));
           }
         }
 
@@ -307,13 +321,18 @@ void VarPtmSearchProcessor::process() {
         if (suff_selected_prsm_ptrs.size() > 0) {
           // LOG_DEBUG("start processing one spectrum.");
           for (size_t k = 0; k < spec_set_vec.size(); k++) {
+            // the tasks average ~26 ms, so the 16 workers drain the whole
+            // queue in far less than the previous 100 ms polling sleep and
+            // starved while the producer overslept; poll at 1 ms and keep
+            // enough tasks queued to cover the producer's reading bursts
             while (pool_ptr->getQueueSize() >=
-                   static_cast<std::size_t>(mng_ptr_->thread_num_) * 2) {
-              std::this_thread::sleep_for(std::chrono::milliseconds(100));
+                   static_cast<std::size_t>(mng_ptr_->thread_num_) * 8) {
+              std::this_thread::sleep_for(std::chrono::milliseconds(1));
             }
             pool_ptr->enqueue(geneTask(
-                spec_set_vec[k], suff_selected_prsm_ptrs, reader_ptr, mng_ptr_,
-                ProteoformType::SUFFIX, pool_ptr, suff_writer_ptr_vec));
+                spec_set_vec[k], suff_selected_prsm_ptrs, db_file_name,
+                mng_ptr_, ProteoformType::SUFFIX, pool_ptr,
+                suff_writer_ptr_vec));
           }
         }
 
@@ -328,14 +347,19 @@ void VarPtmSearchProcessor::process() {
         if (internal_selected_prsm_ptrs.size() > 0) {
           // LOG_DEBUG("start processing one spectrum.");
           for (size_t k = 0; k < spec_set_vec.size(); k++) {
+            // the tasks average ~26 ms, so the 16 workers drain the whole
+            // queue in far less than the previous 100 ms polling sleep and
+            // starved while the producer overslept; poll at 1 ms and keep
+            // enough tasks queued to cover the producer's reading bursts
             while (pool_ptr->getQueueSize() >=
-                   static_cast<std::size_t>(mng_ptr_->thread_num_) * 2) {
-              std::this_thread::sleep_for(std::chrono::milliseconds(100));
+                   static_cast<std::size_t>(mng_ptr_->thread_num_) * 8) {
+              std::this_thread::sleep_for(std::chrono::milliseconds(1));
             }
             pool_ptr->enqueue(geneTask(spec_set_vec[k],
-                                       internal_selected_prsm_ptrs, reader_ptr,
-                                       mng_ptr_, ProteoformType::INTERNAL,
-                                       pool_ptr, internal_writer_ptr_vec));
+                                       internal_selected_prsm_ptrs,
+                                       db_file_name, mng_ptr_,
+                                       ProteoformType::INTERNAL, pool_ptr,
+                                       internal_writer_ptr_vec));
           }
         }
       }

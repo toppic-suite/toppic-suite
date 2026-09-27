@@ -15,8 +15,11 @@
 
 #include "console/toppic_argument.hpp"
 
+#include <exception>
 #include <filesystem>
 #include <iomanip>
+#include <string>
+#include <utility>
 
 #include "common/base/mod_util.hpp"
 #include "common/util/file_util.hpp"
@@ -26,6 +29,7 @@
 #include "common/util/version.hpp"
 #include "common/xml/xml_dom_util.hpp"
 #include "prsm/prsm_post_mass_match.hpp"
+#include "seq/fasta_util.hpp"
 
 namespace toppic {
 
@@ -56,8 +60,9 @@ std::map<std::string, std::string> ToppicArgument::initArguments() {
   arguments["searchType"] = "TARGET";
   arguments["numOfTopPrsms"] = "1";
   arguments["filteringResultNumber"] = "20";
-  arguments["massErrorTolerance"] = "10";
-  arguments["envCnnCutoff"] = "0.2";
+  arguments["precErrorTolerance"] = "10";
+  arguments["fragErrorTolerance"] = "10";
+  arguments["envCnnCutoff"] = "0.4";
   arguments["proteoformPpmError"] = "false";
   arguments["proteoformErrorTolerance"] = "1.2";
   arguments["cutoffSpectralType"] = "EVALUE";
@@ -75,11 +80,21 @@ std::map<std::string, std::string> ToppicArgument::initArguments() {
   arguments["useFeatureFile"] = "true";
   arguments["keepTempFiles"] = "false";
   arguments["keepDecoyResults"] = "false";
+  arguments["useFdrGroups"] = "false";
   arguments["combineResultOnly"] = "false";
   arguments["outputRawPrsmTable"] = "false";
   arguments["outputPrsmCoverage"] = "false";
   arguments["postMassMatch"] = "true";
+  arguments["averageMass"] = "false";
   arguments["postMinPeakNum"] = "1";
+  arguments["zeroShiftPrecOneDaError"] = "true";
+  arguments["oneShiftPrecOneDaError"] = "false";
+  arguments["varPtmPrecOneDaError"] = "false";
+  arguments["fragMassExtension"] = "true";
+  arguments["fragExtendMinMass"] = "5000";
+  arguments["fragMassDedup"] = "false";
+  arguments["multiSkipEvalue"] = "";
+  arguments["multiTypeAlign"] = "true";
 
   arguments["version"] = "";
   return arguments;
@@ -95,6 +110,9 @@ void ToppicArgument::outputArguments(
          << arguments["oriDatabaseFileName"] << std::endl;
   output << std::setw(gap) << std::left << "Spectrum file:" << sep
          << arguments["spectrumFileName"] << std::endl;
+  output << std::setw(gap) << std::left << "Spectrum file masses:" << sep
+         << (arguments["averageMass"] == "true" ? "Average" : "Monoisotopic")
+         << std::endl;
   output << std::setw(gap) << std::left << "Number of combined spectra:" << sep
          << arguments["groupSpectrumNumber"] << std::endl;
   output << std::setw(gap) << std::left << "Fragmentation method:" << sep
@@ -148,6 +166,10 @@ void ToppicArgument::outputArguments(
     output << std::setw(gap) << std::left
            << "Use approximate spectra in protein filtering:" << sep
            << arguments["useApproxSpectra"] << std::endl;
+    if (arguments.at("useFdrGroups") == "true") {
+      output << std::setw(gap) << std::left << "FDR computation:" << sep
+             << "separate PrSM groups" << std::endl;
+    }
     output << std::setw(gap) << std::left
            << "Variable modifications file name:" << sep
            << arguments["variablePtmFileName"] << std::endl;
@@ -188,10 +210,17 @@ void ToppicArgument::outputArguments(
          << arguments["cutoffProteinValue"] << std::endl;
 
   output << std::setw(gap) << std::left
-         << "Error tolerance for matching masses:" << sep
-         << arguments["massErrorTolerance"] << " ppm" << std::endl;
+         << "Error tolerance for precursor masses:" << sep
+         << arguments["precErrorTolerance"] << " ppm" << std::endl;
+  output << std::setw(gap) << std::left
+         << "Error tolerance for fragment masses:" << sep
+         << arguments["fragErrorTolerance"] << " ppm" << std::endl;
   output << std::setw(gap) << std::left << "EnvCNN score cutoff:" << sep
          << arguments["envCnnCutoff"] << std::endl;
+  output << std::setw(gap) << std::left
+         << "Fragment mass deduplication:" << sep
+         << (arguments["fragMassDedup"] == "true" ? "True" : "False")
+         << std::endl;
   if (arguments["postMassMatch"] == "true") {
     output << std::setw(gap) << std::left << "Post mass matching:" << sep
            << "True" << std::endl;
@@ -292,7 +321,8 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
   std::string shift_num = "";
   std::string min_shift_mass = "";
   std::string max_shift_mass = "";
-  std::string mass_error_tole = "";
+  std::string frag_error_tole = "";
+  std::string prec_error_tole = "";
   std::string env_cnn_cutoff = "";
   std::string form_error_tole = "";
   std::string cutoff_spectral_type = "";
@@ -309,6 +339,8 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
   std::string thread_number = "";
   std::string top_prsm_number = "";
   std::string post_min_peak_num = "";
+  std::string frag_extend_min_mass = "";
+  std::string multi_skip_evalue = "";
 
   /** Define and parse the program options*/
   try {
@@ -366,14 +398,17 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
             "the information of variable modifications.")(
             "decoy,d",
             "Use a shuffled decoy protein database to estimate false discovery "
-            "rates.")("mass-error-tolerance,e",
-                      po::value<std::string>(&mass_error_tole),
-                      "<a positive integer>. Error tolerance for precursor and "
-                      "fragment masses in PPM. Default value: 10.")(
+            "rates.")("frag-error-tolerance,e",
+                      po::value<std::string>(&frag_error_tole),
+                      "<a positive integer>. Error tolerance for fragment "
+                      "masses in PPM. Default value: 10.")(
+            "prec-error-tolerance,E", po::value<std::string>(&prec_error_tole),
+            "<a positive integer>. Error tolerance for precursor masses in "
+            "PPM. Default value: 10.")(
             "filter-by-env-cnn,F", po::value<std::string>(&env_cnn_cutoff),
             "<a number between 0 and 1>. Remove the deconvoluted masses whose "
             "EnvCNN score is below the cutoff before spectral filtering, "
-            "database search and E-value computation. Default value: 0.2.")(
+            "database search and E-value computation. Default value: 0.4.")(
             "proteoform-error-tolerance,p",
             po::value<std::string>(&form_error_tole),
             "<a positive number>. Error tolerance for identifying PrSM "
@@ -431,7 +466,7 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
             "No TopFD feature file for proteoform identification.")(
             "keep-temp-files,k", "Keep intermediate files.")(
             "keep-decoy-ids,K", "Keep decoy identifications.")(
-            "disable-post-match,E",
+            "disable-post-match,D",
             "Disable post mass matching. By default, after the search, the "
             "theoretical fragment masses of each PrSM that no deconvoluted "
             "mass matched are matched against the centroided MS/MS peaks in "
@@ -441,7 +476,12 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
             "post-min-peak-num,I", po::value<std::string>(&post_min_peak_num),
             "<a positive integer>. Minimum number of observed isotopic peaks "
             "of a fragment mass matched by the post mass matching. Default "
-            "value: 1.");
+            "value: 1.")(
+            "average-mass,g",
+            "The spectrum files report average masses of precursor and "
+            "fragment ions (topfd --average-mass). Before the search, each "
+            "file is converted to <name>_mono_ms2.msalign with monoisotopic "
+            "masses, which is then searched.");
 
     po::options_description desc("Options");
 
@@ -457,7 +497,8 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
         "variable-ptm-file-name,b",
         po::value<std::string>(&variable_ptm_file_name),
         "")("approximate-spectra,A", "")("decoy,d", "")(
-        "mass-error-tolerance,e", po::value<std::string>(&mass_error_tole), "")(
+        "frag-error-tolerance,e", po::value<std::string>(&frag_error_tole), "")(
+        "prec-error-tolerance,E", po::value<std::string>(&prec_error_tole), "")(
         "filter-by-env-cnn,F", po::value<std::string>(&env_cnn_cutoff), "")(
         "proteoform-ppm-error,P", "")("proteoform-error-tolerance,p",
                                       po::value<std::string>(&form_error_tole),
@@ -483,8 +524,15 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
         "no-topfd-feature,x", "")("keep-temp-files,k", "")(
         "keep-decoy-ids,K", "")("combine-result-only,C", "")(
         "output-raw-prsm-table,o", "")("output-prsm-coverage,O", "")(
-        "disable-post-match,E", "")(
+        "disable-post-match,D", "")(
         "post-min-peak-num,I", po::value<std::string>(&post_min_peak_num), "")(
+        "average-mass,g", "")("disable-zero-shift-prec-error", "")(
+        "enable-one-shift-prec-error", "")("enable-var-ptm-prec-error", "")(
+        "fdr-groups", "")("disable-frag-mass-extension", "")(
+        "frag-mass-dedup", "")(
+        "frag-extend-min-mass", po::value<std::string>(&frag_extend_min_mass),
+        "")("multi-skip-evalue", po::value<std::string>(&multi_skip_evalue),
+            "")("disable-multi-type-align", "")(
         "filtering-result-number",
         po::value<std::string>(&filtering_result_num),
         "Filtering result number. Default value: 20.")(
@@ -592,16 +640,12 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
       arguments_["searchType"] = "TARGET+DECOY";
     }
 
-    if (arguments_["searchType"] == "TARGET+DECOY") {
-      arguments_["databaseFileName"] =
-          arguments_["oriDatabaseFileName"] + "_target_decoy";
-    } else {
-      arguments_["databaseFileName"] =
-          arguments_["oriDatabaseFileName"] + "_target";
+    if (vm.count("frag-error-tolerance")) {
+      arguments_["fragErrorTolerance"] = frag_error_tole;
     }
 
-    if (vm.count("mass-error-tolerance")) {
-      arguments_["massErrorTolerance"] = mass_error_tole;
+    if (vm.count("prec-error-tolerance")) {
+      arguments_["precErrorTolerance"] = prec_error_tole;
     }
 
     if (vm.count("filter-by-env-cnn")) {
@@ -674,6 +718,17 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
     if (vm.count("keep-decoy-ids")) {
       arguments_["keepDecoyResults"] = "true";
     }
+    if (vm.count("fdr-groups")) {
+      arguments_["useFdrGroups"] = "true";
+    }
+    // hidden: by default, the multiple-unexpected-shift search computes
+    // COMPLETE/PREFIX/SUFFIX/INTERNAL with one fused dynamic program instead
+    // of one PsAlign pass per type (PrsmPara::useMultiTypeAlign);
+    // --disable-multi-type-align falls back to the original one-pass-per-type
+    // PsAlign search.
+    if (vm.count("disable-multi-type-align")) {
+      arguments_["multiTypeAlign"] = "false";
+    }
 
     if (vm.count("combine-result-only")) {
       arguments_["combineResultOnly"] = "true";
@@ -693,6 +748,30 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
 
     if (vm.count("post-min-peak-num")) {
       arguments_["postMinPeakNum"] = post_min_peak_num;
+    }
+    if (vm.count("average-mass")) {
+      arguments_["averageMass"] = "true";
+    }
+    if (vm.count("disable-zero-shift-prec-error")) {
+      arguments_["zeroShiftPrecOneDaError"] = "false";
+    }
+    if (vm.count("enable-one-shift-prec-error")) {
+      arguments_["oneShiftPrecOneDaError"] = "true";
+    }
+    if (vm.count("enable-var-ptm-prec-error")) {
+      arguments_["varPtmPrecOneDaError"] = "true";
+    }
+    if (vm.count("disable-frag-mass-extension")) {
+      arguments_["fragMassExtension"] = "false";
+    }
+    if (vm.count("frag-mass-dedup")) {
+      arguments_["fragMassDedup"] = "true";
+    }
+    if (vm.count("frag-extend-min-mass")) {
+      arguments_["fragExtendMinMass"] = frag_extend_min_mass;
+    }
+    if (vm.count("multi-skip-evalue")) {
+      arguments_["multiSkipEvalue"] = multi_skip_evalue;
     }
 
     if (vm.count("filtering-result-number")) {
@@ -737,6 +816,20 @@ bool ToppicArgument::validateArguments() {
     LOG_ERROR("Database file " << arguments_["oriDatabaseFileName"]
                                << " path is too long!");
     return false;
+  }
+
+  // A database whose protein ids (the header text up to the first
+  // whitespace) repeat cannot be indexed by htslib: search its
+  // _dedup.fasta copy, which keeps the first record of every id, instead.
+  arguments_["oriDatabaseFileName"] =
+      fasta_util::removeDuplicatedIds(arguments_["oriDatabaseFileName"]);
+
+  if (arguments_["searchType"] == "TARGET+DECOY") {
+    arguments_["databaseFileName"] =
+        arguments_["oriDatabaseFileName"] + "_target_decoy";
+  } else {
+    arguments_["databaseFileName"] =
+        arguments_["oriDatabaseFileName"] + "_target";
   }
 
   for (size_t k = 0; k < spec_file_list_.size(); k++) {
@@ -916,19 +1009,23 @@ bool ToppicArgument::validateArguments() {
     return false;
   }
 
-  std::string mass_error_tole_value = arguments_["massErrorTolerance"];
-  try {
-    double tole = std::stoi(mass_error_tole_value);
-    if (tole <= 0) {
-      LOG_ERROR("Mass error tolerance: "
-                << mass_error_tole_value
-                << " error! The value should be positive.");
+  for (const auto& [key, name] :
+       {std::pair<const char*, const char*>{"precErrorTolerance",
+                                            "Precursor error tolerance"},
+        std::pair<const char*, const char*>{"fragErrorTolerance",
+                                            "Fragment error tolerance"}}) {
+    std::string tole_value = arguments_[key];
+    try {
+      double tole = std::stoi(tole_value);
+      if (tole <= 0) {
+        LOG_ERROR(name << ": " << tole_value
+                       << " error! The value should be positive.");
+        return false;
+      }
+    } catch (const std::exception& ex) {
+      LOG_ERROR(name << ": " << tole_value << " should be a number.");
       return false;
     }
-  } catch (const std::exception& ex) {
-    LOG_ERROR("Mass error tolerance: " << mass_error_tole_value
-                                       << " should be a number.");
-    return false;
   }
 
   std::string env_cnn_cutoff_value = arguments_["envCnnCutoff"];
@@ -1029,6 +1126,36 @@ bool ToppicArgument::validateArguments() {
     LOG_ERROR("Post mass matching minimum isotopic peak number "
               << post_min_peak_num << " should be a number.");
     return false;
+  }
+
+  std::string frag_extend_min_mass = arguments_["fragExtendMinMass"];
+  try {
+    if (std::stod(frag_extend_min_mass) < 0) {
+      LOG_ERROR("Fragment extension minimum mass "
+                << frag_extend_min_mass << " should not be negative.");
+      return false;
+    }
+  } catch (const std::exception& ex) {
+    LOG_ERROR("Fragment extension minimum mass " << frag_extend_min_mass
+                                                 << " should be a number.");
+    return false;
+  }
+
+  // empty: the default of the multiple-shift stage (the smallest decoy
+  // E-value with a decoy database, 0.01 without)
+  std::string multi_skip_evalue = arguments_["multiSkipEvalue"];
+  if (multi_skip_evalue != "") {
+    try {
+      if (std::stod(multi_skip_evalue) < 0) {
+        LOG_ERROR("Multiple-shift skip E-value " << multi_skip_evalue
+                                                 << " should not be negative.");
+        return false;
+      }
+    } catch (const std::exception& ex) {
+      LOG_ERROR("Multiple-shift skip E-value " << multi_skip_evalue
+                                               << " should be a number.");
+      return false;
+    }
   }
 
   return true;

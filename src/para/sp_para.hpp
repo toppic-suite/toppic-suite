@@ -21,25 +21,22 @@
 #include <vector>
 
 #include "common/base/activation.hpp"
-#include "common/xml/xml_dom_element.hpp"
 #include "para/peak_tolerance.hpp"
 
 namespace toppic {
 
-class XmlDOMDocument;
-
 class SpPara {
  public:
   SpPara(const std::string& activation_name, double n_term_mod_mass,
-         double ppm);
-
-  explicit SpPara(XmlDOMElement element);
+         double prec_ppm, double frag_ppm);
 
   double getMinMass() const { return min_mass_; }
 
-  double getExtendMinMass() const { return extend_min_mass_; }
+  double getFragExtendMinMass() const { return frag_extend_min_mass_; }
 
-  const std::vector<double>& getExtendOffsets() const { return ext_offsets_; }
+  const std::vector<double>& getFragExtOffsets() const {
+    return frag_ext_offsets_;
+  }
 
   const std::vector<double>& getZeroShiftSearchPrecErrorVec() const {
     return zero_shift_search_prec_error_vec_;
@@ -57,7 +54,10 @@ class SpPara {
     return multi_shift_search_prec_error_vec_;
   }
 
-  PeakTolerancePtr getPeakTolerancePtr() const { return peak_tolerance_ptr_; }
+  // Error tolerance of precursor masses (the precursor mass itself and the
+  // synthetic zero/precursor PRM peaks) and of fragment masses.
+  PeakTolerancePtr getPrecTolerancePtr() const { return prec_tolerance_ptr_; }
+  PeakTolerancePtr getFragTolerancePtr() const { return frag_tolerance_ptr_; }
 
   ActivationPtr getActivationPtr() const { return activation_ptr_; }
 
@@ -67,11 +67,34 @@ class SpPara {
 
   double getEnvCnnCutoff() const { return env_cnn_cutoff_; }
 
+  bool isFragMassDedup() const { return frag_mass_dedup_; }
+
+  // The relative tolerance the msalign readers of database filtering, the
+  // search and the E-value computation combine close masses within, and 0 when
+  // the deduplication is switched off. It is the fragment mass tolerance the
+  // user gave (-e, in ppm), deliberately not compStrictErrorTole, whose
+  // 0.01 Dalton floor would dominate every fragment below 1,000 Dalton.
+  double getFragDedupPpo() const {
+    return frag_mass_dedup_ ? frag_tolerance_ptr_->getPpo() : 0.0;
+  }
+
   void setEnvCnnCutoff(double cutoff) { env_cnn_cutoff_ = cutoff; }
 
-  void appendXml(XmlDOMDocument* xml_doc, XmlDOMElement parent) const;
+  void setFragMassDedup(bool dedup) { frag_mass_dedup_ = dedup; }
 
-  static std::string getXmlElementName() { return "sp_para"; }
+  // Fragment masses at or below this value (Da) are not extended.
+  void setFragExtendMinMass(double mass) { frag_extend_min_mass_ = mass; }
+
+  // Allow (true) or disallow (false) a +-1 Da precursor mass error in the
+  // zero-shift, one-shift and variable-PTM filtering and search stages.
+  void setZeroShiftPrecOneDaError(bool allow);
+  void setOneShiftPrecOneDaError(bool allow);
+  void setVarPtmPrecOneDaError(bool allow);
+
+  // Extend (true) each fragment mass above frag_extend_min_mass_ by a +-1 Da
+  // isotope error, i.e. frag_ext_offsets_ = {0, -1 Da, +1 Da}; false keeps
+  // only the mass itself ({0}).
+  void setFragMassExtension(bool extend);
 
   static int getMaxSpecNumPerFile() { return 10000000; }
 
@@ -81,10 +104,10 @@ class SpPara {
   int min_peak_num_ = 10;
   // if the mass if smaller than min_mass, the mass is removed.
   double min_mass_ = 50.0;
-  // if the mass is smaller than extend_min_mass, the peak is not extended
-  double extend_min_mass_ = 5000;
+  // if the mass is smaller than frag_extend_min_mass_, the peak is not extended
+  double frag_extend_min_mass_ = 5000;
 
-  std::vector<double> ext_offsets_;
+  std::vector<double> frag_ext_offsets_;
 
   // n_term_label_mass is for iTRAQ or TMT labeling
   double n_term_label_mass_ = 0.0;
@@ -92,9 +115,15 @@ class SpPara {
   // envelopes with an EnvCNN score below env_cnn_cutoff are removed
   double env_cnn_cutoff_ = 0.2;
 
+  // combine fragment masses that agree within the fragment mass tolerance
+  // before database filtering, the search and the E-value computation; off by
+  // default, so topmg and topdia, which have no such argument, are unchanged
+  bool frag_mass_dedup_ = false;
+
   ActivationPtr activation_ptr_;
 
-  // the 1 Da error in precursor mass used in zeroptm filtering
+  // the precursor mass offsets tried by each filtering/search stage: {0}
+  // (exact) or {0, -1 Da, +1 Da} (a +-1 Da precursor mass error is allowed)
   std::vector<double> zero_shift_search_prec_error_vec_;
 
   std::vector<double> one_shift_search_prec_error_vec_;
@@ -103,7 +132,8 @@ class SpPara {
 
   std::vector<double> var_ptm_search_prec_error_vec_;
 
-  PeakTolerancePtr peak_tolerance_ptr_;
+  PeakTolerancePtr prec_tolerance_ptr_;
+  PeakTolerancePtr frag_tolerance_ptr_;
 };
 
 using SpParaPtr = std::shared_ptr<SpPara>;

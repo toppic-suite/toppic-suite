@@ -34,11 +34,16 @@ class TopfdPara {
 
   ~TopfdPara();
 
+  // msalign_ext ("ms1.msalign", "ms2.msalign", ...) names the msalign file
+  // the block is written into: it adds an "Msalign file name:" line
+  // (<output base name>_<ext>, so FAIMS runs show their per-voltage file).
+  // Empty for the console printout, which belongs to no file.
   std::string getTopfdParaStr(const std::string& prefix,
-                              const std::string& sep) const;
+                              const std::string& sep,
+                              const std::string& msalign_ext = "") const;
 
-  std::string getParaStr(const std::string& prefix,
-                         const std::string& sep) const;
+  std::string getParaStr(const std::string& prefix, const std::string& sep,
+                         const std::string& msalign_ext = "") const;
 
   void createSqlDb(const std::string& db_name);
 
@@ -46,9 +51,14 @@ class TopfdPara {
   const std::string& getResourceDir() const { return resource_dir_; }
   bool isMissingLevelOne() const { return missing_level_one_; }
   int getMaxCharge() const { return max_charge_; }
+
+  double getMassGroupBoundary() const { return mass_group_boundary_; }
   double getMaxMass() const { return max_mass_; }
   double getMzError() const { return mz_error_; }
   int getMaxMissPeakNum() const { return max_miss_peak_num_; }
+  double getMsOneRankPeakDistance() const { return ms1_rank_peak_distance_; }
+  double getMsTwoRankPeakDistance() const { return ms2_rank_peak_distance_; }
+  bool isMsTwoHarmonicCheck() const { return ms2_harmonic_check_; }
   bool isRunFilterByMz() const { return run_filter_by_mz_; }
 
   bool isEstimateMinInte() const { return estimate_min_inte_; }
@@ -63,9 +73,10 @@ class TopfdPara {
   bool isGeneSql() const { return gene_sql_; }
   bool isSql3d() const { return sql_3d_; }
   bool isKeepUnusedPeaks() const { return keep_unused_peaks_; }
-  bool isOutputMultipleMass() const { return output_multiple_mass_; }
+  bool isOutputAvgMass() const { return output_avg_mass_; }
   bool isOutputCsvFeatureFile() const { return output_csv_feature_file_; }
   bool isOutputDpEnvs() const { return output_dp_envs_; }
+  bool isUseFlashDeconv() const { return use_flashdeconv_; }
   int getThreadNum() const { return thread_num_; }
   double getMs1EcscoreCutoff() const { return ms1_ecscore_cutoff_; }
   double getMs2EcscoreCutoff() const { return ms2_ecscore_cutoff_; }
@@ -98,6 +109,10 @@ class TopfdPara {
   void setResourceDir(std::string dir) { resource_dir_ = std::move(dir); }
   void setMissingLevelOne(bool missing) { missing_level_one_ = missing; }
   void setMaxCharge(int charge) { max_charge_ = charge; }
+
+  void setMassGroupBoundary(double mass) {
+    mass_group_boundary_ = mass;
+  }
   void setMaxMass(double mass) { max_mass_ = mass; }
   void setMzError(double error) { mz_error_ = error; }
   void setMsOneSnRatio(double ratio) { ms_one_sn_ratio_ = ratio; }
@@ -113,14 +128,18 @@ class TopfdPara {
     activation_ = std::move(activation);
   }
   void setKeepUnusedPeaks(bool keep) { keep_unused_peaks_ = keep; }
-  void setOutputMultipleMass(bool output) { output_multiple_mass_ = output; }
+  void setOutputAvgMass(bool output) { output_avg_mass_ = output; }
   void setOutputCsvFeatureFile(bool output) {
     output_csv_feature_file_ = output;
   }
   void setGeneSql(bool gene_sql) { gene_sql_ = gene_sql; }
   void setSql3d(bool sql_3d) { sql_3d_ = sql_3d; }
   void setOutputDpEnvs(bool output) { output_dp_envs_ = output; }
+  void setUseFlashDeconv(bool use) { use_flashdeconv_ = use; }
   void setMaxMissPeakNum(int num) { max_miss_peak_num_ = num; }
+  void setMsOneRankPeakDistance(double d) { ms1_rank_peak_distance_ = d; }
+  void setMsTwoRankPeakDistance(double d) { ms2_rank_peak_distance_ = d; }
+  void setMsTwoHarmonicCheck(bool check) { ms2_harmonic_check_ = check; }
   void setRunFilterByMz(bool run) { run_filter_by_mz_ = run; }
   void setThreadNum(int num) { thread_num_ = num; }
   void setSearchPrecWindow(bool search) { search_prec_window_ = search; }
@@ -171,6 +190,13 @@ class TopfdPara {
 
   // parameters for deconcovolution
   int max_charge_ = 30;
+
+  // hidden option --mass-group-boundary: EnvPara::mass_group_boundary_[2],
+  // above which envelope validation needs three matched and three
+  // consecutive isotopic peaks instead of two
+  // keep in step with EnvPara::DEFAULT_MASS_GROUP_BOUNDARY; this header
+  // deliberately has no project includes, so the value is repeated
+  double mass_group_boundary_ = 4250;
   double max_mass_ = 50000;
   // precursor window is used only when the mzML file does not
   // contain the precursor window information
@@ -183,6 +209,17 @@ class TopfdPara {
   // When false, the "filtering by mz" step is skipped; used to initialize
   // EnvPara::run_filter_by_mz_.
   bool run_filter_by_mz_ = true;
+  // The window of the filtering-by-mz step, in Daltons, one value per
+  // deconvolution level; used to set EnvPara::rank_peak_distance_, which is
+  // shared by the two levels. Keep in step with
+  // EnvPara::DEFAULT_MS1_RANK_PEAK_DISTANCE and
+  // DEFAULT_MS2_RANK_PEAK_DISTANCE; this header deliberately has no project
+  // includes, so the values are repeated.
+  double ms1_rank_peak_distance_ = 12;
+  double ms2_rank_peak_distance_ = 2;
+  // When true, an MS/MS envelope selected by the dynamic programming is
+  // replaced by a better scoring harmonic parent. On by default.
+  bool ms2_harmonic_check_ = true;
   double ms_one_sn_ratio_ = 3.0;
   double ms_two_sn_ratio_ = 1.0;
   int thread_num_ = 1;
@@ -220,12 +257,17 @@ class TopfdPara {
   //** Fixed parameter setting **
   // estimate min intensity using the method in Thrash.
   bool estimate_min_inte_ = true;
-  bool output_multiple_mass_ = false;
+  // report average masses (not monoisotopic masses) of precursor and
+  // fragment ions in the MS/MS msalign file
+  bool output_avg_mass_ = false;
   bool output_match_env_ = false;
   // When true, dump the windowed candidate envelopes and the DP-selected
   // envelopes of every deconvoluted spectrum to win_envs.txt / dp_envs.txt
   // (debugging aid).
   bool output_dp_envs_ = false;
+  // option --ms2-flashdeconv: deconvolute the MS/MS spectra with the
+  // FLASHDeconv algorithm (FlashDeconvMs2Process) instead of DeconvMs2Process
+  bool use_flashdeconv_ = false;
 
   //** information for each run **
   int frac_id_ = -1;

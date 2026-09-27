@@ -15,6 +15,7 @@
 
 #include "filter/oneptm/one_ptm_filter.hpp"
 
+#include <atomic>
 #include <filesystem>
 #include <iostream>
 #include <mutex>
@@ -22,6 +23,7 @@
 #include "common/util/file_util.hpp"
 #include "common/util/logger.hpp"
 #include "filter/massmatch/mass_match_factory.hpp"
+#include "filter/massmatch/index_load_gate.hpp"
 #include "filter/massmatch/mass_match_util.hpp"
 #include "ms/factory/prm_ms_util.hpp"
 #include "seq/prot_candidate.hpp"
@@ -29,9 +31,14 @@
 
 namespace toppic {
 
-// serialization mutex.
+// The first block of the stage is deserialized under the mutex (warming
+// Boost.Serialization's lazy type-registration singletons on one thread);
+// later blocks load in parallel — see the comment in zero_ptm_filter.cpp.
+// On the 480 benchmark this stage read 84 s of index one block at a time
+// through the old always-held lock (toppic_test experiment 66).
 namespace {
 std::mutex one_ptm_filter_mutex;
+std::atomic<bool> one_ptm_filter_warmed{false};
 }  // namespace
 OnePtmFilter::OnePtmFilter(const ProteoformPtrVec& proteo_ptrs,
                            const OnePtmFilterMngPtr& mng_ptr,
@@ -53,6 +60,8 @@ OnePtmFilter::OnePtmFilter(const ProteoformPtrVec& proteo_ptrs,
                                  file_name)) {
       // if any of the index files for this ptm is missing
       index_files_exist = false;
+      // the diagonal file's earlier names
+      mass_match_util::warnOldIndexLayout(index_dir, suffix);
       break;
     }
   }
@@ -64,7 +73,15 @@ OnePtmFilter::OnePtmFilter(const ProteoformPtrVec& proteo_ptrs,
     rev_diag_index_ptr_ = std::make_shared<MassMatch>();
 
     {
-      std::lock_guard<std::mutex> lock(one_ptm_filter_mutex);
+      std::unique_lock<std::mutex> lock(one_ptm_filter_mutex,
+                                        std::defer_lock);
+      if (!one_ptm_filter_warmed.load(std::memory_order_acquire)) {
+        lock.lock();
+        if (one_ptm_filter_warmed.load(std::memory_order_relaxed)) {
+          lock.unlock();
+        }
+      }
+      IndexLoadGate::Slot load_slot(index_load_gate);
       // complete file name is a ptm type from topindexfile vector + parameters
       // + db block id (block_str)
       term_index_ptr_->deserializeMassMatch(
@@ -75,8 +92,33 @@ OnePtmFilter::OnePtmFilter(const ProteoformPtrVec& proteo_ptrs,
           mng_ptr->one_ptm_file_vec_[2] + suffix, index_dir);
       rev_diag_index_ptr_->deserializeMassMatch(
           mng_ptr->one_ptm_file_vec_[3] + suffix, index_dir);
+      if (lock.owns_lock()) {
+        one_ptm_filter_warmed.store(true, std::memory_order_release);
+      }
     }
-  } else {
+    // the files must have been built at this filter's column limits (the
+    // diagonal one is shared with the multiple-shift filter)
+    MassMatchPtr read_ptrs[] = {term_index_ptr_, diag_index_ptr_,
+                                rev_term_index_ptr_, rev_diag_index_ptr_};
+    for (size_t t = 0; t < 4; t++) {
+      if (!mass_match_util::hasFilterLimits(read_ptrs[t],
+                                            mng_ptr->max_proteoform_mass_,
+                                            mng_ptr->filter_scale_)) {
+        mass_match_util::warnIndexLimits(
+            mng_ptr->one_ptm_file_vec_[t] + suffix, read_ptrs[t],
+            mng_ptr->max_proteoform_mass_, mng_ptr->filter_scale_);
+        index_files_exist = false;
+        break;
+      }
+    }
+    if (!index_files_exist) {
+      term_index_ptr_ = nullptr;
+      diag_index_ptr_ = nullptr;
+      rev_term_index_ptr_ = nullptr;
+      rev_diag_index_ptr_ = nullptr;
+    }
+  }
+  if (!index_files_exist) {
     std::vector<std::vector<double>> shift_2d =
         proteoform_util::getNTermShift2D(
             proteo_ptrs, mng_ptr->prsm_para_ptr_->getProtModPtrVec());
@@ -102,56 +144,83 @@ OnePtmFilter::OnePtmFilter(const ProteoformPtrVec& proteo_ptrs,
   };
 }
 
-void OnePtmFilter::computeBestMatch(const PrmMsPtrVec& prm_ms_ptr_vec,
-                                    const PrmMsPtrVec& srm_ms_ptr_vec) {
+FilterSpecPtr OnePtmFilter::geneFilterSpec(
+    const PrmMsPtrVec& prm_ms_ptr_vec, const PrmMsPtrVec& srm_ms_ptr_vec,
+    const OnePtmFilterMngPtr& mng_ptr) {
   PeakTolerancePtr tole_ptr =
-      mng_ptr_->prsm_para_ptr_->getSpParaPtr()->getPeakTolerancePtr();
+      mng_ptr->prsm_para_ptr_->getSpParaPtr()->getPrecTolerancePtr();
   std::vector<std::pair<int, int>> pref_mass_errors =
       prm_ms_util::getIntMassErrorList(prm_ms_ptr_vec, tole_ptr,
-                                       mng_ptr_->filter_scale_, true, false);
+                                       mng_ptr->filter_scale_, true, false);
   std::vector<std::pair<int, int>> suff_mass_errors =
       prm_ms_util::getIntMassErrorList(srm_ms_ptr_vec, tole_ptr,
-                                       mng_ptr_->filter_scale_, false, true);
+                                       mng_ptr->filter_scale_, false, true);
+  return std::make_shared<FilterSpec>(
+      prm_ms_ptr_vec[0]->getMsHeaderPtr(),
+      static_cast<int>(prm_ms_ptr_vec.size()), std::move(pref_mass_errors),
+      std::move(suff_mass_errors), std::pair<int, int>(0, 0));
+}
 
-  int term_row_num = term_index_ptr_->getRowNum();
-  std::vector<short> term_scores(term_row_num, 0);
-  term_index_ptr_->compScores(pref_mass_errors, term_scores);
+void OnePtmFilter::computeBestMatch(const PrmMsPtrVec& prm_ms_ptr_vec,
+                                    const PrmMsPtrVec& srm_ms_ptr_vec) {
+  computeBestMatch(geneFilterSpec(prm_ms_ptr_vec, srm_ms_ptr_vec, mng_ptr_));
+}
 
-  int diag_row_num = diag_index_ptr_->getRowNum();
-  std::vector<short> diag_scores(diag_row_num, 0);
-  diag_index_ptr_->compScores(pref_mass_errors, diag_scores);
+void OnePtmFilter::computeBestMatch(const FilterSpecPtr& spec_ptr) {
+  PeakTolerancePtr tole_ptr =
+      mng_ptr_->prsm_para_ptr_->getSpParaPtr()->getPrecTolerancePtr();
+  const std::vector<std::pair<int, int>>& pref_mass_errors =
+      spec_ptr->getPrefMassErrors();
+  const std::vector<std::pair<int, int>>& suff_mass_errors =
+      spec_ptr->getSuffMassErrors();
 
-  int rev_term_row_num = rev_term_index_ptr_->getRowNum();
-  std::vector<short> rev_term_scores(rev_term_row_num, 0);
-  rev_term_index_ptr_->compScores(suff_mass_errors, rev_term_scores);
+  term_scores_.assign(term_index_ptr_->getRowNum(), 0);
+  term_index_ptr_->compScores(pref_mass_errors, term_scores_);
 
-  int rev_diag_row_num = rev_diag_index_ptr_->getRowNum();
-  std::vector<short> rev_diag_scores(rev_diag_row_num, 0);
-  rev_diag_index_ptr_->compScores(suff_mass_errors, rev_diag_scores);
+  diag_scores_.assign(diag_index_ptr_->getRowNum(), 0);
+  diag_index_ptr_->compScores(pref_mass_errors, diag_scores_);
+
+  rev_term_scores_.assign(rev_term_index_ptr_->getRowNum(), 0);
+  rev_term_index_ptr_->compScores(suff_mass_errors, rev_term_scores_);
+
+  rev_diag_scores_.assign(rev_diag_index_ptr_->getRowNum(), 0);
+  rev_diag_index_ptr_->compScores(suff_mass_errors, rev_diag_scores_);
+
+  // the best row score of each proteoform in each index, computed once and
+  // shared by the four proteoform types below
+  mass_match_util::compProteoMaxScores(term_scores_, term_index_ptr_,
+                                       term_max_);
+  mass_match_util::compProteoMaxScores(diag_scores_, diag_index_ptr_,
+                                       diag_max_);
+  mass_match_util::compProteoMaxScores(rev_term_scores_, rev_term_index_ptr_,
+                                       rev_term_max_);
+  mass_match_util::compProteoMaxScores(rev_diag_scores_, rev_diag_index_ptr_,
+                                       rev_diag_max_);
 
   double prec_minus_water_mass =
-      prm_ms_ptr_vec[0]->getMsHeaderPtr()->getFirstPrecMonoMassMinusWater();
+      spec_ptr->getHeaderPtr()->getFirstPrecMonoMassMinusWater();
   double prec_error_tole =
-      prm_ms_ptr_vec[0]->getMsHeaderPtr()->getFirstPrecErrorTolerance(
-          tole_ptr->getPpo());
+      spec_ptr->getHeaderPtr()->getFirstPrecErrorTolerance(tole_ptr->getPpo());
 
   ProtCandidatePtrVec comp_prots = mass_match_util::findOneShiftTopProteins(
-      term_scores, rev_term_scores, term_index_ptr_, rev_term_index_ptr_,
+      term_scores_, rev_term_scores_, term_max_, rev_term_max_,
+      term_index_ptr_, rev_term_index_ptr_,
       prec_minus_water_mass, prec_error_tole, mng_ptr_->min_shift_,
       mng_ptr_->max_shift_, mng_ptr_->comp_cand_shift_num_,
       mng_ptr_->threshold_, mng_ptr_->comp_num_);
   comp_match_ptrs_.clear();
-  int group_spec_num = prm_ms_ptr_vec.size();
+  int group_spec_num = spec_ptr->getGroupSpecNum();
   for (size_t i = 0; i < comp_prots.size(); i++) {
     int id = comp_prots[i]->getProteinId();
     int score = comp_prots[i]->getScore();
     comp_match_ptrs_.push_back(
-        std::make_shared<SimplePrsm>(prm_ms_ptr_vec[0]->getMsHeaderPtr(),
+        std::make_shared<SimplePrsm>(spec_ptr->getHeaderPtr(),
                                      group_spec_num, proteo_ptrs_[id], score));
   }
 
   ProtCandidatePtrVec pref_prots = mass_match_util::findOneShiftTopProteins(
-      term_scores, rev_diag_scores, term_index_ptr_, rev_diag_index_ptr_,
+      term_scores_, rev_diag_scores_, term_max_, rev_diag_max_,
+      term_index_ptr_, rev_diag_index_ptr_,
       prec_minus_water_mass, prec_error_tole, mng_ptr_->min_shift_,
       mng_ptr_->max_shift_, mng_ptr_->cand_shift_num_, mng_ptr_->threshold_,
       mng_ptr_->pref_suff_num_);
@@ -160,7 +229,7 @@ void OnePtmFilter::computeBestMatch(const PrmMsPtrVec& prm_ms_ptr_vec,
     int id = pref_prots[i]->getProteinId();
     int score = pref_prots[i]->getScore();
     SimplePrsmPtr prsm_ptr =
-        std::make_shared<SimplePrsm>(prm_ms_ptr_vec[0]->getMsHeaderPtr(),
+        std::make_shared<SimplePrsm>(spec_ptr->getHeaderPtr(),
                                      group_spec_num, proteo_ptrs_[id], score);
     std::vector<double> shifts = pref_prots[i]->getCTermShifts();
     prsm_ptr->setCTermShifts(pref_prots[i]->getCTermShifts());
@@ -168,7 +237,8 @@ void OnePtmFilter::computeBestMatch(const PrmMsPtrVec& prm_ms_ptr_vec,
   }
 
   ProtCandidatePtrVec suff_prots = mass_match_util::findOneShiftTopProteins(
-      diag_scores, rev_term_scores, diag_index_ptr_, rev_term_index_ptr_,
+      diag_scores_, rev_term_scores_, diag_max_, rev_term_max_,
+      diag_index_ptr_, rev_term_index_ptr_,
       prec_minus_water_mass, prec_error_tole, mng_ptr_->min_shift_,
       mng_ptr_->max_shift_, mng_ptr_->cand_shift_num_, mng_ptr_->threshold_,
       mng_ptr_->pref_suff_num_);
@@ -177,14 +247,15 @@ void OnePtmFilter::computeBestMatch(const PrmMsPtrVec& prm_ms_ptr_vec,
     int id = suff_prots[i]->getProteinId();
     int score = suff_prots[i]->getScore();
     SimplePrsmPtr prsm_ptr =
-        std::make_shared<SimplePrsm>(prm_ms_ptr_vec[0]->getMsHeaderPtr(),
+        std::make_shared<SimplePrsm>(spec_ptr->getHeaderPtr(),
                                      group_spec_num, proteo_ptrs_[id], score);
     prsm_ptr->setNTermShifts(suff_prots[i]->getNTermShifts());
     suff_match_ptrs_.push_back(prsm_ptr);
   }
 
   ProtCandidatePtrVec internal_prots = mass_match_util::findOneShiftTopProteins(
-      diag_scores, rev_diag_scores, diag_index_ptr_, rev_diag_index_ptr_,
+      diag_scores_, rev_diag_scores_, diag_max_, rev_diag_max_,
+      diag_index_ptr_, rev_diag_index_ptr_,
       prec_minus_water_mass, prec_error_tole, mng_ptr_->min_shift_,
       mng_ptr_->max_shift_, mng_ptr_->cand_shift_num_, mng_ptr_->threshold_,
       mng_ptr_->inte_num_);
@@ -193,7 +264,7 @@ void OnePtmFilter::computeBestMatch(const PrmMsPtrVec& prm_ms_ptr_vec,
     int id = internal_prots[i]->getProteinId();
     int score = internal_prots[i]->getScore();
     SimplePrsmPtr prsm_ptr =
-        std::make_shared<SimplePrsm>(prm_ms_ptr_vec[0]->getMsHeaderPtr(),
+        std::make_shared<SimplePrsm>(spec_ptr->getHeaderPtr(),
                                      group_spec_num, proteo_ptrs_[id], score);
     prsm_ptr->setNTermShifts(internal_prots[i]->getNTermShifts());
     prsm_ptr->setCTermShifts(internal_prots[i]->getCTermShifts());

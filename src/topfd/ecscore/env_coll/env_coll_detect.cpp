@@ -15,6 +15,13 @@
 
 #include "topfd/ecscore/env_coll/env_coll_detect.hpp"
 
+#include <limits>
+
+#include "common/base/mass_constant.hpp"
+
+#include "topfd/ecscore/score/comp_env_cnn_score.hpp"
+#include "topfd/envcnn/onnx_env_cnn.hpp"
+
 #include <algorithm>
 #include <ctime>
 #include <iostream>
@@ -27,6 +34,8 @@
 #include "ms/msmap/ms_map.hpp"
 #include "ms/mzml/mzml_ms_group_reader.hpp"
 #include "ms/spec/deconv_ms.hpp"
+#include <cstdlib>
+
 #include "ms/spec/ms_header.hpp"
 #include "ms/spec/msalign_reader_util.hpp"
 #include "topfd/common/topfd_para.hpp"
@@ -43,8 +52,487 @@ namespace toppic {
 
 namespace env_coll_detect {
 
+
+namespace {
+
+// Batched EnvCNN scoring for the MS1 feature detection (issue #586).
+//
+// Scoring one candidate per EnvCNN call streams the model's 83 MB of weights
+// once per candidate: 2.85 ms each, 246 s of a 610 s run on 480_F3_02.
+// Scoring 64 at a time costs 0.162 ms per candidate. The loop cannot simply
+// score in batches, because an accepted feature removes its peaks from the
+// matrix that later candidates are built and scored from, so a candidate is
+// parked with the region it reads and is rebuilt and rescored on its own when
+// a removal made after it was parked touches that region. On 480_F3_02 that
+// happens to 0.5% of the candidates (toppic_test experiment 62).
+//
+// Two candidates that checkExistingFeatures would merge have the same mass
+// and overlapping retention times, so their regions intersect and the second
+// one is rebuilt; that is why a parked candidate needs no second existing
+// feature check.
+constexpr size_t kEnvcnnBatchSize = 64;
+
+// the m/z range an envelope set covers, widened by the 0.1 Dalton the EnvCNN
+// input reaches for its noise peaks, and the scans it spans
+struct ReadRegion {
+  double mz_lo, mz_hi;
+  int spec_lo, spec_hi;
+};
+
+inline bool regionsIntersect(const ReadRegion& a, const ReadRegion& b) {
+  return a.mz_lo <= b.mz_hi && b.mz_lo <= a.mz_hi && a.spec_lo <= b.spec_hi &&
+         b.spec_lo <= a.spec_hi;
+}
+
+// the m/z range of the theoretical envelope of one charge of this seed
+bool chargeMzRange(const SeedEnvPtr& seed_ptr, int charge, double* lo,
+                   double* hi) {
+  SeedEnvPtr charge_seed_ptr = std::make_shared<SeedEnv>(seed_ptr, charge);
+  EnvPeakPtrVec peaks = charge_seed_ptr->getPeakPtrList();
+  *lo = std::numeric_limits<double>::max();
+  *hi = std::numeric_limits<double>::lowest();
+  for (auto& peak_ptr : peaks) {
+    if (peak_ptr == nullptr) continue;
+    *lo = std::min(*lo, peak_ptr->getPosition());
+    *hi = std::max(*hi, peak_ptr->getPosition());
+  }
+  return *hi >= *lo;
+}
+
+// Everything a candidate's construction and scoring read, which is more than
+// the envelope sets it keeps: searchEnvSet walks max_miss_env_ spectra past
+// each end before it gives up, getEnvCollPtr probes max_miss_charge_ charges
+// past the last one it kept, and the EnvCNN input reaches 0.1 Dalton past the
+// theoretical peaks for its noise array.
+std::vector<ReadRegion> getReadRegions(const EnvCollPtr& coll_ptr,
+                                       const EcscoreParaPtr& para_ptr) {
+  std::vector<ReadRegion> regions;
+  int spec_margin = para_ptr->max_miss_env_;
+  int min_charge = para_ptr->para_max_charge_;
+  int max_charge = para_ptr->para_min_charge_;
+  int spec_lo = std::numeric_limits<int>::max();
+  int spec_hi = std::numeric_limits<int>::lowest();
+  for (auto& env_set_ptr : coll_ptr->getEnvSetList()) {
+    if (env_set_ptr == nullptr) continue;
+    double lo, hi;
+    int charge = env_set_ptr->getSeedPtr()->getCharge();
+    if (!chargeMzRange(env_set_ptr->getSeedPtr(), charge, &lo, &hi)) continue;
+    regions.push_back({lo - 0.1, hi + 0.1,
+                       env_set_ptr->getStartSpecId() - spec_margin,
+                       env_set_ptr->getEndSpecId() + spec_margin});
+    min_charge = std::min(min_charge, charge);
+    max_charge = std::max(max_charge, charge);
+    spec_lo = std::min(spec_lo, env_set_ptr->getStartSpecId());
+    spec_hi = std::max(spec_hi, env_set_ptr->getEndSpecId());
+  }
+  if (regions.empty()) return regions;
+  // the charges the sweep probed and did not keep, and the half charge
+  // findEnvColl tests when the even and odd peaks are out of balance
+  SeedEnvPtr seed_ptr = coll_ptr->getSeedPtr();
+  std::vector<int> probed;
+  for (int charge = min_charge - para_ptr->max_miss_charge_;
+       charge <= max_charge + para_ptr->max_miss_charge_; charge++)
+    probed.push_back(charge);
+  probed.push_back(seed_ptr->getCharge() / 2);
+  probed.push_back(seed_ptr->getCharge() * 2);
+  for (int charge : probed) {
+    if (charge < para_ptr->para_min_charge_ ||
+        charge > para_ptr->para_max_charge_)
+      continue;
+    if (charge >= min_charge && charge <= max_charge) continue;
+    double lo, hi;
+    if (!chargeMzRange(seed_ptr, charge, &lo, &hi)) continue;
+    regions.push_back({lo - 0.1, hi + 0.1, spec_lo - spec_margin,
+                       spec_hi + spec_margin});
+  }
+  return regions;
+}
+
+// what an acceptance made during a batch can invalidate: the peaks it
+// removed, and the fact that it exists - a later candidate of the same mass
+// and overlapping retention time would have been merged into it
+struct BatchChange {
+  std::vector<ReadRegion> removed;
+  double mass;
+  int spec_lo, spec_hi;
+};
+
+// a candidate waiting for its batch to be scored
+struct ParkedCand {
+  SeedEnvPtr orig_seed_ptr;            // to rebuild it if it goes stale
+  EnvCollPtr coll_ptr;
+  std::vector<float> tensor;           // the EnvCNN input as of parking
+  std::vector<ReadRegion> regions;
+  double mass;
+  int spec_lo, spec_hi;
+  size_t change_num;                   // changes made before it was parked
+};
+
+}  // namespace
+
+// Windowed variant of processMs1 (enabled with TOPFD_MS1_WINDOW=1): the raw
+// peaks are kept only as compact m/z + intensity arrays, and the peak matrix
+// holds materialized rows only for a sliding retention-time window. Seeds are
+// processed window by window (intensity order inside a window) instead of in
+// one global intensity order, so results can differ slightly from the
+// whole-run implementation near window boundaries.
+void processMs1Windowed(const TopfdParaPtr& topfd_para_ptr) {
+  EcscoreParaPtr score_para_ptr = std::make_shared<EcscorePara>(
+      topfd_para_ptr->getFracId(), topfd_para_ptr->getMzmlFileName(),
+      topfd_para_ptr->getMaxCharge(), topfd_para_ptr->getMs1MinScanNum());
+  score_para_ptr->seed_env_inte_corr_tole_cutoff_ =
+      topfd_para_ptr->getSeedEnvInteCorrToleCutoff();
+  // read deconvoluted MS1 peaks
+  std::string output_base_name = topfd_para_ptr->getOutputBaseName();
+  std::string ms1_file_name = output_base_name + "_ms1.msalign";
+  DeconvMsPtrVec deconv_ms1_ptr_vec;
+  msalign_reader_util::readAllSpectra(ms1_file_name, deconv_ms1_ptr_vec);
+
+  // read ms1 raw peaks incrementally into compact arrays and ms2 headers
+  std::vector<std::vector<double>> mz_2d;
+  std::vector<std::vector<double>> inte_2d;
+  MsHeaderPtr2D ms2_header_ptr_2d;
+  {
+    MzmlMsGroupReaderPtr mzml_reader_ptr = std::make_shared<MzmlMsGroupReader>(
+        topfd_para_ptr->getMzmlFileName(), topfd_para_ptr->getPrecWindowWidth(),
+        topfd_para_ptr->getActivation(), topfd_para_ptr->getFracId(),
+        topfd_para_ptr->isFaims(), topfd_para_ptr->getFaimsVoltage(),
+        topfd_para_ptr->isMissingLevelOne());
+    while (true) {
+      MzmlMsGroupPtr group_ptr = mzml_reader_ptr->getNextMsGroupPtr();
+      if (group_ptr == nullptr) {
+        break;
+      }
+      const PeakPtrVec& peak_list = group_ptr->getMsOnePtr()->getPeakPtrVec();
+      std::vector<double> mz_list;
+      std::vector<double> inte_list;
+      mz_list.reserve(peak_list.size());
+      inte_list.reserve(peak_list.size());
+      for (auto& peak : peak_list) {
+        mz_list.push_back(peak->getPosition());
+        inte_list.push_back(peak->getIntensity());
+      }
+      mz_2d.push_back(std::move(mz_list));
+      inte_2d.push_back(std::move(inte_list));
+      const MzmlMsPtrVec& ms2_ptr_vec = group_ptr->getMsTwoPtrVec();
+      MsHeaderPtrVec header_vec;
+      for (size_t i = 0; i < ms2_ptr_vec.size(); i++) {
+        header_vec.push_back(ms2_ptr_vec[i]->getMsHeaderPtr());
+      }
+      ms2_header_ptr_2d.push_back(header_vec);
+    }
+  }
+  size_t ms1_raw_spec_num = mz_2d.size();
+
+  // Prepare seed envelopes
+  SeedEnvPtrVec seed_ptrs;
+  SeedEnvPtr2D seed_ptr_2d;
+  for (auto& ms1_data : deconv_ms1_ptr_vec) {
+    DeconvPeakPtrVec peaks = ms1_data->getPeakPtrVec();
+    SeedEnvPtrVec one_spec_seed_ptrs;
+    for (auto& peak : peaks) {
+      SeedEnvPtr seed_ptr = std::make_shared<SeedEnv>(peak);
+      seed_ptrs.push_back(seed_ptr);
+      one_spec_seed_ptrs.push_back(seed_ptr);
+    }
+    seed_ptr_2d.push_back(one_spec_seed_ptrs);
+  }
+  std::sort(seed_ptrs.begin(), seed_ptrs.end(), SeedEnv::cmpSeedInteDec);
+
+  double sn_ratio = topfd_para_ptr->getMsOneSnRatio();
+  bool single_scan_noise = topfd_para_ptr->isUseSingleScanNoiseLevel();
+  MsHeaderPtrVec ms1_header_ptr_vec;
+  for (auto& ms1_spectrum : deconv_ms1_ptr_vec) {
+    ms1_header_ptr_vec.push_back(ms1_spectrum->getMsHeaderPtr());
+  }
+  // Peak matrix shell: global statistics, hollow rows
+  MsMapPtr matrix_ptr = std::make_shared<MsMap>(
+      mz_2d, inte_2d, ms1_header_ptr_vec, score_para_ptr->bin_size_);
+  double neighbor_tole = -1;
+  if (score_para_ptr->min_scan_num_ >= 2) {
+    neighbor_tole = score_para_ptr->neighbor_mz_tole_;
+  }
+
+  const int win_rows = 150;
+  const int win_margin = 150;
+  int row_num = matrix_ptr->getRowNum();
+  int num_wins = (row_num + win_rows - 1) / win_rows;
+  int filled_lo = 0;
+  int filled_hi = 0;
+  double fill_sn_ratio = sn_ratio;
+  double fill_neighbor_tole = neighbor_tole;
+  auto slide = [&](int lo, int hi) {
+    while (filled_lo < lo && filled_lo < filled_hi) {
+      matrix_ptr->evictRow(filled_lo);
+      filled_lo++;
+    }
+    if (filled_lo >= filled_hi) {
+      filled_lo = lo;
+      filled_hi = lo;
+    }
+    while (filled_hi < hi) {
+      matrix_ptr->fillRow(filled_hi, mz_2d[filled_hi], inte_2d[filled_hi],
+                          fill_sn_ratio, single_scan_noise,
+                          fill_neighbor_tole);
+      filled_hi++;
+    }
+  };
+
+  // bucket seeds by window of their apex spectrum; the global sort keeps
+  // intensity order inside each bucket
+  std::vector<SeedEnvPtrVec> win_seed_ptrs(num_wins);
+  for (auto& seed_ptr : seed_ptrs) {
+    int w = seed_ptr->getSpecId() / win_rows;
+    if (w >= 0 && w < num_wins) {
+      win_seed_ptrs[w].push_back(seed_ptr);
+    }
+  }
+
+  /// Extract Features
+  env_coll_util::EnvCollRtCache rt_cache;
+  // the candidates waiting to be scored (issue #586). The batch is flushed
+  // before every slide: slide() is the only place that evicts a row, so a
+  // parked candidate can never lose the rows it was built from.
+  std::vector<ParkedCand> parked;
+  std::vector<BatchChange> changes;
+  LOG_DEBUG("Number of seed envelopes: " << seed_ptrs.size());
+  int seed_num = seed_ptrs.size();
+  int count = 0;
+  EnvCollPtrVec env_coll_list;
+  ECScorePtrVec ecscore_list;
+
+  auto removePeaks = [&](const EnvCollPtr& coll_ptr) {
+    changes.push_back({getReadRegions(coll_ptr, score_para_ptr),
+                       coll_ptr->getMonoNeutralMass(),
+                       coll_ptr->getStartSpecId(), coll_ptr->getEndSpecId()});
+    coll_ptr->removePeakData(matrix_ptr);
+  };
+
+  auto disturbs = [&](const BatchChange& change, const ParkedCand& cand) {
+    for (const auto& removed : change.removed)
+      for (const auto& region : cand.regions)
+        if (regionsIntersect(removed, region)) return true;
+    double isotope_mass = mass_constant::getIsotopeMass();
+    double tole = score_para_ptr->match_feature_ppm_tolerance_ * cand.mass;
+    for (int shift = -1; shift <= 1; shift++)
+      if (std::abs(cand.mass + shift * isotope_mass - change.mass) < tole &&
+          cand.spec_lo <= change.spec_hi && change.spec_lo <= cand.spec_hi)
+        return true;
+    return false;
+  };
+
+  auto flushBatch = [&]() {
+    if (parked.empty()) return;
+    std::vector<float> tensor;
+    tensor.reserve(parked.size() * parked[0].tensor.size());
+    for (auto& cand : parked)
+      tensor.insert(tensor.end(), cand.tensor.begin(), cand.tensor.end());
+    std::vector<double> batch_scores =
+        onnx_env_cnn::predict(static_cast<int>(parked.size()), tensor);
+    for (size_t i = 0; i < parked.size(); i++) {
+      ParkedCand& cand = parked[i];
+      bool stale = false;
+      for (size_t c = cand.change_num; c < changes.size() && !stale; c++)
+        stale = disturbs(changes[c], cand);
+      EnvCollPtr env_coll_ptr = cand.coll_ptr;
+      double envcnn_score = batch_scores[i];
+      if (stale) {
+        SeedEnvPtr seed_ptr = seed_env_util::preprocessSeedEnvPtr(
+            cand.orig_seed_ptr, matrix_ptr, score_para_ptr, sn_ratio);
+        if (seed_ptr == nullptr) continue;
+        env_coll_ptr = env_coll_util::findEnvColl(
+            matrix_ptr, seed_ptr, score_para_ptr, sn_ratio,
+            topfd_para_ptr->getSplitIntensityRatio());
+        if (env_coll_ptr == nullptr) continue;
+        if (env_coll_util::checkExistingFeatures(matrix_ptr, env_coll_ptr,
+                                                 env_coll_list, score_para_ptr,
+                                                 sn_ratio, &rt_cache)) {
+          removePeaks(env_coll_ptr);
+          continue;
+        }
+        env_coll_ptr->refineMonoMass();
+        envcnn_score =
+            comp_env_cnn_score::compEnvcnnScore(matrix_ptr, env_coll_ptr);
+      }
+      ECScorePtr ecscore_ptr = std::make_shared<ECScore>(
+          env_coll_ptr, matrix_ptr, sn_ratio, envcnn_score);
+      if (ecscore_ptr->getScore() < topfd_para_ptr->getMs1EcscoreCutoff()) {
+        continue;
+      }
+      env_coll_ptr->setEcscore(ecscore_ptr->getScore());
+      removePeaks(env_coll_ptr);
+      env_coll_list.push_back(env_coll_ptr);
+      ecscore_list.push_back(ecscore_ptr);
+    }
+    parked.clear();
+    changes.clear();
+  };
+  for (int w = 0; w < num_wins; w++) {
+    // the rows are about to move, so nothing may stay parked across it
+    flushBatch();
+    slide(std::max(0, w * win_rows - win_margin),
+          std::min(row_num, (w + 1) * win_rows + win_margin));
+    for (auto& sorted_seed_ptr : win_seed_ptrs[w]) {
+      count = count + 1;
+      if (count % 100 == 0 || count == seed_num) {
+        double perc = static_cast<int>(count * 100 / seed_num);
+        std::cout << "\r" << "Processing feature " << count << " ...       "
+                  << perc << "\% finished." << std::flush;
+      }
+      SeedEnvPtr seed_ptr = seed_env_util::preprocessSeedEnvPtr(
+          sorted_seed_ptr, matrix_ptr, score_para_ptr, sn_ratio);
+      if (seed_ptr == nullptr) continue;
+      EnvCollPtr env_coll_ptr = env_coll_util::findEnvColl(
+          matrix_ptr, seed_ptr, score_para_ptr, sn_ratio,
+          topfd_para_ptr->getSplitIntensityRatio());
+      if (env_coll_ptr == nullptr) continue;
+      if (env_coll_util::checkExistingFeatures(matrix_ptr, env_coll_ptr,
+                                               env_coll_list, score_para_ptr,
+                                               sn_ratio, &rt_cache)) {
+        removePeaks(env_coll_ptr);
+        continue;
+      }
+      env_coll_ptr->refineMonoMass();
+      parked.push_back({sorted_seed_ptr, env_coll_ptr,
+                        comp_env_cnn_score::getEnvcnnTensor(matrix_ptr,
+                                                            env_coll_ptr),
+                        getReadRegions(env_coll_ptr, score_para_ptr),
+                        env_coll_ptr->getMonoNeutralMass(),
+                        env_coll_ptr->getStartSpecId(),
+                        env_coll_ptr->getEndSpecId(), changes.size()});
+      if (parked.size() >= kEnvcnnBatchSize) flushBatch();
+    }
+  }
+  flushBatch();
+  std::cout << std::endl;
+
+  if (topfd_para_ptr->isSearchPrecWindow()) {
+    // add ms1 feature based on precursor windows
+    // set min match envelope to 1 to accept single scan features
+    score_para_ptr->min_scan_num_ = 1;
+    score_para_ptr->min_match_peak_ = 1;
+    sn_ratio = 0;
+    rt_cache.clear();
+    // rematerialize rows with sn 0 and no neighbor filter, window by window
+    // (the whole-run implementation reconstructs the full matrix here; a
+    // refilled row restores the original peak intensities, while reconstruct
+    // keeps the reductions made by removePeakData)
+    while (filled_lo < filled_hi) {
+      matrix_ptr->evictRow(filled_lo);
+      filled_lo++;
+    }
+    filled_lo = 0;
+    filled_hi = 0;
+    fill_sn_ratio = 0;
+    fill_neighbor_tole = -1;
+    int ms1_spec_num = deconv_ms1_ptr_vec.size();
+    for (std::size_t ms1_idx = 0; ms1_idx < deconv_ms1_ptr_vec.size();
+         ms1_idx++) {
+      slide(std::max(0, static_cast<int>(ms1_idx) - win_margin),
+            std::min(row_num, static_cast<int>(ms1_idx) + win_margin + 1));
+      double perc = static_cast<int>((ms1_idx + 1) * 100 / ms1_spec_num);
+      int scan =
+          deconv_ms1_ptr_vec[ms1_idx]->getMsHeaderPtr()->getFirstScanNum();
+      std::cout << "\r" << "Additional feature search MS1 spectrum scan "
+                << scan << " ...       " << perc << "\% finished."
+                << std::flush;
+      for (std::size_t i = 0; i < ms2_header_ptr_2d[ms1_idx].size(); i++) {
+        MsHeaderPtr header_ptr = ms2_header_ptr_2d[ms1_idx][i];
+        if (env_coll_assign::checkEnvColl(header_ptr, env_coll_list)) {
+          continue;
+        }
+        double prec_win_begin = header_ptr->getPrecWinBegin();
+        double prec_win_end = header_ptr->getPrecWinEnd();
+        SeedEnvPtrVec seed_ptr_list = seed_ptr_2d[ms1_idx];
+        SeedEnvPtrVec selected_seed_list;
+        for (std::size_t j = 0; j < seed_ptr_list.size(); j++) {
+          double ref_mz = seed_ptr_list[j]->getReferMz();
+          if (ref_mz > prec_win_begin && ref_mz < prec_win_end) {
+            selected_seed_list.push_back(seed_ptr_list[j]);
+          }
+        }
+        SeedEnvPtr seed_ptr;
+        if (selected_seed_list.size() > 0) {
+          // choose the highest intensity one
+          std::sort(selected_seed_list.begin(), selected_seed_list.end(),
+                    SeedEnv::cmpSeedInteDec);
+          seed_ptr = selected_seed_list[0];
+          seed_ptr = seed_env_util::relaxProcessSeedEnvPtr(
+              seed_ptr, matrix_ptr, score_para_ptr, sn_ratio);
+        }
+        if (seed_ptr == nullptr) {
+          continue;
+        }
+        EnvCollPtr env_coll_ptr = env_coll_util::findEnvCollWithSingleEnv(
+            matrix_ptr, seed_ptr, score_para_ptr, sn_ratio,
+            topfd_para_ptr->getSplitIntensityRatio());
+        if (env_coll_ptr == nullptr) continue;
+        if (env_coll_util::checkExistingFeatures(matrix_ptr, env_coll_ptr,
+                                                 env_coll_list, score_para_ptr,
+                                                 sn_ratio, &rt_cache)) {
+          env_coll_ptr->removePeakData(matrix_ptr);
+          continue;
+        }
+        env_coll_ptr->refineMonoMass();
+        ECScorePtr ecscore_ptr =
+            std::make_shared<ECScore>(env_coll_ptr, matrix_ptr, sn_ratio);
+        if (ecscore_ptr->getScore() < 0 ||
+            std::isnan(ecscore_ptr->getScore())) {
+          continue;
+        }
+        env_coll_ptr->setEcscore(ecscore_ptr->getScore());
+        env_coll_ptr->removePeakData(matrix_ptr);
+        env_coll_list.push_back(env_coll_ptr);
+        ecscore_list.push_back(ecscore_ptr);
+      }
+    }
+    std::cout << std::endl;
+  }
+
+  FracFeaturePtrVec frac_features;
+  for (std::size_t i = 0; i < env_coll_list.size(); i++) {
+    EnvCollPtr env_coll_ptr = env_coll_list[i];
+    FracFeaturePtr frac_feat_ptr = env_coll_util::getFracFeature(
+        i, deconv_ms1_ptr_vec, score_para_ptr->frac_id_,
+        score_para_ptr->file_name_, env_coll_ptr, matrix_ptr, sn_ratio);
+    frac_features.push_back(frac_feat_ptr);
+  }
+
+  // map MS2 features
+  SpecFeaturePtrVec ms2_features;
+  env_coll_assign::assignEnvColls(frac_features, env_coll_list,
+                                  ms2_header_ptr_2d, ms2_features,
+                                  topfd_para_ptr->getMs1EcscoreCutoff());
+  std::cout << "Number of proteoform features: " << env_coll_list.size()
+            << std::endl;
+  /// output files
+  if (topfd_para_ptr->isOutputCsvFeatureFile()) {
+    std::string feat_file_name = output_base_name + "_ms1.csv";
+    ecscore_writer::writeScores(feat_file_name, ecscore_list);
+    std::string batmass_file_name =
+        output_base_name + "_" + "frac_ms1.mzrt.csv";
+    int num_spec = ms1_raw_spec_num;
+    frac_feature_writer::writeBatMassFeatures(batmass_file_name, frac_features,
+                                              num_spec);
+  }
+
+  std::string frac_feat_xml_file_name = output_base_name + "_feature.xml";
+  frac_feature_writer::writeXmlFeatures(frac_feat_xml_file_name, frac_features);
+  std::string frac_feat_file_name = output_base_name + "_" + "ms1.feature";
+  frac_feature_writer::writeFeatures(frac_feat_file_name, frac_features);
+
+  std::string ms2_feat_file_name = output_base_name + "_" + "ms2.feature";
+  spec_feature_writer::writeFeatures(ms2_feat_file_name, ms2_features);
+}
+
+
+
 void processMs1(const TopfdParaPtr& topfd_para_ptr) {
   if (topfd_para_ptr->isMissingLevelOne()) {
+    return;
+  }
+  if (std::getenv("TOPFD_MS1_WINDOW") != nullptr) {
+    processMs1Windowed(topfd_para_ptr);
     return;
   }
 
@@ -77,10 +565,11 @@ void processMs1(const TopfdParaPtr& topfd_para_ptr) {
     DeconvPeakPtrVec peaks = ms1_data->getPeakPtrVec();
     SeedEnvPtrVec one_spec_seed_ptrs;
     for (auto& peak : peaks) {
-      SeedEnvPtr seed_ptr_1 = std::make_shared<SeedEnv>(peak);
-      seed_ptrs.push_back(seed_ptr_1);
-      SeedEnvPtr seed_ptr_2 = std::make_shared<SeedEnv>(peak);
-      one_spec_seed_ptrs.push_back(seed_ptr_2);
+      // SeedEnv objects are immutable after construction; the global
+      // intensity-sorted list and the per-spectrum list share them.
+      SeedEnvPtr seed_ptr = std::make_shared<SeedEnv>(peak);
+      seed_ptrs.push_back(seed_ptr);
+      one_spec_seed_ptrs.push_back(seed_ptr);
     }
     seed_ptr_2d.push_back(one_spec_seed_ptrs);
   }
@@ -98,6 +587,10 @@ void processMs1(const TopfdParaPtr& topfd_para_ptr) {
   MsMapPtr matrix_ptr = std::make_shared<MsMap>(
       ms1_mzml_peaks, ms1_header_ptr_vec, score_para_ptr->bin_size_, sn_ratio,
       single_scan_noise);
+  // The raw peaks were copied into the matrix; only the spectrum count is
+  // needed below. Release the whole-run raw peak buffer.
+  size_t ms1_raw_spec_num = ms1_mzml_peaks.size();
+  PeakPtrVec2D().swap(ms1_mzml_peaks);
 
   if (score_para_ptr->min_scan_num_ >= 2) {
     matrix_ptr->removeNonNeighbors(score_para_ptr->neighbor_mz_tole_);
@@ -108,6 +601,85 @@ void processMs1(const TopfdParaPtr& topfd_para_ptr) {
   int seed_num = seed_ptrs.size();
   EnvCollPtrVec env_coll_list;
   ECScorePtrVec ecscore_list;
+  env_coll_util::EnvCollRtCache rt_cache;
+  // the candidates waiting to be scored, and the peak removals made since
+  // the oldest of them was parked (issue #586)
+  std::vector<ParkedCand> parked;
+  std::vector<BatchChange> changes;
+
+  auto removePeaks = [&](const EnvCollPtr& coll_ptr) {
+    changes.push_back({getReadRegions(coll_ptr, score_para_ptr),
+                       coll_ptr->getMonoNeutralMass(),
+                       coll_ptr->getStartSpecId(),
+                       coll_ptr->getEndSpecId()});
+    coll_ptr->removePeakData(matrix_ptr);
+  };
+
+  // would this change have altered the candidate, by removing a peak it reads
+  // or by being a feature checkExistingFeatures would have merged it into?
+  auto disturbs = [&](const BatchChange& change, const ParkedCand& cand) {
+    for (const auto& removed : change.removed)
+      for (const auto& region : cand.regions)
+        if (regionsIntersect(removed, region)) return true;
+    double isotope_mass = mass_constant::getIsotopeMass();
+    double tole = score_para_ptr->match_feature_ppm_tolerance_ * cand.mass;
+    for (int shift = -1; shift <= 1; shift++)
+      if (std::abs(cand.mass + shift * isotope_mass - change.mass) < tole &&
+          cand.spec_lo <= change.spec_hi && change.spec_lo <= cand.spec_hi)
+        return true;
+    return false;
+  };
+
+  // score the parked candidates in one call and apply them in parking order
+  auto flushBatch = [&]() {
+    if (parked.empty()) return;
+    std::vector<float> tensor;
+    tensor.reserve(parked.size() * parked[0].tensor.size());
+    for (auto& cand : parked)
+      tensor.insert(tensor.end(), cand.tensor.begin(), cand.tensor.end());
+    std::vector<double> batch_scores =
+        onnx_env_cnn::predict(static_cast<int>(parked.size()), tensor);
+    for (size_t i = 0; i < parked.size(); i++) {
+      ParkedCand& cand = parked[i];
+      bool stale = false;
+      for (size_t c = cand.change_num; c < changes.size() && !stale; c++)
+        stale = disturbs(changes[c], cand);
+      EnvCollPtr env_coll_ptr = cand.coll_ptr;
+      double envcnn_score = batch_scores[i];
+      if (stale) {
+        // a removal touched what this candidate reads: redo it against the
+        // matrix as it stands now, exactly as the sequential loop would
+        SeedEnvPtr seed_ptr = seed_env_util::preprocessSeedEnvPtr(
+            cand.orig_seed_ptr, matrix_ptr, score_para_ptr, sn_ratio);
+        if (seed_ptr == nullptr) continue;
+        env_coll_ptr = env_coll_util::findEnvColl(
+            matrix_ptr, seed_ptr, score_para_ptr, sn_ratio,
+            topfd_para_ptr->getSplitIntensityRatio());
+        if (env_coll_ptr == nullptr) continue;
+        if (env_coll_util::checkExistingFeatures(matrix_ptr, env_coll_ptr,
+                                                 env_coll_list, score_para_ptr,
+                                                 sn_ratio, &rt_cache)) {
+          removePeaks(env_coll_ptr);
+          continue;
+        }
+        env_coll_ptr->refineMonoMass();
+        envcnn_score =
+            comp_env_cnn_score::compEnvcnnScore(matrix_ptr, env_coll_ptr);
+      }
+      ECScorePtr ecscore_ptr = std::make_shared<ECScore>(
+          env_coll_ptr, matrix_ptr, sn_ratio, envcnn_score);
+      if (ecscore_ptr->getScore() < topfd_para_ptr->getMs1EcscoreCutoff()) {
+        continue;
+      }
+      env_coll_ptr->setEcscore(ecscore_ptr->getScore());
+      removePeaks(env_coll_ptr);
+      env_coll_list.push_back(env_coll_ptr);
+      ecscore_list.push_back(ecscore_ptr);
+    }
+    parked.clear();
+    changes.clear();
+  };
+
   for (int seed_env_idx = 0; seed_env_idx < seed_num; seed_env_idx++) {
     int count = seed_env_idx + 1;
     if (count % 100 == 0 || count == seed_num) {
@@ -115,9 +687,9 @@ void processMs1(const TopfdParaPtr& topfd_para_ptr) {
       std::cout << "\r" << "Processing feature " << count << " ...       "
                 << perc << "\% finished." << std::flush;
     }
-    SeedEnvPtr seed_ptr = seed_ptrs[seed_env_idx];
-    seed_ptr = seed_env_util::preprocessSeedEnvPtr(seed_ptr, matrix_ptr,
-                                                   score_para_ptr, sn_ratio);
+    SeedEnvPtr orig_seed_ptr = seed_ptrs[seed_env_idx];
+    SeedEnvPtr seed_ptr = seed_env_util::preprocessSeedEnvPtr(
+        orig_seed_ptr, matrix_ptr, score_para_ptr, sn_ratio);
     if (seed_ptr == nullptr) continue;
     EnvCollPtr env_coll_ptr = env_coll_util::findEnvColl(
         matrix_ptr, seed_ptr, score_para_ptr, sn_ratio,
@@ -125,21 +697,21 @@ void processMs1(const TopfdParaPtr& topfd_para_ptr) {
     if (env_coll_ptr == nullptr) continue;
     if (env_coll_util::checkExistingFeatures(matrix_ptr, env_coll_ptr,
                                              env_coll_list, score_para_ptr,
-                                             sn_ratio)) {
-      env_coll_ptr->removePeakData(matrix_ptr);
+                                             sn_ratio, &rt_cache)) {
+      removePeaks(env_coll_ptr);
       continue;
     }
     env_coll_ptr->refineMonoMass();
-    ECScorePtr ecscore_ptr =
-        std::make_shared<ECScore>(env_coll_ptr, matrix_ptr, sn_ratio);
-    if (ecscore_ptr->getScore() < topfd_para_ptr->getMs1EcscoreCutoff()) {
-      continue;
-    }
-    env_coll_ptr->setEcscore(ecscore_ptr->getScore());
-    env_coll_ptr->removePeakData(matrix_ptr);
-    env_coll_list.push_back(env_coll_ptr);
-    ecscore_list.push_back(ecscore_ptr);
+    parked.push_back({orig_seed_ptr, env_coll_ptr,
+                      comp_env_cnn_score::getEnvcnnTensor(matrix_ptr,
+                                                          env_coll_ptr),
+                      getReadRegions(env_coll_ptr, score_para_ptr),
+                      env_coll_ptr->getMonoNeutralMass(),
+                      env_coll_ptr->getStartSpecId(),
+                      env_coll_ptr->getEndSpecId(), changes.size()});
+    if (parked.size() >= kEnvcnnBatchSize) flushBatch();
   }
+  flushBatch();
   std::cout << std::endl;
 
   if (topfd_para_ptr->isSearchPrecWindow()) {
@@ -149,6 +721,7 @@ void processMs1(const TopfdParaPtr& topfd_para_ptr) {
     score_para_ptr->min_match_peak_ = 1;
     sn_ratio = 0;
     matrix_ptr->reconstruct(sn_ratio, single_scan_noise);
+    rt_cache.clear();
     int ms1_spec_num = deconv_ms1_ptr_vec.size();
     for (std::size_t ms1_idx = 0; ms1_idx < deconv_ms1_ptr_vec.size();
          ms1_idx++) {
@@ -194,7 +767,7 @@ void processMs1(const TopfdParaPtr& topfd_para_ptr) {
         if (env_coll_ptr == nullptr) continue;
         if (env_coll_util::checkExistingFeatures(matrix_ptr, env_coll_ptr,
                                                  env_coll_list, score_para_ptr,
-                                                 sn_ratio)) {
+                                                 sn_ratio, &rt_cache)) {
           env_coll_ptr->removePeakData(matrix_ptr);
           continue;
         }
@@ -236,7 +809,7 @@ void processMs1(const TopfdParaPtr& topfd_para_ptr) {
     ecscore_writer::writeScores(feat_file_name, ecscore_list);
     std::string batmass_file_name =
         output_base_name + "_" + "frac_ms1.mzrt.csv";
-    int num_spec = ms1_mzml_peaks.size();
+    int num_spec = ms1_raw_spec_num;
     frac_feature_writer::writeBatMassFeatures(batmass_file_name, frac_features,
                                               num_spec);
   }
@@ -343,6 +916,7 @@ void processMs2(const TopfdParaPtr& topfd_para_ptr) {
       LOG_DEBUG("Number of seed envelopes: " << seed_ptrs.size());
       int seed_num = static_cast<int>(seed_ptrs.size());
       EnvCollPtrVec env_coll_list;
+      env_coll_util::EnvCollRtCache rt_cache;
       for (int seed_env_idx = 0; seed_env_idx < seed_num; seed_env_idx++) {
         int count = seed_env_idx + 1;
         if (count % 100 == 0 || count == seed_num) {
@@ -360,7 +934,7 @@ void processMs2(const TopfdParaPtr& topfd_para_ptr) {
         if (env_coll_ptr == nullptr) continue;
         if (env_coll_util::checkExistingFeatures(matrix_ptr, env_coll_ptr,
                                                  env_coll_list, score_para_ptr,
-                                                 sn_ratio)) {
+                                                 sn_ratio, &rt_cache)) {
           env_coll_ptr->removePeakData(matrix_ptr);
           continue;
         }

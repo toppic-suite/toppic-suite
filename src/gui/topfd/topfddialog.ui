@@ -771,7 +771,38 @@ p, li { white-space: pre-wrap; }
          <bool>false</bool>
         </property>
         <property name="text">
-         <string>Add MS1 peaks for 3D visualization</string>
+         <string>MS1 3D visualization data</string>
+        </property>
+        <property name="checkable">
+         <bool>true</bool>
+        </property>
+        <property name="checked">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+    <widget class="QWidget" name="horizontalLayoutWidget_22">
+     <property name="geometry">
+      <rect>
+       <x>270</x>
+       <y>80</y>
+       <width>300</width>
+       <height>25</height>
+      </rect>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout_22">
+      <item>
+       <widget class="QCheckBox" name="ms2FlashDeconvCheckBox">
+        <property name="toolTip">
+         <string>Deconvolute the MS/MS spectra with the FLASHDeconv algorithm instead of TopFD's own (topfd --ms2-flashdeconv, experimental).</string>
+        </property>
+        <property name="acceptDrops">
+         <bool>false</bool>
+        </property>
+        <property name="text">
+         <string>Use FLASHDeconv for MS/MS</string>
         </property>
         <property name="checkable">
          <bool>true</bool>
@@ -875,7 +906,7 @@ p, li { white-space: pre-wrap; }
         </size>
        </property>
        <property name="text">
-        <string>Feature min scan number:</string>
+        <string>Feature min scan num:</string>
        </property>
       </widget>
      </item>

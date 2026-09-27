@@ -37,6 +37,8 @@ ExpEnv::ExpEnv(const PeakPtrVec& peak_list, const EnvPtr& theo_env,
   mapPeakList(peak_list, theo_env, tolerance, min_inte);
   // remove duplicated matches
   remvDuplMatch(theo_env);
+  // the peak list is complete now
+  updateAvgMz();
   // count missing peak number
   cntMissPeakNum();
   // count maximum consecutive peak number

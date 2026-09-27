@@ -27,11 +27,27 @@ using EnvParaPtr = std::shared_ptr<EnvPara>;
 
 class EnvPara {
  public:
+  // the default third mass group boundary (experiment 48 of toppic_test)
+  static constexpr double DEFAULT_MASS_GROUP_BOUNDARY = 4250;
+
+  // the default windows of the filtering-by-mz step, in Daltons, for MS1 and
+  // for MS/MS spectra (experiment 58 of toppic_test). The step keeps only the
+  // best scoring envelope of one charge whose monoisotopic mass is within the
+  // window; 12 Da removes MS/MS envelopes that share no peak with the envelope
+  // outranking them, so MS/MS uses a narrower window than MS1.
+  static constexpr double DEFAULT_MS1_RANK_PEAK_DISTANCE = 12;
+  static constexpr double DEFAULT_MS2_RANK_PEAK_DISTANCE = 2;
+
   // EnvPara() to be removed
   EnvPara() {};
   // set mz tolerance, the maximum number of missing peaks, and whether to run
   // the filtering-by-mz step
-  EnvPara(double mz_tolerance, int max_miss_peak_num, bool run_filter_by_mz);
+  // mass_group_boundary is the third entry of mass_group_boundary_: the mass
+  // above which envelope validation requires three matched and three
+  // consecutive isotopic peaks instead of two. topfd passes the value of its
+  // hidden --mass-group-boundary option.
+  EnvPara(double mz_tolerance, int max_miss_peak_num, bool run_filter_by_mz,
+          double mass_group_boundary = DEFAULT_MASS_GROUP_BOUNDARY);
 
   double getMzTolerance(int charge);
 
@@ -44,13 +60,22 @@ class EnvPara {
 
   int getMassGroup(double base_mass);
 
+  // the boundary between the second and the third mass group
+  double getMassGroupBoundary() const { return mass_group_boundary_[2]; }
+
+
   // the minimum monoisotopic envelope for an envelope
   double min_mass_ = 50;
 
   // Several parameters are related with the mass of envelopes. We classify
-  // envelopes into 3 groups based on its base mass. See getMassGroup()
+  // envelopes into 3 groups based on its base mass. See getMassGroup().
+  // The third value is the boundary above which an envelope must show three
+  // matched and three consecutive isotopic peaks instead of two
+  // (min_match_peak_num_, min_consecutive_peak_num_ below); topfd sets it from
+  // the hidden --mass-group-boundary option.
   std::vector<double> mass_group_boundary_ = {
-      min_mass_, min_mass_, 1500, std::numeric_limits<double>::max()};
+      min_mass_, min_mass_, DEFAULT_MASS_GROUP_BOUNDARY,
+      std::numeric_limits<double>::max()};
 
   //  maximum number of peaks left and right to the base peak in theoretical
   //  envelopes
@@ -119,7 +144,7 @@ class EnvPara {
   // 5. filtering by comparing envelopes with similar mz and same charge
   // If two envelopes have the same charge and their monoisotopic mass
   // difference is less than 12 Dalton, then only the top scoring one is keep.
-  double rank_peak_distance_ = 12;
+  double rank_peak_distance_ = DEFAULT_MS1_RANK_PEAK_DISTANCE;
   // Only keep the top envelope
   int max_similar_mz_env_rank_ = 0;
   // When false, the "filtering by mz" step (filterEnvByMz) is skipped.
@@ -139,10 +164,6 @@ class EnvPara {
   // charge state and monoisotopic mass, we will
   // add several envelopes with two consecutive charges
   // and envelopes with -1 and +1 Dalton shift
-  // See match_env_util::addMultipleMass
-  double multiple_min_mass_ = 5000;
-  int multiple_min_charge_ = 20;
-  double multiple_min_ratio_ = 0.9;
 
  private:
   // *** mz_tolerance and score_error_tolerance,

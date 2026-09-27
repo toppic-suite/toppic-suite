@@ -41,18 +41,23 @@ DiagHeaderPtrVec PtmSlowMatch::getNTermShiftListCommonHeaders() {
   double scale = mng_ptr_->ptm_fast_filter_scale_;
   // n term strict c term nonstrict
   PeakTolerancePtr tole_ptr =
-      mng_ptr_->prsm_para_ptr_->getSpParaPtr()->getPeakTolerancePtr();
+      mng_ptr_->prsm_para_ptr_->getSpParaPtr()->getPrecTolerancePtr();
   std::vector<std::pair<int, int>> sp_masses_toles =
       prm_ms_util::getIntMassErrorList(ms_six_ptr_vec_, tole_ptr, scale, true,
                                        false);
 
-  CompShiftLowMemPtr comp_shift_ptr = std::make_shared<CompShiftLowMem>();
+  // The difference count buffer of CompShiftLowMem is reused by the
+  // candidates of a thread. It has one bin per 0.01 Da of the range of the
+  // differences between a spectrum mass and a residue mass of the protein
+  // (about 14 million bins, 28 MB, for this dataset), and it was allocated,
+  // filled bin by bin and freed for every candidate. findBestShift zeroes the
+  // bins it uses before counting, so a reused buffer gives the same counts as
+  // a new one.
+  static thread_local CompShiftLowMem comp_shift;
 
-  std::vector<double> best_shifts = comp_shift_ptr->findBestShift(
+  std::vector<double> best_shifts = comp_shift.findBestShift(
       sp_masses_toles, proteo_ptr_->getBpSpecPtr()->getScaledPrmMasses(scale),
       mng_ptr_->n_top_diagonals_, mng_ptr_->min_diagonal_gap_, scale);
-  // release memory for comp_shift
-  comp_shift_ptr = nullptr;
 
   DiagHeaderPtrVec header_ptrs;
   for (size_t i = 0; i < best_shifts.size(); i++) {
@@ -167,7 +172,7 @@ DiagHeaderPtrVec PtmSlowMatch::geneNTermShiftHeaders() {
 void PtmSlowMatch::init() {
   DiagHeaderPtrVec n_term_shift_header_ptrs = geneNTermShiftHeaders();
   PeakTolerancePtr tole_ptr =
-      mng_ptr_->prsm_para_ptr_->getSpParaPtr()->getPeakTolerancePtr();
+      mng_ptr_->prsm_para_ptr_->getSpParaPtr()->getPrecTolerancePtr();
   PrmPeakPtrVec prm_peaks =
       prm_ms_util::getPrmPeakPtrs(ms_six_ptr_vec_, tole_ptr);
   int group_spec_num = ms_six_ptr_vec_.size();
@@ -179,26 +184,47 @@ void PtmSlowMatch::init() {
   for (size_t i = 0; i < prm_peaks.size(); i++) {
     ms_masses[i] = prm_peaks[i]->getPosition();
   }
-  ps_align_ptr_ = std::make_shared<PsAlign>(
-      ms_masses, seq_masses, diagonal_ptrs, mng_ptr_->align_para_ptr_);
-}
-
-void PtmSlowMatch::compute(const ProteoformTypePtr& type_ptr,
-                           PrsmPtrVec& prsm_ptrs) {
-  ps_align_ptr_->compute(type_ptr);
-  for (int s = 2; s <= mng_ptr_->align_para_ptr_->getUnknownShiftNum(); s++) {
-    PrsmPtr prsm_ptr =
-        ps_align_ptr_->geneResult(s, proteo_ptr_, deconv_ms_ptr_vec_,
-                                  ms_three_ptr_vec_, mng_ptr_->prsm_para_ptr_);
-    prsm_ptrs.push_back(prsm_ptr);
+  // Only one of the two alignment objects is built: PsAlign's and
+  // PsAlignMultiType's constructors both do an O(diagonal count squared)
+  // shift-candidate precomputation, so building both unconditionally would
+  // pay that cost twice regardless of which method compute() ends up using.
+  if (mng_ptr_->prsm_para_ptr_->useMultiTypeAlign()) {
+    multi_align_ptr_ = std::make_shared<PsAlignMultiType>(
+        ms_masses, seq_masses, diagonal_ptrs, mng_ptr_->align_para_ptr_);
+  } else {
+    ps_align_ptr_ = std::make_shared<PsAlign>(
+        ms_masses, seq_masses, diagonal_ptrs, mng_ptr_->align_para_ptr_);
   }
 }
 
-PrsmPtr PtmSlowMatch::compute(const ProteoformTypePtr& align_type_ptr,
-                              int shift_num) {
-  ps_align_ptr_->compute(align_type_ptr_);
-  return ps_align_ptr_->geneResult(shift_num, proteo_ptr_, deconv_ms_ptr_vec_,
-                                   ms_three_ptr_vec_, mng_ptr_->prsm_para_ptr_);
+void PtmSlowMatch::compute(const ProteoformTypePtrVec& type_ptrs,
+                           std::vector<PrsmPtrVec>& prsm_ptr_2d) {
+  int max_shift_num = mng_ptr_->align_para_ptr_->getUnknownShiftNum();
+  if (multi_align_ptr_ != nullptr) {
+    multi_align_ptr_->compute(type_ptrs);
+    for (size_t i = 0; i < type_ptrs.size(); i++) {
+      PrsmPtrVec prsm_ptrs;
+      for (int s = 2; s <= max_shift_num; s++) {
+        PrsmPtr prsm_ptr = multi_align_ptr_->geneResult(
+            type_ptrs[i], s, proteo_ptr_, deconv_ms_ptr_vec_, ms_three_ptr_vec_,
+            mng_ptr_->prsm_para_ptr_);
+        prsm_ptrs.push_back(prsm_ptr);
+      }
+      prsm_ptr_2d.push_back(prsm_ptrs);
+    }
+    return;
+  }
+  for (size_t i = 0; i < type_ptrs.size(); i++) {
+    ps_align_ptr_->compute(type_ptrs[i]);
+    PrsmPtrVec prsm_ptrs;
+    for (int s = 2; s <= max_shift_num; s++) {
+      PrsmPtr prsm_ptr = ps_align_ptr_->geneResult(
+          s, proteo_ptr_, deconv_ms_ptr_vec_, ms_three_ptr_vec_,
+          mng_ptr_->prsm_para_ptr_);
+      prsm_ptrs.push_back(prsm_ptr);
+    }
+    prsm_ptr_2d.push_back(prsm_ptrs);
+  }
 }
 
 } /* namespace toppic */

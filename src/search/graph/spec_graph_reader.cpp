@@ -26,7 +26,8 @@ SpecGraphReader::SpecGraphReader(const std::string& sp_file_name,
                                  const SpParaPtr& sp_para_ptr) {
   ms_reader_ptr_ = std::make_shared<MsAlignReader>(
       sp_file_name, group_sp_num, sp_para_ptr->getActivationPtr(),
-      sp_para_ptr->getEnvCnnCutoff());
+      sp_para_ptr->getEnvCnnCutoff(),
+        sp_para_ptr->getFragDedupPpo());
   group_sp_num_ = group_sp_num;
   convert_ratio_ = convert_ratio;
   sp_para_ptr_ = sp_para_ptr;
@@ -91,7 +92,7 @@ SpecGraphPtrVec SpecGraphReader::getNextSpecGraphPtrVec(
               deconv_ms_ptr_vec, sp_para_ptr_, prec_mono_mass + prec_errors[i]);
       PrmMsPtrVec ms_six_vec = adjusted_spec_set_ptr->getMsSixPtrVec();
       PrmPeakPtrVec peak_vec = prm_ms_util::getPrmPeakPtrs(
-          ms_six_vec, sp_para_ptr_->getPeakTolerancePtr());
+          ms_six_vec, sp_para_ptr_->getPrecTolerancePtr());
       MassGraphPtr graph_ptr = getMassGraphPtr(peak_vec);
       LOG_DEBUG("search/graph complete");
       SpecGraphPtr spec_graph_ptr = std::make_shared<SpecGraph>(

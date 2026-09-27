@@ -67,6 +67,9 @@ std::string geneTopfdCommand(const TopfdParaPtr& para_ptr,
   } else if (para_ptr->isSql3d()) {
     command = command + "-D ";
   }
+  if (para_ptr->isUseFlashDeconv()) {
+    command = command + "-F ";
+  }
   for (size_t i = 0; i < spec_file_lst.size(); i++) {
     command = command + spec_file_lst[i] + " ";
   }
@@ -126,7 +129,8 @@ std::map<std::string, std::string> topindex_para{{"fixedMod", "-f"},
                                                  {"allowProtMod", "-n"},
                                                  {"searchType", "-d"},
                                                  {"threadNumber", "-u"},
-                                                 {"massErrorTolerance", "-e"}};
+                                                 {"fragErrorTolerance", "-e"},
+                                                 {"precErrorTolerance", "-E"}};
 
 /*function for topindex*/
 std::string geneTopIndexCommand(std::map<std::string, std::string> arguments_) {
@@ -183,13 +187,13 @@ std::map<std::string, std::string> toppic_para{
     {"keepTempFiles", "-k "},
     {"keepDecoyResults", "-K "},
     {"combinedOutputName", "-c "},
-    {"massErrorTolerance", "-e "},
-    {"envCnnCutoff", "-F "},
+    {"fragErrorTolerance", "-e "},
+    {"precErrorTolerance", "-E "},
     {"groupSpectrumNumber", "-r "},
     {"localPtmFileName", "-B "},
     {"localThreshold", "-H "},
-    {"postMassMatch", "-E "},
-    {"postMinPeakNum", "-I "}};
+    {"postMassMatch", "-D "},
+    {"averageMass", "-g "}};
 
 std::string geneToppicCommand(std::map<std::string, std::string> arguments_,
                               std::vector<std::string> spec_file_lst_) {
@@ -230,14 +234,14 @@ std::string geneToppicCommand(std::map<std::string, std::string> arguments_,
           command = command + toppic_para[it->first];
         }
       } else if (it->first == "postMassMatch") {
-        // on by default; -E (--disable-post-match) turns it off
+        // on by default; -D (--disable-post-match) turns it off
         if (it->second == "false") {
           command = command + toppic_para[it->first];
         }
-      } else if (it->first == "postMinPeakNum") {
-        // only meaningful while post mass matching is on
-        if (arguments_["postMassMatch"] == "true") {
-          command = command + toppic_para[it->first] + it->second + " ";
+      } else if (it->first == "averageMass") {
+        // -g (--average-mass): the spectrum files hold average masses
+        if (it->second == "true") {
+          command = command + toppic_para[it->first];
         }
       } else if (it->first == "variablePtmFileName" && it->second == "") {
         continue;  // don't add -b
@@ -279,7 +283,8 @@ std::map<std::string, std::string> topmg_para{
     {"keepTempFiles", "-k "},
     {"keepDecoyResults", "-K "},
     {"combinedOutputName", "-c "},
-    {"massErrorTolerance", "-e "},
+    {"fragErrorTolerance", "-e "},
+    {"precErrorTolerance", "-E "},
     {"envCnnCutoff", "-F "},
     {"useAsfDiag", "-D "},
     {"varModFileName", "-i "},

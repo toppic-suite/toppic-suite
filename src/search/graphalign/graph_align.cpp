@@ -575,7 +575,7 @@ PrsmPtr GraphAlign::geneResult(int s, int m) {
   ExtendMsPtrVec ms_three_ptr_vec =
       spec_graph_ptr_->getSpectrumSetPtr()->getMsThreePtrVec();
   double min_mass = sp_para_ptr->getMinMass();
-  double ppo = sp_para_ptr->getPeakTolerancePtr()->getPpo();
+  double ppo = sp_para_ptr->getPrecTolerancePtr()->getPpo();
   LOG_DEBUG("begin refine");
   double refine_prec_mass = diagonal_util::refinePrecursorAndHeaderShift(
       proteo_ptr, ms_three_ptr_vec, diag_headers_, ppo, min_mass,
@@ -641,8 +641,8 @@ PrsmPtr GraphAlign::geneResult(int s) {
       }
 
       if (valid && (best_prsm_ptr == nullptr ||
-                    best_prsm_ptr->getNormMatchFragNum() <
-                        cur_prsm_ptr->getNormMatchFragNum())) {
+                    best_prsm_ptr->getNormMatchTheoFragNum() <
+                        cur_prsm_ptr->getNormMatchTheoFragNum())) {
         best_prsm_ptr = cur_prsm_ptr;
       }
     }

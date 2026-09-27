@@ -54,8 +54,9 @@ void PrsmMatchTableWriter::writeHeader(std::ofstream& file) {
        << "Proteoform mass" << delim << "Protein N-terminal form" << delim
        << "Fixed PTMs" << delim << "# Unexpected modifications" << delim
        << "Unexpected modifications" << delim << "# Variable PTMs" << delim
-       << "Variable PTMs" << delim << "MIScore" << delim << "# Matched masses"
-       << delim << "# Matched fragments" << delim << "E-value" << delim
+       << "Variable PTMs" << delim << "MIScore" << delim
+       << "# Matched exp fragments" << delim << "# Matched theo fragments"
+       << delim << "E-value" << delim
        << "Spectrum-level Q-value" << delim << "Proteoform-level Q-value"
        << delim << "Protein-level Q-value" << std::endl;
 }
@@ -204,8 +205,8 @@ void PrsmMatchTableWriter::writePrsmStandardFormat(
            << form_ptr->getAlterStr(AlterType::UNEXPECTED) << delim
            << form_ptr->getAlterNum(AlterType::VARIABLE) << delim
            << form_ptr->getAlterStr(AlterType::VARIABLE) << delim
-           << form_ptr->getMIScore() << delim << prsm_ptr->getMatchPeakNum()
-           << delim << prsm_ptr->getMatchFragNum() << delim
+           << form_ptr->getMIScore() << delim << prsm_ptr->getMatchExpFragNum()
+           << delim << prsm_ptr->getMatchTheoFragNum() << delim
            << prsm_ptr->getEValue() << delim;
 
   double fdr = prsm_ptr->getFdr();

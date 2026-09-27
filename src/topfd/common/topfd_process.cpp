@@ -33,6 +33,7 @@
 #include "ms/mzml/pw_ms_reader.hpp"
 #include "topfd/deconv/deconv_ms1_process.hpp"
 #include "topfd/deconv/deconv_ms2_process.hpp"
+#include "topfd/deconv/flashdeconv_ms2_process.hpp"
 #include "topfd/ecscore/env_coll/env_coll_detect.hpp"
 #include "topfd/ecscore/score/onnx_ecscore.hpp"
 #include "topfd/envcnn/onnx_env_cnn.hpp"
@@ -42,6 +43,10 @@ namespace toppic {
 namespace topfd_process {
 
 namespace {
+
+// Intra-op threads of the ONNX sessions used by the deconvolution stages
+// (see process() and processFraction()).
+constexpr int kDeconvOnnxThreadNum = 1;
 
 // Deconvolute one fraction (a single FAIMS voltage level, or the whole file
 // when the data is not FAIMS): optional MS1 deconvolution and feature
@@ -59,15 +64,35 @@ void processFraction(const TopfdParaPtr& para_ptr) {
     ms1_proc_ptr = nullptr;
     std::cout << "MS1 deconvolution finished." << std::endl;
     std::cout << "MS1 feature detection started." << std::endl;
+    // The feature detection scores its candidates in batches of 64
+    // (env_coll_detect.cpp, issue #586). One call then carries enough
+    // arithmetic to divide among cores, where a single-envelope call was
+    // pure weight streaming and two threads served it best (experiment 36).
+    // Per envelope at batch 64: 0.616 ms with 1 thread, 0.320 with 2, 0.172
+    // with 4, 0.162 with 8 (toppic_test experiment 62). The stage is
+    // single-threaded, so those cores are idle anyway; the single-thread
+    // session is restored for the MS/MS deconvolution, whose workers call in
+    // parallel.
+    int feat_onnx_thread_num = 8;
+    bool feat_onnx_spinning = false;
+    onnx_env_cnn::initModel(para_ptr->getResourceDir(), feat_onnx_thread_num,
+                            feat_onnx_spinning);
     env_coll_detect::processMs1(para_ptr);
+    onnx_env_cnn::initModel(para_ptr->getResourceDir(), kDeconvOnnxThreadNum);
     std::cout << "MS1 feature detection finished." << std::endl;
   }
 
   std::cout << "MS/MS deconvolution started." << std::endl;
-  DeconvMs2ProcessPtr ms2_proc_ptr =
-      std::make_shared<DeconvMs2Process>(para_ptr, "ms2.msalign");
-  ms2_proc_ptr->process();
-  ms2_proc_ptr = nullptr;
+  if (para_ptr->isUseFlashDeconv()) {
+    // hidden option --flashdeconv: the FLASHDeconv algorithm
+    FlashDeconvMs2ProcessPtr ms2_proc_ptr =
+        std::make_shared<FlashDeconvMs2Process>(para_ptr, "ms2.msalign");
+    ms2_proc_ptr->process();
+  } else {
+    DeconvMs2ProcessPtr ms2_proc_ptr =
+        std::make_shared<DeconvMs2Process>(para_ptr, "ms2.msalign");
+    ms2_proc_ptr->process();
+  }
   std::cout << "MS/MS deconvolution finished." << std::endl;
 }
 
@@ -118,8 +143,15 @@ int process(const TopfdParaPtr& para_ptr,
   // init data, envelope base, envcnn model, and ecscore model
   base_data::init(para_ptr->getResourceDir());
   EnvBase::initBase(para_ptr->getResourceDir());
-  onnx_env_cnn::initModel(para_ptr->getResourceDir(), para_ptr->getThreadNum());
-  onnx_ecscore::initModel(para_ptr->getResourceDir(), para_ptr->getThreadNum());
+  // Both ONNX sessions run with one intra-op thread: the EnvCNN model is
+  // called concurrently from the deconvolution's worker threads (one call
+  // per spectrum), and the ECScore model once per candidate feature from the
+  // single feature-detection thread. With intra-op threads = -u, ONNX
+  // Runtime's pool (16 threads per session) oversubscribed the cores during
+  // the deconvolution and spun between the per-feature calls during the
+  // feature detection (toppic_test experiment 36).
+  onnx_env_cnn::initModel(para_ptr->getResourceDir(), kDeconvOnnxThreadNum);
+  onnx_ecscore::initModel(para_ptr->getResourceDir(), kDeconvOnnxThreadNum);
 
   for (const std::string& spec_file_name : spec_file_list) {
     if (!file_util::isValidMzmlFile(spec_file_name)) {

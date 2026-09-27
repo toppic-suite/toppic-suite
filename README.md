@@ -18,8 +18,6 @@ TopPIC Suite consists of six software tools for the analysis of top-down mass sp
 
 * **TopDiff** (Top-down mass spectrometry-based identification of Differentially expressed proteoforms) compares the abundances of proteoforms and finds differentially expressed proteoforms by using identifications of top-down mass spectrometry data of several protein samples.
 
-* **TopDIA** is a software tool for top-down data-independent-acquistion mass spectrometry (TD-DIA-MS) data analysis. It generates demultiplexed pseudo MS/MS spectra from TD-DIA-MS data, which are then searched against a protein sequence database using TopPIC or TopMG for proteoform identification.
-
 ## Manuals
 
 The command-line tools are documented in `docs/manual/`:
@@ -36,6 +34,11 @@ The GUI tools (`topfd_gui`, `topdia_gui`, `topindex_gui`, `toppic_gui`,
 `topmg_gui`, `topdiff_gui`) offer the same options as the command-line tools
 and run them.
 
+Claude Code loads the skills in `.claude/skills/` automatically when it is
+started in this repository: `tools` for running the command-line tools and
+reading their outputs, `compile` for building and installing the suite, and
+`repo` for publishing the private repository to the public one.
+
 **TopMSV** (Top-down Mass Spectrometry Visualization) is the web-based
 viewer for TopPIC Suite results. It reads the SQLite database written by
 TopFD and TopPIC and shows the MS1 and MS/MS spectra with their
@@ -44,115 +47,48 @@ features, and the identified proteoform-spectrum matches with their
 annotated fragment ions. It is distributed separately; see the
 [TopMSV manual](https://toppic.org/software/topmsv/manual.html).
 
-## System requirements
+## Building TopPIC Suite
 
-* A C++17 compiler: Clang >= 7 (default) or GCC >= 8
-* CMake version >= 3.16
-* Boost version >= 1.74 (filesystem, iostreams, thread, chrono, system, serialization, program_options)
-* pugixml, SQLite3 and zlib development libraries
-* Qt6 (Core, Gui, Widgets) for the GUI tools
-* Git LFS for some runtime resources under `res/`
+* [Ubuntu Linux](docs/compile/ubuntu_build.md)
+* [Red Hat Enterprise Linux](docs/compile/redhat_build.md)
+* [Windows](docs/compile/windows_build.md)
+* [macOS](docs/compile/macos_build.md)
 
-## Building on Ubuntu Linux
+## Citation
 
-### 1. Install the build dependencies
+If you use TopPIC Suite in your research, please cite the paper of each tool
+you used.
 
-```sh
-sudo apt-get update
-# build tools and libraries (Git LFS is needed for the model files under res/)
-sudo apt-get install build-essential cmake clang git git-lfs \
-    zlib1g-dev libsqlite3-dev libpugixml-dev \
-    libboost-filesystem-dev libboost-iostreams-dev libboost-thread-dev \
-    libboost-chrono-dev libboost-system-dev libboost-serialization-dev \
-    libboost-program-options-dev \
-    qt6-base-dev
-```
+**TopFD**\
+Abdul Rehman Basharat, Yong Zang, Liangliang Sun, and Xiaowen Liu. TopFD: a
+proteoform feature detection tool for top-down proteomics. *Analytical
+Chemistry*, 95:8189-8196, 2023.
+[PubMed](https://pubmed.ncbi.nlm.nih.gov/37196155/)
 
-Notes:
+**TopPIC**\
+Qiang Kou, Likun Xun, and Xiaowen Liu. TopPIC: a software tool for top-down
+mass spectrometry-based proteoform identification and characterization.
+*Bioinformatics*, 32:3495-3497, 2016.
+[PubMed](https://pubmed.ncbi.nlm.nih.gov/27423895/)
 
-- The build defaults to **clang/clang++** when they are found; if clang is not
-  installed, CMake falls back to the system default compiler (g++ works too).
-  To force a compiler, pass `-DCMAKE_CXX_COMPILER=...` at configure time.
-- **Boost ≥ 1.74** is required. The Ubuntu packages above are sufficient
-  (`libboost-all-dev` also works if you prefer one package).
-- **Qt6** (`qt6-base-dev`) is needed for the GUI tools (`topfd_gui`, etc.).
-- Other third-party code (htslib, ProteoWizard, ONNX Runtime) is vendored
-  under `ext/` and built/linked automatically — no packages needed.
+**TopMG**\
+Qiang Kou, Si Wu, Nikola Tolić, Ljiljana Paša-Tolić, Yunlong Liu, and Xiaowen
+Liu. A mass graph-based approach for the identification of modified
+proteoforms using top-down tandem mass spectra. *Bioinformatics*,
+33:1309-1316, 2017.
+[PubMed](https://pubmed.ncbi.nlm.nih.gov/28453668/)
 
-### 2. Clone (with Git LFS)
+**TopDIA**\
+Abdul Rehman Basharat, Xingzhao Xiong, Tian Xu, Yong Zang, Liangliang Sun, and
+Xiaowen Liu. TopDIA: a software tool for top-down data-independent acquisition
+proteomics. *Journal of Proteome Research*, 24:55-64, 2025.
+[PubMed](https://pubmed.ncbi.nlm.nih.gov/39641251/)
 
-```sh
-# register the Git LFS hooks/filters for your user (one time per machine)
-git lfs install
-git clone https://github.com/toppic_suite/toppic_suite.git
-cd toppic_suite
-```
-
-If the clone was made before installing Git LFS, run `git lfs pull` inside the
-repository to replace the LFS pointer files with the real model files.
-
-### 3. Configure and build
-
-```sh
-mkdir -p build
-cd build
-cmake ..
-make -j$(nproc)
-```
-
-The build type defaults to `Release`. The executables (`topfd`, `topdia`,
-`topindex`, `toppic`, `topmg`, `topdiff` and their `*_gui` counterparts) are
-placed in the repository's `bin/` directory. To build just one tool, e.g.
-TopFD:
-
-```sh
-make -j$(nproc) topfd
-```
-
-### 4. Install
-
-```sh
-sudo make install
-```
-
-This installs the binaries to `/usr/local/bin`, the ONNX Runtime shared
-library they use to `/usr/local/lib/toppic`, and the runtime resources (model
-files, isotope tables, ...) to `/usr/local/share/toppic`. Use
-`cmake -DCMAKE_INSTALL_PREFIX=<dir> ..` at configure time for a different
-prefix.
-
-The tools can also be run directly from `bin/` **without** installing: they
-find the runtime resources in the repository's `res/` directory (the tools
-look in `res` next to the executable first, then in `../res`, then in the
-installed shared directory).
-
-### 5. Uninstall
-
-To remove everything that `make install` placed under the prefix (the
-binaries, the ONNX Runtime library and the runtime resources), run the
-following from the **same build directory** that was used for `make install`:
-
-```sh
-sudo make uninstall
-```
-
-The command reads the `install_manifest.txt` written into the build directory
-by `make install`, deletes every file listed there, and removes any directories
-(e.g. `/usr/local/share/toppic`) that are left empty. If the build directory
-has been deleted, there is no manifest and `make uninstall` will report an
-error; in that case remove the installed files by hand.
-
-## Building on Red Hat Enterprise Linux
-
-The steps are the same as for Ubuntu above; only the package installation
-differs. Please follow the instructions from [here](docs/compile/redhat_build.md).
-
-## Building on Windows
-
-[MSYS2](http://www.msys2.org/) is used for building TopPIC Suite on Windows systems. Please follow the instructions from [here](docs/compile/windows_build.md).
-
-
-## Building on macOS
-
-Xcode Command Line Tools and [Homebrew](https://brew.sh/) are used for building
-TopPIC Suite on macOS. Please follow the instructions from [here](docs/compile/macos_build.md).
+**FLASHDeconv**\
+TopFD deconvolutes MS/MS spectra with the FLASHDeconv algorithm when
+`--ms2-flashdeconv` is given. If you use that option, please also cite:\
+Kyowon Jeong, Jihyung Kim, Manasi Gaikwad, Siti Nurul Hidayah, Laura Heikaus,
+Hartmut Schlüter, and Oliver Kohlbacher. FLASHDeconv: ultrafast, high-quality
+feature deconvolution for top-down proteomics. *Cell Systems*, 10:213-218,
+2020.
+[PubMed](https://pubmed.ncbi.nlm.nih.gov/32078799/)

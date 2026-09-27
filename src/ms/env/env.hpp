@@ -34,7 +34,12 @@ class Env {
   // used by env_base to create envelopes
   Env(int num, std::vector<std::string>& line_List);
 
+  // copies the peaks
   Env(int refer_idx, int charge, double mono_mz, EnvPeakPtrVec& peaks);
+
+  // takes the peaks over without copying them: for a peak list built for
+  // this envelope only (convertToTheo, addZero)
+  Env(int refer_idx, int charge, double mono_mz, EnvPeakPtrVec&& peaks);
 
   EnvPtr convertToTheo(double mass_diff, int new_charge);
 
@@ -85,7 +90,9 @@ class Env {
     return peak_ptr_list_[refer_idx_]->getPosition() - mono_mz_;
   }
 
-  double getAvgMz();
+  // intensity-weighted average m/z of the peak list, kept up to date by
+  // updateAvgMz()
+  double getAvgMz() { return avg_mz_; }
 
   double getAvgNeutralMass() {
     return peak_util::compPeakNeutralMass(getAvgMz(), charge_);
@@ -130,10 +137,12 @@ class Env {
 
   void setPeakPtrList(EnvPeakPtrVec peak_ptr_list) {
     peak_ptr_list_ = peak_ptr_list;
+    updateAvgMz();
   }
 
   void setInte(int i, double intensity) {
     peak_ptr_list_[i]->setIntensity(intensity);
+    updateAvgMz();
   }
 
   void appendXml(XmlDOMDocument* xml_doc, XmlDOMElement parent) const;
@@ -147,11 +156,18 @@ class Env {
   int charge_;
   // Theoretical m/z value of monoisotopic ion
   double mono_mz_;
+  // Intensity-weighted average m/z of the peak list (0 if the list is empty
+  // or has no intensity)
+  double avg_mz_ = 0;
   // peak list
   EnvPeakPtrVec peak_ptr_list_;
 
   // used in finding the reference index
   int getHighestPeakIdx();
+
+  // recompute avg_mz_ from the peak list; call after the peak list or
+  // the peak positions or intensities change
+  void updateAvgMz();
 };
 
 using EnvPtrVec = std::vector<EnvPtr>;

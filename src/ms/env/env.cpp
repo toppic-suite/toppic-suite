@@ -21,6 +21,7 @@
 #include <iterator>
 #include <memory>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include "common/base/mass_constant.hpp"
@@ -30,7 +31,10 @@
 namespace toppic {
 
 Env::Env(Env& env)
-    : refer_idx_(env.refer_idx_), charge_(env.charge_), mono_mz_(env.mono_mz_) {
+    : refer_idx_(env.refer_idx_),
+      charge_(env.charge_),
+      mono_mz_(env.mono_mz_),
+      avg_mz_(env.avg_mz_) {
   for (int i = 0; i < env.getPeakNum(); i++) {
     EnvPeakPtr peak_ptr = std::make_shared<EnvPeak>(env.getPeakPtr(i));
     peak_ptr_list_.push_back(peak_ptr);
@@ -50,6 +54,7 @@ Env::Env(int num, std::vector<std::string>& line_list) {
   }
   refer_idx_ = getHighestPeakIdx();
   mono_mz_ = peak_ptr_list_[0]->getPosition();
+  updateAvgMz();
 }
 
 Env::Env(int refer_idx, int charge, double mono_mz, EnvPeakPtrVec& peaks)
@@ -58,6 +63,15 @@ Env::Env(int refer_idx, int charge, double mono_mz, EnvPeakPtrVec& peaks)
     EnvPeakPtr peak_ptr = std::make_shared<EnvPeak>(peaks[i]);
     peak_ptr_list_.push_back(peak_ptr);
   }
+  updateAvgMz();
+}
+
+Env::Env(int refer_idx, int charge, double mono_mz, EnvPeakPtrVec&& peaks)
+    : refer_idx_(refer_idx),
+      charge_(charge),
+      mono_mz_(mono_mz),
+      peak_ptr_list_(std::move(peaks)) {
+  updateAvgMz();
 }
 
 EnvPtr Env::convertToTheo(double mass_diff, int new_charge) {
@@ -69,7 +83,8 @@ EnvPtr Env::convertToTheo(double mass_diff, int new_charge) {
     new_peaks[i] =
         std::make_shared<EnvPeak>(new_mz, peak_ptr_list_[i]->getIntensity());
   }
-  return std::make_shared<Env>(refer_idx_, new_charge, new_mono_mz, new_peaks);
+  return std::make_shared<Env>(refer_idx_, new_charge, new_mono_mz,
+                               std::move(new_peaks));
 }
 
 // Convert a theoretical distribution to a theoretical envelope
@@ -91,6 +106,7 @@ void Env::changeIntensity(double ratio) {
   for (size_t i = 0; i < peak_ptr_list_.size(); i++) {
     peak_ptr_list_[i]->changeIntensity(ratio);
   }
+  updateAvgMz();
 }
 
 void Env::changeToAbsInte(double absolute_intensity) {
@@ -103,6 +119,7 @@ void Env::changeMz(double shift) {
     peak_ptr_list_[i]->shiftPosition(shift);
   }
   mono_mz_ += shift;
+  updateAvgMz();
 }
 
 void Env::changeMzByIsotope(double shift_num) {
@@ -131,6 +148,7 @@ void Env::removeLeftPeaks(int num) {
   }
   refer_idx_ = new_refer_idx;
   peak_ptr_list_ = new_peaks;
+  updateAvgMz();
 }
 
 void Env::removeRightPeaks(int num) {
@@ -140,6 +158,7 @@ void Env::removeRightPeaks(int num) {
     new_peaks.push_back(peak_ptr_list_[i]);
   }
   peak_ptr_list_ = new_peaks;
+  updateAvgMz();
 }
 
 EnvPtr Env::addZero(int num) {
@@ -164,8 +183,8 @@ EnvPtr Env::addZero(int num) {
     new_peaks[i]->setPosition(pos);
   }
   int new_refer_idx = refer_idx_ + num;
-  EnvPtr env_ptr =
-      std::make_shared<Env>(new_refer_idx, charge_, mono_mz_, new_peaks);
+  EnvPtr env_ptr = std::make_shared<Env>(new_refer_idx, charge_, mono_mz_,
+                                         std::move(new_peaks));
   return env_ptr;
 }
 
@@ -324,15 +343,23 @@ double Env::compTopThreeInteSum() {
   return sum;
 }
 
-double Env::getAvgMz() {
+// Intensity-weighted average m/z of the peaks; peaks with a negative
+// position (non-existing peaks) are skipped
+void Env::updateAvgMz() {
   double sum = 0;
+  double inte_sum = 0;
   for (size_t i = 0; i < peak_ptr_list_.size(); i++) {
     if (peak_ptr_list_[i]->getPosition() >= 0) {
       sum = sum + peak_ptr_list_[i]->getPosition() *
                       peak_ptr_list_[i]->getIntensity();
+      inte_sum = inte_sum + peak_ptr_list_[i]->getIntensity();
     }
   }
-  return sum / compInteSum();
+  if (inte_sum > 0) {
+    avg_mz_ = sum / inte_sum;
+  } else {
+    avg_mz_ = 0;
+  }
 }
 
 int Env::getHighestPeakIdx() {

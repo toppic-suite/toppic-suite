@@ -22,8 +22,8 @@ namespace comp_prob_value_array {
 int getMaxScore(const PrsmPtrVec& prsm_ptrs) {
   int score = 0;
   for (size_t i = 0; i < prsm_ptrs.size(); i++) {
-    if (prsm_ptrs[i]->getMatchFragNum() > score) {
-      score = prsm_ptrs[i]->getMatchFragNum();
+    if (prsm_ptrs[i]->getMatchTheoFragNum() > score) {
+      score = prsm_ptrs[i]->getMatchTheoFragNum();
     }
   }
   return score;
@@ -55,7 +55,7 @@ void compProbArray(const CompProbValuePtr& comp_prob_ptr,
   for (size_t i = 0; i < prsm_ptrs.size(); i++) {
     int shift_num =
         prsm_ptrs[i]->getProteoformPtr()->getAlterNum(AlterType::UNEXPECTED);
-    int score = prsm_ptrs[i]->getMatchFragNum();
+    int score = prsm_ptrs[i]->getMatchTheoFragNum();
     results.push_back(comp_prob_ptr->getCondProb(shift_num, score));
   }
 }

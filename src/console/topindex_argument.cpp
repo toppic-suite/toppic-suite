@@ -15,14 +15,18 @@
 
 #include "console/topindex_argument.hpp"
 
+#include <exception>
 #include <filesystem>
 #include <iomanip>
+#include <string>
+#include <utility>
 
 #include "common/util/file_util.hpp"
 #include "common/util/logger.hpp"
 #include "common/util/mem_check.hpp"
 #include "common/util/str_util.hpp"
 #include "common/util/version.hpp"
+#include "seq/fasta_util.hpp"
 
 namespace toppic {
 
@@ -37,15 +41,13 @@ std::map<std::string, std::string> TopIndexArgument::initArguments() {
   arguments["minBlockNum"] = "10";
   arguments["searchType"] = "TARGET";
   arguments["fixedMod"] = "";
-  arguments["massErrorTolerance"] = "10";
+  arguments["precErrorTolerance"] = "10";
+  arguments["fragErrorTolerance"] = "10";
   arguments["allowProtMod"] = "NONE,NME,NME_ACETYLATION,M_ACETYLATION";
   arguments["executiveDir"] = ".";
   arguments["resourceDir"] = "";
   arguments["threadNumber"] = "1";
   arguments["version"] = "";
-
-  // filtering result number is for diagonal filter
-  arguments["filteringResultNumber"] = "20";
 
   // the following two arguments are used for the initializatio of prsm para
   arguments["groupSpectrumNumber"] = "1";
@@ -79,8 +81,11 @@ void TopIndexArgument::outputArguments(
   }
 
   output << std::setw(gap) << std::left
-         << "Error tolerance for matching masses:" << sep
-         << arguments["massErrorTolerance"] << " ppm" << std::endl;
+         << "Error tolerance for precursor masses:" << sep
+         << arguments["precErrorTolerance"] << " ppm" << std::endl;
+  output << std::setw(gap) << std::left
+         << "Error tolerance for fragment masses:" << sep
+         << arguments["fragErrorTolerance"] << " ppm" << std::endl;
 
   output << std::setw(gap) << std::left << "Allowed N-terminal forms:" << sep
          << arguments["allowProtMod"] << std::endl;
@@ -104,7 +109,8 @@ bool TopIndexArgument::parse(int argc, char* argv[]) {
   std::string argument_file_name = "";
   std::string fixed_mod = "";
   std::string allow_mod = "";
-  std::string mass_error_tole = "";
+  std::string frag_error_tole = "";
+  std::string prec_error_tole = "";
   std::string thread_number = "";
 
   /** Define and parse the program options*/
@@ -131,10 +137,13 @@ bool TopIndexArgument::parse(int argc, char* argv[]) {
         "NONE,NME,NME_ACETYLATION,M_ACETYLATION.")(
         "decoy,d",
         "Use a shuffled decoy protein database to estimate false discovery "
-        "rates.")("mass-error-tolerance,e",
-                  po::value<std::string>(&mass_error_tole),
-                  "<a positive integer>. Error tolerance for precursor and "
-                  "fragment masses in PPM. Default value: 10.")(
+        "rates.")("frag-error-tolerance,e",
+                  po::value<std::string>(&frag_error_tole),
+                  "<a positive integer>. Error tolerance for fragment masses "
+                  "in PPM. Default value: 10.")(
+        "prec-error-tolerance,E", po::value<std::string>(&prec_error_tole),
+        "<a positive integer>. Error tolerance for precursor masses in PPM. "
+        "Default value: 10.")(
         "thread-number,u", po::value<std::string>(&thread_number),
         "<a positive integer>. Number of threads used in the computation. "
         "Default value: 1.");
@@ -144,8 +153,9 @@ bool TopIndexArgument::parse(int argc, char* argv[]) {
     desc.add_options()("help,h", "")("fixed-mod,f",
                                      po::value<std::string>(&fixed_mod), "")(
         "n-terminal-form,n", po::value<std::string>(&allow_mod), "")(
-        "decoy,d", "")("mass-error-tolerance,e",
-                       po::value<std::string>(&mass_error_tole), "")(
+        "decoy,d", "")("frag-error-tolerance,e",
+                       po::value<std::string>(&frag_error_tole), "")(
+        "prec-error-tolerance,E", po::value<std::string>(&prec_error_tole), "")(
         "thread-number,u", po::value<std::string>(&thread_number), "")(
         "database-file-name",
         po::value<std::string>(&database_file_name)->required(),
@@ -199,13 +209,6 @@ bool TopIndexArgument::parse(int argc, char* argv[]) {
       arguments_["searchType"] = "TARGET+DECOY";
     }
 
-    if (arguments_["searchType"] == "TARGET+DECOY") {
-      arguments_["databaseFileName"] =
-          arguments_["oriDatabaseFileName"] + "_target_decoy";
-    } else {
-      arguments_["databaseFileName"] =
-          arguments_["oriDatabaseFileName"] + "_target";
-    }
 
     if (vm.count("fixed-mod")) {
       arguments_["fixedMod"] = fixed_mod;
@@ -215,8 +218,12 @@ bool TopIndexArgument::parse(int argc, char* argv[]) {
       arguments_["allowProtMod"] = allow_mod;
     }
 
-    if (vm.count("mass-error-tolerance")) {
-      arguments_["massErrorTolerance"] = mass_error_tole;
+    if (vm.count("frag-error-tolerance")) {
+      arguments_["fragErrorTolerance"] = frag_error_tole;
+    }
+
+    if (vm.count("prec-error-tolerance")) {
+      arguments_["precErrorTolerance"] = prec_error_tole;
     }
 
     if (vm.count("thread-number")) {
@@ -263,6 +270,20 @@ bool TopIndexArgument::validateArguments() {
     return false;
   }
 
+  // A database whose protein ids (the header text up to the first
+  // whitespace) repeat cannot be indexed by htslib: search its
+  // _dedup.fasta copy, which keeps the first record of every id, instead.
+  arguments_["oriDatabaseFileName"] =
+      fasta_util::removeDuplicatedIds(arguments_["oriDatabaseFileName"]);
+
+  if (arguments_["searchType"] == "TARGET+DECOY") {
+    arguments_["databaseFileName"] =
+        arguments_["oriDatabaseFileName"] + "_target_decoy";
+  } else {
+    arguments_["databaseFileName"] =
+        arguments_["oriDatabaseFileName"] + "_target";
+  }
+
   std::string search_type = arguments_["searchType"];
   if (search_type != "TARGET" && search_type != "TARGET+DECOY") {
     LOG_ERROR("Search type "
@@ -283,19 +304,23 @@ bool TopIndexArgument::validateArguments() {
     }
   }
 
-  std::string mass_error_tole_value = arguments_["massErrorTolerance"];
-  try {
-    double tole = std::stoi(mass_error_tole_value);
-    if (tole <= 0) {
-      LOG_ERROR("Mass error tolerance: "
-                << mass_error_tole_value
-                << " error! The value should be positive.");
+  for (const auto& [key, name] :
+       {std::pair<const char*, const char*>{"precErrorTolerance",
+                                            "Precursor error tolerance"},
+        std::pair<const char*, const char*>{"fragErrorTolerance",
+                                            "Fragment error tolerance"}}) {
+    std::string tole_value = arguments_[key];
+    try {
+      double tole = std::stoi(tole_value);
+      if (tole <= 0) {
+        LOG_ERROR(name << ": " << tole_value
+                       << " error! The value should be positive.");
+        return false;
+      }
+    } catch (const std::exception& ex) {
+      LOG_ERROR(name << ": " << tole_value << " should be a number.");
       return false;
     }
-  } catch (int e) {
-    LOG_ERROR("Mass error tolerance: " << mass_error_tole_value
-                                       << " should be a number.");
-    return false;
   }
 
   std::string thread_number = arguments_["threadNumber"];

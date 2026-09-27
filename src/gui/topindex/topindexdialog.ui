@@ -230,8 +230,8 @@ p, li { white-space: pre-wrap; }
    <widget class="QWidget" name="horizontalLayoutWidget_21">
     <property name="geometry">
      <rect>
-      <x>560</x>
-      <y>110</y>
+      <x>390</x>
+      <y>120</y>
       <width>151</width>
       <height>33</height>
      </rect>
@@ -249,9 +249,9 @@ p, li { white-space: pre-wrap; }
    <widget class="QWidget" name="horizontalLayoutWidget_22">
     <property name="geometry">
      <rect>
-      <x>560</x>
-      <y>150</y>
-      <width>331</width>
+      <x>390</x>
+      <y>160</y>
+      <width>190</width>
       <height>33</height>
      </rect>
     </property>
@@ -267,13 +267,13 @@ p, li { white-space: pre-wrap; }
       <widget class="QLineEdit" name="threadNumberEdit">
        <property name="minimumSize">
         <size>
-         <width>110</width>
+         <width>80</width>
          <height>0</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
-         <width>110</width>
+         <width>80</width>
          <height>16777215</height>
         </size>
        </property>
@@ -287,20 +287,85 @@ p, li { white-space: pre-wrap; }
      </item>
     </layout>
    </widget>
+     <widget class="QWidget" name="horizontalLayoutWidget_precTole">
+      <property name="geometry">
+       <rect>
+      <x>595</x>
+      <y>120</y>
+      <width>321</width>
+      <height>31</height>
+     </rect>
+      </property>
+      <layout class="QHBoxLayout" name="horizontalLayout_precTole">
+       <item alignment="Qt::AlignLeft">
+        <widget class="QLabel" name="label_precTole">
+         <property name="minimumSize">
+          <size>
+           <width>200</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>200</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>Precursor tolerance (PPM):</string>
+         </property>
+        </widget>
+       </item>
+       <item alignment="Qt::AlignRight">
+        <widget class="QLineEdit" name="precErrorToleranceEdit">
+         <property name="minimumSize">
+          <size>
+           <width>110</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>110</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>10</string>
+         </property>
+         <property name="frame">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
    <widget class="QWidget" name="horizontalLayoutWidget_14">
     <property name="geometry">
      <rect>
-      <x>560</x>
-      <y>190</y>
-      <width>331</width>
-      <height>31</height>
-     </rect>
+        <x>595</x>
+        <y>160</y>
+        <width>321</width>
+        <height>31</height>
+       </rect>
     </property>
     <layout class="QHBoxLayout" name="horizontalLayout_14">
      <item alignment="Qt::AlignLeft">
       <widget class="QLabel" name="label_15">
+         <property name="minimumSize">
+          <size>
+           <width>200</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>200</width>
+           <height>16777215</height>
+          </size>
+         </property>
        <property name="text">
-        <string>Mass error tolerance (PPM):</string>
+        <string>Fragment tolerance (PPM):</string>
        </property>
       </widget>
      </item>

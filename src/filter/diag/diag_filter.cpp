@@ -16,11 +16,14 @@
 #include "filter/diag/diag_filter.hpp"
 
 #include <algorithm>
+#include <atomic>
 #include <filesystem>
 #include <mutex>
+#include <utility>
 
 #include "common/util/file_util.hpp"
 #include "filter/massmatch/mass_match_factory.hpp"
+#include "filter/massmatch/index_load_gate.hpp"
 #include "filter/massmatch/mass_match_util.hpp"
 #include "ms/factory/prm_ms_util.hpp"
 #include "prsm/simple_prsm_util.hpp"
@@ -28,9 +31,14 @@
 
 namespace toppic {
 
-// serialization mutex.
+// The first block of the stage is deserialized under the mutex (warming
+// Boost.Serialization's lazy type-registration singletons on one thread);
+// later blocks load in parallel — see the comment in zero_ptm_filter.cpp.
+// On the 480 benchmark this stage read 42 s of index one block at a time
+// through the old always-held lock (toppic_test experiment 66).
 namespace {
 std::mutex diag_filter_mutex;
+std::atomic<bool> diag_filter_warmed{false};
 }  // namespace
 DiagFilter::DiagFilter(const ProteoformPtrVec& proteo_ptrs,
                        const DiagFilterMngPtr& mng_ptr, std::string block_str) {
@@ -51,6 +59,8 @@ DiagFilter::DiagFilter(const ProteoformPtrVec& proteo_ptrs,
                                  file_name)) {
       // if any of the index files for this ptm is missing
       index_files_exist = false;
+      // the file's earlier names
+      mass_match_util::warnOldIndexLayout(index_dir, suffix);
       break;
     }
   }
@@ -60,17 +70,55 @@ DiagFilter::DiagFilter(const ProteoformPtrVec& proteo_ptrs,
     std::string file_name = mng_ptr->multi_ptm_file_vec_[0] + suffix;
 
     {
-      std::lock_guard<std::mutex> lock(diag_filter_mutex);
+      std::unique_lock<std::mutex> lock(diag_filter_mutex, std::defer_lock);
+      if (!diag_filter_warmed.load(std::memory_order_acquire)) {
+        lock.lock();
+        if (diag_filter_warmed.load(std::memory_order_relaxed)) {
+          lock.unlock();
+        }
+      }
+      IndexLoadGate::Slot load_slot(index_load_gate);
       index_ptr_->deserializeMassMatch(file_name, index_dir);
+      if (lock.owns_lock()) {
+        diag_filter_warmed.store(true, std::memory_order_release);
+      }
     }
-  } else {
+    // the file is shared with the one-shift filter; it must have been built
+    // at this filter's column limits
+    if (!mass_match_util::hasFilterLimits(index_ptr_,
+                                          mng_ptr->max_proteoform_mass_,
+                                          mng_ptr->filter_scale_)) {
+      mass_match_util::warnIndexLimits(file_name, index_ptr_,
+                                       mng_ptr->max_proteoform_mass_,
+                                       mng_ptr->filter_scale_);
+      index_files_exist = false;
+      index_ptr_ = nullptr;
+    }
+  }
+  if (!index_files_exist) {
     index_ptr_ = mass_match_factory::getPrmDiagMassMatchPtr(
         proteo_ptrs, mng_ptr->max_proteoform_mass_, mng_ptr->filter_scale_);
   }
 }
 
+DiagFilterSpectrumPtr DiagFilter::convert(const PrmMsPtrVec& ms_ptr_vec,
+                                          const DiagFilterMngPtr& mng_ptr) {
+  PeakTolerancePtr tole_ptr =
+      mng_ptr->prsm_para_ptr_->getSpParaPtr()->getPrecTolerancePtr();
+  std::vector<std::pair<int, int> > mass_errors =
+      prm_ms_util::getIntMassErrorList(ms_ptr_vec, tole_ptr,
+                                       mng_ptr->filter_scale_, true, false);
+  return std::make_shared<DiagFilterSpectrum>(
+      ms_ptr_vec[0]->getMsHeaderPtr(), static_cast<int>(ms_ptr_vec.size()),
+      std::move(mass_errors));
+}
+
 SimplePrsmPtrVec DiagFilter::getBestMatch(const PrmMsPtrVec& ms_ptr_vec) {
-  SimplePrsmPtrVec match_ptrs = compute(ms_ptr_vec);
+  return getBestMatch(*convert(ms_ptr_vec, mng_ptr_));
+}
+
+SimplePrsmPtrVec DiagFilter::getBestMatch(const DiagFilterSpectrum& spectrum) {
+  SimplePrsmPtrVec match_ptrs = compute(spectrum);
   SimplePrsmPtrVec unique_match_ptrs =
       simple_prsm_util::getUniqueMatches(match_ptrs);
   std::sort(unique_match_ptrs.begin(), unique_match_ptrs.end(),
@@ -91,28 +139,15 @@ SimplePrsmPtrVec DiagFilter::getBestMatch(const PrmMsPtrVec& ms_ptr_vec) {
   return result_ptrs;
 }
 
-SimplePrsmPtrVec DiagFilter::compute(const PrmMsPtrVec& ms_ptr_vec) {
-  PeakTolerancePtr tole_ptr =
-      mng_ptr_->prsm_para_ptr_->getSpParaPtr()->getPeakTolerancePtr();
-  std::vector<std::pair<int, int> > mass_errors =
-      prm_ms_util::getIntMassErrorList(ms_ptr_vec, tole_ptr,
-                                       mng_ptr_->filter_scale_, true, false);
+SimplePrsmPtrVec DiagFilter::compute(const DiagFilterSpectrum& spectrum) {
   SimplePrsmPtrVec match_ptrs;
-  int row_num = index_ptr_->getRowNum();
-  std::vector<int> proteo_row_begins = index_ptr_->getProteoRowBegins();
-  std::vector<int> proteo_row_ends = index_ptr_->getProteoRowEnds();
+  const std::vector<int>& proteo_row_begins = index_ptr_->getProteoRowBegins();
+  const std::vector<int>& proteo_row_ends = index_ptr_->getProteoRowEnds();
   int threshold = 4;
-  std::vector<short> scores(row_num, 0);
-  std::vector<short> max_scores(row_num, 0);
-  for (size_t i = 0; i < mass_errors.size(); i++) {
-    std::fill(scores.begin(), scores.end(), 0);
-    index_ptr_->compScores(mass_errors, i, -mass_errors[i].first, scores);
-    for (int j = 0; j < row_num; j++) {
-      if (scores[j] > max_scores[j]) {
-        max_scores[j] = scores[j];
-      }
-    }
-  }
+  // the best score over anchors of every row that reaches the threshold
+  std::vector<short> max_scores;
+  index_ptr_->compDiagMaxScores(spectrum.getMassErrors(), threshold,
+                                max_scores);
 
   ProtCandidatePtrVec results = mass_match_util::findDiagTopProteins(
       max_scores, proteo_row_begins, proteo_row_ends, threshold,
@@ -121,7 +156,7 @@ SimplePrsmPtrVec DiagFilter::compute(const PrmMsPtrVec& ms_ptr_vec) {
     int id = results[j]->getProteinId();
     int score = results[j]->getScore();
     match_ptrs.push_back(std::make_shared<SimplePrsm>(
-        ms_ptr_vec[0]->getMsHeaderPtr(), ms_ptr_vec.size(), proteo_ptrs_[id],
+        spectrum.getHeaderPtr(), spectrum.getSpectrumNum(), proteo_ptrs_[id],
         score));
   }
   return match_ptrs;

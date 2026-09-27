@@ -70,7 +70,7 @@ std::function<void()> geneTask(const SpectrumSetPtr& spectrum_set_ptr,
       PrsmPtrVec complete_prsm_ptrs = slow_filter_ptr->getPrsms(
           s - 2, mng_ptr->prsm_para_ptr_, ProteoformType::COMPLETE);
       std::sort(complete_prsm_ptrs.begin(), complete_prsm_ptrs.end(),
-                Prsm::cmpMatchFragDecMatchPeakDecProtIncStartPosInc);
+                Prsm::cmpMatchTheoFragDecMatchExpFragDecProtIncStartPosInc);
       PrsmPtrVec sele_complete_prsm_ptrs;
       seleTopPrsms(complete_prsm_ptrs, sele_complete_prsm_ptrs,
                    mng_ptr->n_report_);
@@ -79,7 +79,7 @@ std::function<void()> geneTask(const SpectrumSetPtr& spectrum_set_ptr,
       PrsmPtrVec prefix_prsm_ptrs = slow_filter_ptr->getPrsms(
           s - 2, mng_ptr->prsm_para_ptr_, ProteoformType::PREFIX);
       std::sort(prefix_prsm_ptrs.begin(), prefix_prsm_ptrs.end(),
-                Prsm::cmpMatchFragDecMatchPeakDecProtIncStartPosInc);
+                Prsm::cmpMatchTheoFragDecMatchExpFragDecProtIncStartPosInc);
       PrsmPtrVec sele_prefix_prsm_ptrs;
       seleTopPrsms(prefix_prsm_ptrs, sele_prefix_prsm_ptrs, mng_ptr->n_report_);
       writer_ptr->getPrefixWriterPtr(s)->writeVector(sele_prefix_prsm_ptrs);
@@ -87,7 +87,7 @@ std::function<void()> geneTask(const SpectrumSetPtr& spectrum_set_ptr,
       PrsmPtrVec suffix_prsm_ptrs = slow_filter_ptr->getPrsms(
           s - 2, mng_ptr->prsm_para_ptr_, ProteoformType::SUFFIX);
       std::sort(suffix_prsm_ptrs.begin(), suffix_prsm_ptrs.end(),
-                Prsm::cmpMatchFragDecMatchPeakDecProtInc);
+                Prsm::cmpMatchTheoFragDecMatchExpFragDecProtInc);
       PrsmPtrVec sele_suffix_prsm_ptrs;
       seleTopPrsms(suffix_prsm_ptrs, sele_suffix_prsm_ptrs, mng_ptr->n_report_);
       writer_ptr->getSuffixWriterPtr(s)->writeVector(sele_suffix_prsm_ptrs);
@@ -95,7 +95,7 @@ std::function<void()> geneTask(const SpectrumSetPtr& spectrum_set_ptr,
       PrsmPtrVec internal_prsm_ptrs = slow_filter_ptr->getPrsms(
           s - 2, mng_ptr->prsm_para_ptr_, ProteoformType::INTERNAL);
       std::sort(internal_prsm_ptrs.begin(), internal_prsm_ptrs.end(),
-                Prsm::cmpMatchFragDecMatchPeakDecProtInc);
+                Prsm::cmpMatchTheoFragDecMatchExpFragDecProtInc);
       PrsmPtrVec sele_internal_prsm_ptrs;
       seleTopPrsms(internal_prsm_ptrs, sele_internal_prsm_ptrs,
                    mng_ptr->n_report_);
@@ -131,7 +131,8 @@ void PtmSearchProcessor::process() {
   int group_spec_num = prsm_para_ptr->getGroupSpecNum();
   MsAlignReaderPtr ms_reader_ptr = std::make_shared<MsAlignReader>(
       sp_file_name, group_spec_num, sp_para_ptr->getActivationPtr(),
-      sp_para_ptr->getEnvCnnCutoff());
+      sp_para_ptr->getEnvCnnCutoff(),
+        sp_para_ptr->getFragDedupPpo());
 
   const int n_unknown_shift = 2;
 

@@ -259,7 +259,7 @@ PrsmPtrVec getTopPrsms(const PrsmPtrVec& prsm_ptrs, int top_num) {
     if ((int)top_prsms.size() >= top_num) {
       break;
     }
-    if (prsm_ptrs[i]->getMatchFragNum() < 1) {
+    if (prsm_ptrs[i]->getMatchTheoFragNum() < 1) {
       continue;
     }
     std::string prot = prsm_ptrs[i]->getProteoformPtr()->getSeqName();

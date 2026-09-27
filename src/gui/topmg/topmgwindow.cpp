@@ -15,6 +15,10 @@
 
 #include "gui/topmg/topmgwindow.hpp"
 
+#include <string>
+#include <utility>
+#include <vector>
+
 #include <QCloseEvent>
 #include <QCoreApplication>
 #include <QDesktopServices>
@@ -51,6 +55,8 @@ TopmgWindow::TopmgWindow(QWidget* parent)
   ui->cutoffProteinValueEdit->setValidator(validator1);
   ui->threadNumberEdit->setValidator(new QIntValidator(0, 2147483647, this));
   ui->errorToleranceEdit->setValidator(new QIntValidator(0, 2147483647, this));
+  ui->precErrorToleranceEdit->setValidator(
+      new QIntValidator(0, 2147483647, this));
   ui->envCnnCutoffEdit->setValidator(new QDoubleValidator(0, 1, 4, this));
   ui->formErrorToleranceEdit->setValidator(
       new QDoubleValidator(0, 2147483647, 4, this));
@@ -109,7 +115,9 @@ void TopmgWindow::on_defaultButton_clicked() {
   ui->modFileEdit->setText("");
 
   ui->errorToleranceEdit->setText(
-      QString::fromStdString(arguments_["massErrorTolerance"]));
+      QString::fromStdString(arguments_["fragErrorTolerance"]));
+  ui->precErrorToleranceEdit->setText(
+      QString::fromStdString(arguments_["precErrorTolerance"]));
   ui->envCnnCutoffEdit->setText(
       QString::fromStdString(arguments_["envCnnCutoff"]));
   ui->formErrorToleranceEdit->setText(
@@ -281,8 +289,10 @@ std::map<std::string, std::string> TopmgWindow::getArguments() {
   arguments_["varPtmNumber"] = ui->numModComboBox->currentText().toStdString();
   arguments_["shiftNumber"] =
       ui->numUnknownShiftComboBox->currentText().toStdString();
-  arguments_["massErrorTolerance"] =
+  arguments_["fragErrorTolerance"] =
       ui->errorToleranceEdit->text().toStdString();
+  arguments_["precErrorTolerance"] =
+      ui->precErrorToleranceEdit->text().toStdString();
   arguments_["envCnnCutoff"] = ui->envCnnCutoffEdit->text().toStdString();
   arguments_["proteoformErrorTolerance"] =
       ui->formErrorToleranceEdit->text().toStdString();
@@ -417,6 +427,7 @@ void TopmgWindow::lockDialog() {
   ui->fixedModFileEdit->setEnabled(false);
   ui->fixedModFileButton->setEnabled(false);
   ui->errorToleranceEdit->setEnabled(false);
+  ui->precErrorToleranceEdit->setEnabled(false);
   ui->envCnnCutoffEdit->setEnabled(false);
   ui->formErrorToleranceEdit->setEnabled(false);
   ui->maxModEdit->setEnabled(false);
@@ -461,6 +472,7 @@ void TopmgWindow::unlockDialog() {
   }
   ui->fixedModFileEdit->setEnabled(true);
   ui->errorToleranceEdit->setEnabled(true);
+  ui->precErrorToleranceEdit->setEnabled(true);
   ui->envCnnCutoffEdit->setEnabled(true);
   ui->formErrorToleranceEdit->setEnabled(true);
   ui->maxModEdit->setEnabled(true);
@@ -546,7 +558,13 @@ bool TopmgWindow::checkError() {
 
   if (ui->errorToleranceEdit->text().isEmpty()) {
     QMessageBox::warning(this, tr("Warning"),
-                         tr("Mass error tolerance is empty!"),
+                         tr("Fragment error tolerance is empty!"),
+                         QMessageBox::Yes);
+    return true;
+  }
+  if (ui->precErrorToleranceEdit->text().isEmpty()) {
+    QMessageBox::warning(this, tr("Warning"),
+                         tr("Precursor error tolerance is empty!"),
                          QMessageBox::Yes);
     return true;
   }
@@ -584,25 +602,41 @@ bool TopmgWindow::checkError() {
                          QMessageBox::Yes);
     return true;
   }
-  if (ui->threadNumberEdit->text().toInt() >
-      toppic::mem_check::getMaxThreads("topmg")) {
-    int max_thread = toppic::mem_check::getMaxThreads("topmg");
-    QMessageBox::StandardButton reply = QMessageBox::warning(
-        this, tr("Warning"),
-        QString("Thread number is too large! Based on the memory size, up to "
-                "%1 threads can run on this computer. Are you sure you want to "
-                "proceed?")
-            .arg(max_thread)
-            .arg(max_thread),
-        QMessageBox::Yes | QMessageBox::No);
-    if (reply == QMessageBox::No) {
-      return true;
-    }
-  }
   if (ui->threadNumberEdit->text().isEmpty()) {
     QMessageBox::warning(this, tr("Warning"), tr("Thread number is empty!"),
                          QMessageBox::Yes);
     return true;
+  }
+  // topmg lowers the thread number of a protein sequence filtering step by
+  // itself when the memory is tight, one budget per step, so this is not the
+  // "thread number is too large, the program may crash" warning the tools
+  // without that control show (topfd, topdia, topindex): it reports the steps
+  // the memory limits and the number each one will use, from the same
+  // mem_check list the console warning of topmg prints.
+  int thread_number = ui->threadNumberEdit->text().toInt();
+  std::vector<std::pair<std::string, int>> limited_stages =
+      toppic::mem_check::getLimitedFilterStages("topmg", thread_number);
+  if (!limited_stages.empty()) {
+    QString message =
+        QString("With the memory available now, these protein sequence "
+                "filtering steps will use fewer than the %1 threads "
+                "requested:\n")
+            .arg(thread_number);
+    for (const auto& stage : limited_stages) {
+      message += QString("\n    %1: %2 threads")
+                     .arg(QString::fromStdString(stage.first))
+                     .arg(stage.second);
+    }
+    message += QString("\n\nAll other steps will use %1 threads, and a step "
+                       "reports its own number if the memory available when it "
+                       "starts has changed. Do you want to proceed?")
+                   .arg(thread_number);
+    QMessageBox::StandardButton reply =
+        QMessageBox::warning(this, tr("Warning"), message,
+                             QMessageBox::Yes | QMessageBox::No);
+    if (reply == QMessageBox::No) {
+      return true;
+    }
   }
   if (ui->maxGapLength->text().isEmpty()) {
     QMessageBox::warning(this, tr("Warning"),
@@ -645,7 +679,8 @@ void TopmgWindow::showArguments() {
        "\nactivation:" + arguments_["activation"] + "\nsearchType:" +
        arguments_["searchType"] + "\nfixedMod:" + arguments_["fixedMod"] +
        "\nshiftNumber:" + arguments_["shiftNumber"] +
-       "\nerrorTolerance:" + arguments_["massErrorTolerance"] +
+       "\nprecErrorTolerance:" + arguments_["precErrorTolerance"] +
+       "\nfragErrorTolerance:" + arguments_["fragErrorTolerance"] +
        "\nformErrorTolerance:" + arguments_["proteoformErrorTolerance"] +
        "\ncutoffSpectralType:" + arguments_["cutoffSpectralType"] +
        "\ncutoffSpectralValue:" + arguments_["cutoffSpectralValue"] +

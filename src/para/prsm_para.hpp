@@ -66,6 +66,13 @@ class PrsmPara {
     return allowProtType(ProteoformType::INTERNAL);
   }
 
+  // The multiple-unexpected-shift ("slow filter") search computes
+  // COMPLETE/PREFIX/SUFFIX/INTERNAL for a candidate with one fused dynamic
+  // program (search/ptmsearch/ps_align_multi_type.hpp) instead of one PsAlign
+  // pass per type. Default true; toppic hidden --disable-multi-type-align
+  // falls back to the original one-pass-per-type PsAlign.
+  bool useMultiTypeAlign() const { return use_multi_type_align_; }
+
  private:
   std::string ori_db_name_;
 
@@ -87,6 +94,8 @@ class PrsmPara {
 
   /** spectrum parameters */
   SpParaPtr sp_para_ptr_;
+
+  bool use_multi_type_align_ = true;
 };
 
 using PrsmParaPtr = std::shared_ptr<PrsmPara>;

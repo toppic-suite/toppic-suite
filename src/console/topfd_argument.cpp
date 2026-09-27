@@ -19,6 +19,7 @@
 #include <exception>
 #include <filesystem>
 #include <iostream>
+#include <cmath>
 #include <string>
 
 #include "common/util/file_util.hpp"
@@ -81,6 +82,9 @@ bool Argument::parse(int argc, char* argv[]) {
   std::string ecscore_cutoff = "";
   std::string min_scan_num = "";
   std::string max_miss_peak_num = "";
+  std::string ms1_rank_peak_distance = "";
+  std::string ms2_rank_peak_distance = "";
+  std::string mass_group_boundary = "";
 
   // Define and parse the program options
   try {
@@ -146,29 +150,50 @@ bool Argument::parse(int argc, char* argv[]) {
         "thread-number,u", po::value<std::string>(&thread_number),
         "<a positive integer>. Number of threads used in spectral "
         "deconvolution. The default value is 1.")(
+        "average-mass,A",
+        "Report average masses instead of monoisotopic masses for the "
+        "precursor and fragment ions in the MS/MS msalign file. TopPIC reads "
+        "such a file with its --average-mass option. The feature files and "
+        "the SQLite database keep monoisotopic masses.")(
         "no-sql,N", "Do not write the deconvoluted spectra to an SQLite database.")(
         "sql-3d,D",
         "Add the MS1 peaks for 3D visualization to the SQLite database.")(
         "text-peak-list,T",
         "Deconvolute a single MS/MS spectrum given as a text peak list: one "
         "peak per line, m/z and intensity separated by a space. The output "
-        "files are named after the input file.");
+        "files are named after the input file.")(
+        "ms2-flashdeconv,F",
+        "Deconvolute the MS/MS spectra with the FLASHDeconv algorithm instead "
+        "of TopFD's own (experimental).");
 
     // Advanced options accepted on the command line but hidden from the help
     // message; the positional spectrum file argument is also hidden here.
     po::options_description hidden_desc("Hidden options");
     hidden_desc.add_options()(
-        "multiple-mass,M",
-        "Output multiple monoisotopic masses for each MS/MS spectrum.")(
         "output-dp-envs",
         "Dump the windowed candidate envelopes and DP-selected envelopes of "
         "each spectrum to win_envs.txt / dp_envs.txt (debugging).")(
+        "mass-group-boundary", po::value<std::string>(&mass_group_boundary),
+        "The mass above which envelope validation requires three matched and "
+        "three consecutive isotopic peaks instead of two (default 4250).")(
         "max-miss-peak-num", po::value<std::string>(&max_miss_peak_num),
         "<a non-negative integer>. Maximum number of missing peaks allowed in "
         "a matched envelope. The default value is 1.")(
         "disable-filter-by-mz",
         "Skip the filtering-by-mz step that removes an envelope outranked by a "
         "higher-scoring neighbor with the same charge.")(
+        "ms1-rank-peak-distance",
+        po::value<std::string>(&ms1_rank_peak_distance),
+        "<a positive number>. The window of the filtering-by-mz step for MS1 "
+        "spectra, in Daltons: only the best scoring envelope of one charge "
+        "within the window is kept. The default value is 12.")(
+        "ms2-rank-peak-distance",
+        po::value<std::string>(&ms2_rank_peak_distance),
+        "<a positive number>. The same window for MS/MS spectra. The default "
+        "value is 2.")(
+        "disable-ms2-harmonic-check",
+        "Skip the harmonic check of MS/MS spectra, which replaces an envelope "
+        "by a better scoring harmonic parent mass.")(
         "keep,k",
         "Report monoisotopic masses extracted from low quality isotopic "
         "envelopes.")(
@@ -306,8 +331,8 @@ bool Argument::parse(int argc, char* argv[]) {
       topfd_para_ptr_->setMs2EnvCnnScoreCutoff(cutoff);
     }
 
-    if (vm.count("multiple-mass")) {
-      topfd_para_ptr_->setOutputMultipleMass(true);
+    if (vm.count("average-mass")) {
+      topfd_para_ptr_->setOutputAvgMass(true);
     }
 
     if (vm.count("no-sql")) {
@@ -327,6 +352,20 @@ bool Argument::parse(int argc, char* argv[]) {
       topfd_para_ptr_->setOutputDpEnvs(true);
     }
 
+    if (vm.count("ms2-flashdeconv")) {
+      topfd_para_ptr_->setUseFlashDeconv(true);
+    }
+
+    if (vm.count("mass-group-boundary")) {
+      double mass = 0;
+      if (!toDouble(mass_group_boundary, mass) || mass <= 0) {
+        LOG_ERROR("Mass group boundary "
+                  << mass_group_boundary << " should be a positive number.");
+        return false;
+      }
+      topfd_para_ptr_->setMassGroupBoundary(mass);
+    }
+
     if (vm.count("max-miss-peak-num")) {
       int num = 0;
       if (!toInt(max_miss_peak_num, num) || num < 0) {
@@ -339,6 +378,32 @@ bool Argument::parse(int argc, char* argv[]) {
 
     if (vm.count("disable-filter-by-mz")) {
       topfd_para_ptr_->setRunFilterByMz(false);
+    }
+
+    if (vm.count("ms1-rank-peak-distance")) {
+      double distance = 0;
+      if (!toDouble(ms1_rank_peak_distance, distance) || !std::isfinite(distance) ||
+          distance <= 0) {
+        LOG_ERROR("MS1 rank peak distance "
+                  << ms1_rank_peak_distance << " should be a positive number.");
+        return false;
+      }
+      topfd_para_ptr_->setMsOneRankPeakDistance(distance);
+    }
+
+    if (vm.count("ms2-rank-peak-distance")) {
+      double distance = 0;
+      if (!toDouble(ms2_rank_peak_distance, distance) || !std::isfinite(distance) ||
+          distance <= 0) {
+        LOG_ERROR("MS/MS rank peak distance "
+                  << ms2_rank_peak_distance << " should be a positive number.");
+        return false;
+      }
+      topfd_para_ptr_->setMsTwoRankPeakDistance(distance);
+    }
+
+    if (vm.count("disable-ms2-harmonic-check")) {
+      topfd_para_ptr_->setMsTwoHarmonicCheck(false);
     }
 
     if (vm.count("output-batmass-feature")) {

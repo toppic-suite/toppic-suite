@@ -81,7 +81,8 @@ PrsmPtrVec readAllPrsms(const std::string& prsm_file_name,
 }
 
 PrsmPtrVec readPrsmsWithSpectra(const PrsmParaPtr& prsm_para_ptr,
-                                const std::string& input_file_ext) {
+                                const std::string& input_file_ext,
+                                double env_cnn_cutoff) {
   std::string sp_file_name = prsm_para_ptr->getSpectrumFileName();
   std::string input_file_name =
       file_util::basename(sp_file_name) + "." + input_file_ext;
@@ -95,7 +96,8 @@ PrsmPtrVec readPrsmsWithSpectra(const PrsmParaPtr& prsm_para_ptr,
   int group_spec_num = prsm_para_ptr->getGroupSpecNum();
   SpParaPtr sp_para_ptr = prsm_para_ptr->getSpParaPtr();
   MsAlignReaderPtr ms_reader_ptr = std::make_shared<MsAlignReader>(
-      sp_file_name, group_spec_num, sp_para_ptr->getActivationPtr());
+      sp_file_name, group_spec_num, sp_para_ptr->getActivationPtr(),
+      env_cnn_cutoff);
   DeconvMsPtrVec deconv_ms_ptr_vec = ms_reader_ptr->getNextMsPtrVec();
   PrsmPtrVec prsm_list;
   while (deconv_ms_ptr_vec.size() != 0) {

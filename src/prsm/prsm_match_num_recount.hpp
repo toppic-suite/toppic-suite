@@ -28,12 +28,14 @@ namespace prsm_match_num_recount {
 // the masses below the EnvCNN score cutoff (SpPara::getEnvCnnCutoff()), so
 // the matched mass and matched fragment numbers they store in the PrSMs
 // count only the remaining masses. This step reads the PrSMs of
-// <spectrum base name>.<input_file_ext> together with the full spectra
-// (no cutoff), recomputes the two numbers against all masses, and writes the
-// PrSMs to <base>.<output_file_ext>. The input must be sorted by spectrum id.
+// <spectrum base name>.<input_file_ext> together with the spectra whose
+// masses have an EnvCNN score of at least env_cnn_cutoff (0, the default,
+// keeps every mass), recomputes the two numbers against those masses, and
+// writes the PrSMs to <base>.<output_file_ext>. The input must be sorted by
+// spectrum id.
 void process(const PrsmParaPtr& prsm_para_ptr,
              const std::string& input_file_ext,
-             const std::string& output_file_ext);
+             const std::string& output_file_ext, double env_cnn_cutoff = 0.0);
 
 }  // namespace prsm_match_num_recount
 

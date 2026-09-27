@@ -77,16 +77,60 @@ PrsmPara::PrsmPara(const std::map<std::string, std::string>& arguments) {
   }
 
   std::string activation_name = getArg(arguments, "activation");
-  int ppm = std::stoi(getArg(arguments, "massErrorTolerance"));
+  int prec_ppm = std::stoi(getArg(arguments, "precErrorTolerance"));
+  int frag_ppm = std::stoi(getArg(arguments, "fragErrorTolerance"));
   double n_term_label_mass = 0;
   if (getArg(arguments, "nTermLabelMass") != "") {
     n_term_label_mass = std::stod(getArg(arguments, "nTermLabelMass"));
   }
-  sp_para_ptr_ =
-      std::make_shared<SpPara>(activation_name, n_term_label_mass, ppm);
+  sp_para_ptr_ = std::make_shared<SpPara>(activation_name, n_term_label_mass,
+                                          prec_ppm, frag_ppm);
   if (getArg(arguments, "envCnnCutoff") != "") {
     sp_para_ptr_->setEnvCnnCutoff(std::stod(getArg(arguments, "envCnnCutoff")));
   }
+  // +-1 Da precursor mass error per stage; absent keys keep the SpPara
+  // defaults (allowed for zero/one shift, not for variable PTMs). toppic
+  // overrides oneShiftPrecOneDaError = "false" unless
+  // --enable-one-shift-prec-error is given; varPtmPrecOneDaError = "false"
+  // (the SpPara default) unless --enable-var-ptm-prec-error is given.
+  if (getArg(arguments, "zeroShiftPrecOneDaError") == "false") {
+    sp_para_ptr_->setZeroShiftPrecOneDaError(false);
+  }
+  std::string one_shift_prec_error =
+      getArg(arguments, "oneShiftPrecOneDaError");
+  if (one_shift_prec_error == "false") {
+    sp_para_ptr_->setOneShiftPrecOneDaError(false);
+  } else if (one_shift_prec_error == "true") {
+    sp_para_ptr_->setOneShiftPrecOneDaError(true);
+  }
+  std::string var_ptm_prec_error = getArg(arguments, "varPtmPrecOneDaError");
+  if (var_ptm_prec_error == "true") {
+    sp_para_ptr_->setVarPtmPrecOneDaError(true);
+  } else if (var_ptm_prec_error == "false") {
+    sp_para_ptr_->setVarPtmPrecOneDaError(false);
+  }
+  // +-1 Da fragment mass extension (toppic hidden
+  // --disable-frag-mass-extension); an absent key keeps the SpPara default
+  if (getArg(arguments, "fragMassExtension") == "false") {
+    sp_para_ptr_->setFragMassExtension(false);
+  }
+  // minimum fragment mass for the extension (toppic hidden
+  // --frag-extend-min-mass); an absent key keeps the SpPara default
+  // fragment mass deduplication (toppic hidden --frag-mass-dedup, off by
+  // default); an absent key keeps the SpPara default, so topmg and topdia are
+  // unchanged
+  std::string frag_mass_dedup = getArg(arguments, "fragMassDedup");
+  if (frag_mass_dedup == "true") {
+    sp_para_ptr_->setFragMassDedup(true);
+  } else if (frag_mass_dedup == "false") {
+    sp_para_ptr_->setFragMassDedup(false);
+  }
+  if (getArg(arguments, "fragExtendMinMass") != "") {
+    sp_para_ptr_->setFragExtendMinMass(
+        std::stod(getArg(arguments, "fragExtendMinMass")));
+  }
+  // toppic hidden --disable-multi-type-align; default true
+  use_multi_type_align_ = (getArg(arguments, "multiTypeAlign") != "false");
 }
 
 bool PrsmPara::allowProtType(const ProteoformTypePtr& type_ptr) const {

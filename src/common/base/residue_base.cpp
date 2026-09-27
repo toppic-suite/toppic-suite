@@ -83,8 +83,19 @@ ResiduePtrVec ResidueBase::getBaseNonePtmResiduePtrVec() {
 
 ResiduePtr ResidueBase::getBaseResiduePtr(const AminoAcidPtr& acid_ptr,
                                           const PtmPtr& ptm_ptr) {
+  // Look up first without allocating: this runs once per residue of every
+  // protein a search loads, and the temporary Residue plus its shared_ptr
+  // copies were the hot spot when many threads convert sequences at once.
+  for (size_t i = 0; i < residue_ptr_vec_.size(); i++) {
+    const Residue& residue = *residue_ptr_vec_[i];
+    if (residue.getAminoAcidPtr().get() == acid_ptr.get() &&
+        residue.getPtmPtr().get() == ptm_ptr.get()) {
+      return residue_ptr_vec_[i];
+    }
+  }
   ResiduePtr residue_ptr = std::make_shared<Residue>(acid_ptr, ptm_ptr);
-  return getBaseResiduePtr(residue_ptr);
+  residue_ptr_vec_.push_back(residue_ptr);
+  return residue_ptr;
 }
 
 ResiduePtr ResidueBase::getBaseResiduePtr(const AminoAcidPtr& acid_ptr) {

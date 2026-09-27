@@ -161,7 +161,7 @@ inline DiagHeaderPtrVec OnePtmSlowMatch::geneOnePtmNTermShiftHeaders() {
 void OnePtmSlowMatch::init() {
   DiagHeaderPtrVec n_term_shift_header_ptrs = geneOnePtmNTermShiftHeaders();
   PeakTolerancePtr tole_ptr =
-      mng_ptr_->prsm_para_ptr_->getSpParaPtr()->getPeakTolerancePtr();
+      mng_ptr_->prsm_para_ptr_->getSpParaPtr()->getPrecTolerancePtr();
   PrmPeakPtrVec prm_peaks =
       prm_ms_util::getPrmPeakPtrs(ms_six_ptr_vec_, tole_ptr);
   int group_spec_num = ms_six_ptr_vec_.size();

@@ -171,7 +171,8 @@ void DprProcessor::process() {
   MsAlignReaderPtr ms_reader_ptr = std::make_shared<MsAlignReader>(
       sp_file_name,
       1,  // prsm_para_ptr->getGroupSpecNum()
-      sp_para_ptr_->getActivationPtr(), sp_para_ptr_->getEnvCnnCutoff());
+      sp_para_ptr_->getActivationPtr(), sp_para_ptr_->getEnvCnnCutoff(),
+        sp_para_ptr_->getFragDedupPpo());
 
   int peak_num_limit = 500;
 
@@ -253,7 +254,7 @@ std::function<void()> geneTask(
         prsm_ptr->getAdjustedPrecMass());
 
     double ppo = mng_ptr->prsm_para_ptr_->getSpParaPtr()
-                     ->getPeakTolerancePtr()
+                     ->getPrecTolerancePtr()
                      ->getPpo();
 
     double tolerance =
@@ -325,7 +326,7 @@ std::function<void()> geneTask(
 void DprProcessor::processOnePrsm(const PrsmPtr& prsm_ptr,
                                   const SpectrumSetPtr& spec_set_ptr,
                                   const PrsmXmlWriterPtr& prsm_writer) {
-  if (prsm_ptr->getMatchFragNum() < 4) {
+  if (prsm_ptr->getMatchTheoFragNum() < 4) {
     prsm_ptr->setExpectedValuePtr(ExpectedValue::getMaxEvaluePtr());
     prsm_writer->write(prsm_ptr);
     return;

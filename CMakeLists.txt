@@ -34,7 +34,7 @@ if(NOT CMAKE_HOST_WIN32)
   endif()
 endif()
 
-project(TopPIC_claude VERSION 1.9.0.0 LANGUAGES C CXX)
+project(TopPIC_claude VERSION 2.0.0.0 LANGUAGES C CXX)
 message(STATUS "Project name: " ${PROJECT_NAME})
 message(STATUS "System name: " ${CMAKE_SYSTEM_NAME})
 
@@ -224,7 +224,13 @@ endif()
 # as a static library against Boost + zlib and linked into toppic_common. The
 # vendored sources include themselves as "pwiz/...", so ext/ is the include root.
 # WITHOUT_MZ5 drops the HDF5-backed mz5 format so no HDF5 dependency is needed.
-find_package(Boost 1.74 REQUIRED COMPONENTS filesystem iostreams thread chrono system serialization program_options)
+#
+# Boost.System is deliberately not a component: it has been header-only since
+# Boost 1.69 (below our 1.74 minimum), and Boost >= 1.90 (Ubuntu 26.04) no
+# longer ships the compiled stub library or its boost_system CMake config, so
+# requesting it makes find_package fail there. Its symbols (error_code etc.,
+# used through Boost.Filesystem) come from the headers on every platform.
+find_package(Boost 1.74 REQUIRED COMPONENTS filesystem iostreams thread chrono serialization program_options)
 file(GLOB PWIZ_SRCS CONFIGURE_DEPENDS
   ${CMAKE_CURRENT_SOURCE_DIR}/ext/pwiz/utility/minimxml/*.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/ext/pwiz/utility/misc/*.cpp
@@ -241,7 +247,7 @@ list(APPEND PWIZ_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/ext/boost/nowide/iostream.cpp)
 add_library(pwiz STATIC ${PWIZ_SRCS})
 target_include_directories(pwiz SYSTEM PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/ext)
 target_link_libraries(pwiz PUBLIC
-  Boost::filesystem Boost::iostreams Boost::thread Boost::chrono Boost::system
+  Boost::filesystem Boost::iostreams Boost::thread Boost::chrono
   ZLIB::ZLIB)
 target_compile_definitions(pwiz PUBLIC WITHOUT_MZ5)
 # SpectrumList_mzML.cpp includes <boost/bind.hpp>, whose "#pragma message"
@@ -316,17 +322,19 @@ target_link_libraries(toppic_common PUBLIC Boost::serialization)
 # so the existing SYSTEM ext/ include covers the headers) and the library is an
 # IMPORTED target linked into toppic_common.
 #
-# The vendored prebuilt libonnxruntime.so.1.14.1 is a Linux x86-64 binary and is
-# used on Linux. On macOS and Windows no library is vendored: the system package
-# is used instead (`brew install onnxruntime` on macOS; the MSYS2 package
+# The vendored prebuilt libonnxruntime.so.1.23.2 (SONAME libonnxruntime.so.1,
+# the symlink next to it, from Microsoft's onnxruntime-linux-x64-1.23.2.tgz
+# release archive; needs glibc >= 2.27) is a Linux x86-64 binary and is used on
+# Linux. On macOS and Windows no library is vendored: the system package is
+# used instead (`brew install onnxruntime` on macOS; the MSYS2 package
 # mingw-w64-ucrt-x86_64-onnxruntime in a UCRT64 shell on Windows), located with
-# find_library. A newer runtime serves the vendored 1.14 API headers (the ONNX
+# find_library. A newer runtime serves the vendored 1.23 API headers (the ONNX
 # Runtime C API is backward compatible).
 if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
   add_library(onnxruntime SHARED IMPORTED)
   set_target_properties(onnxruntime PROPERTIES
-    IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/ext/onnx/libonnxruntime.so.1.14.1
-    IMPORTED_SONAME libonnxruntime.so.1.14.1)
+    IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/ext/onnx/libonnxruntime.so.1.23.2
+    IMPORTED_SONAME libonnxruntime.so.1)
 else()
   find_library(ONNXRUNTIME_LIBRARY onnxruntime
     HINTS /opt/homebrew/lib /usr/local/lib)
@@ -452,7 +460,9 @@ install(TARGETS ${TOPPIC_EXECUTABLES}
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-  install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/ext/onnx/libonnxruntime.so.1.14.1
+  # the library and its SONAME symlink, which the executables load it by
+  install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/ext/onnx/libonnxruntime.so.1.23.2
+                ${CMAKE_CURRENT_SOURCE_DIR}/ext/onnx/libonnxruntime.so.1
           DESTINATION ${CMAKE_INSTALL_LIBDIR})
   set_target_properties(${TOPPIC_EXECUTABLES} PROPERTIES
     INSTALL_RPATH "$ORIGIN/../${CMAKE_INSTALL_LIBDIR}")

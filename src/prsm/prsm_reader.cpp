@@ -15,14 +15,19 @@
 
 #include "prsm/prsm_reader.hpp"
 
+#include <cstdlib>
+
 #include "common/util/logger.hpp"
 #include "common/util/str_util.hpp"
+#include "common/util/version.hpp"
 #include "common/xml/xml_dom_document.hpp"
 #include "common/xml/xml_dom_parser.hpp"
+#include "prsm/prsm_util.hpp"
 
 namespace toppic {
 
 PrsmReader::PrsmReader(const std::string& file_name) {
+  file_name_ = file_name;
   input_.open(file_name.c_str(), std::ios::in);
 }
 
@@ -60,6 +65,22 @@ PrsmStrPtr PrsmReader::readOnePrsmStr() {
   std::vector<std::string> prsm_str_vec = readOnePrsmLines();
   if (prsm_str_vec.size() == 0) {
     return PrsmStrPtr(nullptr);
+  }
+  // Every PrSM carries the version of TopPIC Suite that wrote it (the
+  // version element, since 2.0.0); the tools read only the PrSM files of
+  // their own version. Files of 1.9 and earlier have no version element.
+  std::string version_line = prsm_util::getXmlLine(prsm_str_vec, "<version>");
+  std::string file_version =
+      version_line == "" ? "" : prsm_util::getValueStr(version_line);
+  if (file_version != Version::getVersion()) {
+    LOG_ERROR("The result file "
+              << file_name_ << " was written by "
+              << (file_version == "" ? std::string("an earlier version")
+                                     : "version " + file_version)
+              << " of TopPIC Suite and cannot be read by this version ("
+              << Version::getVersion()
+              << "). Run the database search again with this version.");
+    exit(EXIT_FAILURE);
   }
   return std::make_shared<PrsmStr>(prsm_str_vec);
 }

@@ -23,6 +23,26 @@ namespace toppic {
 
 namespace mass_match_util {
 
+// Whether an index read from a file was built at a filter's column limits
+// (the largest proteoform mass and the scale of the integer masses).
+bool hasFilterLimits(const MassMatchPtr& index_ptr, int max_proteoform_mass,
+                     int filter_scale);
+
+// Prints, once per run, that the index file does not have the filter's
+// limits and that the filter builds its indexes in memory instead.
+void warnIndexLimits(const std::string& file_name,
+                     const MassMatchPtr& index_ptr, int max_proteoform_mass,
+                     int filter_scale);
+
+// Prints, once per run, that the index directory holds the files of an
+// earlier version, which wrote the diagonal index the one-shift and
+// multiple-shift filters share as one_ptm_diag_index and multi_ptm_index
+// instead of ptm_diag_index (suffix: the parameter and block part of the
+// file names), so that those filters build their indexes in memory.
+// Prints nothing when neither old file exists.
+void warnOldIndexLayout(const std::string& index_dir,
+                        const std::string& suffix);
+
 ProtCandidatePtrVec findZeroShiftTopProteins(std::vector<short>& scores,
                                              std::vector<short>& rev_scores,
                                              const MassMatchPtr& index_ptr,
@@ -32,14 +52,29 @@ ProtCandidatePtrVec findZeroShiftTopProteins(std::vector<short>& scores,
                                              int threshold, int num);
 
 // the simple version is faster, but less accurate
-ProtCandidatePtrVec simpleFindZeroShiftTopProteins(
-    std::vector<short>& scores, std::vector<short>& rev_scores,
-    const MassMatchPtr& index_ptr, const MassMatchPtr& rev_index_ptr,
-    double prec_minus_water_mass, double prec_error_tole, int threshold,
-    int top_num);
+// max_scores[i]: the best row score of proteoform i in the index
+void compProteoMaxScores(const std::vector<short>& scores,
+                         const MassMatchPtr& index_ptr,
+                         std::vector<int>& max_scores);
 
+// Zero-shift candidates: the proteoforms whose best N-terminal row score
+// plus best C-terminal row score reaches the threshold (no truncation shift
+// is recorded). The maxima come from compProteoMaxScores, so the four
+// proteoform types share four scans of the score arrays.
+ProtCandidatePtrVec simpleFindZeroShiftTopProteins(
+    const std::vector<int>& max_scores, const std::vector<int>& rev_max_scores,
+    int threshold, int top_num);
+
+// One-shift candidates: the proteoforms with the best total score of an
+// N-terminal row and a C-terminal row whose masses leave a shift in
+// [min_shift, max_shift] of the precursor mass. The per-proteoform maxima
+// come from compProteoMaxScores, so the four proteoform types share four
+// scans of the score arrays, and they bound the total score of a proteoform,
+// which keeps the truncation row scan to the proteoforms that can be
+// reported.
 ProtCandidatePtrVec findOneShiftTopProteins(
     std::vector<short>& scores, std::vector<short>& rev_scores,
+    const std::vector<int>& max_scores, const std::vector<int>& rev_max_scores,
     const MassMatchPtr& index_ptr, const MassMatchPtr& rev_index_ptr,
     double prec_minus_water_mass, double prec_error_tole, double min_shift,
     double max_shift, int term_shift_num, int threshold, int top_num);
@@ -50,10 +85,29 @@ ProtCandidatePtrVec findVarPtmTopProteins(
     double prec_minus_water_mass, double prec_error_tole,
     std::vector<double>& ptm_shifts, int threshold, int top_num);
 
-ProtCandidatePtrVec findDiagTopProteins(std::vector<short>& scores,
-                                        std::vector<int>& proteo_row_begins,
-                                        std::vector<int>& proteo_row_ends,
-                                        int threshold, int top_num);
+// prec_match_rows[i]: the rows of proteoform i that received the precursor
+// bonus, in ascending row order, collected from the rows the scoring noted
+// instead of a pass over every row of the index. A row without the bonus
+// scores at most the number of masses of the spectrum, far below the bonus,
+// and the threshold of the variable-PTM filter is twice the bonus, so no
+// other row can belong to a candidate.
+void compPrecMatchRows(const MassMatchPtr& index_ptr,
+                       const std::vector<int>& prec_rows,
+                       std::vector<std::vector<int>>& prec_match_rows);
+
+// The same candidates from those row lists, which the four proteoform types
+// of a spectrum share.
+ProtCandidatePtrVec findVarPtmTopProteins(
+    const std::vector<short>& scores, const std::vector<short>& rev_scores,
+    const std::vector<std::vector<int>>& prec_match_rows,
+    const std::vector<std::vector<int>>& rev_prec_match_rows,
+    const MassMatchPtr& index_ptr, const MassMatchPtr& rev_index_ptr,
+    double prec_minus_water_mass, double prec_error_tole,
+    std::vector<double>& ptm_shifts, int threshold, int top_num);
+
+ProtCandidatePtrVec findDiagTopProteins(
+    const std::vector<short>& scores, const std::vector<int>& proteo_row_begins,
+    const std::vector<int>& proteo_row_ends, int threshold, int top_num);
 
 }  // namespace mass_match_util
 

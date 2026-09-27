@@ -31,16 +31,21 @@ namespace env_detect {
 MatchEnvPtr detectEnvByRefPeak(const PeakPtrVec& peak_list, int ref_peak,
                                int charge, double max_mass, double min_inte,
                                double min_ref_inte, double bound_inte,
-                               const EnvParaPtr& env_para_ptr, bool is_full);
+                               const EnvParaPtr& env_para_ptr, bool is_full,
+                               bool check_real_env = false);
 
 MatchEnvPtr detectEnvByMonoMass(const PeakPtrVec& peak_list, double mono_mass,
                                 int charge, double min_inte, double bound_inte,
                                 const EnvParaPtr& env_para_ptr, bool is_full);
 
+// With check_real_env, the candidates that env_filter::filter's first test
+// (checkRealEnvValid) would remove are not built; use it only when that
+// filter follows.
 MatchEnvPtr2D getCandidateEnv(const PeakPtrVec& peak_list, int max_charge,
                               double max_mass, double min_inte,
                               double min_ref_inte, double bound_inte,
-                              const EnvParaPtr& env_para_ptr);
+                              const EnvParaPtr& env_para_ptr,
+                              bool check_real_env = false);
 }  // namespace env_detect
 
 }  // namespace toppic

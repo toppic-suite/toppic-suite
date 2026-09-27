@@ -29,6 +29,7 @@
 #include "common/util/file_util.hpp"
 #include "common/util/logger.hpp"
 #include "onnx/onnxruntime_cxx_api.h"
+#include "onnx/onnxruntime_session_options_config_keys.h"
 
 namespace toppic {
 
@@ -36,23 +37,41 @@ namespace onnx_env_cnn {
 
 namespace {
 
-Ort::Env* env;
-Ort::SessionOptions* session_options;
-Ort::Session* session;
-int batch_size = 1024;
+Ort::Env* env = nullptr;
+Ort::SessionOptions* session_options = nullptr;
+Ort::Session* session = nullptr;
+// Envelopes per ONNX call. Smaller batches keep the layers' intermediate
+// tensors nearer the caches: on st_1 the inference thread time was 149 s
+// with 1,024, 137 s with 256, 139 s with 64 and 178 s with 16 (toppic_test
+// experiment 36). The per-envelope arithmetic does not depend on the batch.
+int batch_size = 256;
 std::vector<const char*> input_node_names = {"input"};
 std::vector<const char*> output_node_names = {"output"};
 
 }  // namespace
 
 void initModel(const std::string& dir_name, int thread_num) {
+  bool allow_spinning = true;
+  initModel(dir_name, thread_num, allow_spinning);
+}
+
+void initModel(const std::string& dir_name, int thread_num,
+               bool allow_spinning) {
   std::string file_name = dir_name + file_util::getFileSeparator() +
                           "envcnn_models" + file_util::getFileSeparator() +
                           "envcnn_two_block.onnx";
-
+  file_util::checkResourceFile(file_name);
+  // a session may be replaced between stages (topfd_process)
+  delete session;
+  delete session_options;
+  delete env;
   env = new Ort::Env(ORT_LOGGING_LEVEL_WARNING, "env_cnn");
   session_options = new Ort::SessionOptions();
   session_options->SetIntraOpNumThreads(thread_num);
+  // without spinning, the intra-op threads sleep between calls instead of
+  // burning a core each while the caller works
+  session_options->AddConfigEntry(kOrtSessionOptionsConfigAllowIntraOpSpinning,
+                                  allow_spinning ? "1" : "0");
 
 #ifdef _WIN32
   std::wstring widestr = std::wstring(file_name.begin(), file_name.end());

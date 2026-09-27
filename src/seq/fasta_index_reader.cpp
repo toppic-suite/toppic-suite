@@ -17,17 +17,11 @@
 
 #include <cstdlib>
 #include <memory>
-#include <mutex>
 #include <string>
 
 #include "common/util/logger.hpp"
 
 namespace toppic {
-
-namespace {
-// fai_fetch is not thread safe, so all fetches are serialized on this mutex.
-std::mutex fasta_index_reader_mtx;
-}  // namespace
 
 FastaIndexReader::FastaIndexReader(const std::string& file_name) {
   fai_ = fai_load(file_name.c_str());
@@ -39,7 +33,9 @@ FastaSeqPtr FastaIndexReader::readFastaSeq(const std::string& name,
                                            const std::string& desc) {
   std::string ori_seq;
   {
-    std::lock_guard<std::mutex> lock(fasta_index_reader_mtx);
+    // fai_fetch is not thread safe on one handle, so the fetches through
+    // this reader are serialized; separate readers fetch in parallel
+    std::lock_guard<std::mutex> lock(mutex_);
     int seq_len = 0;
     char* seq = fai_fetch(fai_, name.c_str(), &seq_len);
     if (seq == nullptr || seq_len < 0) {

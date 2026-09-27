@@ -16,6 +16,7 @@
 #ifndef TOPPIC_FILTER_VARPTM_VAR_PTM_FILTER_HPP_
 #define TOPPIC_FILTER_VARPTM_VAR_PTM_FILTER_HPP_
 
+#include "filter/massmatch/filter_spec.hpp"
 #include "filter/massmatch/mass_match.hpp"
 #include "filter/mng/var_ptm_filter_mng.hpp"
 #include "ms/spec/prm_ms.hpp"
@@ -27,6 +28,13 @@ class VarPtmFilter {
  public:
   VarPtmFilter(const ProteoformPtrVec& proteo_ptrs,
                const VarPtmFilterMngPtr& mng_ptr, std::string block_str);
+
+  // the block independent part of a spectrum set, computed once per stage
+  static FilterSpecPtr geneFilterSpec(const PrmMsPtrVec& prm_ms_ptr_vec,
+                                     const PrmMsPtrVec& srm_ms_ptr_vec,
+                                     const VarPtmFilterMngPtr& mng_ptr);
+
+  void computeBestMatch(const FilterSpecPtr& spec_ptr);
 
   void computeBestMatch(const PrmMsPtrVec& prm_ms_ptr_vec,
                         const PrmMsPtrVec& srm_ms_ptr_vec);
@@ -44,6 +52,23 @@ class VarPtmFilter {
  private:
   VarPtmFilterMngPtr mng_ptr_;
   ProteoformPtrVec proteo_ptrs_;
+
+  // Score arrays of the four indexes, the rows of each that received the
+  // precursor bonus, and those rows grouped by proteoform, which the four
+  // proteoform types share. They are members so that they are allocated once
+  // per database block instead of once per spectrum.
+  std::vector<short> term_scores_;
+  std::vector<short> diag_scores_;
+  std::vector<short> rev_term_scores_;
+  std::vector<short> rev_diag_scores_;
+  std::vector<int> term_prec_rows_;
+  std::vector<int> diag_prec_rows_;
+  std::vector<int> rev_term_prec_rows_;
+  std::vector<int> rev_diag_prec_rows_;
+  std::vector<std::vector<int>> term_rows_2d_;
+  std::vector<std::vector<int>> diag_rows_2d_;
+  std::vector<std::vector<int>> rev_term_rows_2d_;
+  std::vector<std::vector<int>> rev_diag_rows_2d_;
 
   MassMatchPtr diag_index_ptr_;
   MassMatchPtr rev_diag_index_ptr_;

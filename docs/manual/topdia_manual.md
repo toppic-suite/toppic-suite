@@ -50,7 +50,14 @@ and runs five steps:
    proteoform features, scored with ECScore and filtered by
    `--ms1-ecscore-cutoff` and `--ms1-min-scan-number`.
 3. **MS/MS deconvolution.** Every DIA MS/MS scan is deconvoluted on its own,
-   without precursor information, into `sample_ms2_raw.msalign`.
+   without precursor information, into `sample_ms2_raw.msalign`. TopDIA
+   deconvolutes these scans with the parameters of version 1.9.0.0: a 12
+   Dalton envelope ranking window, no harmonic check and a 1,500 Dalton mass
+   group boundary. The 2.0.0.0 defaults of TopFD (2 Dalton, harmonic check,
+   4,250 Dalton) were measured on DDA data; a DIA MS/MS scan holds the
+   fragments of every co-isolated precursor of a wide window, where they
+   roughly double the reported masses and the fragment features that step 5
+   must hold in memory.
 4. **MS/MS feature detection.** The deconvoluted MS/MS scans are grouped by
    isolation window, and within each window the fragment masses are linked
    across scans into fragment features, scored with ECScore and filtered by
@@ -86,7 +93,7 @@ For an input `sample.mzML`:
 | `sample.sqlite` | The SQLite database with the deconvoluted MS1 and MS/MS scans and their peaks, as written by TopFD. It is always written. |
 
 The intermediate files are left in place. When searching the pseudo spectra
-with TopPIC, add `-E`: post mass matching looks up the
+with TopPIC, add `-D`: post mass matching looks up the
 centroided peaks of a single MS/MS scan, and a pseudo spectrum does not
 correspond to one scan.
 
@@ -138,7 +145,7 @@ TopFD only.
 
 ```sh
 topdia -u 8 sample.mzML
-toppic -E -d -t FDR -v 0.01 proteins.fasta sample_ms2.msalign
+toppic -D -d -t FDR -v 0.01 proteins.fasta sample_ms2.msalign
 ```
 
 The first command writes `sample_ms2.msalign` (pseudo spectra) and

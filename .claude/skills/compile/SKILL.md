@@ -12,9 +12,9 @@ land in `<repo>/bin/` and run from there without installing, because they
 find the runtime resources in `<repo>/res/` (`res` next to the executable,
 then `../res`, then the installed share directory).
 
-The authoritative, user-facing instructions are `README.md` (Ubuntu) and
-`docs/compile/{redhat,windows,macos}_build.md`. Keep them in step with
-`CMakeLists.txt` when the build changes.
+The authoritative, user-facing instructions are the four guides
+`docs/compile/{ubuntu,redhat,windows,macos}_build.md`, which `README.md`
+links to. Keep them in step with `CMakeLists.txt` when the build changes.
 
 ## Quick path (an existing checkout on Linux or macOS)
 
@@ -38,8 +38,10 @@ make -j$(nproc)          # macOS: make -j$(sysctl -n hw.ncpu)
 - C++17 compiler: Clang >= 7 (default) or GCC >= 8. Force one with
   `-DCMAKE_CXX_COMPILER=...`.
 - CMake >= 3.16.
-- Boost >= 1.74: filesystem, iostreams, thread, chrono, system,
-  serialization, program_options.
+- Boost >= 1.74: filesystem, iostreams, thread, chrono, serialization,
+  program_options. Not `system`: Boost.System is header-only since 1.69,
+  and Boost >= 1.90 (Ubuntu 26.04) ships no `boost_system` library or CMake
+  config, so listing it makes `find_package(Boost)` fail.
 - pugixml, SQLite3, zlib development packages.
 - Qt6 (Core, Gui, Widgets) for the `*_gui` targets only.
 - Git LFS: the EnvCNN/ECScore model files and the isotope table under
@@ -49,7 +51,7 @@ make -j$(nproc)          # macOS: make -j$(sysctl -n hw.ncpu)
   tools failing to load models at run time.
 - Vendored, nothing to install: htslib (`ext/htslib`), ProteoWizard
   (`ext/pwiz`), and on Linux x86-64 the ONNX Runtime shared library
-  (`ext/onnx/libonnxruntime.so.1.14.1`).
+  (`ext/onnx/libonnxruntime.so.1.23.2`, a Git LFS object).
 
 ## Platform notes
 
@@ -60,7 +62,7 @@ sudo apt-get update
 sudo apt-get install build-essential cmake clang git git-lfs \
     zlib1g-dev libsqlite3-dev libpugixml-dev \
     libboost-filesystem-dev libboost-iostreams-dev libboost-thread-dev \
-    libboost-chrono-dev libboost-system-dev libboost-serialization-dev \
+    libboost-chrono-dev libboost-serialization-dev \
     libboost-program-options-dev \
     qt6-base-dev
 ```
@@ -118,7 +120,7 @@ ninja
 - Release zip: `scripts\win_release.bat [version]` (run from cmd or
   PowerShell after building) bundles `bin\*.exe`, the UCRT64 DLLs they
   import, the Qt plugins and `res/` into `toppic-windows-<version>.zip` in the
-  repository root (default version `1.9.0.0`); the extracted folder runs
+  repository root (default version `2.0.0.0`); the extracted folder runs
   without MSYS2 on `PATH`.
 
 ### macOS (Xcode CLT + Homebrew)

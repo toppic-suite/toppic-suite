@@ -58,7 +58,10 @@ std::string process(const PrsmParaPtr& prsm_para_ptr,
 // The TopFD SQLite database that goes with an msalign spectrum file:
 // <path>/<base>.sqlite, where <base> is the file name without its extension
 // and without a trailing "_ms2" (TopFD writes <base>_ms2.msalign and
-// <base>.sqlite). The argument parser checks it exists before the search.
+// <base>.sqlite), nor a trailing "_mono" before it (<base>_mono_ms2.msalign,
+// the monoisotopic-mass copy of an average-mass file that TopPIC searches
+// with --average-mass, shares the database of <base>_ms2.msalign). The
+// argument parser checks it exists before the search.
 std::string sqlFileName(const std::string& sp_file_name);
 
 }  // namespace prsm_post_mass_match

@@ -18,9 +18,11 @@ executable must not contain spaces), and the database path must be at most
 ## 1. Input
 
 A protein database in FASTA format (`.fasta`, `.fa`, `.FASTA` or `.FA`).
-Every protein needs a unique accession: if two share one, TopIndex reports
-it, deletes the whole `<database>_idx/` directory (including index files
-from earlier runs), and stops.
+If two records share an accession (the header text up to the first
+space), TopIndex writes `<database>_dedup.fasta` next to the input,
+keeping the first record of each accession, prints a notice, and builds
+the indexes for that file in `<database>_dedup.fasta_idx/`. TopPIC and
+TopMG do the same when given the original file, so they find the indexes.
 
 ## 2. What TopIndex does
 
@@ -32,18 +34,29 @@ from earlier runs), and stops.
    proteins whose accessions start with `DECOY_`), its block files and block
    index, and its `.fai` index for random access. These are the same files
    TopPIC and TopMG create when they run without an index.
-3. Writes three families of index files, one file per index name and
-   database block; blocks are processed in parallel on the `-u` threads:
-   - `Generating non shift index files`: the zero-shift indexes
-     `zero_ptm_term_index`, `zero_ptm_diag_index`, `zero_ptm_rev_term_index`
-     and `zero_ptm_rev_diag_index`, used by TopPIC's zero-shift and
-     variable-PTM filters.
-   - `Generating one shift index files`: the one-shift indexes
-     `one_ptm_term_index`, `one_ptm_diag_index`, `one_ptm_rev_term_index` and
-     `one_ptm_rev_diag_index`, used by TopPIC's one-shift filter and TopMG's
-     ASF-One PTM filter.
-   - `Generating multiple shift index files`: `multi_ptm_index`, used by
-     TopPIC's multiple-shift filter and TopMG's ASF-Diagonal filter.
+3. Writes two families of index files, one file per index name and
+   database block, in one pass over the blocks (`Generating index files`);
+   blocks are processed in parallel on the `-u` threads:
+   - the zero-shift indexes `zero_ptm_term_index`, `zero_ptm_diag_index`,
+     `zero_ptm_rev_term_index` and `zero_ptm_rev_diag_index`, used by
+     TopPIC's zero-shift and variable-PTM filters, cover proteoform masses
+     up to 100 kDa;
+   - the one-shift indexes `one_ptm_term_index`, `ptm_diag_index`,
+     `one_ptm_rev_term_index` and `one_ptm_rev_diag_index`, used by TopPIC's
+     one-shift filter and TopMG's ASF-One PTM filter, are the zero-shift
+     indexes cut at 50 kDa, so each is written from the index just built
+     rather than built a second time. `ptm_diag_index` is also the index of
+     TopPIC's multiple-shift filter and TopMG's ASF-Diagonal filter, which
+     read the same file; there is no separate multiple-shift index file.
+
+   Index directories written by earlier versions hold that index twice, as
+   `one_ptm_diag_index` and `multi_ptm_index`. The searches do not read
+   those names: their zero-shift and variable-PTM filters still use such a
+   directory, but the one-shift and multiple-shift filters build their
+   indexes in memory and print a warning. Either run TopIndex again on the
+   directory (it rewrites the index files and leaves the two old names in
+   place, which can be deleted) or rename the `one_ptm_diag_index` files to
+   `ptm_diag_index` and delete the `multi_ptm_index` files.
 
 Each file name carries the parameters the index depends on, in the form
 `<family>_<fixed mod>_<N-terminal forms>_<error tolerance>_<no_decoy|decoy><block>`,
@@ -61,9 +74,9 @@ Indexes built with other settings are ignored silently, and the search
 builds its own in memory. TopIndex skips database files that already exist,
 so several parameter sets can be indexed into the same `_idx` directory.
 
-The index files are large: roughly ten thousand times the size of the FASTA
-file, spread over the three families, and about twice as much with
-`--decoy`. A few-megabyte database can produce tens of gigabytes of index
+The index files are large: roughly seven thousand times the size of the
+FASTA file, spread over the two families, and about twice as much with
+`--decoy` (184 GB for the 14 MB human SwissProt database with `--decoy`). A few-megabyte database can produce tens of gigabytes of index
 files. Delete the `_idx` directory to reclaim the space; the searches then
 fall back to in-memory indexes.
 
@@ -74,8 +87,9 @@ fall back to in-memory indexes.
 | `-f`, `--fixed-mod <C57\|C58\|file>` | none | Fixed modifications: `C57` carbamidomethylation of cysteine, `C58` carboxymethylation, or a modification file (see the [TopPIC manual](toppic_manual.md), section 5). |
 | `-n`, `--n-terminal-form <list>` | NONE,NME,NME_ACETYLATION,M_ACETYLATION | Allowed protein N-terminal forms, comma-separated. |
 | `-d`, `--decoy` | off | Also index a shuffled decoy database. |
-| `-e`, `--mass-error-tolerance <int>` | 10 | Error tolerance of precursor and fragment masses (ppm). |
-| `-u`, `--thread-number <int>` | 1 | Number of threads; database blocks are processed in parallel. Must not exceed the number of hardware threads. Each thread needs about 0.5 GiB of memory; TopIndex warns (but still runs) when the machine has too little for the requested number. |
+| `-e`, `--frag-error-tolerance <int>` | 10 | Error tolerance of fragment masses (ppm). |
+| `-E`, `--prec-error-tolerance <int>` | 10 | Error tolerance of precursor masses (ppm). |
+| `-u`, `--thread-number <int>` | 1 | Number of threads; database blocks are processed in parallel. Must not exceed the number of hardware threads. Each thread needs about 0.5 GiB of memory; TopIndex warns (but still runs) when the machine has too little for the requested number. The build is limited by memory and disk bandwidth rather than by cores, so more threads than physical cores gain nothing (on an 8-core machine, `-u 8` was faster than `-u 16`). |
 
 
 ## 5. Example
@@ -89,5 +103,5 @@ toppic -d -f C57 -e 15 proteins.fasta sample_ms2.msalign
 topmg  -d -f C57 -e 15 -i mods.txt proteins.fasta sample_ms2.msalign
 ```
 
-The console shows the three phases with one progress line per block and ends
-with `TopIndex - finished.`
+The console shows one progress line per block and ends with
+`TopIndex - finished.`

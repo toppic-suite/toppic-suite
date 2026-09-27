@@ -46,6 +46,7 @@
 #include "ms/spec/deconv_peak.hpp"
 #include "ms/spec/ms_header.hpp"
 #include "ms/spec/msalign_reader.hpp"
+#include "ms/spec/msalign_util.hpp"
 #include "ms/spec/msalign_writer.hpp"
 #include "ms/spec/peak.hpp"
 #include "ms/spec/peak_util.hpp"
@@ -71,12 +72,13 @@ namespace {
 // AbstractFragmentScorer in Informed-Proteomics): theoretical isotopic peaks
 // below 10% of the highest one are neither looked for nor scored; an envelope
 // is accepted with a Pearson correlation >= 0.7 or a Bhattacharyya distance
-// <= 0.03; fragment charges run from 1 to min(15, precursor charge + 2).
+// <= 0.03; fragment charges run from 1 to min(15, precursor charge +
+// CHARGE_ABOVE_PREC) (MSPathFinderT uses 2 above the precursor charge).
 constexpr double MIN_RELATIVE_INTE = 0.1;
 constexpr double MIN_CORR = 0.7;
 constexpr double MAX_DIST = 0.03;
 constexpr int MAX_CHARGE = 15;
-constexpr int CHARGE_ABOVE_PREC = 2;
+constexpr int CHARGE_ABOVE_PREC = 0;
 
 // m/z tolerance for pairing the theoretical isotopic peaks of an accepted
 // envelope with the observed peaks when the envelope is scored by EnvCNN
@@ -109,6 +111,12 @@ using PostMatchVec = std::vector<PostMatch>;
 class RawPeakReader {
  public:
   explicit RawPeakReader(sqlite3* db) : db_(db) {
+    // TopFD writes ms2_peak without an index; without one every spectrum's
+    // peak query scans the whole table (4.5 M rows on 480_F3_02, 11 of the
+    // 18 minutes of a default toppic run).
+    sql_util::execSql(db_,
+                      "CREATE INDEX IF NOT EXISTS ms2_peak_spec_id_index "
+                      "ON ms2_peak(spec_id);");
     id_stmt_ = sql_util::prepareSql(
         db_, "SELECT id FROM ms2_spectrum WHERE scan = ?;");
     peak_stmt_ = sql_util::prepareSql(
@@ -310,7 +318,7 @@ PostMatchVec matchPrsm(const PrsmPtr& prsm_ptr, const RawPeakVec& peaks,
       prsm_ptr, header_ptr->getActivationPtr(), sp_para_ptr->getMinMass());
   int max_charge =
       std::min(MAX_CHARGE, header_ptr->getFirstPrecCharge() + CHARGE_ABOVE_PREC);
-  double ppo = sp_para_ptr->getPeakTolerancePtr()->getPpo();
+  double ppo = sp_para_ptr->getFragTolerancePtr()->getPpo();
   PostMatchVec matches;
   for (size_t i = 0; i < theo_peaks.size(); i++) {
     double mass = theo_peaks[i]->getModMass();
@@ -380,23 +388,6 @@ void addMatchesToPrsm(const PrsmPtr& prsm_ptr, const PostMatchVec& matches,
   prsm_ptr->updateMatchNum(sp_para_ptr);
 }
 
-// The parameter block (comment lines) at the top of an msalign file.
-std::string readMsalignPara(const std::string& file_name) {
-  std::ifstream input(file_name);
-  std::string line;
-  std::string para_str;
-  while (std::getline(input, line)) {
-    if (line == "BEGIN IONS") {
-      break;
-    }
-    if (!para_str.empty()) {
-      para_str += "\n";
-    }
-    para_str += line;
-  }
-  return para_str;
-}
-
 // Write the spectra of the input msalign file, with the matched masses
 // appended, to the new msalign file.
 void writeMsalign(const std::string& sp_file_name,
@@ -404,7 +395,7 @@ void writeMsalign(const std::string& sp_file_name,
                   const SpParaPtr& sp_para_ptr,
                   const std::map<int, PostMatchVec>& spec_matches) {
   MsAlignWriter writer(post_sp_file_name);
-  writer.writePara(readMsalignPara(sp_file_name));
+  writer.writePara(msalign_util::readParaStr(sp_file_name));
   MsAlignReader reader(sp_file_name, 1, sp_para_ptr->getActivationPtr());
   DeconvMsPtr ms_ptr = reader.getNextMsPtr();
   while (ms_ptr != nullptr) {
@@ -429,8 +420,22 @@ void writeMsalign(const std::string& sp_file_name,
 // continuing the envelope ids of each spectrum.
 void writeSqlEnvs(sqlite3* db,
                   const std::map<int, PostMatchVec>& sql_spec_matches) {
+  // One scan for every spectrum's next envelope id. The per-spectrum
+  // "SELECT COALESCE(MAX(env_id)+1,0) ... WHERE spec_id = ?" this replaces
+  // ran once per matched spectrum against a table TopFD writes without an
+  // index, so each query scanned all of ms2_env: ~3,600 scans of a ~395k-row
+  // table, 36 s of the post mass matching step against 0.07 s for this one
+  // GROUP BY (toppic_test experiment 66) - the same defect class as the
+  // ms2_peak scan fixed by 4bdf749f, one table over. MAX is
+  // order-independent and every spectrum is visited once below, so
+  // prefetching before the inserts is exact.
+  std::map<int, int> next_env_ids;
   sqlite3_stmt* max_stmt = sql_util::prepareSql(
-      db, "SELECT COALESCE(MAX(env_id) + 1, 0) FROM ms2_env WHERE spec_id = ?;");
+      db, "SELECT spec_id, MAX(env_id) + 1 FROM ms2_env GROUP BY spec_id;");
+  while (sqlite3_step(max_stmt) == SQLITE_ROW) {
+    next_env_ids[sqlite3_column_int(max_stmt, 0)] =
+        sqlite3_column_int(max_stmt, 1);
+  }
   sqlite3_stmt* env_stmt = sql_util::prepareSql(
       db,
       "INSERT INTO ms2_env(spec_id, env_id, mono_mass, ref_mass, charge, "
@@ -442,13 +447,11 @@ void writeSqlEnvs(sqlite3* db,
   sql_util::execSql(db, "BEGIN TRANSACTION;");
   for (const auto& entry : sql_spec_matches) {
     int spec_id = entry.first;
-    sqlite3_bind_int(max_stmt, 1, spec_id);
     int env_id = 0;
-    if (sqlite3_step(max_stmt) == SQLITE_ROW) {
-      env_id = sqlite3_column_int(max_stmt, 0);
+    auto next_it = next_env_ids.find(spec_id);
+    if (next_it != next_env_ids.end()) {
+      env_id = next_it->second;
     }
-    sqlite3_clear_bindings(max_stmt);
-    sqlite3_reset(max_stmt);
     for (const PostMatch& match : entry.second) {
       EnvPtr env_ptr = match.env;
       int peak_num = env_ptr->getPeakNum();
@@ -484,6 +487,12 @@ std::string sqlFileName(const std::string& sp_file_name) {
   std::string sql_base = file_util::basename(sp_file_name);
   if (str_util::endsWith(sql_base, "_ms2")) {
     sql_base = sql_base.substr(0, sql_base.size() - 4);
+  }
+  // <base>_mono_ms2.msalign, the monoisotopic-mass copy TopPIC writes for
+  // an average-mass file (--average-mass), shares the database of
+  // <base>_ms2.msalign
+  if (str_util::endsWith(sql_base, "_mono")) {
+    sql_base = sql_base.substr(0, sql_base.size() - 5);
   }
   return sql_base + ".sqlite";
 }

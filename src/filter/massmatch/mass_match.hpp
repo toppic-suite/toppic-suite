@@ -54,13 +54,50 @@ class MassMatch {
       const std::vector<std::pair<int, int>>& prec_minus_water_mass_errors,
       std::vector<short>& scores);
 
+  // The same scoring, with the rows that received the precursor bonus
+  // appended to prec_rows. Only those rows can belong to a candidate of the
+  // variable-PTM filter, whose score threshold is twice the precursor match
+  // score, so the caller can work from them instead of scanning every row of
+  // the index. scores must be zero on entry.
+  void compMatchScores(
+      const std::vector<std::pair<int, int>>& pref_mass_errors,
+      const std::vector<std::pair<int, int>>& prec_minus_water_mass_errors,
+      std::vector<short>& scores, std::vector<int>& prec_rows);
+
+  // Diagonal scoring for the multiple-shift filter: for every anchor peak i,
+  // the peaks k >= i shifted by -mass_i are scored against the index (as
+  // compScores(pref_mass_errors, i, -mass_i, scores) does), and max_scores
+  // receives, for the rows whose score reaches threshold for some anchor,
+  // the maximum of that score over the anchors; the other rows are 0.
+  void compDiagMaxScores(
+      const std::vector<std::pair<int, int>>& pref_mass_errors, int threshold,
+      std::vector<short>& max_scores);
+
   void serializeMassMatch(std::string file_name, std::string dir_name);
 
   void deserializeMassMatch(std::string file_name, std::string dir_name);
 
   int getRowNum() { return row_num_; }
 
+  int getColNum() { return col_num_; }
+
+  double getScale() { return scale_; }
+
+  // Whether truncateColumns(max_proteoform_mass) gives the index that the
+  // constructor builds at that limit: the limit is at most this index's, and
+  // every proteoform's masses were nondecreasing, so that the construction
+  // loops, which stop at the first mass beyond the limit, put the same
+  // entries in the same order into the columns below it. False for an index
+  // read from a file, whose masses are not known.
+  bool canTruncateColumns(double max_proteoform_mass) const;
+
+  // Drops the columns from max_proteoform_mass * scale on and their entries
+  // (see canTruncateColumns).
+  void truncateColumns(double max_proteoform_mass);
+
   static int getPrecursorMatchScore() { return 10000; }
+
+  const std::vector<int>& getRowProteoIds() { return row_proteo_ids_; }
 
   const std::vector<int>& getProteoRowBegins() { return proteo_row_begins_; }
 
@@ -97,6 +134,24 @@ class MassMatch {
   std::vector<int> col_index_ends_;
   std::vector<int> col_indexes_;
 
+  // col_index_begins_ followed by the end of the last column, so that the
+  // entries of columns [left, right] are [begins[left], begins[right + 1]);
+  // built after construction or deserialization, not serialized.
+  std::vector<int> col_index_bounds_;
+
+  // whether every proteoform's masses were nondecreasing at construction
+  // (see canTruncateColumns); not serialized
+  bool rows_nondecreasing_ = false;
+
+  void initColIndexBounds();
+
+  template <typename Score>
+  void compDiagMaxScoresImpl(
+      const std::vector<std::pair<int, int>>& pref_mass_errors,
+      int anchor_begin, int anchor_end, int threshold,
+      std::vector<Score>& scores, std::vector<int>& hot_rows,
+      std::vector<short>& max_scores);
+
   void initProteoformBeginEnds(std::vector<std::vector<double>>& shift_2d);
 
   void initIndexes(std::vector<std::vector<int>>& mass_2d,
@@ -115,6 +170,11 @@ class MassMatch {
 
   void updatePrecScore(const std::pair<int, int> mass_error,
                        std::vector<short>& scores);
+
+  template <bool TrackPrecRows>
+  void updatePrecScoreImpl(const std::pair<int, int>& mass_error,
+                           std::vector<short>& scores,
+                           std::vector<int>* prec_rows);
 };
 
 using MassMatchPtr = std::shared_ptr<MassMatch>;

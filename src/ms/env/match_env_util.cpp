@@ -148,68 +148,6 @@ MatchEnvPtr getNewMatchEnv(PeakPtrVec& ms, int idx, double tolerance) {
   return std::make_shared<MatchEnv>(mass_group, theo_env, real_env);
 }
 
-MatchEnvPtrVec addMultipleMass(MatchEnvPtrVec& envs, MatchEnvPtr2D& candidates,
-                               const EnvParaPtr& env_para_ptr) {
-  MatchEnvPtrVec mass_envs;
-  for (size_t i = 0; i < envs.size(); i++) {
-    // check if we can use another charge state
-    int charge = envs[i]->getExpEnvPtr()->getCharge();
-    int refer_peak = envs[i]->getExpEnvPtr()->getReferPeakIdx();
-    MatchEnvPtrVec charge_envs(2, nullptr);
-    // we use non-overlapping envelopes here
-    // Current charge stored in [ref_peak][charge-1]
-    charge_envs[0] = candidates[refer_peak][charge - 1];
-    double min_score =
-        charge_envs[0]->getMsdeconvScore() * env_para_ptr->multiple_min_ratio_;
-    if (charge >= env_para_ptr->multiple_min_charge_) {
-      double score_minus_one = 0;
-      // Env for charge - 1
-      if (charge > 1 && candidates[refer_peak][charge - 2] != nullptr) {
-        score_minus_one =
-            candidates[refer_peak][charge - 2]->getMsdeconvScore();
-      }
-      double score_plus_one = 0;
-      // Env for charge + 1
-      if (charge < static_cast<int>(candidates[0].size()) &&
-          candidates[refer_peak][charge] != nullptr) {
-        score_plus_one = candidates[refer_peak][charge]->getMsdeconvScore();
-      }
-      if (score_minus_one > score_plus_one && score_minus_one >= min_score) {
-        charge_envs[1] = candidates[refer_peak][charge - 2];
-      } else if (score_plus_one >= min_score) {
-        charge_envs[1] = candidates[refer_peak][charge];
-      }
-    }
-    for (size_t j = 0; j < charge_envs.size(); j++) {
-      if (charge_envs[j] == nullptr) {
-        continue;
-      }
-      mass_envs.push_back(charge_envs[j]);
-      double mono_mass = charge_envs[j]->getExpEnvPtr()->getMonoNeutralMass();
-      ExpEnvPtr real_env_ptr = charge_envs[j]->getExpEnvPtr();
-      int refer_idx = real_env_ptr->getReferIdx();
-      if (mono_mass >= env_para_ptr->multiple_min_mass_) {
-        // check left -1 Dalton
-        if (refer_idx > 0) {
-          int p = real_env_ptr->getPeakIdx(refer_idx - 1);
-          if (p >= 0 && candidates[p][charge - 1] != nullptr &&
-              candidates[p][charge - 1]->getMsdeconvScore() >= min_score) {
-            mass_envs.push_back(candidates[p][charge - 1]);
-          }
-        }
-        // check right +1 Dalton
-        if (refer_idx < real_env_ptr->getPeakNum() - 1) {
-          int p = real_env_ptr->getPeakIdx(refer_idx + 1);
-          if (p >= 0 && candidates[p][charge - 1] != nullptr &&
-              candidates[p][charge - 1]->getMsdeconvScore() >= min_score) {
-            mass_envs.push_back(candidates[p][charge - 1]);
-          }
-        }
-      }
-    }
-  }
-  return mass_envs;
-}
 
 DeconvMsPtr getDeconvMsPtr(const MsHeaderPtr& header_ptr,
                            MatchEnvPtrVec& envs) {

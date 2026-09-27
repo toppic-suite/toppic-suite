@@ -80,6 +80,10 @@ std::string getResourceDir(const std::string& exec_dir);
 
 bool checkSpace(const std::string& dir);
 
+// Aborts with an error message when a resource file (an isotopic
+// distribution table or an ONNX model under res/) does not exist.
+void checkResourceFile(const std::string& file_name);
+
 }  // namespace file_util
 
 }  // namespace toppic

@@ -61,11 +61,13 @@ FastaSeq::FastaSeq(const FastaSeqPtr& seq_ptr, int start, int len) {
 void FastaSeq::compAcidPtmPairVec() {
   size_t pos = 0;
   int count = 0;
+  const std::string& empty_ptm_str = PtmBase::getEmptyPtmPtr()->getAbbrName();
+  acid_ptm_pair_vec_.reserve(seq_.length());
   while (pos < seq_.length()) {
     std::string acid_one_letter = seq_.substr(pos, 1);
     std::string ptm_str;
     if (pos + 1 >= seq_.length() || seq_.at(pos + 1) != '[') {
-      ptm_str = PtmBase::getEmptyPtmPtr()->getAbbrName();
+      ptm_str = empty_ptm_str;
       pos = pos + 1;
     } else {
       size_t bracket_pos = seq_.find(']', pos + 1);

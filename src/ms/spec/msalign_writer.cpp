@@ -23,7 +23,8 @@
 
 namespace toppic {
 
-MsAlignWriter::MsAlignWriter(const std::string& file_name) {
+MsAlignWriter::MsAlignWriter(const std::string& file_name)
+    : file_name_(file_name) {
   output_.open(file_name);
   if (!output_.is_open()) {
     LOG_ERROR("Cannot open the msalign file  " << file_name << "!");
@@ -46,6 +47,9 @@ void MsAlignWriter::writeMs(const DeconvMsPtr& ms_ptr) {
   output_ << std::fixed;
   output_ << "BEGIN IONS" << std::endl;
   output_ << "FILE_NAME=" << header_ptr->getFileName() << std::endl;
+  // the msalign file this spectrum is written into (for FAIMS data the
+  // per-voltage file, e.g. sample_-40_ms2.msalign)
+  output_ << "MSALIGN_FILE_NAME=" << file_name_ << std::endl;
   output_ << "SPECTRUM_ID=" << header_ptr->getSpecId() << std::endl;
   output_ << "TITLE=" << header_ptr->getTitle() << std::endl;
   output_ << "SCANS=" << header_ptr->getScansString() << std::endl;

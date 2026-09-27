@@ -182,7 +182,7 @@ void compOnePtmSTable(std::vector<int>& s_table, const ProteoformPtr& form_ptr,
   std::vector<double> srm_masses = bp_spec_ptr->getSrmMasses();
   // LOG_DEBUG("prm size " << prm_masses.size() << " len " << len);
   // LOG_DEBUG("srm size " << srm_masses.size() << " len " << len);
-  PeakTolerancePtr tole_ptr = mng_ptr->peak_tole_ptr_;
+  PeakTolerancePtr tole_ptr = mng_ptr->frag_tole_ptr_;
 
   double shift_mass = ptm_ptr->getMonoMass();
   for (size_t i = 0; i < extend_ms_ptr_vec.size(); i++) {
@@ -250,7 +250,7 @@ void compTwoPtmMTable(std::vector<std::vector<int>>& m_table,
   std::vector<double> prm_masses = bp_spec_ptr->getPrmMasses();
   // srm mass is in the increasing order
   std::vector<double> srm_masses = bp_spec_ptr->getSrmMasses();
-  PeakTolerancePtr tole_ptr = mng_ptr->peak_tole_ptr_;
+  PeakTolerancePtr tole_ptr = mng_ptr->frag_tole_ptr_;
 
   double mass_1 = ptm_ptr_1->getMonoMass();
   double mass_2 = ptm_ptr_2->getMonoMass();

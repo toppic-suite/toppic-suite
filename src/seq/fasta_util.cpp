@@ -16,11 +16,13 @@
 #include "seq/fasta_util.hpp"
 
 #include <algorithm>
+#include <cctype>
 #include <cmath>
 #include <cstddef>
 #include <cstdlib>
 #include <filesystem>
 #include <fstream>
+#include <iostream>
 #include <random>
 #include <set>
 #include <string>
@@ -269,6 +271,67 @@ int countProteinNum(const std::string& fasta_file) {
   }
   reader.close();
   return cnt;
+}
+
+namespace {
+
+// The protein id of a FASTA header line: the text after '>' up to the first
+// whitespace, the same rule htslib's faidx uses to name a sequence.
+std::string getProteinId(const std::string& header_line) {
+  size_t end = 1;
+  while (end < header_line.size() &&
+         !std::isspace(static_cast<unsigned char>(header_line[end]))) {
+    end++;
+  }
+  return header_line.substr(1, end - 1);
+}
+
+}  // namespace
+
+std::string removeDuplicatedIds(const std::string& fasta_file) {
+  std::ifstream input(fasta_file);
+  if (!input) {
+    LOG_ERROR("Unable to open the protein sequence file " << fasta_file);
+    exit(EXIT_FAILURE);
+  }
+  // first pass: count the records whose id was already seen
+  std::set<std::string> id_set;
+  int dup_num = 0;
+  std::string line;
+  while (std::getline(input, line)) {
+    if (!line.empty() && line[0] == '>' &&
+        !id_set.insert(getProteinId(line)).second) {
+      dup_num++;
+    }
+  }
+  if (dup_num == 0) {
+    return fasta_file;
+  }
+
+  // second pass: copy the file, skipping every record of an id seen before
+  std::string dedup_file = file_util::basename(fasta_file) + "_dedup.fasta";
+  input.clear();
+  input.seekg(0);
+  std::ofstream output(dedup_file);
+  if (!output) {
+    LOG_ERROR("Unable to write the protein sequence file " << dedup_file);
+    exit(EXIT_FAILURE);
+  }
+  id_set.clear();
+  bool skip = false;
+  while (std::getline(input, line)) {
+    if (!line.empty() && line[0] == '>') {
+      skip = !id_set.insert(getProteinId(line)).second;
+    }
+    if (!skip) {
+      output << line << std::endl;
+    }
+  }
+  std::cout << "The protein database file " << fasta_file << " contains "
+            << dup_num << " record(s) with a duplicated protein id. "
+            << "The deduplicated database file " << dedup_file
+            << " is used instead." << std::endl;
+  return dedup_file;
 }
 
 }  // namespace fasta_util

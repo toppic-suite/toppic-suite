@@ -40,9 +40,9 @@
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>390</y>
+      <y>420</y>
       <width>881</width>
-      <height>261</height>
+      <height>231</height>
      </rect>
     </property>
     <property name="html">
@@ -133,7 +133,7 @@ p, li { white-space: pre-wrap; }
       <x>20</x>
       <y>10</y>
       <width>881</width>
-      <height>371</height>
+      <height>401</height>
      </rect>
     </property>
     <property name="currentIndex">
@@ -426,11 +426,43 @@ p, li { white-space: pre-wrap; }
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="horizontalLayoutWidget_11">
+     <widget class="QWidget" name="horizontalLayoutWidget_precTole">
       <property name="geometry">
        <rect>
         <x>10</x>
         <y>160</y>
+        <width>277</width>
+        <height>33</height>
+       </rect>
+      </property>
+      <layout class="QHBoxLayout" name="horizontalLayout_precTole">
+       <item>
+        <widget class="QLabel" name="label_precTole">
+         <property name="minimumSize">
+          <size>
+           <width>210</width>
+           <height>0</height>
+          </size>
+         </property>
+                  <property name="text">
+          <string>Precursor tolerance (PPM):</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="precErrorToleranceEdit">
+         <property name="text">
+          <string>10</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="horizontalLayoutWidget_11">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>190</y>
         <width>277</width>
         <height>33</height>
        </rect>
@@ -445,7 +477,7 @@ p, li { white-space: pre-wrap; }
           </size>
          </property>
          <property name="text">
-          <string>Mass error tolerance (PPM):</string>
+          <string>Fragment tolerance (PPM):</string>
          </property>
         </widget>
        </item>
@@ -462,7 +494,7 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>230</y>
+        <y>260</y>
         <width>861</width>
         <height>101</height>
        </rect>
@@ -692,7 +724,7 @@ level:</string>
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>190</y>
+        <y>220</y>
         <width>277</width>
         <height>33</height>
        </rect>
@@ -755,7 +787,7 @@ level:</string>
        <item>
         <widget class="QLineEdit" name="envCnnCutoffEdit">
          <property name="text">
-          <string>0.2</string>
+          <string>0.4</string>
          </property>
         </widget>
        </item>

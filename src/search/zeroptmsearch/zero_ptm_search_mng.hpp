@@ -24,14 +24,17 @@ namespace toppic {
 
 class ZeroPtmSearchMng {
  public:
-  ZeroPtmSearchMng(const PrsmParaPtr& prsm_para_ptr,
+  ZeroPtmSearchMng(const PrsmParaPtr& prsm_para_ptr, int thread_num,
                    const std::string& input_file_ext,
                    const std::string& output_file_ext)
       : prsm_para_ptr_(prsm_para_ptr),
+        thread_num_(thread_num),
         input_file_ext_(input_file_ext),
         output_file_ext_(output_file_ext) {}
 
   PrsmParaPtr prsm_para_ptr_;
+
+  int thread_num_ = 1;
 
   // zero ptm fast filtering result
   int zero_ptm_filter_result_num_ = 20;

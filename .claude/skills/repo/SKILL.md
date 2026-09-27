@@ -9,7 +9,7 @@ Two GitHub repositories hold the TopPIC Suite:
 
 | Role | Repository | Branch |
 |---|---|---|
-| **Private, the source of truth** | `https://github.com/liuxiaowen/toppic_suite_private.git` (the remote of this checkout may still show its old name `proteomics_cpp`; GitHub redirects) | `main` |
+| **Private, the source of truth** | `https://github.com/liuxiaowen/toppic_suite_private.git` (the `origin` of this checkout) | `main` |
 | **Public release copy** | `https://github.com/toppic-suite/toppic-suite.git` | `main` |
 
 Development happens in the private repository. Publishing means making the
@@ -33,8 +33,11 @@ a sync should produce, and works without manual conflict resolution.
   repository and pushed to the public one explicitly (steps below).
 - Push rights on `toppic-suite/toppic-suite` (an HTTPS token or SSH key that
   git can use non-interactively).
-- The private `main` is at the state to publish (merge `release_1.9` into
-  `main` first if needed) and the release tag exists there.
+- The private `main` is at the state to publish and the release tag exists
+  there. Release tags are annotated, `v<version>` with the message
+  `TopPIC Suite <version>`, where `<version>` is the `project(... VERSION
+  ...)` of `CMakeLists.txt` (e.g. `v2.0.0.0`):
+  `git tag -a v2.0.0.0 -m "TopPIC Suite 2.0.0.0" && git push origin v2.0.0.0`.
 
 ## Procedure
 
@@ -48,7 +51,7 @@ git clone https://github.com/toppic-suite/toppic-suite.git toppic_suite
 cd toppic_suite
 git remote add upstream https://github.com/liuxiaowen/toppic_suite_private.git
 git fetch upstream --tags
-git lfs fetch upstream main            # the model files behind the pointers
+git lfs fetch upstream upstream/main   # the model files behind the pointers
 
 # 1. Does the public main have commits the private one lacks?
 git log --oneline upstream/main..main
@@ -86,7 +89,7 @@ Verify from anywhere:
 
 ```sh
 git ls-remote --heads https://github.com/toppic-suite/toppic-suite.git main
-git ls-remote --tags  https://github.com/toppic-suite/toppic-suite.git v1.9.0.0
+git ls-remote --tags  https://github.com/toppic-suite/toppic-suite.git v2.0.0.0
 ```
 
 The public `main` hash is the new merge commit (or, after a fast-forward,
@@ -96,7 +99,7 @@ private repository.
 ## Optional: publish other branches
 
 Only `main` and the tags are synced above. The public repository also lacks
-`release_1.9` (and the private working branches `mdec`, `post_mass_match`,
+`release_1.9` (and the private working branches such as `mdec` and
 `low_resolution`, which stay private). To publish the release branch too:
 
 ```sh
@@ -136,10 +139,16 @@ It fails for four reasons, now fixed above:
   done for `v1.9.0.0` once). If the private tag is the intended one, run
   `git fetch upstream --tags --force` and later `git push origin --tags
   --force`; announce it, since existing clones keep the old tag.
-- **`Object does not exist on the server`** or `LFS: object not found`
-  during `git push`: an LFS object referenced by a pushed commit is not in
-  the local cache. `git lfs fetch upstream --all` (every version of every
-  LFS file; several hundred MB) then `git lfs push origin --all`.
+- **`Object does not exist on the server` ... smudge filter lfs failed**
+  during `read-tree`: the LFS objects were not fetched from the private
+  repository, so the checkout asked the public server for them. The ref
+  must be spelled `upstream/main`: `git lfs fetch upstream main` resolves
+  `main` to the local (public) branch and fetches nothing. Run
+  `git lfs fetch upstream upstream/main` and repeat the `read-tree` line.
+- **`LFS: object not found`** during `git push`: an LFS object referenced
+  by a pushed commit is not in the local cache. `git lfs fetch upstream
+  --all` (every version of every LFS file; several hundred MB) then
+  `git lfs push origin --all`.
 - **`git diff --stat upstream/main HEAD` prints files** after the merge:
   the read-tree step was skipped or ran against the wrong ref; do not
   push. `git reset --hard main` (the clone's original tip) and redo it.

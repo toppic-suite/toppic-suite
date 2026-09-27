@@ -27,6 +27,11 @@ namespace onnx_env_cnn {
 
 void initModel(const std::string& dir_name, int thread_num);
 
+// thread_num intra-op threads for the session, with or without spinning
+// between calls (see topfd_process for the settings of each stage).
+void initModel(const std::string& dir_name, int thread_num,
+               bool allow_spinning);
+
 void computeEnvScores(const PeakPtrVec& peak_list, MatchEnvPtrVec& ori_envs);
 
 std::vector<std::vector<float>> initInputMatrix();

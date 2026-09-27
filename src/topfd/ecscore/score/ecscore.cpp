@@ -31,9 +31,18 @@
 namespace toppic {
 
 ECScore::ECScore(const EnvCollPtr& env_coll_ptr, const MsMapPtr& matrix_ptr,
-                 double sn_ratio) {
+                 double sn_ratio)
+    : ECScore(env_coll_ptr, matrix_ptr, sn_ratio,
+              comp_env_cnn_score::compEnvcnnScore(matrix_ptr, env_coll_ptr)) {}
+
+ECScore::ECScore(const EnvCollPtr& env_coll_ptr, const MsMapPtr& matrix_ptr,
+                 double sn_ratio, double envcnn_score) {
   SeedEnvPtr seed_ptr = env_coll_ptr->getSeedPtr();
-  MsMapRowHeaderPtrVec spec_list = matrix_ptr->getHeaderPtrList();
+  // retention times are read from the map's rows (getHeaderPtrList would
+  // copy the whole header list for every scored feature)
+  auto rt = [&matrix_ptr](int spec_id) {
+    return matrix_ptr->getRowPtr(spec_id)->getHeaderPtr()->getRt();
+  };
 
   EnvSetPtr env_set_ptr = env_coll_ptr->getSeedEnvSet();
   // score_id_ = score_id;
@@ -49,10 +58,10 @@ ECScore::ECScore(const EnvCollPtr& env_coll_ptr, const MsMapPtr& matrix_ptr,
   abundance_ = env_coll_ptr->getIntensity();
 
   // convert seconds to minutes
-  min_elution_time_ = spec_list[min_scan_]->getRt() / 60;
-  max_elution_time_ = spec_list[max_scan_]->getRt() / 60;
+  min_elution_time_ = rt(min_scan_) / 60;
+  max_elution_time_ = rt(max_scan_) / 60;
   int seed_spec_id = seed_ptr->getSpecId();
-  apex_elution_time_ = spec_list[seed_spec_id]->getRt() / 60;
+  apex_elution_time_ = rt(seed_spec_id) / 60;
   elution_length_ = max_elution_time_ - min_elution_time_;
 
   EnvSetPtr seed_set_ptr = env_coll_ptr->getSeedEnvSet();
@@ -60,7 +69,7 @@ ECScore::ECScore(const EnvCollPtr& env_coll_ptr, const MsMapPtr& matrix_ptr,
   std::vector<std::vector<double>> theo_map =
       seed_set_ptr->getScaledTheoIntes(min_inte);
 
-  map_max_elution_time_ = spec_list[spec_list.size() - 1]->getRt() / 60;
+  map_max_elution_time_ = rt(matrix_ptr->getRowNum() - 1) / 60;
 
   percent_matched_peaks_ =
       component_score::getMatchedPeakPercent(env_set_ptr, theo_map);
@@ -73,7 +82,7 @@ ECScore::ECScore(const EnvCollPtr& env_coll_ptr, const MsMapPtr& matrix_ptr,
   num_theo_peaks_ = component_score::getTheoPeakNum(theo_map);
   mz_error_sum_ = component_score::getMzErrors(env_set_ptr);
 
-  envcnn_score_ = comp_env_cnn_score::compEnvcnnScore(matrix_ptr, env_coll_ptr);
+  envcnn_score_ = envcnn_score;
   label_ = 0;
 
   std::vector<float> ecscore_input = getEcscoreInput(map_max_elution_time_);

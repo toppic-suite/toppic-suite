@@ -44,7 +44,7 @@ void mergeMs1MsalignFiles(const TopfdParaPtr& topfd_para_ptr,
                           std::string output_base_name) {
   // Merge files
   std::string file_name_ext = "ms1.msalign";
-  std::string para_str = topfd_para_ptr->getParaStr("#", "\t");
+  std::string para_str = topfd_para_ptr->getParaStr("#", "\t", file_name_ext);
   MsalignThreadMergePtr ms1_merge_ptr = std::make_shared<MsalignThreadMerge>(
       file_name_ext, topfd_para_ptr->getThreadNum(), file_name_ext,
       output_base_name, para_str);

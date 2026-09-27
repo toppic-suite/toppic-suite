@@ -128,7 +128,7 @@ void LocalProcessor::process() {
 PrsmPtr LocalProcessor::processOnePrsm(const PrsmPtr& prsm) {
   int mass_shift_num =
       prsm->getProteoformPtr()->getAlterNum(AlterType::UNEXPECTED);
-  double err_tole = mng_ptr_->peak_tole_ptr_->compStrictErrorTole(
+  double err_tole = mng_ptr_->prec_tole_ptr_->compStrictErrorTole(
       prsm->getAdjustedPrecMass());
   if (mass_shift_num == 1) {
     double mass = prsm->getProteoformPtr()
@@ -270,7 +270,7 @@ ProteoformPtr LocalProcessor::processOneKnownPtm(const PrsmPtr& prsm_ptr) {
   ExtendMsPtrVec extend_ms_ptr_vec = prsm_ptr->getRefineMsPtrVec();
   double adjust_prec_mass = prsm_ptr->getAdjustedPrecMass();
   double err_tole =
-      mng_ptr_->peak_tole_ptr_->compStrictErrorTole(adjust_prec_mass);
+      mng_ptr_->prec_tole_ptr_->compStrictErrorTole(adjust_prec_mass);
 
   int best_match_score = 0;
   ProteoformPtr best_form_ptr = nullptr;
@@ -394,7 +394,7 @@ ProteoformPtr LocalProcessor::processTwoKnownPtms(const PrsmPtr& prsm_ptr) {
   ExtendMsPtrVec extend_ms_ptr_vec = prsm_ptr->getRefineMsPtrVec();
   double adjust_prec_mass = prsm_ptr->getAdjustedPrecMass();
   double err_tole =
-      mng_ptr_->peak_tole_ptr_->compStrictErrorTole(adjust_prec_mass);
+      mng_ptr_->prec_tole_ptr_->compStrictErrorTole(adjust_prec_mass);
 
   // get best form and best ptm pair
   int best_match_score = 0;
@@ -434,7 +434,7 @@ ProteoformPtr LocalProcessor::processTwoKnownPtms(const PrsmPtr& prsm_ptr) {
     LOG_DEBUG(best_ptm_pair.second->getName());
   }
 
-  int ori_match_score = prsm_ptr->getMatchFragNum();
+  int ori_match_score = prsm_ptr->getMatchTheoFragNum();
   if (best_match_score <= 0 ||
       best_match_score < ori_match_score - mng_ptr_->DESC_MATCH_LIMIT_ ||
       best_match_score < ori_match_score * mng_ptr_->desc_ratio_) {

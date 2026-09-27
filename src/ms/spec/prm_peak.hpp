@@ -42,7 +42,7 @@ class PrmPeak : public Peak {
 
   int getNeighborSize() const { return neighbor_list_.size(); }
 
-  DeconvPeakPtr getBasePeakPtr() const { return base_peak_ptr_; }
+  const DeconvPeakPtr& getBasePeakPtr() const { return base_peak_ptr_; }
 
   double getMonoMass() const { return mono_mass_; }
 
@@ -52,7 +52,7 @@ class PrmPeak : public Peak {
 
   double getStrictTolerance() const { return strict_tolerance_; }
 
-  BasePeakTypePtr getBaseTypePtr() const { return base_type_; }
+  const BasePeakTypePtr& getBaseTypePtr() const { return base_type_; }
 
   double getNStrictCRelaxTolerance() const {
     return n_strict_c_relax_tolerance_;

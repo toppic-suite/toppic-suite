@@ -210,7 +210,7 @@ PrmMsPtr geneMsTwoPtr(const DeconvMsPtr& deconv_ms_ptr, int spec_id,
       MsHeader::geneMsHeaderPtr(ori_header_ptr, prec_mass_without_label);
   // get two prm peaks
   ActivationPtr active_type_ptr = header_ptr->getActivationPtr();
-  PeakTolerancePtr tole_ptr = sp_para_ptr->getPeakTolerancePtr();
+  PeakTolerancePtr tole_ptr = sp_para_ptr->getFragTolerancePtr();
   PrmPeakPtrVec list;
   for (size_t i = 0; i < deconv_ms_ptr->size(); i++) {
     addTwoMasses(list, spec_id, deconv_ms_ptr->getPeakPtr(i), prec_mono_mass,
@@ -238,7 +238,7 @@ PrmMsPtr geneSuffixMsTwoPtr(const DeconvMsPtr& deconv_ms_ptr, int spec_id,
       MsHeader::geneMsHeaderPtr(ori_header_ptr, prec_mass_without_label);
   // get two prm peaks
   ActivationPtr active_type_ptr = header_ptr->getActivationPtr();
-  PeakTolerancePtr tole_ptr = sp_para_ptr->getPeakTolerancePtr();
+  PeakTolerancePtr tole_ptr = sp_para_ptr->getFragTolerancePtr();
   PrmPeakPtrVec list;
   for (size_t i = 0; i < deconv_ms_ptr->size(); i++) {
     addSuffixTwoMasses(list, spec_id, deconv_ms_ptr->getPeakPtr(i),
@@ -267,17 +267,17 @@ PrmMsPtr geneMsSixPtr(const DeconvMsPtr& deconv_ms_ptr, int spec_id,
       MsHeader::geneMsHeaderPtr(ori_header_ptr, prec_mass_without_label);
   // get six prm peaks
   ActivationPtr active_type_ptr = header_ptr->getActivationPtr();
-  PeakTolerancePtr tole_ptr = sp_para_ptr->getPeakTolerancePtr();
-  double extend_min_mass = sp_para_ptr->getExtendMinMass();
+  PeakTolerancePtr tole_ptr = sp_para_ptr->getFragTolerancePtr();
+  double frag_extend_min_mass = sp_para_ptr->getFragExtendMinMass();
   PrmPeakPtrVec list;
   for (size_t i = 0; i < deconv_ms_ptr->size(); i++) {
-    if (deconv_ms_ptr->getPeakPtr(i)->getMonoMass() <= extend_min_mass) {
+    if (deconv_ms_ptr->getPeakPtr(i)->getMonoMass() <= frag_extend_min_mass) {
       addTwoMasses(list, spec_id, deconv_ms_ptr->getPeakPtr(i), prec_mono_mass,
                    n_term_label_mass, active_type_ptr, tole_ptr);
     } else {
       addSixMasses(list, spec_id, deconv_ms_ptr->getPeakPtr(i), prec_mono_mass,
                    n_term_label_mass, active_type_ptr, tole_ptr,
-                   sp_para_ptr->getExtendOffsets());
+                   sp_para_ptr->getFragExtOffsets());
     }
   }
 
@@ -299,17 +299,17 @@ PrmMsPtr geneSuffixMsSixPtr(const DeconvMsPtr& deconv_ms_ptr, int spec_id,
       MsHeader::geneMsHeaderPtr(ori_header_ptr, prec_mass_without_label);
   // get two prm peaks
   ActivationPtr active_type_ptr = header_ptr->getActivationPtr();
-  PeakTolerancePtr tole_ptr = sp_para_ptr->getPeakTolerancePtr();
-  double extend_min_mass = sp_para_ptr->getExtendMinMass();
+  PeakTolerancePtr tole_ptr = sp_para_ptr->getFragTolerancePtr();
+  double frag_extend_min_mass = sp_para_ptr->getFragExtendMinMass();
   PrmPeakPtrVec list;
   for (size_t i = 0; i < deconv_ms_ptr->size(); i++) {
-    if (deconv_ms_ptr->getPeakPtr(i)->getMonoMass() <= extend_min_mass) {
+    if (deconv_ms_ptr->getPeakPtr(i)->getMonoMass() <= frag_extend_min_mass) {
       addSuffixTwoMasses(list, spec_id, deconv_ms_ptr->getPeakPtr(i),
                          prec_mono_mass, active_type_ptr, tole_ptr);
     } else {
       addSuffixSixMasses(list, spec_id, deconv_ms_ptr->getPeakPtr(i),
                          prec_mono_mass, active_type_ptr, tole_ptr,
-                         sp_para_ptr->getExtendOffsets());
+                         sp_para_ptr->getFragExtOffsets());
     }
   }
   // filter low mass peaks

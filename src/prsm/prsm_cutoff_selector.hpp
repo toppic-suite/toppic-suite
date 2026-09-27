@@ -22,11 +22,12 @@ namespace toppic {
 
 namespace prsm_cutoff_selector {
 
-// Write the PrSMs of <base>.<input_file_ext> that pass the cutoff to
-// <base>.<output_file_ext>. cutoff_type: EVALUE (E-value), FDR (spectrum-level
-// FDR), FORMFDR (spectrum- and proteoform-level FDR), PROTFDR (protein-level
-// FDR) or FRAG (number of matched fragments, kept as the score).
-void process(const std::string& db_file_name, const std::string& spec_file_name,
+// Write the PrSMs of <base_name>.<input_file_ext> that pass the cutoff to
+// <base_name>.<output_file_ext>; base_name is the spectrum file name without
+// its extension. cutoff_type: EVALUE (E-value), FDR (spectrum-level FDR),
+// FORMFDR (spectrum- and proteoform-level FDR), PROTFDR (protein-level FDR)
+// or FRAG (number of matched fragments, kept as the score).
+void process(const std::string& db_file_name, const std::string& base_name,
              const std::string& input_file_ext,
              const std::string& output_file_ext, const std::string& cutoff_type,
              double cutoff_value);

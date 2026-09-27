@@ -81,7 +81,6 @@ class ToppicWindow : public QMainWindow {
 
   void on_decoyCheckBox_clicked(bool checked);
 
-  void on_postMassMatchCheckBox_clicked(bool checked);
 
   void on_addButton_clicked();
 

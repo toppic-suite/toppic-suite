@@ -18,6 +18,7 @@
 #include <algorithm>
 #include <cstddef>
 #include <cstdlib>
+#include <exception>
 #include <iostream>
 #include <limits>
 #include <map>
@@ -52,7 +53,29 @@ PwMsReader::PwMsReader(const std::string& file_name, double isolation_window,
 void PwMsReader::init(const std::string& file_name) {
   file_name_ = file_name;
   input_sp_id_ = 0;
-  msd_ptr_ = std::make_shared<pwiz::msdata::MSDataFile>(file_name, &readers_);
+  try {
+    msd_ptr_ =
+        std::make_shared<pwiz::msdata::MSDataFile>(file_name, &readers_);
+  } catch (const std::exception& e) {
+    // pwiz reports a truncated mzML file (missing index and closing tags)
+    // as a bad input stream after its fallback re-indexing parse hits the
+    // end of the file.
+    LOG_ERROR("Unable to read the spectrum file " << file_name << ": "
+              << e.what());
+    std::cout << "\nERROR: Unable to read the spectrum file " << file_name
+              << ".";
+    std::string what = e.what();
+    if (what.find("Bad istream") != std::string::npos) {
+      std::cout << "\nThe mzML file is truncated or incomplete: it ends before "
+                << "its closing tags and index.";
+      std::cout << "\nCopy or convert the file again and check that it ends "
+                << "with </indexedmzML> or </mzML>.";
+    } else {
+      std::cout << "\nReader message: " << what;
+    }
+    std::cout << std::endl;
+    exit(EXIT_FAILURE);
+  }
   spec_list_ptr_ = msd_ptr_->run.spectrumListPtr;
   input_sp_num_ = spec_list_ptr_->size();
   is_waters_instrument_ = checkWatersInstrument();
@@ -311,6 +334,11 @@ int PwMsReader::readNextWithVoltage(double voltage) {
   while (!found) {
     if (input_sp_id_ >= input_sp_num_) {
       LOG_DEBUG("Only " << input_sp_num_ << " spectra in the input data!");
+      // The last spectrum read while skipping other voltages is still in
+      // header_ptr_/peak_list_; drop it, or the caller (which only tests
+      // header_ptr_ for null) would emit it into this voltage's outputs.
+      peak_list_.clear();
+      header_ptr_ = nullptr;
       return -1;
     }
     bool valid = readOneMs(input_sp_id_, peak_list_, header_ptr_);

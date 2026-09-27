@@ -37,6 +37,7 @@
 #include "ms/spec/msalign_util.hpp"
 #include "para/prsm_para.hpp"
 #include "prsm/prsm_cutoff_selector.hpp"
+#include "prsm/prsm_decoy_filter.hpp"
 #include "prsm/prsm_fdr.hpp"
 #include "prsm/prsm_fdr_groups.hpp"
 #include "prsm/prsm_feature_cluster.hpp"
@@ -103,6 +104,7 @@ void cleanTopmgDir(const std::string& fa_name, const std::string& sp_name,
     file_util::delFile(sp_base + ".topmg_proteoform_cluster");
     file_util::delFile(sp_base + ".topmg_cluster");
     file_util::delFile(sp_base + ".topmg_cluster_fdr");
+    file_util::delFile(sp_base + ".topmg_prsm_target");
     file_util::delFile(sp_base + ".topmg_form_cutoff");
     file_util::delFile(sp_base + ".topmg_prot_cutoff");
     file_util::delDir(sp_base + "_topmg_proteoform_cutoff_xml");
@@ -168,17 +170,6 @@ int TopMG_identify(std::map<std::string, std::string>& arguments) {
     double max_shift_mass = std::stod(arguments["maxShiftMass"]);
 
     int thread_num = std::stoi(arguments["threadNumber"]);
-    // Filter steps requires a large amount of memory.
-    // We use only one thread to reduce the memory requirement.
-    int filter_thread_num = mem_check::getMaxThreads("zero_one_shift_filter");
-    if (filter_thread_num > thread_num) {
-      filter_thread_num = thread_num;
-    }
-    LOG_DEBUG("Filter thread number " << filter_thread_num);
-    int diag_filter_thread_num = mem_check::getMaxThreads("diag_filter");
-    if (diag_filter_thread_num > thread_num) {
-      diag_filter_thread_num = thread_num;
-    }
 
     bool decoy = false;
     if (arguments["searchType"] == "TARGET+DECOY") {
@@ -202,6 +193,12 @@ int TopMG_identify(std::map<std::string, std::string>& arguments) {
     std::vector<std::string> input_exts;
 
     std::cout << "ASF-One PTM filtering - started." << std::endl;
+    // The filtering steps require a large amount of memory, so each one asks
+    // mem_check for its own thread number where it starts, from its own
+    // per-thread budget and the memory available then.
+    int filter_thread_num =
+        mem_check::getStageThreadNum("ASF-One PTM filtering", thread_num);
+    LOG_DEBUG("Filter thread number " << filter_thread_num);
     int var_ptm_num_in_filtering = 1;
     OnePtmFilterMngPtr one_ptm_filter_mng_ptr =
         std::make_shared<OnePtmFilterMng>(
@@ -221,6 +218,10 @@ int TopMG_identify(std::map<std::string, std::string>& arguments) {
 
     if (arguments["useAsfDiag"] == "true") {
       std::cout << "ASF-Diagonal PTM filtering - started." << std::endl;
+      int diag_filter_thread_num =
+          mem_check::getStageThreadNum("ASF-Diagonal PTM filtering",
+                                       thread_num);
+      LOG_DEBUG("Diagonal filter thread number " << diag_filter_thread_num);
       filter_result_num = 15;
       DiagFilterMngPtr diag_filter_mng_ptr = std::make_shared<DiagFilterMng>(
           prsm_para_ptr, index_file_para, filter_result_num,
@@ -299,6 +300,7 @@ int TopMG_post(std::map<std::string, std::string>& arguments) {
         ori_db_file_name + "_idx" + file_util::getFileSeparator() +
         file_util::filenameFromEntirePath(arguments["databaseFileName"]);
     std::string sp_file_name = arguments["spectrumFileName"];
+    std::string base_name = file_util::basename(sp_file_name);
     std::string var_mod_file_name = arguments["varModFileName"];
 
     PrsmParaPtr prsm_para_ptr = std::make_shared<PrsmPara>(arguments);
@@ -344,19 +346,26 @@ int TopMG_post(std::map<std::string, std::string>& arguments) {
 
     if (arguments["searchType"] == "TARGET+DECOY") {
       std::cout << "FDR computation - started. " << std::endl;
-      prsm_fdr::process(sp_file_name, "topmg_cluster", "topmg_cluster_fdr",
-                        arguments["keepDecoyResults"]);
+      // the FDR step writes the decoys too; they are removed below unless -K
+      prsm_fdr::process(sp_file_name, "topmg_cluster", "topmg_cluster_fdr");
       // prsm_fdr_groups::process(sp_file_name, "topmg_cluster",
-      // "topmg_cluster_fdr", arguments["keepDecoyResults"]);
+      // "topmg_cluster_fdr");
       std::cout << "FDR computation - finished." << std::endl;
       cur_suffix = "topmg_cluster_fdr";
+      if (arguments["keepDecoyResults"] != "true") {
+        std::cout << "Removing decoy identifications - started." << std::endl;
+        prsm_decoy_filter::process(base_name, cur_suffix, "topmg_prsm_target");
+        cur_suffix = "topmg_prsm_target";
+        std::cout << "Removing decoy identifications - finished."
+                  << std::endl;
+      }
     }
 
     std::string cutoff_type = arguments["cutoffSpectralType"];
     std::cout << "PrSM filtering by " << cutoff_type << " - started."
               << std::endl;
     double cutoff_value = std::stod(arguments["cutoffSpectralValue"]);
-    prsm_cutoff_selector::process(db_file_name, sp_file_name, cur_suffix,
+    prsm_cutoff_selector::process(db_file_name, base_name, cur_suffix,
                                   "topmg_prsm_cutoff", cutoff_type,
                                   cutoff_value);
     std::cout << "PrSM filtering by " << cutoff_type << " - finished."
@@ -383,14 +392,14 @@ int TopMG_post(std::map<std::string, std::string>& arguments) {
     std::cout << "Proteoform filtering by " << cutoff_type << " - started."
               << std::endl;
     std::istringstream(arguments["cutoffProteoformValue"]) >> cutoff_value;
-    prsm_cutoff_selector::process(db_file_name, sp_file_name, cur_suffix,
+    prsm_cutoff_selector::process(db_file_name, base_name, cur_suffix,
                                   "topmg_form_cutoff", cutoff_type,
                                   cutoff_value);
     std::cout << "Proteoform filtering by " << cutoff_type << " - finished."
               << std::endl;
 
     std::cout << "Selecting top PrSMs for proteoforms - started." << std::endl;
-    prsm_form_filter::process(db_file_name, sp_file_name, "topmg_form_cutoff",
+    prsm_form_filter::process(db_file_name, base_name, "topmg_form_cutoff",
                               "topmg_form_cutoff_form");
     std::cout << "Selecting top PrSMs for proteoforms - finished." << std::endl;
     std::cout << "Outputting proteoform table - started." << std::endl;
@@ -406,14 +415,14 @@ int TopMG_post(std::map<std::string, std::string>& arguments) {
     std::cout << "Protein filtering by " << cutoff_type << " - started."
               << std::endl;
     std::istringstream(arguments["cutoffProteinValue"]) >> cutoff_value;
-    prsm_cutoff_selector::process(db_file_name, sp_file_name,
+    prsm_cutoff_selector::process(db_file_name, base_name,
                                   "topmg_form_cutoff", "topmg_prot_cutoff",
                                   cutoff_type, cutoff_value);
     std::cout << "Protein filtering by " << cutoff_type << " - finished."
               << std::endl;
 
     std::cout << "Selecting top PrSMs for proteins - started." << std::endl;
-    prsm_prot_filter::process(db_file_name, sp_file_name, "topmg_prot_cutoff",
+    prsm_prot_filter::process(db_file_name, base_name, "topmg_prot_cutoff",
                               "topmg_prot_cutoff_prot");
     std::cout << "Selecting top PrSMs for proteins - finished." << std::endl;
     std::cout << "Outputting protein table - started." << std::endl;
@@ -424,7 +433,7 @@ int TopMG_post(std::map<std::string, std::string>& arguments) {
     prot_out = nullptr;
     std::cout << "Outputting protein table - finished." << std::endl;
 
-    prsm_sql_output::write(prsm_para_ptr, sp_file_name, ori_db_file_name,
+    prsm_sql_output::write(prsm_para_ptr, base_name, ori_db_file_name,
                            "topmg_prsm_cutoff", "topmg_form_cutoff_form",
                            "topmg_prot_cutoff_prot");
 

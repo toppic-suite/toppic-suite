@@ -156,7 +156,8 @@ void GraphPostProcessor::process() {
   int group_spec_num = prsm_para_ptr->getGroupSpecNum();
   MsAlignReaderPtr ms_reader_ptr = std::make_shared<MsAlignReader>(
       sp_file_name, group_spec_num, sp_para_ptr->getActivationPtr(),
-      sp_para_ptr->getEnvCnnCutoff());
+      sp_para_ptr->getEnvCnnCutoff(),
+        sp_para_ptr->getFragDedupPpo());
 
   int cnt = 0;
   DeconvMsPtrVec deconv_ms_ptr_vec = ms_reader_ptr->getNextMsPtrVec();
@@ -294,7 +295,7 @@ void GraphPostProcessor::process() {
               new_form, spec_set_ptr->getDeconvMsPtrVec(), adjusted_prec_mass,
               prsm_para_ptr->getSpParaPtr());
 
-          if (new_prsm->getMatchFragNum() > 0) prsm_writer->write(new_prsm);
+          if (new_prsm->getMatchTheoFragNum() > 0) prsm_writer->write(new_prsm);
 
           prsm_ptr = prsm_reader->readOnePrsm(
               fasta_reader, mng_ptr_->prsm_para_ptr_->getFixModPtrVec());

@@ -36,6 +36,11 @@ void MsMapRow::print() const {
   }
 }
 
+const MsMapPeakPtrVec& MsMapRow::emptyPeakVec() {
+  static const MsMapPeakPtrVec empty_vec;
+  return empty_vec;
+}
+
 void MsMapRow::clearPeaks() {
   for (size_t i = 0; i < peak_ptr_2d_.size(); i++) {
     peak_ptr_2d_[i].clear();

@@ -30,11 +30,11 @@ class Residue {
 
   explicit Residue(XmlDOMElement element);
   /** Get amino acid. */
-  AminoAcidPtr getAminoAcidPtr() const { return acid_ptr_; }
+  const AminoAcidPtr& getAminoAcidPtr() const { return acid_ptr_; }
   /** Get residue mass. */
   double getMass() const { return mass_; }
   /** Get post-translational modification. */
-  PtmPtr getPtmPtr() const { return ptm_ptr_; }
+  const PtmPtr& getPtmPtr() const { return ptm_ptr_; }
   /** Checks if the residue contains the same amino acid and ptm.  */
   bool isSame(const ResiduePtr& residue_ptr) const;
   /** Get string representation */

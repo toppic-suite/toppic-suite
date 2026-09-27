@@ -19,6 +19,7 @@
 #include <cmath>
 #include <cstddef>
 #include <cstdlib>
+#include <limits>
 #include <numeric>
 #include <vector>
 
@@ -95,6 +96,99 @@ void MsMap::initMap(const PeakPtrVec2D& raw_peak_2d,
     }
     peaks_.push_back(ms_map_row_peaks);
   }
+}
+
+MsMap::MsMap(const std::vector<std::vector<double>>& mz_2d,
+             const std::vector<std::vector<double>>& inte_2d,
+             const MsHeaderPtrVec& ms1_header_ptr_vec, double bin_size) {
+  bin_size_ = bin_size;
+  // global statistics, iterated in the same order as the full constructor
+  std::vector<double> intes;
+  double min_mz = std::numeric_limits<double>::max();
+  double max_mz = std::numeric_limits<double>::lowest();
+  for (auto& row_inte : inte_2d) {
+    for (auto v : row_inte) {
+      intes.push_back(v);
+    }
+  }
+  for (auto& row_mz : mz_2d) {
+    for (auto v : row_mz) {
+      if (v < min_mz) min_mz = v;
+      if (v > max_mz) max_mz = v;
+    }
+  }
+  if (intes.size() == 0) {
+    LOG_ERROR("No peaks in the input data!");
+    exit(EXIT_FAILURE);
+  }
+  min_mz_ = min_mz;
+  max_mz_ = max_mz;
+  base_inte_ = baseline_util::getBaseLine(intes);
+  col_num_ = int((max_mz_ - min_mz_) / bin_size_) + 1;
+  // hollow rows with per-row base intensities
+  for (size_t row_id = 0; row_id < ms1_header_ptr_vec.size(); row_id++) {
+    MsHeaderPtr ms_header_ptr = ms1_header_ptr_vec[row_id];
+    MsMapRowHeaderPtr row_header_ptr = std::make_shared<MsMapRowHeader>(
+        ms_header_ptr->getSpecId(), ms_header_ptr->getFirstScanNum(),
+        ms_header_ptr->getRetentionTime());
+    const std::vector<double>& row_inte = inte_2d[row_id];
+    double row_base_inte = 0.0;
+    if (std::accumulate(row_inte.begin(), row_inte.end(), 0.0) > 0) {
+      row_base_inte = baseline_util::getBaseLine(row_inte);
+    }
+    row_header_ptr->setBaseInte(row_base_inte);
+    MsMapRowPtr row_ptr = std::make_shared<MsMapRow>(row_header_ptr, 0);
+    row_ptr_list_.push_back(row_ptr);
+    peaks_.push_back(MsMapPeakPtrVec());
+  }
+}
+
+void MsMap::fillRow(int row_id, const std::vector<double>& mz,
+                    const std::vector<double>& inte, double sn_ratio,
+                    bool single_scan_noise, double neighbor_mz_tole) {
+  MsMapRowPtr row_ptr = row_ptr_list_[row_id];
+  row_ptr->fillBins(col_num_);
+  double base_inte = base_inte_;
+  if (single_scan_noise) {
+    base_inte = row_ptr->getHeaderPtr()->getBaseInte();
+  }
+  MsMapPeakPtrVec ms_map_row_peaks;
+  for (size_t j = 0; j < mz.size(); j++) {
+    PeakPtr p_ptr = std::make_shared<Peak>(mz[j], inte[j]);
+    MsMapPeakPtr new_peak_ptr = std::make_shared<MsMapPeak>(p_ptr);
+    ms_map_row_peaks.push_back(new_peak_ptr);
+    if (new_peak_ptr->getIntensity() > sn_ratio * base_inte) {
+      int bin_idx = getColIndex(new_peak_ptr->getPosition());
+      row_ptr->addPeak(bin_idx, new_peak_ptr);
+    }
+  }
+  peaks_[row_id] = ms_map_row_peaks;
+  if (neighbor_mz_tole > 0) {
+    // removeNonNeighbors compares peaks within one row (findNeighbors reads
+    // first_row for both sides), so the filter is applied per row here.
+    int search_bin_num = int(neighbor_mz_tole / bin_size_) + 1;
+    for (auto& peak : peaks_[row_id]) {
+      peak->setNeighbor(false);
+    }
+    if (row_id + 1 < static_cast<int>(row_ptr_list_.size())) {
+      findNeighbors(row_id, search_bin_num, neighbor_mz_tole);
+    }
+    for (int bin_idx = 0; bin_idx < col_num_; bin_idx++) {
+      const MsMapPeakPtrVec& peak_ptrs = row_ptr->getPeakPtrVec(bin_idx);
+      MsMapPeakPtrVec new_peak_ptrs;
+      for (auto peak : peak_ptrs) {
+        if (peak->getNeighbor()) {
+          new_peak_ptrs.push_back(peak);
+        }
+      }
+      row_ptr->setPeakPtrVec(bin_idx, new_peak_ptrs);
+    }
+  }
+}
+
+void MsMap::evictRow(int row_id) {
+  row_ptr_list_[row_id]->dropBins();
+  MsMapPeakPtrVec().swap(peaks_[row_id]);
 }
 
 void MsMap::reconstruct(double sn_ratio, bool single_scan_noise) {

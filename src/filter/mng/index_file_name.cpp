@@ -29,7 +29,9 @@ std::string IndexFileName::geneFileName(
   // keep only the file name from the entire path
   fixed_mod = file_util::basenameFromEntirePath(fixed_mod);
 
-  std::string error_tol = arguments["massErrorTolerance"];
+  // the indexes do not depend on either tolerance; the fragment tolerance
+  // (-e) is kept in the name so topindex and the searches agree on it
+  std::string error_tol = arguments["fragErrorTolerance"];
 
   std::string search_type = arguments["searchType"];
   std::string decoy = search_type_map_.find(search_type)->second;

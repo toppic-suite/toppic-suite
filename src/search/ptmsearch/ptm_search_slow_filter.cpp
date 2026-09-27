@@ -28,8 +28,12 @@ PtmSearchSlowFilter::PtmSearchSlowFilter(
     const SimplePrsmPtrVec& simple_prsm_ptrs, const PtmSearchMngPtr& mng_ptr) {
   std::string db_file_name =
       mng_ptr->prsm_para_ptr_->getSearchDbFileNameWithFolder();
-  FastaIndexReaderPtr reader_ptr =
-      std::make_shared<FastaIndexReader>(db_file_name);
+  // one indexed FASTA reader per worker thread: a reader was constructed -
+  // an fai_load parsing the 40k-entry .fai index - for every spectrum task
+  static thread_local FastaIndexReaderPtr reader_ptr;
+  if (reader_ptr == nullptr) {
+    reader_ptr = std::make_shared<FastaIndexReader>(db_file_name);
+  }
   ModPtrVec fix_mod_list = mng_ptr->prsm_para_ptr_->getFixModPtrVec();
   ProtModPtrVec prot_mod_ptr_vec = mng_ptr->prsm_para_ptr_->getProtModPtrVec();
   ProteoformPtrVec proteoform_ptr_vec;
@@ -46,50 +50,55 @@ PtmSearchSlowFilter::PtmSearchSlowFilter(
       PtmSlowMatchPtr ptm_slow_match_ptr =
           std::make_shared<PtmSlowMatch>(mod_form_ptr_vec[j], spectrum_set_ptr,
                                          ProteoformType::INTERNAL, mng_ptr);
-      complete_prefix_slow_match_ptrs_.push_back(ptm_slow_match_ptr);
+      slow_match_ptrs_.push_back(ptm_slow_match_ptr);
     }
   }
 
-  // init suffix_internal_slow_prsm_ptrs
-  for (size_t i = 0; i < complete_prefix_slow_match_ptrs_.size(); i++) {
-    ProtModPtr prot_mod_ptr =
-        complete_prefix_slow_match_ptrs_[i]->getProteoform()->getProtModPtr();
-    if (prot_mod_ptr == ProtModBase::getProtModPtr_NONE()) {
-      suffix_internal_slow_match_ptrs_.push_back(
-          complete_prefix_slow_match_ptrs_[i]);
-    }
-  }
-
-  // compute complete and prefix prsms
-  for (size_t i = 0; i < complete_prefix_slow_match_ptrs_.size(); i++) {
-    PrsmPtrVec comp_ptrs;
+  // Compute complete, prefix, suffix and internal PrSMs together, one fused
+  // dynamic program per candidate (search/ptmsearch/ps_align_multi_type.hpp)
+  // instead of up to four separate PsAlign passes. Suffix and internal
+  // widen the search to fragments that do not start/end at either end of
+  // the full-length protein, so, as before, they are only computed for
+  // proteoforms without an N/C-terminal protein modification.
+  for (size_t i = 0; i < slow_match_ptrs_.size(); i++) {
+    bool is_none_mod = slow_match_ptrs_[i]->getProteoform()->getProtModPtr() ==
+                       ProtModBase::getProtModPtr_NONE();
+    ProteoformTypePtrVec types;
     if (mng_ptr->prsm_para_ptr_->allowCompleteProt()) {
-      complete_prefix_slow_match_ptrs_[i]->compute(ProteoformType::COMPLETE,
-                                                   comp_ptrs);
+      types.push_back(ProteoformType::COMPLETE);
     }
-    complete_prsm_2d_ptrs_.push_back(comp_ptrs);
-    PrsmPtrVec prefix_ptrs;
     if (mng_ptr->prsm_para_ptr_->allowPrefixProt()) {
-      complete_prefix_slow_match_ptrs_[i]->compute(ProteoformType::PREFIX,
-                                                   prefix_ptrs);
+      types.push_back(ProteoformType::PREFIX);
     }
-    prefix_prsm_2d_ptrs_.push_back(prefix_ptrs);
-  }
+    if (is_none_mod && mng_ptr->prsm_para_ptr_->allowSuffixProt()) {
+      types.push_back(ProteoformType::SUFFIX);
+    }
+    if (is_none_mod && mng_ptr->prsm_para_ptr_->allowCompleteProt()) {
+      // Preserves the original condition (also gated on allowCompleteProt,
+      // not allowInternalProt) so results match the existing implementation.
+      types.push_back(ProteoformType::INTERNAL);
+    }
 
-  // compute suffix and internal prsms
-  for (size_t i = 0; i < suffix_internal_slow_match_ptrs_.size(); i++) {
-    PrsmPtrVec suffix_ptrs;
-    if (mng_ptr->prsm_para_ptr_->allowSuffixProt()) {
-      suffix_internal_slow_match_ptrs_[i]->compute(ProteoformType::SUFFIX,
-                                                   suffix_ptrs);
+    std::vector<PrsmPtrVec> result_2d;
+    if (!types.empty()) {
+      slow_match_ptrs_[i]->compute(types, result_2d);
     }
-    suffix_prsm_2d_ptrs_.push_back(suffix_ptrs);
-    PrsmPtrVec internal_ptrs;
-    if (mng_ptr->prsm_para_ptr_->allowCompleteProt()) {
-      suffix_internal_slow_match_ptrs_[i]->compute(ProteoformType::INTERNAL,
-                                                   internal_ptrs);
+
+    size_t idx = 0;
+    complete_prsm_2d_ptrs_.push_back(
+        mng_ptr->prsm_para_ptr_->allowCompleteProt() ? result_2d[idx++]
+                                                     : PrsmPtrVec());
+    prefix_prsm_2d_ptrs_.push_back(mng_ptr->prsm_para_ptr_->allowPrefixProt()
+                                       ? result_2d[idx++]
+                                       : PrsmPtrVec());
+    if (is_none_mod) {
+      suffix_prsm_2d_ptrs_.push_back(mng_ptr->prsm_para_ptr_->allowSuffixProt()
+                                         ? result_2d[idx++]
+                                         : PrsmPtrVec());
+      internal_prsm_2d_ptrs_.push_back(
+          mng_ptr->prsm_para_ptr_->allowCompleteProt() ? result_2d[idx++]
+                                                       : PrsmPtrVec());
     }
-    internal_prsm_2d_ptrs_.push_back(internal_ptrs);
   }
 }
 

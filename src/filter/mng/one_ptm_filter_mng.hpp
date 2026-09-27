@@ -18,6 +18,7 @@
 
 #include <mutex>
 
+#include "filter/mng/ptm_diag_index.hpp"
 #include "para/prsm_para.hpp"
 
 namespace toppic {
@@ -46,18 +47,20 @@ class OnePtmFilterMng {
 
   PrsmParaPtr prsm_para_ptr_;
 
-  // parameters for fast filteration
-  int max_proteoform_mass_ = 50000;
+  // parameters for fast filteration; the column limits of the whole
+  // one-shift index family, which the multiple-shift filter shares through
+  // its diagonal file (see ptm_diag_index.hpp)
+  int max_proteoform_mass_ = ptm_diag_index::kMaxProteoformMass;
 
   // Candidate protein number for each spectrum
   unsigned int comp_num_ = 10;
-  unsigned int pref_suff_num_ = 5;
+  unsigned int pref_suff_num_ = 10;
   unsigned int inte_num_ = 10;
 
   // reported n term or c term shift number
   unsigned int comp_cand_shift_num_ = 1;
   unsigned int cand_shift_num_ = 10;
-  int filter_scale_ = 100;
+  int filter_scale_ = ptm_diag_index::kFilterScale;
 
   int threshold_ = 4;
 
@@ -80,10 +83,11 @@ class OnePtmFilterMng {
 
   std::vector<int> cnts_;
 
-  // file name vector
+  // file name vector: N-terminal, PRM diagonal (the file the multiple-shift
+  // filter reads as well), C-terminal, SRM diagonal
   std::vector<std::string> one_ptm_file_vec_{
-      "one_ptm_term_index", "one_ptm_diag_index", "one_ptm_rev_term_index",
-      "one_ptm_rev_diag_index"};
+      "one_ptm_term_index", ptm_diag_index::kFileName,
+      "one_ptm_rev_term_index", "one_ptm_rev_diag_index"};
 };
 
 using OnePtmFilterMngPtr = std::shared_ptr<OnePtmFilterMng>;

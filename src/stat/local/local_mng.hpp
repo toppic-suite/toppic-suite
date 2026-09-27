@@ -30,7 +30,10 @@ class LocalMng {
            const std::string& output_file_ext);
 
   PrsmParaPtr prsm_para_ptr_;
-  PeakTolerancePtr peak_tole_ptr_;
+  // precursor tolerance (shift/precursor checks) and fragment tolerance
+  // (matching extended masses in the M tables)
+  PeakTolerancePtr prec_tole_ptr_;
+  PeakTolerancePtr frag_tole_ptr_;
 
   std::string input_file_ext_;
   std::string output_file_ext_;

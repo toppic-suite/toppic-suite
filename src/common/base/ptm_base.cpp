@@ -81,11 +81,12 @@ void PtmBase::initBase(const std::string& base_dir) {
 
 // Returns a PTM based on the abbreviation name. Returns null if the
 // abbreviation name does not exist.
-PtmPtr PtmBase::getPtmPtrByAbbrName(const std::string& abbr_name) {
+const PtmPtr& PtmBase::getPtmPtrByAbbrName(const std::string& abbr_name) {
+  static const PtmPtr null_ptr;
   auto it = ptm_abbr_name_map_.find(abbr_name);
   if (it == ptm_abbr_name_map_.end()) {
     LOG_ERROR("PTM " << abbr_name << " cannot be found!");
-    return nullptr;
+    return null_ptr;
   }
   return it->second;
 }

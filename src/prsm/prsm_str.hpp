@@ -74,11 +74,11 @@ class PrsmStr {
 
   std::string getProteoformDbSeq() { return proteoform_db_seq_; }
 
-  double getMatchPeakNum() { return match_peak_num_; }
+  double getMatchExpFragNum() { return match_exp_frag_num_; }
 
-  double getMatchFragNum() { return match_frag_num_; }
+  double getMatchTheoFragNum() { return match_theo_frag_num_; }
 
-  double getNormMatchFragNum() { return norm_match_frag_num_; }
+  double getNormMatchTheoFragNum() { return norm_match_theo_frag_num_; }
 
   double getEValue() { return e_value_; }
 
@@ -128,11 +128,11 @@ class PrsmStr {
 
   static bool cmpEValueIncProtInc(const PrsmStrPtr& a, const PrsmStrPtr& b);
 
-  static bool cmpMatchFragDecMatchPeakDecProtInc(const PrsmStrPtr& a,
-                                                 const PrsmStrPtr& b);
+  static bool cmpMatchTheoFragDecMatchExpFragDecProtInc(const PrsmStrPtr& a,
+                                                        const PrsmStrPtr& b);
 
-  static bool cmpNormMatchFragDecProtInc(const PrsmStrPtr& a,
-                                         const PrsmStrPtr& b);
+  static bool cmpNormMatchTheoFragDecProtInc(const PrsmStrPtr& a,
+                                             const PrsmStrPtr& b);
 
   static bool cmpSpecIncPrecIncEvalueIncProtInc(const PrsmStrPtr& a,
                                                 const PrsmStrPtr& b);
@@ -204,11 +204,11 @@ class PrsmStr {
   std::vector<MassShiftPtr> mass_shift_vec_;
 
   // The information below is stored in the prsm class
-  double match_peak_num_;
+  double match_exp_frag_num_;
 
-  double match_frag_num_;
+  double match_theo_frag_num_;
 
-  double norm_match_frag_num_;
+  double norm_match_theo_frag_num_;
 
   double e_value_;
 

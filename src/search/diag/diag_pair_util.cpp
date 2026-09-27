@@ -44,20 +44,23 @@ inline DiagPairPtrVec compDiagPair(const PrmPeakPtrVec& prm_peaks,
     real_masses.push_back(prm_peaks[k]->getPosition());
   }
 
+  // This is the inner loop of the alignment setup: keep it free of
+  // shared_ptr copies (they are atomic operations on objects shared by all
+  // search threads).
   while (i < prm_peaks.size() && j < seq_masses.size()) {
-    PrmPeakPtr peak = prm_peaks[i];
-    BasePeakTypePtr type_ptr = peak->getBaseTypePtr();
-    int spec_id = peak->getSpectrumId();
+    const PrmPeak& peak = *prm_peaks[i];
+    bool is_original = peak.getBaseTypePtr() == BasePeakType::ORIGINAL;
+    int spec_id = peak.getSpectrumId();
     double error = 0;
     if (header_ptr->isNStrict() && !header_ptr->isCStrict()) {
-      error = peak->getNStrictCRelaxTolerance();
+      error = peak.getNStrictCRelaxTolerance();
     } else {
-      error = peak->getNRelaxCStrictTolerance();
+      error = peak.getNRelaxCStrictTolerance();
     }
-    double deviation = peak->getPosition() - seq_masses[j] - n_term_shift;
+    double deviation = peak.getPosition() - seq_masses[j] - n_term_shift;
     if (std::abs(deviation) <= error) {
-      double peak_score = peak->getScore();
-      if (type_ptr == BasePeakType::ORIGINAL) {
+      double peak_score = peak.getScore();
+      if (is_original) {
         if (n_term_scores[spec_id][j] < peak_score) {
           n_term_scores[spec_id][j] = peak_score;
         }
@@ -73,7 +76,7 @@ inline DiagPairPtrVec compDiagPair(const PrmPeakPtrVec& prm_peaks,
       }
     }
     if (prsm_algo::increaseIJ(i, j, deviation,
-                              peak->getNRelaxCStrictTolerance(), real_masses,
+                              peak.getNRelaxCStrictTolerance(), real_masses,
                               seq_masses)) {
       i++;
     } else {

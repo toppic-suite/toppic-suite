@@ -18,6 +18,7 @@
 #include <cstddef>
 #include <memory>
 #include <string>
+#include <utility>
 
 #include "common/base/mod_base.hpp"
 #include "common/base/prot_mod_base.hpp"
@@ -75,7 +76,8 @@ ProteoformPtr geneDbProteoformPtr(const FastaSeqPtr& fasta_seq_ptr,
     }
   }
 
-  ResSeqPtr res_seq_ptr = std::make_shared<ResidueSeq>(residue_ptrs);
+  ResSeqPtr res_seq_ptr =
+      std::make_shared<ResidueSeq>(std::move(residue_ptrs));
   return std::make_shared<Proteoform>(fasta_seq_ptr, none_prot_mod_ptr,
                                       start_pos, end_pos, res_seq_ptr,
                                       shift_list);
