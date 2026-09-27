@@ -153,6 +153,7 @@ void cleanToppicDir(const std::string& fa_name, const std::string& sp_name,
     file_util::delFile(sp_base + ".toppic_multi_evalue");
     file_util::delFile(sp_base + ".toppic_multi_evalue_all");
     file_util::delFile(sp_base + ".toppic_pre_raw_prsm");
+    file_util::delFile(sp_base + ".toppic_multi_ptm_raw_prsm");
     file_util::delFile(sp_base + ".toppic_raw_prsm");
     file_util::delFile(sp_base + ".toppic_multi_shift");
     file_util::cleanPrefix(sp_name, sp_base + ".toppic_multi_shift_");
@@ -716,7 +717,7 @@ int TopPIC_multi_ptm_search(std::map<std::string, std::string>& arguments) {
       all_merge_ptr = nullptr;
     }
     prsm_top_selector::process(sp_file_name, "toppic_multi_evalue_all",
-                               "toppic_raw_prsm", n_top);
+                               "toppic_multi_ptm_raw_prsm", n_top);
     std::cout << "Multiple-shift top PrSM selecting - finished." << std::endl;
   } catch (const char* e) {
     std::cout << "[Exception]" << std::endl;
@@ -728,7 +729,8 @@ int TopPIC_multi_ptm_search(std::map<std::string, std::string>& arguments) {
 // Post-processing of the identifications. With -s 2 the set is the best PrSM
 // of every spectrum: the first-pass PrSM of the skipped spectra and, for the
 // searched spectra, the best of their first-pass and multiple-shift PrSMs
-// (toppic_raw_prsm); without -s 2 it is toppic_pre_raw_prsm. The set is
+// (toppic_multi_ptm_raw_prsm); without -s 2 it is toppic_pre_raw_prsm.
+// Either becomes toppic_raw_prsm, the name the steps below read. The set is
 // clustered and protein-corrected, recounted against the full spectra, then
 // post-matched (the added masses are in every later step), characterized
 // and given one FDR; the best PrSM of every spectrum is kept as
@@ -749,15 +751,16 @@ int TopPIC_postprocess(std::map<std::string, std::string>& arguments) {
     msalign_util::geneSpIndex(sp_file_name);
     std::string base_name = file_util::basename(sp_file_name);
 
-    // with -s 2 the multiple-shift stage wrote toppic_raw_prsm;
-    // otherwise the set is toppic_pre_raw_prsm, copied to that name --
-    // unconditionally, so that a toppic_raw_prsm left in the directory
-    // by an earlier -s 2 run is not picked up
+    // the set is the multiple-shift stage's toppic_multi_ptm_raw_prsm with
+    // -s 2 and the first pass's toppic_pre_raw_prsm otherwise; either way it
+    // is copied to toppic_raw_prsm, the name every step below reads, and
+    // copied unconditionally, so that a toppic_raw_prsm left in the
+    // directory by an earlier run is never picked up
     int shift_num = std::stoi(arguments["shiftNumber"]);
-    if (shift_num < 2) {
-      file_util::copyFile(base_name + ".toppic_pre_raw_prsm",
-                          base_name + ".toppic_raw_prsm", true);
-    }
+    std::string raw_prsm_ext =
+        shift_num < 2 ? ".toppic_pre_raw_prsm" : ".toppic_multi_ptm_raw_prsm";
+    file_util::copyFile(base_name + raw_prsm_ext,
+                        base_name + ".toppic_raw_prsm", true);
 
     bool is_proteoform_ppm_error = (arguments["proteoformPpmError"] == "true");
     double proteoform_error_tole =
