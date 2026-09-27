@@ -569,10 +569,9 @@ int TopPIC_topmg_identify(std::map<std::string, std::string>& arguments) {
 // PrSM selection of the new PrSMs alone.
 int TopPIC_multi_ptm_search(std::map<std::string, std::string>& arguments) {
   try {
+    // the search and the E-value computation of this stage take the number of
+    // unexpected shifts; TopPICProgress calls the stage only when it is 2
     int shift_num = std::stoi(arguments["shiftNumber"]);
-    if (shift_num < 2) {
-      return 0;
-    }
     std::string resource_dir = arguments["resourceDir"];
     base_data::init(resource_dir);
 
@@ -1068,7 +1067,10 @@ int TopPIC_report(std::map<std::string, std::string>& arguments) {
 
 int TopPICProgress(std::map<std::string, std::string>& arguments) {
   TopPIC_identify(arguments);
-  TopPIC_multi_ptm_search(arguments);
+  // the multiple unexpected shifts stage is the -s 2 stage
+  if (std::stoi(arguments["shiftNumber"]) >= 2) {
+    TopPIC_multi_ptm_search(arguments);
+  }
   if (arguments["topmgIdentify"] == "true") {
     TopPIC_topmg_identify(arguments);
   }
