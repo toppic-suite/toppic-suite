@@ -42,6 +42,11 @@ class Prsm {
 
   std::string getFileName() { return file_name_; }
 
+  // the search that found this PrSM, "toppic" or "topmg": one PrSM file can
+  // hold both, since TopPIC's stages and TopMG's graph alignment merge their
+  // PrSMs before the best one of every spectrum is chosen
+  std::string getTool() { return tool_; }
+
   int getPrsmId() { return prsm_id_; }
 
   int getSpectrumId() { return spectrum_id_; }
@@ -107,6 +112,8 @@ class Prsm {
 
   // setter
   void setFileName(const std::string& fname) { file_name_ = fname; }
+
+  void setTool(const std::string& tool) { tool_ = tool; }
 
   void setPrsmId(int id) { prsm_id_ = id; }
 
@@ -181,6 +188,9 @@ class Prsm {
 
  private:
   std::string file_name_;
+
+  // "toppic" unless a search sets it; the graph alignment sets "topmg"
+  std::string tool_ = "toppic";
 
   int prsm_id_ = -1;
   // spectrum information

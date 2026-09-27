@@ -619,9 +619,12 @@ PrsmPtr GraphAlign::geneResult(int s, int m) {
   sub_proteo_ptr->addMassShiftPtrVec(shifts);
   // sub_proteo_ptr->setVariablePtmNum(m);
 
-  return std::make_shared<Prsm>(sub_proteo_ptr, deconv_ms_ptr_vec,
-                                refine_prec_mass,
-                                mng_ptr_->prsm_para_ptr_->getSpParaPtr());
+  PrsmPtr prsm_ptr = std::make_shared<Prsm>(
+      sub_proteo_ptr, deconv_ms_ptr_vec, refine_prec_mass,
+      mng_ptr_->prsm_para_ptr_->getSpParaPtr());
+  // the graph alignment is TopMG's search, wherever it runs from
+  prsm_ptr->setTool("topmg");
+  return prsm_ptr;
 }
 
 PrsmPtr GraphAlign::geneResult(int s) {

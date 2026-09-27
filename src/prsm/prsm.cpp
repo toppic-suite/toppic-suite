@@ -115,6 +115,8 @@ XmlDOMElement Prsm::toXmlElement(XmlDOMDocument* xml_doc,
   // the version of TopPIC Suite that wrote the PrSM; the readers refuse a
   // PrSM of another version (PrsmReader::readOnePrsmStr)
   xml_doc->addElement(element, "version", Version::getVersion().c_str());
+  // the search that found the PrSM, toppic or topmg
+  xml_doc->addElement(element, "tool", tool_.c_str());
   xml_doc->addElement(element, "file_name", file_name_.c_str());
   std::string str = std::to_string(prsm_id_);
   xml_doc->addElement(element, "prsm_id", str.c_str());
@@ -167,6 +169,10 @@ void Prsm::appendXml(XmlDOMDocument* xml_doc, XmlDOMElement parent) {
 }
 
 void Prsm::parseXml(XmlDOMElement element) {
+  // PrSM files written before <tool> was added have no such element
+  if (xml_dom_util::getChildCount(element, "tool") > 0) {
+    tool_ = xml_dom_util::getChildValue(element, "tool", 0);
+  }
   file_name_ = xml_dom_util::getChildValue(element, "file_name", 0);
   prsm_id_ = xml_dom_util::getIntChildValue(element, "prsm_id", 0);
   spectrum_id_ = xml_dom_util::getIntChildValue(element, "spectrum_id", 0);

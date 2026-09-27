@@ -294,6 +294,8 @@ void GraphPostProcessor::process() {
           PrsmPtr new_prsm = std::make_shared<Prsm>(
               new_form, spec_set_ptr->getDeconvMsPtrVec(), adjusted_prec_mass,
               prsm_para_ptr->getSpParaPtr());
+          // a PrSM rebuilt from a graph alignment is still TopMG's
+          new_prsm->setTool(prsm_ptr->getTool());
 
           if (new_prsm->getMatchTheoFragNum() > 0) prsm_writer->write(new_prsm);
 
