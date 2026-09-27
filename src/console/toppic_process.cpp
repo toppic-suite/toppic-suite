@@ -1066,15 +1066,16 @@ int TopPIC_report(std::map<std::string, std::string>& arguments) {
 }
 
 int TopPICProgress(std::map<std::string, std::string>& arguments) {
-  TopPIC_identify(arguments);
+  std::string raw_prsm_ext;
+  raw_prsm_ext = TopPIC_identify(arguments);
   // the multiple unexpected shifts stage is the -s 2 stage
   if (std::stoi(arguments["shiftNumber"]) >= 2) {
-    TopPIC_multi_ptm_search(arguments);
+    raw_prsm_ext = TopPIC_multi_ptm_search(arguments, raw_prsm_ext);
   }
   if (arguments["topmgIdentify"] == "true") {
-    TopPIC_topmg_identify(arguments);
+    raw_prsm_ext = TopPIC_topmg_identify(arguments, raw_prsm_ext);
   }
-  TopPIC_postprocess(arguments);
+  TopPIC_postprocess(arguments, raw_prsm_ext);
   TopPIC_report(arguments);
   return 0;
 }
