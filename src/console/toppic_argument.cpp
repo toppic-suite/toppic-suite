@@ -1176,6 +1176,21 @@ bool ToppicArgument::validateArguments() {
     return false;
   }
 
+  // TopMG's identification (hidden --topmg-identify) searches whole proteins
+  // or whole proteins and their fragments; no other combination of the
+  // proteoform types is meaningful for its proteoform graphs
+  if (arguments_["topmgIdentify"] == "true") {
+    std::string prot_type = arguments_["allowProtType"];
+    if (prot_type != "COMPLETE,PREFIX,SUFFIX,INTERNAL" &&
+        prot_type != "COMPLETE") {
+      LOG_ERROR("Proteoform type "
+                << prot_type
+                << " error! With TopMG's identification, the value should be "
+                   "COMPLETE,PREFIX,SUFFIX,INTERNAL or COMPLETE!");
+      return false;
+    }
+  }
+
   // empty: the default of the multiple-shift stage (the smallest decoy
   // E-value with a decoy database, 0.01 without)
   std::string multi_skip_evalue = arguments_["multiSkipEvalue"];
