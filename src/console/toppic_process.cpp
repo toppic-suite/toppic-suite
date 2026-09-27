@@ -154,6 +154,8 @@ void cleanToppicDir(const std::string& fa_name, const std::string& sp_name,
     file_util::delFile(sp_base + ".toppic_multi_evalue_all");
     file_util::delFile(sp_base + ".toppic_pre_raw_prsm");
     file_util::delFile(sp_base + ".toppic_multi_ptm_raw_prsm");
+    file_util::delFile(sp_base + ".toppic_topmg_evalue_all");
+    file_util::delFile(sp_base + ".toppic_topmg_raw_prsm");
     file_util::delFile(sp_base + ".toppic_raw_prsm");
     file_util::delFile(sp_base + ".toppic_multi_shift");
     file_util::cleanPrefix(sp_name, sp_base + ".toppic_multi_shift_");
@@ -205,7 +207,7 @@ int TopPIC_testModFile(std::map<std::string, std::string>& arguments) {
 }
 
 // protein filtering + database searching + E-value computation
-int TopPIC_identify(std::map<std::string, std::string>& arguments) {
+std::string TopPIC_identify(std::map<std::string, std::string>& arguments) {
   try {
     std::time_t start = time(nullptr);
     char buf[50];
@@ -232,7 +234,7 @@ int TopPIC_identify(std::map<std::string, std::string>& arguments) {
         LOG_ERROR(
             "Please use -x option in command line or select 'Missing MS1 "
             "feature file in GUI'.");
-        return 1;
+        return "";
       }
     }
 
@@ -404,8 +406,9 @@ int TopPIC_identify(std::map<std::string, std::string>& arguments) {
   } catch (const char* e) {
     std::cout << "[Exception]" << std::endl;
     std::cout << e << std::endl;
+    return "";
   }
-  return 0;
+  return "toppic_pre_raw_prsm";
 }
 
 // TopMG's identification hosted in toppic, behind the hidden
@@ -421,7 +424,9 @@ int TopPIC_identify(std::map<std::string, std::string>& arguments) {
 // own nor with toppic's. The PrSMs end in toppic_topmg_raw_prsm and are not
 // merged into toppic's recounting, clustering, FDR, cutoffs or tables: the
 // two searches' E-values come from different models.
-int TopPIC_topmg_identify(std::map<std::string, std::string>& arguments) {
+std::string TopPIC_topmg_identify(
+    std::map<std::string, std::string>& arguments,
+    const std::string& raw_prsm_ext) {
   try {
     std::string db_file_name = arguments["databaseFileName"];
     std::string sp_file_name = arguments["spectrumFileName"];
@@ -430,7 +435,7 @@ int TopPIC_topmg_identify(std::map<std::string, std::string>& arguments) {
     if (var_mod_file_name == "") {
       LOG_ERROR("TopMG's identification needs a variable modification file. "
                 "Please use the -b option.");
-      return 1;
+      return raw_prsm_ext;
     }
 
     int n_top = std::stoi(arguments["numOfTopPrsms"]);
@@ -552,22 +557,40 @@ int TopPIC_topmg_identify(std::map<std::string, std::string>& arguments) {
     processor = nullptr;
     std::cout << "E-value computation using MCMC - finished." << std::endl;
 
+    // the PrSMs of this stage, whose E-values the MCMC gave, and those of the
+    // stage before it, so that the best PrSM of every spectrum is chosen
+    // between the two searches
+    std::cout << "Merging TopMG and TopPIC PrSMs - started." << std::endl;
+    {
+      std::vector<std::string> all_exts = {"toppic_topmg_evalue",
+                                           raw_prsm_ext};
+      PrsmStrMergePtr all_merge_ptr = std::make_shared<PrsmStrMerge>(
+          sp_file_name, all_exts, "toppic_topmg_evalue_all",
+          std::numeric_limits<int>::max(), false, false);
+      all_merge_ptr->process();
+      all_merge_ptr = nullptr;
+    }
+    std::cout << "Merging TopMG and TopPIC PrSMs - finished." << std::endl;
+
     std::cout << "TopMG top PrSM selecting - started" << std::endl;
-    prsm_top_selector::process(sp_file_name, "toppic_topmg_evalue",
+    prsm_top_selector::process(sp_file_name, "toppic_topmg_evalue_all",
                                "toppic_topmg_raw_prsm", n_top);
     std::cout << "TopMG top PrSM selecting - finished." << std::endl;
   } catch (const char* e) {
     std::cout << "[Exception]" << std::endl;
     std::cout << e << std::endl;
   }
-  return 0;
+  // its PrSMs, merged with those of the stage before it, are the set now
+  return "toppic_topmg_raw_prsm";
 }
 
 // The multiple unexpected shifts stage (-s 2): the diagonal filter and the
 // PTM search on the spectra that TopPIC_identify left without a PrSM passing
 // the spectrum-level cutoff, then the merge, E-value computation and top
 // PrSM selection of the new PrSMs alone.
-int TopPIC_multi_ptm_search(std::map<std::string, std::string>& arguments) {
+std::string TopPIC_multi_ptm_search(
+    std::map<std::string, std::string>& arguments,
+    const std::string& raw_prsm_ext) {
   try {
     // the search and the E-value computation of this stage take the number of
     // unexpected shifts; TopPICProgress calls the stage only when it is 2
@@ -707,8 +730,9 @@ int TopPIC_multi_ptm_search(std::map<std::string, std::string>& arguments) {
     // estimation of the multiple-shift pass.
     std::cout << "Multiple-shift top PrSM selecting - started" << std::endl;
     {
+      // the PrSMs of this stage and those of the stage before it
       std::vector<std::string> all_exts = {"toppic_multi_evalue",
-                                           "toppic_pre_raw_prsm"};
+                                           raw_prsm_ext};
       PrsmStrMergePtr all_merge_ptr = std::make_shared<PrsmStrMerge>(
           sp_file_name, all_exts, "toppic_multi_evalue_all",
           std::numeric_limits<int>::max(), false, false);
@@ -721,8 +745,10 @@ int TopPIC_multi_ptm_search(std::map<std::string, std::string>& arguments) {
   } catch (const char* e) {
     std::cout << "[Exception]" << std::endl;
     std::cout << e << std::endl;
+    // the set is still the one this stage was given
+    return raw_prsm_ext;
   }
-  return 0;
+  return "toppic_multi_ptm_raw_prsm";
 }
 
 // Post-processing of the identifications. With -s 2 the set is the best PrSM
@@ -734,7 +760,8 @@ int TopPIC_multi_ptm_search(std::map<std::string, std::string>& arguments) {
 // post-matched (the added masses are in every later step), characterized
 // and given one FDR; the best PrSM of every spectrum is kept as
 // toppic_record_prsm, from which TopPIC_report writes the results.
-int TopPIC_postprocess(std::map<std::string, std::string>& arguments) {
+int TopPIC_postprocess(std::map<std::string, std::string>& arguments,
+                       const std::string& raw_prsm_ext) {
   try {
     std::string resource_dir = arguments["resourceDir"];
     base_data::init(resource_dir);
@@ -749,16 +776,22 @@ int TopPIC_postprocess(std::map<std::string, std::string>& arguments) {
     PrsmParaPtr prsm_para_ptr = std::make_shared<PrsmPara>(arguments);
     msalign_util::geneSpIndex(sp_file_name);
     std::string base_name = file_util::basename(sp_file_name);
-
-    // the set is the multiple-shift stage's toppic_multi_ptm_raw_prsm with
-    // -s 2 and the first pass's toppic_pre_raw_prsm otherwise; either way it
-    // is copied to toppic_raw_prsm, the name every step below reads, and
-    // copied unconditionally, so that a toppic_raw_prsm left in the
-    // directory by an earlier run is never picked up
+    // the E-value model of the cluster protein correction below. TopMG's
+    // PrSMs carry up to its own number of unexpected shifts, which is not
+    // toppic's --num-shift, so the model has to allow for the larger of the
+    // two or it refuses to score them ("Number of unexpected PTMs is too
+    // large").
     int shift_num = std::stoi(arguments["shiftNumber"]);
-    std::string raw_prsm_ext =
-        shift_num < 2 ? ".toppic_pre_raw_prsm" : ".toppic_multi_ptm_raw_prsm";
-    file_util::copyFile(base_name + raw_prsm_ext,
+    if (arguments["topmgIdentify"] == "true") {
+      shift_num = std::max(shift_num, prsm_para_ptr->getTopmgShiftNum());
+    }
+
+    // raw_prsm_ext is the file the last stage that produced a PrSM set
+    // reported: toppic_pre_raw_prsm, or toppic_multi_ptm_raw_prsm after the
+    // multiple-shift stage. It is copied to toppic_raw_prsm, the name every
+    // step below reads, unconditionally, so that a toppic_raw_prsm left in
+    // the directory by an earlier run is never picked up.
+    file_util::copyFile(base_name + "." + raw_prsm_ext,
                         base_name + ".toppic_raw_prsm", true);
 
     bool is_proteoform_ppm_error = (arguments["proteoformPpmError"] == "true");
@@ -1066,8 +1099,10 @@ int TopPIC_report(std::map<std::string, std::string>& arguments) {
 }
 
 int TopPICProgress(std::map<std::string, std::string>& arguments) {
-  std::string raw_prsm_ext;
-  raw_prsm_ext = TopPIC_identify(arguments);
+  std::string raw_prsm_ext = TopPIC_identify(arguments);
+  if (raw_prsm_ext.empty()) {
+    return 1;
+  }
   // the multiple unexpected shifts stage is the -s 2 stage
   if (std::stoi(arguments["shiftNumber"]) >= 2) {
     raw_prsm_ext = TopPIC_multi_ptm_search(arguments, raw_prsm_ext);
