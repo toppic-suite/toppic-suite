@@ -1189,6 +1189,15 @@ bool ToppicArgument::validateArguments() {
                    "COMPLETE,PREFIX,SUFFIX,INTERNAL or COMPLETE!");
       return false;
     }
+    // its proteoform graphs carry no N-terminal label mass; the value has
+    // already been checked to be a non-negative number above
+    if (std::stod(arguments_["nTermLabelMass"]) != 0.0) {
+      LOG_ERROR("N-terminal label mass "
+                << arguments_["nTermLabelMass"]
+                << " error! With TopMG's identification, the value should be "
+                   "0!");
+      return false;
+    }
   }
 
   // empty: the default of the multiple-shift stage (the smallest decoy
