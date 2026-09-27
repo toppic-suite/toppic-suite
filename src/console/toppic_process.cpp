@@ -1065,10 +1065,10 @@ int TopPIC_report(std::map<std::string, std::string>& arguments) {
 
 int TopPICProgress(std::map<std::string, std::string>& arguments) {
   TopPIC_identify(arguments);
+  TopPIC_multi_ptm_search(arguments);
   if (arguments["topmgIdentify"] == "true") {
     TopPIC_topmg_identify(arguments);
   }
-  TopPIC_multi_ptm_search(arguments);
   TopPIC_postprocess(arguments);
   TopPIC_report(arguments);
   return 0;
