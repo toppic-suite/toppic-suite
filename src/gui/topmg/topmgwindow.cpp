@@ -693,7 +693,7 @@ void TopmgWindow::showArguments() {
        "\nmaxShiftMass:" + arguments_["maxShiftMass"] +
        "\nkeepTempFiles:" + arguments_["keepTempFiles"] +
        "\ngroupSpectrumNumber:" + arguments_["groupSpectrumNumber"] +
-       "\nfilteringResultNumber:" + arguments_["filteringResultNumber"] +
+       "\nasfFilteringResultNumber:" + arguments_["asfFilteringResultNumber"] +
        "\nvarModFileName:" + arguments_["varModFileName"] +
        "\nthreadNumber:" + arguments_["threadNumber"] + "\nuseFeatureFile:" +
        arguments_["useFeatureFile"] + "\nskipList:" + arguments_["skipList"] +

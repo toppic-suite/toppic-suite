@@ -433,7 +433,9 @@ int TopPIC_topmg_identify(std::map<std::string, std::string>& arguments) {
     }
 
     int n_top = std::stoi(arguments["numOfTopPrsms"]);
-    int filter_result_num = std::stoi(arguments["filteringResultNumber"]);
+    // the ASF filtering of these stages keeps this many results per
+    // spectrum: TopMG's own number, not toppic's filteringResultNumber
+    int filter_result_num = std::stoi(arguments["asfFilteringResultNumber"]);
     double max_shift_mass = std::stod(arguments["maxShiftMass"]);
     int thread_num = std::stoi(arguments["threadNumber"]);
 
@@ -491,7 +493,6 @@ int TopPIC_topmg_identify(std::map<std::string, std::string>& arguments) {
       int diag_filter_thread_num = mem_check::getStageThreadNum(
           "ASF-Diagonal PTM filtering", thread_num);
       LOG_DEBUG("Diagonal filter thread number " << diag_filter_thread_num);
-      filter_result_num = 15;
       DiagFilterMngPtr diag_filter_mng_ptr = std::make_shared<DiagFilterMng>(
           prsm_para_ptr, index_file_para, filter_result_num,
           diag_filter_thread_num, "toppic_topmg_multi_filter",

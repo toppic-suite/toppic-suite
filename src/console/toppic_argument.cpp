@@ -58,6 +58,9 @@ std::map<std::string, std::string> ToppicArgument::initArguments() {
   // when neither is set
   arguments["topmgIdentify"] = "false";
   arguments["graphShiftNumber"] = "1";
+  // the results the ASF filtering of that stage keeps per spectrum, TopMG's
+  // own number; toppic's own stages keep filteringResultNumber
+  arguments["asfFilteringResultNumber"] = "15";
   arguments["proteoGraphGap"] = "40";
   arguments["varPtmNumInGap"] = "5";
   arguments["wholeProteinOnly"] = "false";
@@ -329,6 +332,7 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
   std::string variable_ptm_file_name = "";
   std::string shift_num = "";
   std::string graph_shift_num = "";
+  std::string asf_filtering_result_num = "";
   std::string min_shift_mass = "";
   std::string max_shift_mass = "";
   std::string frag_error_tole = "";
@@ -544,6 +548,8 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
         "")("multi-skip-evalue", po::value<std::string>(&multi_skip_evalue),
             "")("disable-multi-type-align", "")("topmg-identify", "")(
         "graph-num-shift", po::value<std::string>(&graph_shift_num), "")(
+        "asf-filtering-result-number",
+        po::value<std::string>(&asf_filtering_result_num), "")(
         "filtering-result-number",
         po::value<std::string>(&filtering_result_num),
         "Filtering result number. Default value: 20.")(
@@ -752,6 +758,11 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
     // number, which --num-shift does not change
     if (vm.count("graph-num-shift")) {
       arguments_["graphShiftNumber"] = graph_shift_num;
+    }
+    // hidden: the ASF filtering result number of that stage, TopMG's own,
+    // which --filtering-result-number does not change
+    if (vm.count("asf-filtering-result-number")) {
+      arguments_["asfFilteringResultNumber"] = asf_filtering_result_num;
     }
 
     if (vm.count("combine-result-only")) {

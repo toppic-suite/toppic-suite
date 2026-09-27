@@ -68,7 +68,10 @@ std::map<std::string, std::string> TopmgArgument::initArguments() {
   arguments["resourceDir"] = "";
   arguments["keepTempFiles"] = "false";
   arguments["groupSpectrumNumber"] = "1";
-  arguments["filteringResultNumber"] = "20";
+  // the number of results the ASF filtering keeps per spectrum. TopMG's own
+  // number: toppic's filteringResultNumber belongs to toppic's stages. The
+  // default is the 15 that the ASF-Diagonal filtering used to hardcode.
+  arguments["asfFilteringResultNumber"] = "15";
   arguments["varModFileName"] = "";
   arguments["threadNumber"] = "1";
   arguments["useFeatureFile"] = "true";
@@ -383,7 +386,8 @@ bool TopmgArgument::parse(int argc, char* argv[]) {
         "protein-cutoff-value,Y", po::value<std::string>(&cutoff_protein_value),
         "")("filtering-result-number",
             po::value<std::string>(&filtering_result_num),
-            "Filtering result number. Default value: 20.")("full-binary-path,b",
+            "ASF filtering result number. Default value: 15.")(
+        "full-binary-path,b",
                                                            "Full binary path.")(
         "mod-file-name,i", po::value<std::string>(&var_mod_file_name), "")(
         "thread-number,u", po::value<std::string>(&thread_number), "")(
@@ -523,7 +527,7 @@ bool TopmgArgument::parse(int argc, char* argv[]) {
     }
 
     if (vm.count("filtering-result-number")) {
-      arguments_["filteringResultNumber"] = filtering_result_num;
+      arguments_["asfFilteringResultNumber"] = filtering_result_num;
     }
 
     if (vm.count("mod-file-name")) {
