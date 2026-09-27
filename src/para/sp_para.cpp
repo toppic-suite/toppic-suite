@@ -37,7 +37,8 @@ SpPara::SpPara(const std::string& activation_name, double n_term_label_mass,
   setFragMassExtension(true);
 
   setZeroShiftPrecOneDaError(true);
-  setOneShiftPrecOneDaError(true);
+  // the one-shift stages absorb a 1 Da error into their unknown mass shift
+  setOneShiftPrecOneDaError(false);
   setVarPtmPrecOneDaError(false);
   // multi-shift stages absorb a 1 Da error into an unknown mass shift
   multi_shift_search_prec_error_vec_ = {0};

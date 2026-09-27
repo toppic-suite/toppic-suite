@@ -113,7 +113,7 @@ class SpPara {
   double n_term_label_mass_ = 0.0;
 
   // envelopes with an EnvCNN score below env_cnn_cutoff are removed
-  double env_cnn_cutoff_ = 0.2;
+  double env_cnn_cutoff_ = 0.4;
 
   // combine fragment masses that agree within the fragment mass tolerance
   // before database filtering, the search and the E-value computation; off by
