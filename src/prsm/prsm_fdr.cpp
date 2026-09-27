@@ -222,34 +222,51 @@ void process(const std::string& spec_file_name,
   // target and decoy lists inherit it
   std::sort(filtered_prsm_str_ptrs.begin(), filtered_prsm_str_ptrs.end(),
             PrsmStr::cmpEValueIncProtInc);
-  PrsmStrPtrVec target_prsms;
-  PrsmStrPtrVec decoy_prsms;
+
+  // One FDR per search. TopPIC's E-values come from the generating function
+  // and TopMG's from MCMC sampling, so their decoy distributions are not
+  // comparable: mixed in one target and decoy count, whichever search
+  // produces the smallest decoy E-value sets the cutoff for both. Each
+  // search's PrSMs are therefore counted against its own decoys, and the
+  // cutoffs of TopPIC_report then keep the PrSMs that pass in either - the
+  // passing sets merged.
+  std::map<std::string, PrsmStrPtrVec> by_tool;
   for (size_t i = 0; i < filtered_prsm_str_ptrs.size(); i++) {
-    if (isDecoy(filtered_prsm_str_ptrs[i])) {
-      decoy_prsms.push_back(filtered_prsm_str_ptrs[i]);
-    } else {
-      target_prsms.push_back(filtered_prsm_str_ptrs[i]);
-    }
+    by_tool[filtered_prsm_str_ptrs[i]->getTool()].push_back(
+        filtered_prsm_str_ptrs[i]);
   }
-  computePrsmFdr(target_prsms, decoy_prsms);
 
-  PrsmStrPtrVec2D all_proteoforms = getProteoformGroups(filtered_prsm_str_ptrs);
-  PrsmStrPtrVec2D target_proteoforms;
-  PrsmStrPtrVec2D decoy_proteoforms;
-  splitTargetDecoyProteoforms(all_proteoforms, target_proteoforms,
-                              decoy_proteoforms);
-  computeProteoformFdr(target_proteoforms, decoy_proteoforms);
+  for (auto& tool_prsms : by_tool) {
+    PrsmStrPtrVec target_prsms;
+    PrsmStrPtrVec decoy_prsms;
+    for (size_t i = 0; i < tool_prsms.second.size(); i++) {
+      if (isDecoy(tool_prsms.second[i])) {
+        decoy_prsms.push_back(tool_prsms.second[i]);
+      } else {
+        target_prsms.push_back(tool_prsms.second[i]);
+      }
+    }
+    computePrsmFdr(target_prsms, decoy_prsms);
 
-  PrsmStrPtrVec2D target_proteins = getProteinGroups(target_proteoforms);
-  PrsmStrPtrVec2D decoy_proteins = getProteinGroups(decoy_proteoforms);
-  computeProteinFdr(target_proteins, decoy_proteins);
+    PrsmStrPtrVec2D all_proteoforms = getProteoformGroups(tool_prsms.second);
+    PrsmStrPtrVec2D target_proteoforms;
+    PrsmStrPtrVec2D decoy_proteoforms;
+    splitTargetDecoyProteoforms(all_proteoforms, target_proteoforms,
+                                decoy_proteoforms);
+    computeProteoformFdr(target_proteoforms, decoy_proteoforms);
+
+    PrsmStrPtrVec2D target_proteins = getProteinGroups(target_proteoforms);
+    PrsmStrPtrVec2D decoy_proteins = getProteinGroups(decoy_proteoforms);
+    computeProteinFdr(target_proteins, decoy_proteins);
+
+    std::cout << tool_prsms.first << " target_prsms: " << target_prsms.size()
+              << ", decoy_prsms: " << decoy_prsms.size() << std::endl;
+  }
 
   std::string output_file_name = base_name + "." + output_file_ext;
   PrsmXmlWriter writer(output_file_name);
   std::sort(filtered_prsm_str_ptrs.begin(), filtered_prsm_str_ptrs.end(),
             PrsmStr::cmpSpecIncPrecIncEvalueIncProtInc);
-  std::cout << "target_prsms: " << target_prsms.size()
-            << ", decoy_prsms: " << decoy_prsms.size() << std::endl;
   writer.writeVector(filtered_prsm_str_ptrs);
   writer.close();
 }
