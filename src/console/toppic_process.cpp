@@ -15,6 +15,7 @@
 
 #include "console/toppic_process.hpp"
 
+#include <algorithm>
 #include <cstdlib>
 #include <ctime>
 #include <filesystem>
@@ -63,11 +64,15 @@
 #include "prsm/prsm_prot_filter.hpp"
 #include "prsm/prsm_reader_util.hpp"
 #include "prsm/prsm_simple_cluster.hpp"
+#include "prsm/simple_prsm_str_merge.hpp"
 #include "prsm/prsm_sql_output.hpp"
 #include "prsm/prsm_str_merge.hpp"
 #include "prsm/prsm_top_selector.hpp"
 #include "prsm/prsm_util.hpp"
 #include "prsm/prsm_xml_writer.hpp"
+#include "search/graphalign/graph_align_mng.hpp"
+#include "search/graphalign/graph_align_processor.hpp"
+#include "search/graphalign/graph_post_processor.hpp"
 #include "search/oneptmsearch/one_ptm_search_processor.hpp"
 #include "search/oneptmsearch/ptm_search_mng.hpp"
 #include "search/ptmsearch/ptm_search_processor.hpp"
@@ -79,6 +84,8 @@
 #include "seq/fasta_util.hpp"
 #include "stat/local/local_mng.hpp"
 #include "stat/local/local_processor.hpp"
+#include "stat/mcmc/mcmc_dpr_processor.hpp"
+#include "stat/mcmc/mcmc_mng.hpp"
 #include "stat/tdgf/cluster_prot_corrector.hpp"
 #include "stat/tdgf/evalue_processor.hpp"
 #include "stat/tdgf/tdgf_mng.hpp"
@@ -393,6 +400,158 @@ int TopPIC_identify(std::map<std::string, std::string>& arguments) {
                                "toppic_pre_raw_prsm", n_top);
     std::cout << "Top PrSM selecting - finished." << std::endl;
 
+  } catch (const char* e) {
+    std::cout << "[Exception]" << std::endl;
+    std::cout << e << std::endl;
+  }
+  return 0;
+}
+
+// TopMG's identification hosted in toppic, behind the hidden
+// --topmg-identify option. Every stage of TopMG_identify, in its order: the
+// database preprocessing and the spectrum index, the ASF-One PTM filtering
+// with the variable modification file, the ASF-Diagonal filtering when it is
+// asked for, the merge of their results, the proteoform-graph alignment, its
+// post-processing, the E-value computation by MCMC and the top PrSM
+// selection. Only the initialisation of the base data and the echo of the
+// arguments are left out, because toppic has done them before this runs.
+//
+// The files are named toppic_topmg_*, so they collide neither with TopMG's
+// own nor with toppic's. The PrSMs end in toppic_topmg_raw_prsm and are not
+// merged into toppic's recounting, clustering, FDR, cutoffs or tables: the
+// two searches' E-values come from different models.
+int TopPIC_topmg_identify(std::map<std::string, std::string>& arguments) {
+  try {
+    std::string db_file_name = arguments["databaseFileName"];
+    std::string sp_file_name = arguments["spectrumFileName"];
+    std::string ori_db_file_name = arguments["oriDatabaseFileName"];
+    std::string var_mod_file_name = arguments["variablePtmFileName"];
+    if (var_mod_file_name == "") {
+      LOG_ERROR("TopMG's identification needs a variable modification file. "
+                "Please use the -b option.");
+      return 1;
+    }
+
+    int n_top = std::stoi(arguments["numOfTopPrsms"]);
+    int filter_result_num = std::stoi(arguments["filteringResultNumber"]);
+    double max_shift_mass = std::stod(arguments["maxShiftMass"]);
+    int thread_num = std::stoi(arguments["threadNumber"]);
+
+    bool decoy = false;
+    if (arguments["searchType"] == "TARGET+DECOY") {
+      decoy = true;
+    }
+    int db_block_size = std::stoi(arguments["databaseBlockSize"]);
+    int max_frag_len = std::stoi(arguments["maxFragmentLength"]);
+    int min_block_num = std::stoi(arguments["minBlockNum"]);
+    // every step of dbPreprocess is guarded by an existence check, so calling
+    // it again after TopPIC_identify rebuilds nothing and does not reshuffle
+    // the decoy database
+    fasta_util::dbPreprocess(ori_db_file_name, db_file_name, decoy,
+                             db_block_size, max_frag_len, min_block_num);
+    msalign_util::geneSpIndex(sp_file_name);
+
+    PrsmParaPtr prsm_para_ptr = std::make_shared<PrsmPara>(arguments);
+    // the unexpected shifts of the graph alignment: TopMG's own number, not
+    // toppic's --num-shift
+    int shift_num = prsm_para_ptr->getGraphShiftNum();
+    // TopMG keeps the +-1 Da precursor error that SpPara allows by default in
+    // the one-shift filtering, and toppic's defaults turn it off; these
+    // stages filter as TopMG filters (toppic_test experiment 71)
+    prsm_para_ptr->getSpParaPtr()->setOneShiftPrecOneDaError(true);
+
+    IndexFileNamePtr file_name_ptr = std::make_shared<IndexFileName>();
+    std::string index_file_para = file_name_ptr->geneFileName(arguments);
+
+    std::vector<std::string> input_exts;
+
+    std::cout << "TopMG ASF-One PTM filtering - started." << std::endl;
+    int filter_thread_num =
+        mem_check::getStageThreadNum("ASF-One PTM filtering", thread_num);
+    LOG_DEBUG("Filter thread number " << filter_thread_num);
+    int var_ptm_num_in_filtering = 1;
+    OnePtmFilterMngPtr one_ptm_filter_mng_ptr =
+        std::make_shared<OnePtmFilterMng>(
+            prsm_para_ptr, index_file_para, "toppic_topmg_one_filter",
+            filter_thread_num, -max_shift_mass, max_shift_mass,
+            var_mod_file_name, var_ptm_num_in_filtering);
+    one_ptm_filter_mng_ptr->inte_num_ = 4;
+    one_ptm_filter_mng_ptr->pref_suff_num_ = 4;
+    one_ptm_filter_mng_ptr->comp_num_ = 4;
+    one_ptm_filter_processor::process(one_ptm_filter_mng_ptr);
+    std::cout << "TopMG ASF-One PTM filtering - finished." << std::endl;
+
+    input_exts.push_back("toppic_topmg_one_filter_COMPLETE");
+    input_exts.push_back("toppic_topmg_one_filter_PREFIX");
+    input_exts.push_back("toppic_topmg_one_filter_SUFFIX");
+    input_exts.push_back("toppic_topmg_one_filter_INTERNAL");
+
+    if (arguments["useAsfDiag"] == "true") {
+      std::cout << "TopMG ASF-Diagonal PTM filtering - started." << std::endl;
+      int diag_filter_thread_num = mem_check::getStageThreadNum(
+          "ASF-Diagonal PTM filtering", thread_num);
+      LOG_DEBUG("Diagonal filter thread number " << diag_filter_thread_num);
+      filter_result_num = 15;
+      DiagFilterMngPtr diag_filter_mng_ptr = std::make_shared<DiagFilterMng>(
+          prsm_para_ptr, index_file_para, filter_result_num,
+          diag_filter_thread_num, "toppic_topmg_multi_filter",
+          var_mod_file_name, 1);
+      DiagFilterProcessorPtr diag_filter_processor =
+          std::make_shared<DiagFilterProcessor>(diag_filter_mng_ptr);
+      diag_filter_processor->process();
+      diag_filter_processor = nullptr;
+      std::cout << "TopMG ASF-Diagonal filtering - finished." << std::endl;
+
+      input_exts.push_back("toppic_topmg_multi_filter");
+    }
+
+    std::cout << "TopMG combining filtering results - started." << std::endl;
+    SimplePrsmStrMergePtr asf_filter_merger =
+        std::make_shared<SimplePrsmStrMerge>(sp_file_name, input_exts,
+                                             "toppic_topmg_graph_filter",
+                                             20 * input_exts.size());
+    asf_filter_merger->process();
+    asf_filter_merger = nullptr;
+    std::cout << "TopMG combining filtering results - finished." << std::endl;
+
+    int max_mod_num = std::stoi(arguments["variablePtmNum"]);
+    int gap = std::stoi(arguments["proteoGraphGap"]);
+    int var_ptm_in_gap =
+        std::min(std::stoi(arguments["varPtmNumInGap"]), max_mod_num);
+    bool whole_protein_only = (arguments["wholeProteinOnly"] == "true");
+    GraphAlignMngPtr ga_mng_ptr = std::make_shared<GraphAlignMng>(
+        prsm_para_ptr, var_mod_file_name, shift_num, max_mod_num, gap,
+        var_ptm_in_gap, max_shift_mass, thread_num, whole_protein_only,
+        "toppic_topmg_graph_filter", "toppic_topmg_graph_align");
+    std::cout << "Graph alignment - started." << std::endl;
+    GraphAlignProcessorPtr ga_processor_ptr =
+        std::make_shared<GraphAlignProcessor>(ga_mng_ptr);
+    ga_processor_ptr->process();
+    ga_processor_ptr = nullptr;
+    std::cout << "Graph alignment - finished." << std::endl;
+
+    std::cout << "Graph alignment post-processing - started." << std::endl;
+    GraphPostProcessorPtr ga_post_processor_ptr =
+        std::make_shared<GraphPostProcessor>(ga_mng_ptr,
+                                             "toppic_topmg_graph_align",
+                                             "toppic_topmg_graph_post");
+    ga_post_processor_ptr->process();
+    ga_post_processor_ptr = nullptr;
+    std::cout << "Graph alignment post-processing - finished." << std::endl;
+
+    std::cout << "E-value computation using MCMC - started." << std::endl;
+    MCMCMngPtr mcmc_mng_ptr = std::make_shared<MCMCMng>(
+        prsm_para_ptr, "toppic_topmg_graph_post", "toppic_topmg_evalue",
+        var_mod_file_name, max_mod_num, thread_num);
+    DprProcessorPtr processor = std::make_shared<DprProcessor>(mcmc_mng_ptr);
+    processor->process();
+    processor = nullptr;
+    std::cout << "E-value computation using MCMC - finished." << std::endl;
+
+    std::cout << "TopMG top PrSM selecting - started" << std::endl;
+    prsm_top_selector::process(sp_file_name, "toppic_topmg_evalue",
+                               "toppic_topmg_raw_prsm", n_top);
+    std::cout << "TopMG top PrSM selecting - finished." << std::endl;
   } catch (const char* e) {
     std::cout << "[Exception]" << std::endl;
     std::cout << e << std::endl;
@@ -903,6 +1062,9 @@ int TopPIC_report(std::map<std::string, std::string>& arguments) {
 
 int TopPICProgress(std::map<std::string, std::string>& arguments) {
   TopPIC_identify(arguments);
+  if (arguments["topmgIdentify"] == "true") {
+    TopPIC_topmg_identify(arguments);
+  }
   TopPIC_multi_ptm_search(arguments);
   TopPIC_postprocess(arguments);
   TopPIC_report(arguments);

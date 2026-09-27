@@ -164,8 +164,6 @@ int TopMG_identify(std::map<std::string, std::string>& arguments) {
       }
     }
 
-    int shift_num = std::stoi(arguments["shiftNumber"]);
-    LOG_DEBUG("num of unknown shift " << shift_num);
     int filter_result_num = std::stoi(arguments["filteringResultNumber"]);
     double max_shift_mass = std::stod(arguments["maxShiftMass"]);
 
@@ -185,6 +183,10 @@ int TopMG_identify(std::map<std::string, std::string>& arguments) {
     msalign_util::geneSpIndex(sp_file_name);
 
     PrsmParaPtr prsm_para_ptr = std::make_shared<PrsmPara>(arguments);
+    // the unexpected shifts of the graph alignment: TopMG's own --num-shift,
+    // which is not toppic's shiftNumber (PrsmPara::getGraphShiftNum)
+    int shift_num = prsm_para_ptr->getGraphShiftNum();
+    LOG_DEBUG("num of unknown shift " << shift_num);
 
     // index file name
     IndexFileNamePtr file_name_ptr = std::make_shared<IndexFileName>();

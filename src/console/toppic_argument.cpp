@@ -53,6 +53,15 @@ std::map<std::string, std::string> ToppicArgument::initArguments() {
   arguments["useApproxSpectra"] = "false";
   arguments["variablePtmNum"] = "3";
   arguments["variablePtmFileName"] = "";
+  // TopMG's identification hosted in toppic, behind the hidden
+  // --topmg-identify option: TopMG's own defaults, so that the two agree
+  // when neither is set
+  arguments["topmgIdentify"] = "false";
+  arguments["graphShiftNumber"] = "1";
+  arguments["proteoGraphGap"] = "40";
+  arguments["varPtmNumInGap"] = "5";
+  arguments["wholeProteinOnly"] = "false";
+  arguments["useAsfDiag"] = "false";
   arguments["shiftNumber"] = "1";
   arguments["minShiftMass"] = "-500";
   arguments["maxShiftMass"] = "500";
@@ -319,6 +328,7 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
   std::string variable_ptm_num = "";
   std::string variable_ptm_file_name = "";
   std::string shift_num = "";
+  std::string graph_shift_num = "";
   std::string min_shift_mass = "";
   std::string max_shift_mass = "";
   std::string frag_error_tole = "";
@@ -532,7 +542,8 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
         "frag-mass-dedup", "")(
         "frag-extend-min-mass", po::value<std::string>(&frag_extend_min_mass),
         "")("multi-skip-evalue", po::value<std::string>(&multi_skip_evalue),
-            "")("disable-multi-type-align", "")(
+            "")("disable-multi-type-align", "")("topmg-identify", "")(
+        "graph-num-shift", po::value<std::string>(&graph_shift_num), "")(
         "filtering-result-number",
         po::value<std::string>(&filtering_result_num),
         "Filtering result number. Default value: 20.")(
@@ -728,6 +739,19 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
     // PsAlign search.
     if (vm.count("disable-multi-type-align")) {
       arguments_["multiTypeAlign"] = "false";
+    }
+
+    // hidden: run TopMG's identification - the ASF filtering with the
+    // variable modification file, the graph alignment, its post-processing,
+    // the MCMC E-value and the top PrSM selection - on the same spectra,
+    // after toppic's own identification stages
+    if (vm.count("topmg-identify")) {
+      arguments_["topmgIdentify"] = "true";
+    }
+    // hidden: the unexpected shifts of that graph alignment, TopMG's own
+    // number, which --num-shift does not change
+    if (vm.count("graph-num-shift")) {
+      arguments_["graphShiftNumber"] = graph_shift_num;
     }
 
     if (vm.count("combine-result-only")) {

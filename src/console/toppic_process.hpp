@@ -27,6 +27,13 @@ int TopPICProgress(std::map<std::string, std::string>& arguments);
 // protein filtering + database searching + E-value computation
 int TopPIC_identify(std::map<std::string, std::string>& arguments);
 
+// TopMG's identification hosted here (hidden --topmg-identify): the ASF
+// filtering with the variable modification file, the proteoform-graph
+// alignment, its post-processing, the MCMC E-value and the top PrSM
+// selection; its PrSMs are left in toppic_topmg_raw_prsm and are not merged
+// into toppic's own results
+int TopPIC_topmg_identify(std::map<std::string, std::string>& arguments);
+
 // the multiple unexpected shifts stage (-s 2) on the spectra whose first-pass
 // PrSM no decoy PrSM could compete with
 int TopPIC_multi_ptm_search(std::map<std::string, std::string>& arguments);

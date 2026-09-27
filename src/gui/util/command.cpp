@@ -278,7 +278,7 @@ std::map<std::string, std::string> topmg_para{
     {"cutoffProteoformValue", "-V "},
     {"cutoffProteinType", "-y "},
     {"cutoffProteinValue", "-Y "},
-    {"shiftNumber", "-s "},
+    {"graphShiftNumber", "-s "},
     {"useFeatureFile", "-x "},
     {"keepTempFiles", "-k "},
     {"keepDecoyResults", "-K "},

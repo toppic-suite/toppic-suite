@@ -46,7 +46,9 @@ std::map<std::string, std::string> TopmgArgument::initArguments() {
   arguments["activation"] = "FILE";
   arguments["searchType"] = "TARGET";
   arguments["fixedMod"] = "";
-  arguments["shiftNumber"] = "0";
+  // the unexpected shifts of the graph alignment, TopMG's own number,
+  // kept apart from toppic's shiftNumber (PrsmPara::getGraphShiftNum)
+  arguments["graphShiftNumber"] = "1";
   arguments["precErrorTolerance"] = "10";
   arguments["fragErrorTolerance"] = "10";
   arguments["envCnnCutoff"] = "0.4";
@@ -147,7 +149,7 @@ void TopmgArgument::outputArguments(
 
   output << std::setw(gap) << std::left
          << "Maximum number of unexpected modifications:" << sep
-         << arguments["shiftNumber"] << std::endl;
+         << arguments["graphShiftNumber"] << std::endl;
   output << std::setw(gap) << std::left
          << "Maximum mass shift of modifications:" << sep
          << arguments["maxShiftMass"] << " Da" << std::endl;
@@ -549,7 +551,7 @@ bool TopmgArgument::parse(int argc, char* argv[]) {
     }
 
     if (vm.count("num-shift")) {
-      arguments_["shiftNumber"] = shift_num;
+      arguments_["graphShiftNumber"] = shift_num;
     }
 
     if (vm.count("var-ptm-in-gap")) {
@@ -679,7 +681,7 @@ bool TopmgArgument::validateArguments() {
               << " error! The value should be TARGET|TARGET+DECOY!");
     return false;
   }
-  std::string shift_number = arguments_["shiftNumber"];
+  std::string shift_number = arguments_["graphShiftNumber"];
   if (shift_number != "0" && shift_number != "1" && shift_number != "2") {
     LOG_ERROR("Shift number " << shift_number
                               << " error! The value should be 0|1|2!");
