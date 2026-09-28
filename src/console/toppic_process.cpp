@@ -471,6 +471,65 @@ std::string TopPIC_topmg_identify(
     IndexFileNamePtr file_name_ptr = std::make_shared<IndexFileName>();
     std::string index_file_para = file_name_ptr->geneFileName(arguments);
 
+    // The spectra to search: the ones no earlier stage has identified, as the
+    // multiple-shift stage chooses them. A spectrum counts as identified when
+    // its best PrSM in the set this stage was given has an E-value strictly
+    // below the skip E-value, which with a decoy database is the smallest
+    // E-value of a decoy PrSM of that set. Every spectrum a decoy could
+    // compete with is searched, so TopMG's decoys are those of a full search
+    // over the spectra it searches, and the spectra no decoy can reach keep
+    // the PrSM they have. The hidden --multi-skip-evalue overrides it. A
+    // spectrum with no PrSM at all is searched, which is why the list is built
+    // from every spectrum of the file and not from the PrSMs.
+    std::string base_name = file_util::basename(sp_file_name);
+    std::set<int> identified_spec_ids;
+    PrsmStrPtrVec prev_ptrs =
+        prsm_reader_util::readAllPrsmStrs(base_name + "." + raw_prsm_ext);
+    double skip_evalue;
+    std::string skip_source;
+    if (arguments["multiSkipEvalue"] != "") {
+      skip_evalue = std::stod(arguments["multiSkipEvalue"]);
+      skip_source = "--multi-skip-evalue";
+    } else if (arguments["searchType"] == "TARGET+DECOY") {
+      skip_evalue = std::numeric_limits<double>::max();
+      for (size_t i = 0; i < prev_ptrs.size(); i++) {
+        if (prev_ptrs[i]->getSeqName().find("DECOY_") == 0 &&
+            prev_ptrs[i]->getEValue() < skip_evalue) {
+          skip_evalue = prev_ptrs[i]->getEValue();
+        }
+      }
+      skip_source = "the smallest E-value of a decoy PrSM";
+    } else {
+      skip_evalue = 0.01;
+      skip_source = "the default without a decoy database";
+    }
+    int skipped_target_num = 0;
+    int skipped_decoy_num = 0;
+    for (size_t i = 0; i < prev_ptrs.size(); i++) {
+      if (prev_ptrs[i]->getEValue() < skip_evalue) {
+        int spec_id = prev_ptrs[i]->getSpectrumId();
+        if (identified_spec_ids.insert(spec_id).second) {
+          if (prev_ptrs[i]->getSeqName().find("DECOY_") == 0) {
+            skipped_decoy_num++;
+          } else {
+            skipped_target_num++;
+          }
+        }
+      }
+    }
+    std::set<int> search_spec_ids;
+    int spectrum_num = msalign_util::getSpNum(sp_file_name);
+    for (int spec_id = 0; spec_id < spectrum_num; spec_id++) {
+      if (identified_spec_ids.count(spec_id) == 0) {
+        search_spec_ids.insert(spec_id);
+      }
+    }
+    std::cout << "TopMG's identification - " << search_spec_ids.size()
+              << " spectra to search, " << identified_spec_ids.size()
+              << " identified by the earlier stages (" << skipped_target_num
+              << " target, " << skipped_decoy_num << " decoy; E-value < "
+              << skip_evalue << ", " << skip_source << ")." << std::endl;
+
     std::vector<std::string> input_exts;
 
     std::cout << "TopMG ASF-One PTM filtering - started." << std::endl;
@@ -532,6 +591,9 @@ std::string TopPIC_topmg_identify(
         prsm_para_ptr, var_mod_file_name, shift_num, max_mod_num, gap,
         var_ptm_in_gap, max_shift_mass, thread_num, whole_protein_only,
         "toppic_topmg_graph_filter", "toppic_topmg_graph_align");
+    // the graph alignment searches these spectra and no others
+    ga_mng_ptr->search_spec_ids_ = search_spec_ids;
+    ga_mng_ptr->search_all_ = false;
     std::cout << "Graph alignment - started." << std::endl;
     GraphAlignProcessorPtr ga_processor_ptr =
         std::make_shared<GraphAlignProcessor>(ga_mng_ptr);

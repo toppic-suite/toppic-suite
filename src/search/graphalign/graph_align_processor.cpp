@@ -18,6 +18,7 @@
 #include <algorithm>
 #include <fstream>
 #include <iostream>
+#include <set>
 #include <string>
 #include <vector>
 
@@ -190,7 +191,19 @@ void GraphAlignProcessor::process() {
   SimplePrsmPtr prsm_ptr = simple_prsm_reader->readOnePrsm();
   int spec_id = -1;
   SimplePrsmPtrVec selected_prsm_ptrs;
+  // only the spectra of the list are searched: the candidates of the others
+  // are dropped here, so neither the alignment nor anything after it sees
+  // them
+  std::set<int> searched_spec_ids;
+  std::set<int> skipped_spec_ids;
   while (prsm_ptr != nullptr) {
+    if (!mng_ptr_->search_all_ &&
+        mng_ptr_->search_spec_ids_.count(prsm_ptr->getSpectrumId()) == 0) {
+      skipped_spec_ids.insert(prsm_ptr->getSpectrumId());
+      prsm_ptr = simple_prsm_reader->readOnePrsm();
+      continue;
+    }
+    searched_spec_ids.insert(prsm_ptr->getSpectrumId());
     if (prsm_ptr->getSpectrumId() == spec_id) {
       selected_prsm_ptrs.push_back(prsm_ptr);
     } else {
@@ -206,6 +219,12 @@ void GraphAlignProcessor::process() {
   SimplePrsmFilter(selected_prsm_ptrs);
   graph_filter_writer->write(selected_prsm_ptrs);
   graph_filter_writer->close();
+  if (!mng_ptr_->search_all_) {
+    std::cout << "Graph alignment - " << searched_spec_ids.size()
+              << " of the spectra to search have candidates, "
+              << skipped_spec_ids.size() << " other spectra skipped."
+              << std::endl;
+  }
 
   SimplePrsmXmlWriterPtrVec simple_prsm_writer_vec =
       simple_prsm_xml_writer_util::geneWriterPtrVec(input_file_name,
