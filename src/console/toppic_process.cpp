@@ -206,37 +206,49 @@ int TopPIC_testModFile(std::map<std::string, std::string>& arguments) {
   return 0;
 }
 
+namespace {
+// The start of the search of one spectrum file, whichever stage searches
+// first: the start time, the echo of the arguments, the base data and the
+// check that TopFD's feature file exists. Returns false if it does not.
+bool TopPIC_init(std::map<std::string, std::string>& arguments) {
+  std::time_t start = time(nullptr);
+  char buf[50];
+  std::strftime(buf, 50, "%a %b %d %H:%M:%S %Y", std::localtime(&start));
+
+  arguments["startTime"] = buf;
+  ToppicArgument::outputArguments(std::cout, " ", arguments);
+
+  std::string resource_dir = arguments["resourceDir"];
+  base_data::init(resource_dir);
+  EnvBase::initBase(resource_dir);
+
+  LOG_DEBUG("Init base data completed");
+
+  std::string feature_file_name =
+      file_util::basename(arguments["spectrumFileName"]) + ".feature";
+  if (arguments["useFeatureFile"] == "true") {
+    if (!std::filesystem::exists(feature_file_name)) {
+      LOG_ERROR("TopFD feature file does not exist!.");
+      LOG_ERROR(
+          "Please use -x option in command line or select 'Missing MS1 "
+          "feature file in GUI'.");
+      return false;
+    }
+  }
+  return true;
+}
+}  // namespace
+
 // protein filtering + database searching + E-value computation
 std::string TopPIC_identify(std::map<std::string, std::string>& arguments) {
   try {
-    std::time_t start = time(nullptr);
-    char buf[50];
-    std::strftime(buf, 50, "%a %b %d %H:%M:%S %Y", std::localtime(&start));
-
-    arguments["startTime"] = buf;
-    ToppicArgument::outputArguments(std::cout, " ", arguments);
-
-    std::string resource_dir = arguments["resourceDir"];
-    base_data::init(resource_dir);
-    EnvBase::initBase(resource_dir);
-
-    LOG_DEBUG("Init base data completed");
+    if (!TopPIC_init(arguments)) {
+      return "";
+    }
 
     std::string db_file_name = arguments["databaseFileName"];
     std::string sp_file_name = arguments["spectrumFileName"];
     std::string ori_db_file_name = arguments["oriDatabaseFileName"];
-    std::string feature_file_name =
-        file_util::basename(sp_file_name) + ".feature";
-
-    if (arguments["useFeatureFile"] == "true") {
-      if (!std::filesystem::exists(feature_file_name)) {
-        LOG_ERROR("TopFD feature file does not exist!.");
-        LOG_ERROR(
-            "Please use -x option in command line or select 'Missing MS1 "
-            "feature file in GUI'.");
-        return "";
-      }
-    }
 
     int n_top = std::stoi(arguments["numOfTopPrsms"]);
     LOG_DEBUG("Number of top PrSMs to retain for each spectrum: " << n_top);
@@ -417,13 +429,17 @@ std::string TopPIC_identify(std::map<std::string, std::string>& arguments) {
 // with the variable modification file, the ASF-Diagonal filtering when it is
 // asked for, the merge of their results, the proteoform-graph alignment, its
 // post-processing, the E-value computation by the generating function (by
-// MCMC with the hidden --topmg-use-mcmc) and the top PrSM selection. Only the initialisation of the base data and the echo of the
-// arguments are left out, because toppic has done them before this runs.
+// MCMC with the hidden --topmg-use-mcmc) and the top PrSM selection. Only
+// the initialisation of the base data and the echo of the arguments are left
+// out, because toppic has done them before this runs.
 //
 // The files are named toppic_topmg_*, so they collide neither with TopMG's
-// own nor with toppic's. The PrSMs end in toppic_topmg_raw_prsm and are not
-// merged into toppic's recounting, clustering, FDR, cutoffs or tables: the
-// two searches' E-values come from different models.
+// own nor with toppic's. The graph alignment searches the spectra that the
+// set raw_prsm_ext names (the stages before this one) left unidentified, and
+// the top PrSM selection chooses between its PrSMs and that set's, writing
+// toppic_topmg_raw_prsm, which the post-processing reads. With the hidden
+// --topmg-only there is no set before this stage (raw_prsm_ext is empty):
+// every spectrum is searched and only this stage's PrSMs are selected.
 std::string TopPIC_topmg_identify(
     std::map<std::string, std::string>& arguments,
     const std::string& raw_prsm_ext) {
@@ -482,53 +498,64 @@ std::string TopPIC_topmg_identify(
     // spectrum with no PrSM at all is searched, which is why the list is built
     // from every spectrum of the file and not from the PrSMs.
     std::string base_name = file_util::basename(sp_file_name);
-    std::set<int> identified_spec_ids;
-    PrsmStrPtrVec prev_ptrs =
-        prsm_reader_util::readAllPrsmStrs(base_name + "." + raw_prsm_ext);
-    double skip_evalue;
-    std::string skip_source;
-    if (arguments["multiSkipEvalue"] != "") {
-      skip_evalue = std::stod(arguments["multiSkipEvalue"]);
-      skip_source = "--multi-skip-evalue";
-    } else if (arguments["searchType"] == "TARGET+DECOY") {
-      skip_evalue = std::numeric_limits<double>::max();
-      for (size_t i = 0; i < prev_ptrs.size(); i++) {
-        if (prev_ptrs[i]->getSeqName().find("DECOY_") == 0 &&
-            prev_ptrs[i]->getEValue() < skip_evalue) {
-          skip_evalue = prev_ptrs[i]->getEValue();
-        }
+    std::set<int> search_spec_ids;
+    int spectrum_num = msalign_util::getSpNum(sp_file_name);
+    if (raw_prsm_ext.empty()) {
+      // --topmg-only: no earlier stage has searched, every spectrum is
+      // searched here
+      for (int spec_id = 0; spec_id < spectrum_num; spec_id++) {
+        search_spec_ids.insert(spec_id);
       }
-      skip_source = "the smallest E-value of a decoy PrSM";
+      std::cout << "TopMG's identification - " << search_spec_ids.size()
+                << " spectra to search, the only search (--topmg-only)."
+                << std::endl;
     } else {
-      skip_evalue = 0.01;
-      skip_source = "the default without a decoy database";
-    }
-    int skipped_target_num = 0;
-    int skipped_decoy_num = 0;
-    for (size_t i = 0; i < prev_ptrs.size(); i++) {
-      if (prev_ptrs[i]->getEValue() < skip_evalue) {
-        int spec_id = prev_ptrs[i]->getSpectrumId();
-        if (identified_spec_ids.insert(spec_id).second) {
-          if (prev_ptrs[i]->getSeqName().find("DECOY_") == 0) {
-            skipped_decoy_num++;
-          } else {
-            skipped_target_num++;
+      std::set<int> identified_spec_ids;
+      PrsmStrPtrVec prev_ptrs =
+          prsm_reader_util::readAllPrsmStrs(base_name + "." + raw_prsm_ext);
+      double skip_evalue;
+      std::string skip_source;
+      if (arguments["multiSkipEvalue"] != "") {
+        skip_evalue = std::stod(arguments["multiSkipEvalue"]);
+        skip_source = "--multi-skip-evalue";
+      } else if (arguments["searchType"] == "TARGET+DECOY") {
+        skip_evalue = std::numeric_limits<double>::max();
+        for (size_t i = 0; i < prev_ptrs.size(); i++) {
+          if (prev_ptrs[i]->getSeqName().find("DECOY_") == 0 &&
+              prev_ptrs[i]->getEValue() < skip_evalue) {
+            skip_evalue = prev_ptrs[i]->getEValue();
+          }
+        }
+        skip_source = "the smallest E-value of a decoy PrSM";
+      } else {
+        skip_evalue = 0.01;
+        skip_source = "the default without a decoy database";
+      }
+      int skipped_target_num = 0;
+      int skipped_decoy_num = 0;
+      for (size_t i = 0; i < prev_ptrs.size(); i++) {
+        if (prev_ptrs[i]->getEValue() < skip_evalue) {
+          int spec_id = prev_ptrs[i]->getSpectrumId();
+          if (identified_spec_ids.insert(spec_id).second) {
+            if (prev_ptrs[i]->getSeqName().find("DECOY_") == 0) {
+              skipped_decoy_num++;
+            } else {
+              skipped_target_num++;
+            }
           }
         }
       }
-    }
-    std::set<int> search_spec_ids;
-    int spectrum_num = msalign_util::getSpNum(sp_file_name);
-    for (int spec_id = 0; spec_id < spectrum_num; spec_id++) {
-      if (identified_spec_ids.count(spec_id) == 0) {
-        search_spec_ids.insert(spec_id);
+      for (int spec_id = 0; spec_id < spectrum_num; spec_id++) {
+        if (identified_spec_ids.count(spec_id) == 0) {
+          search_spec_ids.insert(spec_id);
+        }
       }
+      std::cout << "TopMG's identification - " << search_spec_ids.size()
+                << " spectra to search, " << identified_spec_ids.size()
+                << " identified by the earlier stages (" << skipped_target_num
+                << " target, " << skipped_decoy_num << " decoy; E-value < "
+                << skip_evalue << ", " << skip_source << ")." << std::endl;
     }
-    std::cout << "TopMG's identification - " << search_spec_ids.size()
-              << " spectra to search, " << identified_spec_ids.size()
-              << " identified by the earlier stages (" << skipped_target_num
-              << " target, " << skipped_decoy_num << " decoy; E-value < "
-              << skip_evalue << ", " << skip_source << ")." << std::endl;
 
     std::vector<std::string> input_exts;
 
@@ -647,8 +674,11 @@ std::string TopPIC_topmg_identify(
     // PrSM of every spectrum is chosen between the two searches
     std::cout << "Merging TopMG and TopPIC PrSMs - started." << std::endl;
     {
-      std::vector<std::string> all_exts = {"toppic_topmg_evalue",
-                                           raw_prsm_ext};
+      // with --topmg-only there is no stage before this one
+      std::vector<std::string> all_exts = {"toppic_topmg_evalue"};
+      if (!raw_prsm_ext.empty()) {
+        all_exts.push_back(raw_prsm_ext);
+      }
       PrsmStrMergePtr all_merge_ptr = std::make_shared<PrsmStrMerge>(
           sp_file_name, all_exts, "toppic_topmg_evalue_all",
           std::numeric_limits<int>::max(), false, false);
@@ -1201,16 +1231,42 @@ int TopPIC_report(std::map<std::string, std::string>& arguments) {
 }
 
 int TopPICProgress(std::map<std::string, std::string>& arguments) {
-  std::string raw_prsm_ext = TopPIC_identify(arguments);
+  std::string raw_prsm_ext;
+  if (arguments["topmgOnly"] == "true") {
+    // --topmg-only: TopMG's identification is the only database search, and
+    // toppic's own identification stages (TopPIC_identify and
+    // TopPIC_multi_ptm_search) are skipped
+    if (!TopPIC_init(arguments)) {
+      return 1;
+    }
+    // The variable PTM type number by which the generating function (the
+    // hosted stage's E-values and the cluster protein correction) multiplies
+    // the candidate number of a PrSM for each variable PTM. TopPIC_identify
+    // counts it in its variable-PTM stage, from the same file.
+    int var_ptm_type_num = 0;
+    if (std::stoi(arguments["variablePtmNum"]) >= 1 &&
+        arguments["variablePtmFileName"] != "") {
+      var_ptm_type_num = static_cast<int>(
+          mod_util::readModTxtToShiftList(arguments["variablePtmFileName"])
+              .size());
+    }
+    arguments["varPtmTypeNum"] = std::to_string(var_ptm_type_num);
+    raw_prsm_ext = TopPIC_topmg_identify(arguments, "");
+  } else {
+    raw_prsm_ext = TopPIC_identify(arguments);
+    if (raw_prsm_ext.empty()) {
+      return 1;
+    }
+    // the multiple unexpected shifts stage is the -s 2 stage
+    if (std::stoi(arguments["shiftNumber"]) >= 2) {
+      raw_prsm_ext = TopPIC_multi_ptm_search(arguments, raw_prsm_ext);
+    }
+    if (arguments["topmgIdentify"] == "true") {
+      raw_prsm_ext = TopPIC_topmg_identify(arguments, raw_prsm_ext);
+    }
+  }
   if (raw_prsm_ext.empty()) {
     return 1;
-  }
-  // the multiple unexpected shifts stage is the -s 2 stage
-  if (std::stoi(arguments["shiftNumber"]) >= 2) {
-    raw_prsm_ext = TopPIC_multi_ptm_search(arguments, raw_prsm_ext);
-  }
-  if (arguments["topmgIdentify"] == "true") {
-    raw_prsm_ext = TopPIC_topmg_identify(arguments, raw_prsm_ext);
   }
   TopPIC_postprocess(arguments, raw_prsm_ext);
   TopPIC_report(arguments);

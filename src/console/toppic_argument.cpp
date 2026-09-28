@@ -60,6 +60,9 @@ std::map<std::string, std::string> ToppicArgument::initArguments() {
   // the E-values of that stage: the generating function of toppic's own
   // stages, or with the hidden --topmg-use-mcmc TopMG's MCMC
   arguments["topmgUseMcmc"] = "false";
+  // with the hidden --topmg-only, that stage is the only database search:
+  // toppic's own identification stages are skipped
+  arguments["topmgOnly"] = "false";
   arguments["topmgShiftNumber"] = "1";
   // the results the ASF filtering of that stage keeps per spectrum, TopMG's
   // own number; toppic's own stages keep filteringResultNumber
@@ -549,7 +552,7 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
         "frag-extend-min-mass", po::value<std::string>(&frag_extend_min_mass),
         "")("multi-skip-evalue", po::value<std::string>(&multi_skip_evalue),
             "")("disable-multi-type-align", "")("topmg-identify", "")(
-        "topmg-use-mcmc", "")(
+        "topmg-use-mcmc", "")("topmg-only", "")(
         "topmg-num-shift", po::value<std::string>(&topmg_shift_num), "")(
         "asf-filtering-result-number",
         po::value<std::string>(&asf_filtering_result_num), "")(
@@ -761,6 +764,13 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
     // of the generating function (TDGF)
     if (vm.count("topmg-use-mcmc")) {
       arguments_["topmgUseMcmc"] = "true";
+    }
+    // hidden: TopMG's identification alone, on every spectrum; toppic's own
+    // identification stages (zero, variable-PTM, one and multiple
+    // unexpected shift searches) are skipped. It implies --topmg-identify.
+    if (vm.count("topmg-only")) {
+      arguments_["topmgOnly"] = "true";
+      arguments_["topmgIdentify"] = "true";
     }
     // hidden: the unexpected shifts of that graph alignment, TopMG's own
     // number, which --num-shift does not change
@@ -1206,6 +1216,14 @@ bool ToppicArgument::validateArguments() {
                    "0!");
       return false;
     }
+  }
+  // TopMG's identification needs the variable modifications; as the only
+  // search, a run without them would search nothing
+  if (arguments_["topmgOnly"] == "true" &&
+      arguments_["variablePtmFileName"] == "") {
+    LOG_ERROR("--topmg-only error! It needs a variable modification file "
+              "(-b).");
+    return false;
   }
   // the E-value method of TopMG's identification means nothing without it
   if (arguments_["topmgUseMcmc"] == "true" &&
