@@ -603,7 +603,15 @@ instead of the input. Facts to keep straight:
   → `toppic_form_cutoff_form` / `toppic_prot_cutoff` → `toppic_prot_cutoff_prot`.
   Do not reintroduce a separate FDR for the multiple-shift PrSMs: with the
   skipped targets missing from its denominator it under-reports (toppic_test
-  reports 0023/0024).
+  reports 0023/0024). With the hidden `--topmg-identify`,
+  `TopPIC_topmg_identify` runs after the multiple-shift stage on the spectra
+  the earlier stages left unidentified and hands `toppic_topmg_raw_prsm` to
+  `TopPIC_postprocess`; with the hidden `--topmg-only` (which implies it and
+  needs `-b`) `TopPICProgress` skips `TopPIC_identify` and
+  `TopPIC_multi_ptm_search` altogether, runs `TopPIC_init` (start time,
+  argument echo, base data, feature file check) and sets `varPtmTypeNum`
+  from the modification file itself, and `TopPIC_topmg_identify` searches
+  every spectrum with an empty `raw_prsm_ext`.
 - **GUI wiring.** `toppicwindow.ui` has `postMassMatchCheckBox` (checked by
   default from the parser's argument map, enables `postMinPeakNumEdit`) on the
   bottom row of the Advanced Parameters tab; `gui/util/command.cpp` emits
