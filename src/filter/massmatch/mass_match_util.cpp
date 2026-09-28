@@ -19,6 +19,7 @@
 #include <atomic>
 #include <filesystem>
 #include <iostream>
+#include <limits>
 
 #include "common/util/file_util.hpp"
 #include "common/util/logger.hpp"
@@ -226,19 +227,26 @@ void addTruncShiftsWithRestriction(
     best.clear();
     bool lazy = nonincr_shifts != nullptr && (*nonincr_shifts)[prot_id];
     for (int j = bgn; j <= end; j++) {
-      double n_trunc_shift = trunc_shifts[j];
-      if (!lazy) {
-        moveTruncWindow(proteo_mass, n_trunc_shift, rev_trunc_shifts, rev_bgn,
-                        min_mass, max_mass, k_start, k_end);
-      }
-      // a row that cannot beat the worst kept pair adds nothing
-      if (static_cast<int>(best.size()) >= term_group_num &&
-          scores[j] + rev_max_scores[prot_id] <= best.back().score_) {
-        continue;
-      }
+      // a row that cannot beat the worst kept pair adds nothing: once the
+      // list is full, a row adds something when its score is at least
+      // row_cutoff
+      bool full = static_cast<int>(best.size()) >= term_group_num;
+      int row_cutoff = full ? best.back().score_ + 1 - rev_max_scores[prot_id]
+                            : std::numeric_limits<int>::min();
       if (lazy) {
-        moveTruncWindow(proteo_mass, n_trunc_shift, rev_trunc_shifts, rev_bgn,
-                        min_mass, max_mass, k_start, k_end);
+        // the window is moved for the rows that are scanned only
+        while (j <= end && scores[j] < row_cutoff) {
+          j++;
+        }
+        if (j > end) {
+          break;
+        }
+      }
+      double n_trunc_shift = trunc_shifts[j];
+      moveTruncWindow(proteo_mass, n_trunc_shift, rev_trunc_shifts, rev_bgn,
+                      min_mass, max_mass, k_start, k_end);
+      if (scores[j] < row_cutoff) {
+        continue;
       }
 
       for (int k = k_start; k >= k_end; k--) {
@@ -552,22 +560,27 @@ inline ProtCandidatePtrVec findOneShiftTopProteinsWithRestrict(
     double best_c_term_shift = 0;
     bool lazy = nonincr_shifts != nullptr && (*nonincr_shifts)[i];
     for (int j = bgn; j <= end; j++) {
-      double n_trunc_shift = trunc_shifts[j];
-      if (!lazy) {
-        moveTruncWindow(proteo_mass, n_trunc_shift, rev_trunc_shifts, rev_bgn,
-                        min_mass, max_mass, k_start, k_end);
-      }
       // A row that cannot beat the best pair so far, or reach the cutoff,
       // adds nothing: a pair below the cutoff cannot be kept, and the pair
       // that gives the proteoform's best score is the first to reach it,
-      // which no skipped row can be.
-      if (scores[j] + rev_max_score <= best_score ||
-          scores[j] + rev_max_score < cutoff) {
-        continue;
-      }
+      // which no skipped row can be. A row adds something when its score
+      // is at least row_cutoff.
+      int row_cutoff = std::max(best_score + 1, cutoff) - rev_max_score;
       if (lazy) {
-        moveTruncWindow(proteo_mass, n_trunc_shift, rev_trunc_shifts, rev_bgn,
-                        min_mass, max_mass, k_start, k_end);
+        // the window is moved for the rows that are scanned only, so the
+        // rows before the next one to scan are passed over at once
+        while (j <= end && scores[j] < row_cutoff) {
+          j++;
+        }
+        if (j > end) {
+          break;
+        }
+      }
+      double n_trunc_shift = trunc_shifts[j];
+      moveTruncWindow(proteo_mass, n_trunc_shift, rev_trunc_shifts, rev_bgn,
+                      min_mass, max_mass, k_start, k_end);
+      if (scores[j] < row_cutoff) {
+        continue;
       }
 
       for (int k = k_start; k >= k_end; k--) {
