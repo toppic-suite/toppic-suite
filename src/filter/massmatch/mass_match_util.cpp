@@ -527,7 +527,12 @@ inline ProtCandidatePtrVec findOneShiftTopProteinsWithRestrict(
           break;
         }
       }
-      if (scores[j] + rev_max_score <= best_score) {
+      // A row that cannot beat the best pair so far, or reach the cutoff,
+      // adds nothing: a pair below the cutoff cannot be kept, and the pair
+      // that gives the proteoform's best score is the first to reach it,
+      // which no skipped row can be.
+      if (scores[j] + rev_max_score <= best_score ||
+          scores[j] + rev_max_score < cutoff) {
         continue;
       }
 
