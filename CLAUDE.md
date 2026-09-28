@@ -501,8 +501,15 @@ instead of the input. Facts to keep straight:
   `SpPara::getFragDedupPpo()` (the combined masses of `--frag-mass-dedup`);
   the recount that follows replaces the matched numbers with full-spectrum
   counts (a `TdgfMng` built from the same values as the search's, with
-  `varPtmTypeNum` from the argument map, 0 if absent). Nothing is removed;
-  a corrected PrSM that matches at most
+  `varPtmTypeNum` from the argument map, 0 if absent, and, with
+  `--topmg-identify`, max(`-s`, `--topmg-num-shift`) unexpected shifts, since
+  a graph-alignment proteoform is corrected like any other). A corrected PrSM
+  also takes the best PrSM's `<tool>` (toppic or topmg), so the per-search
+  FDR counts it with that search. Only with `--topmg-use-mcmc` are the other
+  proteins' PrSMs of a cluster whose best PrSM comes from the graph alignment
+  dropped instead (their generating-function E-value would be counted
+  against MCMC ones; `Cluster protein correction - removed N PrSMs`).
+  Otherwise nothing is removed; a corrected PrSM that matches at most
   `comp_evalue_min_match_theo_frag_num_` fragments gets the maximum
   E-value and fails the cutoffs. The output is `toppic_cluster_prot`
   (deleted without `-k`); the recount reads it and writes `toppic_recount`

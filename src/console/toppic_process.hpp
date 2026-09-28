@@ -34,8 +34,8 @@ std::string TopPIC_identify(std::map<std::string, std::string>& arguments);
 
 // TopMG's identification hosted here (hidden --topmg-identify): the ASF
 // filtering with the variable modification file, the proteoform-graph
-// alignment, its post-processing, the MCMC E-value (the generating-function
-// one with the hidden --topmg-use-tdgf) and the top PrSM selection, which
+// alignment, its post-processing, the generating-function E-value (the MCMC
+// one with the hidden --topmg-use-mcmc) and the top PrSM selection, which
 // chooses between its PrSMs and those of the set it was given; returns
 // toppic_topmg_raw_prsm
 std::string TopPIC_topmg_identify(

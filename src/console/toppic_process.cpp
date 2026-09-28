@@ -416,9 +416,8 @@ std::string TopPIC_identify(std::map<std::string, std::string>& arguments) {
 // database preprocessing and the spectrum index, the ASF-One PTM filtering
 // with the variable modification file, the ASF-Diagonal filtering when it is
 // asked for, the merge of their results, the proteoform-graph alignment, its
-// post-processing, the E-value computation by MCMC (by the generating
-// function with the hidden --topmg-use-tdgf) and the top PrSM
-// selection. Only the initialisation of the base data and the echo of the
+// post-processing, the E-value computation by the generating function (by
+// MCMC with the hidden --topmg-use-mcmc) and the top PrSM selection. Only the initialisation of the base data and the echo of the
 // arguments are left out, because toppic has done them before this runs.
 //
 // The files are named toppic_topmg_*, so they collide neither with TopMG's
@@ -611,7 +610,7 @@ std::string TopPIC_topmg_identify(
     ga_post_processor_ptr = nullptr;
     std::cout << "Graph alignment post-processing - finished." << std::endl;
 
-    if (arguments["topmgUseTdgf"] == "true") {
+    if (arguments["topmgUseMcmc"] != "true") {
       // The generating function of toppic's own E-value stages. Its table
       // has one layer per unexpected shift, so it takes the graph
       // alignment's shift number; the maximum shift mass the graph alignment
@@ -643,8 +642,8 @@ std::string TopPIC_topmg_identify(
       std::cout << "E-value computation using MCMC - finished." << std::endl;
     }
 
-    // the PrSMs of this stage, whose E-values the MCMC (or the generating
-    // function) gave, and those of the stage before it, so that the best
+    // the PrSMs of this stage, whose E-values the generating function (or
+    // the MCMC) gave, and those of the stage before it, so that the best
     // PrSM of every spectrum is chosen between the two searches
     std::cout << "Merging TopMG and TopPIC PrSMs - started." << std::endl;
     {
@@ -863,11 +862,23 @@ int TopPIC_postprocess(std::map<std::string, std::string>& arguments,
     msalign_util::geneSpIndex(sp_file_name);
     std::string base_name = file_util::basename(sp_file_name);
     // the E-value model of the cluster protein correction below. The PrSMs it
-    // scores carry the proteoform of their cluster's best PrSM, which is one
-    // of toppic's own whenever anything is corrected at all - a cluster whose
-    // best PrSM comes from the graph alignment has the others dropped
-    // instead - so toppic's own number of unexpected shifts is enough.
+    // scores carry the proteoform of their cluster's best PrSM: one of
+    // toppic's own, or with --topmg-identify one of the graph alignment's,
+    // which carries up to TopMG's own number of unexpected shifts. The
+    // generating function needs a table layer for every shift, so it takes
+    // the larger of the two numbers.
     int shift_num = std::stoi(arguments["shiftNumber"]);
+    if (arguments["topmgIdentify"] == "true" &&
+        arguments["topmgShiftNumber"] != "") {
+      shift_num = std::max(shift_num, std::stoi(arguments["topmgShiftNumber"]));
+    }
+    // The other proteins' PrSMs of a cluster whose best PrSM comes from the
+    // graph alignment are dropped, not corrected, only when the graph
+    // alignment's E-values come from MCMC (--topmg-use-mcmc): a corrected
+    // PrSM gets a generating-function E-value, which is not comparable with
+    // the MCMC one of the PrSM it would be counted with.
+    bool remove_topmg_others = arguments["topmgIdentify"] == "true" &&
+                               arguments["topmgUseMcmc"] == "true";
 
     // raw_prsm_ext is the file the last stage that produced a PrSM set
     // reported: toppic_pre_raw_prsm, or toppic_multi_ptm_raw_prsm after the
@@ -904,9 +915,10 @@ int TopPIC_postprocess(std::map<std::string, std::string>& arguments,
 
     // In every proteoform cluster, the PrSMs whose protein differs from the
     // protein of the cluster's best-E-value PrSM (the same proteoform mass
-    // matched to another protein) get that PrSM's proteoform; their matched
-    // fragment numbers and E-values are recomputed on the spectra as the
-    // search read them (EnvCNN cutoff, deduplicated masses). The recount,
+    // matched to another protein) get that PrSM's proteoform and its tool;
+    // their matched fragment numbers and E-values are recomputed on the
+    // spectra as the search read them (EnvCNN cutoff, deduplicated masses).
+    // The recount,
     // the post mass matching, the PTM characterization and the FDR run on
     // the corrected PrSMs.
     std::cout << "Cluster protein correction - started." << std::endl;
@@ -921,7 +933,7 @@ int TopPIC_postprocess(std::map<std::string, std::string>& arguments,
       int removed_num = 0;
       int corrected_num = cluster_prot_corrector::process(
           prsm_para_ptr, tdgf_mng_ptr, cur_suffix, "toppic_cluster_prot",
-          &removed_num);
+          remove_topmg_others, &removed_num);
       if (removed_num > 0) {
         std::cout << "Cluster protein correction - removed " << removed_num
                   << " PrSMs of other proteins in clusters whose best PrSM "

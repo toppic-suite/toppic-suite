@@ -43,7 +43,8 @@ namespace cluster_prot_corrector {
 
 int process(const PrsmParaPtr& prsm_para_ptr, const TdgfMngPtr& tdgf_mng_ptr,
             const std::string& input_file_ext,
-            const std::string& output_file_ext, int* removed_num) {
+            const std::string& output_file_ext, bool remove_topmg_others,
+            int* removed_num) {
   std::string sp_file_name = prsm_para_ptr->getSpectrumFileName();
   std::string base_name = file_util::basename(sp_file_name);
   FastaIndexReaderPtr seq_reader = std::make_shared<FastaIndexReader>(
@@ -62,9 +63,10 @@ int process(const PrsmParaPtr& prsm_para_ptr, const TdgfMngPtr& tdgf_mng_ptr,
       best_ptrs[cluster_id] = prsm_ptrs[i];
     }
   }
-  // the PrSMs to correct, by spectrum id, with the proteoform they get, and
-  // the PrSMs to drop instead
-  std::map<int, std::vector<std::pair<PrsmPtr, ProteoformPtr>>> corrections;
+  // the PrSMs to correct, by spectrum id, with the best PrSM of their
+  // cluster, whose proteoform and tool they get, and the PrSMs to drop
+  // instead
+  std::map<int, std::vector<std::pair<PrsmPtr, PrsmPtr>>> corrections;
   std::set<PrsmPtr> removals;
   int corrected_num = 0;
   for (size_t i = 0; i < prsm_ptrs.size(); i++) {
@@ -73,16 +75,16 @@ int process(const PrsmParaPtr& prsm_para_ptr, const TdgfMngPtr& tdgf_mng_ptr,
     if (form_ptr->getProtId() == best_ptr->getProteoformPtr()->getProtId()) {
       continue;
     }
-    if (best_ptr->getTool() == "topmg") {
-      // The cluster's best PrSM comes from the graph alignment, whose
-      // proteoform carries TopMG's variable PTMs and gaps. Giving it to a
-      // PrSM of another protein and asking the generating-function method for
-      // an E-value is not a computation that method can do, so the PrSM is
-      // dropped instead: the cluster keeps the graph alignment's own protein.
+    if (remove_topmg_others && best_ptr->getTool() == "topmg") {
+      // The cluster's best PrSM comes from the graph alignment and its
+      // E-value from MCMC. A corrected PrSM would get a generating-function
+      // E-value for the same proteoform, which the per-search FDR would count
+      // against the MCMC ones, so the PrSM is dropped instead: the cluster
+      // keeps the graph alignment's own protein.
       removals.insert(prsm_ptrs[i]);
     } else {
-      corrections[prsm_ptrs[i]->getSpectrumId()].emplace_back(
-          prsm_ptrs[i], best_ptr->getProteoformPtr());
+      corrections[prsm_ptrs[i]->getSpectrumId()].emplace_back(prsm_ptrs[i],
+                                                              best_ptr);
       corrected_num++;
     }
   }
@@ -124,7 +126,8 @@ int process(const PrsmParaPtr& prsm_para_ptr, const TdgfMngPtr& tdgf_mng_ptr,
           PrsmPtrVec sele_prsm_ptrs;
           for (size_t i = 0; i < it->second.size(); i++) {
             PrsmPtr prsm_ptr = it->second[i].first;
-            ProteoformPtr form_ptr = it->second[i].second;
+            const PrsmPtr& best_ptr = it->second[i].second;
+            ProteoformPtr form_ptr = best_ptr->getProteoformPtr();
             prsm_ptr->setDeconvMsPtrVec(spec_set_ptr->getDeconvMsPtrVec());
             // the refined spectra are built for the proteoform's mass, as in
             // the search (the refined spectra do not exist yet, so only the
@@ -133,6 +136,10 @@ int process(const PrsmParaPtr& prsm_para_ptr, const TdgfMngPtr& tdgf_mng_ptr,
             // sets the proteoform, builds the refined spectra and recounts
             // the matched fragment numbers
             prsm_ptr->setProteoformPtr(form_ptr, sp_para_ptr);
+            // the PrSM is now the best PrSM's identification, so it takes
+            // that PrSM's tool and is counted with its search's PrSMs in the
+            // per-search FDR
+            prsm_ptr->setTool(best_ptr->getTool());
             sele_prsm_ptrs.push_back(prsm_ptr);
           }
           while (pool_ptr->getQueueSize() >=

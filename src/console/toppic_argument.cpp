@@ -57,9 +57,9 @@ std::map<std::string, std::string> ToppicArgument::initArguments() {
   // --topmg-identify option: TopMG's own defaults, so that the two agree
   // when neither is set
   arguments["topmgIdentify"] = "false";
-  // the E-values of that stage: TopMG's MCMC, or with the hidden
-  // --topmg-use-tdgf the generating function of toppic's own stages
-  arguments["topmgUseTdgf"] = "false";
+  // the E-values of that stage: the generating function of toppic's own
+  // stages, or with the hidden --topmg-use-mcmc TopMG's MCMC
+  arguments["topmgUseMcmc"] = "false";
   arguments["topmgShiftNumber"] = "1";
   // the results the ASF filtering of that stage keeps per spectrum, TopMG's
   // own number; toppic's own stages keep filteringResultNumber
@@ -549,7 +549,7 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
         "frag-extend-min-mass", po::value<std::string>(&frag_extend_min_mass),
         "")("multi-skip-evalue", po::value<std::string>(&multi_skip_evalue),
             "")("disable-multi-type-align", "")("topmg-identify", "")(
-        "topmg-use-tdgf", "")(
+        "topmg-use-mcmc", "")(
         "topmg-num-shift", po::value<std::string>(&topmg_shift_num), "")(
         "asf-filtering-result-number",
         po::value<std::string>(&asf_filtering_result_num), "")(
@@ -757,10 +757,10 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
     if (vm.count("topmg-identify")) {
       arguments_["topmgIdentify"] = "true";
     }
-    // hidden: compute the E-values of that stage with the generating
-    // function (TDGF) instead of MCMC
-    if (vm.count("topmg-use-tdgf")) {
-      arguments_["topmgUseTdgf"] = "true";
+    // hidden: compute the E-values of that stage with TopMG's MCMC instead
+    // of the generating function (TDGF)
+    if (vm.count("topmg-use-mcmc")) {
+      arguments_["topmgUseMcmc"] = "true";
     }
     // hidden: the unexpected shifts of that graph alignment, TopMG's own
     // number, which --num-shift does not change
@@ -1208,9 +1208,9 @@ bool ToppicArgument::validateArguments() {
     }
   }
   // the E-value method of TopMG's identification means nothing without it
-  if (arguments_["topmgUseTdgf"] == "true" &&
+  if (arguments_["topmgUseMcmc"] == "true" &&
       arguments_["topmgIdentify"] != "true") {
-    LOG_ERROR("--topmg-use-tdgf error! It needs --topmg-identify.");
+    LOG_ERROR("--topmg-use-mcmc error! It needs --topmg-identify.");
     return false;
   }
 
