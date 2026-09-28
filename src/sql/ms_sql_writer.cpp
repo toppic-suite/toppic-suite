@@ -85,9 +85,9 @@ void setColors(std::vector<MsSqlPeak>& peaks, const MsSqlRange& range) {
 }
 
 // Keep, for one retention-time row of the grid, the most intense peak of each
-// m/z block. The kept peaks are appended to layer and extend layer_range.
+// m/z block. The kept peaks are appended to layer.
 void addRow(std::vector<MsSqlPeak>& row, double mz_min, double mz_size,
-            std::vector<MsSqlPeak>& layer, MsSqlRange& layer_range) {
+            std::vector<MsSqlPeak>& layer) {
   std::sort(row.begin(), row.end(),
             [](const MsSqlPeak& a, const MsSqlPeak& b) { return a.mz < b.mz; });
   double block_end = mz_min;  // upper m/z bound of the current block
@@ -101,12 +101,10 @@ void addRow(std::vector<MsSqlPeak>& row, double mz_min, double mz_size,
           layer.pop_back();
         }
         layer.push_back(peak);
-        extendRange(layer_range, peak);
         block_max_inte = peak.inte;
       }
     } else {
       layer.push_back(peak);
-      extendRange(layer_range, peak);
       block_max_inte = peak.inte;
       while (block_end < peak.mz) {
         block_end += mz_size;
@@ -118,28 +116,27 @@ void addRow(std::vector<MsSqlPeak>& row, double mz_min, double mz_size,
 
 // One down-sampling step: cut the map into rt_size x mz_size blocks (from the
 // map's minimum retention time and m/z) and keep the most intense peak of each
-// block. peaks is reordered by retention time.
+// block. peaks is reordered by retention time. layer_range is the range of the
+// kept peaks, computed once the layer is complete: a peak replaced by a more
+// intense one of its block must not widen it.
 std::vector<MsSqlPeak> downsample(std::vector<MsSqlPeak>& peaks,
                                   const MsSqlRange& range, double mz_size,
                                   double rt_size, MsSqlRange& layer_range) {
   std::sort(peaks.begin(), peaks.end(),
             [](const MsSqlPeak& a, const MsSqlPeak& b) { return a.rt < b.rt; });
-  layer_range = emptyRange();
-  layer_range.count = 0;
   std::vector<MsSqlPeak> layer;
   std::vector<MsSqlPeak> row;
   int row_num = 1;
   for (const MsSqlPeak& peak : peaks) {
     if (peak.rt >= range.rt_min + rt_size * row_num) {
-      addRow(row, range.mz_min, mz_size, layer, layer_range);
+      addRow(row, range.mz_min, mz_size, layer);
       row.clear();
       row_num++;
     }
     row.push_back(peak);
   }
-  addRow(row, range.mz_min, mz_size, layer, layer_range);
-  // extendRange counted every kept peak, including the ones later replaced
-  layer_range.count = static_cast<int>(layer.size());
+  addRow(row, range.mz_min, mz_size, layer);
+  layer_range = computeRange(layer);
   return layer;
 }
 
