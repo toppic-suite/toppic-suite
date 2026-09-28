@@ -35,7 +35,8 @@ ProteoGraph::ProteoGraph(const FastaSubSeqPtr& fasta_seq_ptr,
                          const MassGraphPtr& graph_ptr, bool is_nme,
                          double convert_ratio, int max_mod_num,
                          int max_ptm_sum_mass, int proteo_graph_gap,
-                         int var_ptm_in_gap)
+                         int var_ptm_in_gap,
+                         const std::vector<char>* dist_cover)
     : is_nme_(is_nme),
       proteo_graph_gap_(proteo_graph_gap),
       var_ptm_in_gap_(var_ptm_in_gap) {
@@ -46,7 +47,7 @@ ProteoGraph::ProteoGraph(const FastaSubSeqPtr& fasta_seq_ptr,
   LOG_DEBUG("node num " << node_num_);
   pair_num_ = node_num_ * (proteo_graph_gap_ + 1);
   compSeqMasses(convert_ratio);
-  compDistances(max_mod_num, max_ptm_sum_mass);
+  compDistances(max_mod_num, max_ptm_sum_mass, dist_cover);
 }
 
 int ProteoGraph::getVecIndex(int v1, int v2) {
@@ -74,7 +75,12 @@ void ProteoGraph::compSeqMasses(double convert_ratio) {
   }
 }
 
-void ProteoGraph::compDistances(int max_mod_num, int max_ptm_sum_mass) {
+// With a cover (SpecGraph::compDistCover), the distance lists keep only the
+// distances an alignment with that spectrum graph can pair; the others are
+// counted in the lists' all_ fields, from which the alignment takes the
+// range of the proteoform's distances.
+void ProteoGraph::compDistances(int max_mod_num, int max_ptm_sum_mass,
+                                const std::vector<char>* dist_cover) {
   MassGraph* g_p = graph_ptr_.get();
   // The distances of each pair (i, j) with each number of variable
   // modifications, sorted and unique: those of the pair (i, j - 1) plus the
@@ -127,7 +133,8 @@ void ProteoGraph::compDistances(int max_mod_num, int max_ptm_sum_mass) {
 
   dist_lists_.resize(max_mod_num + 1);
   for (int k = 0; k < max_mod_num + 1; k++) {
-    addToDistList(dist_vecs, node_num_, k, dist_lists_[k], proteo_graph_gap_);
+    addToDistList(dist_vecs, node_num_, k, dist_lists_[k], proteo_graph_gap_,
+                  dist_cover);
   }
 }
 

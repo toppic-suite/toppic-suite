@@ -67,4 +67,18 @@ void SpecGraph::compSpecDistances(double convert_ratio) {
   addToDistList(entries, dist_list_);
 }
 
+void SpecGraph::compDistCover(int min_dist, int tole) {
+  dist_cover_.clear();
+  if (dist_list_.size() == 0) {
+    return;
+  }
+  dist_cover_.assign(dist_list_.dists_.back() + tole + 1, 0);
+  for (size_t i = 0; i < dist_list_.size(); i++) {
+    int d = dist_list_.dists_[i];
+    if (d < min_dist) continue;
+    int bgn = std::max(0, d - tole);
+    std::fill(dist_cover_.begin() + bgn, dist_cover_.begin() + d + tole + 1, 1);
+  }
+}
+
 }  // namespace toppic

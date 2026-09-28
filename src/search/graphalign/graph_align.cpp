@@ -32,10 +32,11 @@ namespace toppic {
 
 std::vector<int> getMinMaxProtDist(const DistList2D& dist_lists) {
   std::vector<int> min_dist, max_dist;
+  // the range of all the distances, including those a cover left out
   for (size_t i = 0; i < dist_lists.size(); i++) {
-    if (dist_lists[i].size() == 0) continue;
-    min_dist.push_back(dist_lists[i].dists_[0]);
-    max_dist.push_back(dist_lists[i].dists_[dist_lists[i].size() - 1]);
+    if (dist_lists[i].all_num_ == 0) continue;
+    min_dist.push_back(dist_lists[i].all_min_);
+    max_dist.push_back(dist_lists[i].all_max_);
   }
   std::sort(min_dist.begin(), min_dist.end());
   std::sort(max_dist.begin(), max_dist.end());

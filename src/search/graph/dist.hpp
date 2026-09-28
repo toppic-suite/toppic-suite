@@ -30,6 +30,12 @@ struct DistList {
   std::vector<int> begins_{0};
   std::vector<std::pair<int, int>> pairs_;
 
+  // the number of (i, j) pairs and the smallest and the largest distance the
+  // list was built from, including those a cover left out
+  int all_num_ = 0;
+  int all_min_ = 0;
+  int all_max_ = 0;
+
   size_t size() const { return dists_.size(); }
 };
 
@@ -50,9 +56,12 @@ void addToDistList(std::vector<DistEntry>& entries, DistList& dist_list);
 // The distances of the pairs (i, j) of a proteoform graph with j - i at most
 // gap and mod_num variable modifications: dist_vecs[(gap + 1) * i + j - i]
 // [mod_num] holds the distances of the pair, sorted and unique, and a
-// distance of 0 is left out.
+// distance of 0 is left out. With a cover, only the distances d with
+// (*dist_cover)[d] set are listed; all_num_, all_min_ and all_max_ count
+// them all.
 void addToDistList(const std::vector<std::vector<std::vector<int>>>& dist_vecs,
-                   int node_num, int mod_num, DistList& dist_list, int gap);
+                   int node_num, int mod_num, DistList& dist_list, int gap,
+                   const std::vector<char>* dist_cover = nullptr);
 
 }  // namespace toppic
 

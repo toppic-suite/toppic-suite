@@ -29,7 +29,8 @@ class ProteoGraph {
   ProteoGraph(const FastaSubSeqPtr& seq_ptr, const ModPtrVec& fix_mod_ptr_vec,
               const MassGraphPtr& graph_ptr, bool is_nme, double convert_ratio,
               int max_mod_num, int max_ptm_sum_mass, int proteo_graph_gap,
-              int var_ptm_in_gap);
+              int var_ptm_in_gap,
+              const std::vector<char>* dist_cover = nullptr);
 
   int getVecIndex(int v1, int v2);
 
@@ -64,7 +65,8 @@ class ProteoGraph {
 
   void compSeqMasses(double convert_ratio);
 
-  void compDistances(int max_mod_num, int max_ptm_sum_mass);
+  void compDistances(int max_mod_num, int max_ptm_sum_mass,
+                     const std::vector<char>* dist_cover);
 };
 
 using ProteoGraphPtr = std::shared_ptr<ProteoGraph>;

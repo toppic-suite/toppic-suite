@@ -69,7 +69,8 @@ void alignCandidate(const GraphAlignMngPtr& mng_ptr,
           seq_ptr_vec[j], prsm_para_ptr->getFixModPtrVec(), graph_ptr,
           proteo_anno_ptr->isNme(), mng_ptr->convert_ratio_,
           mng_ptr->max_known_mods_, mng_ptr->getIntMaxPtmSumMass(),
-          mng_ptr->proteo_graph_gap_, mng_ptr->var_ptm_in_gap_);
+          mng_ptr->proteo_graph_gap_, mng_ptr->var_ptm_in_gap_,
+          &spec_ptr_vec[k]->getDistCover());
       GraphAlignPtr graph_align = std::make_shared<GraphAlign>(
           mng_ptr, proteo_ptr, spec_ptr_vec[k], seq_ptr);
       graph_align->process();
@@ -236,6 +237,12 @@ void GraphAlignProcessor::process() {
               std::make_shared<SpecGraphPtrVec>(
                   spec_reader.getNextSpecGraphPtrVec(spec_set_ptr,
                                                      mng_ptr_->prec_error_));
+          // the proteoform distances the alignments can pair with each
+          for (size_t k = 0; k < spec_ptr_vec->size(); k++) {
+            (*spec_ptr_vec)[k]->compDistCover(
+                mng_ptr_->getIntMinConsistentDist(),
+                mng_ptr_->getIntTolerance());
+          }
           for (size_t c = next_cand; c < end_cand; c++) {
             if (file_stopped[c % thread_num]) {
               continue;

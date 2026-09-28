@@ -39,6 +39,13 @@ class SpecGraph {
 
   const DistList& getDistList() { return dist_list_; }
 
+  // Marks the distances d that are within tole of a distance of the graph
+  // of at least min_dist: the only distances of a proteoform graph that an
+  // alignment with this graph can pair (GraphAlign::getConsistentPairs).
+  void compDistCover(int min_dist, int tole);
+
+  const std::vector<char>& getDistCover() { return dist_cover_; }
+
   PrmPeakPtr getPrmPeakPtr(int i) { return peak_vec_[i]; }
 
   const PrmPeakPtrVec& getPrmPeakPtrVec() { return peak_vec_; }
@@ -59,6 +66,8 @@ class SpecGraph {
   PrmPeakPtrVec peak_vec_;
 
   DistList dist_list_;
+
+  std::vector<char> dist_cover_;
 
   int getVecIndex(int v1, int v2);
 
