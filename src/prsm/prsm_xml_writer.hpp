@@ -17,6 +17,7 @@
 #define TOPPIC_PRSM_PRSM_XML_WRITER_HPP_
 
 #include <fstream>
+#include <string>
 
 #include "prsm/prsm.hpp"
 #include "prsm/prsm_str.hpp"
@@ -36,6 +37,14 @@ class PrsmXmlWriter {
   void writeVector(const PrsmStrPtrVec& prsm_str_ptr_vec);
 
   void write(const PrsmPtr& prsm_ptr);
+
+  // The XML write(prsm_ptr) writes, as a string, and writing such a string:
+  // what a thread that computes PrSMs for this file can do without the
+  // file, which is written later in its own order. toXmlString does not
+  // touch the file.
+  std::string toXmlString(const PrsmPtr& prsm_ptr);
+
+  void writeXmlString(const std::string& str);
 
   void writeVector(const PrsmPtrVec& prsm_ptrs);
 
