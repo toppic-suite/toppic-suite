@@ -37,7 +37,7 @@ class SpecGraph {
 
   MassGraphPtr getMassGraphPtr() { return graph_ptr_; }
 
-  DistVec getDistVec() { return dist_; }
+  const DistVec& getDistVec() { return dist_; }
 
   PrmPeakPtr getPrmPeakPtr(int i) { return peak_vec_[i]; }
 

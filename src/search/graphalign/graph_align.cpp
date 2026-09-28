@@ -30,7 +30,7 @@
 
 namespace toppic {
 
-std::vector<int> getMinMaxProtDist(DistVec2D dist_vec) {
+std::vector<int> getMinMaxProtDist(const DistVec2D& dist_vec) {
   std::vector<int> min_dist, max_dist;
   for (size_t i = 0; i < dist_vec.size(); i++) {
     if (dist_vec[i].size() == 0) continue;
@@ -45,6 +45,17 @@ std::vector<int> getMinMaxProtDist(DistVec2D dist_vec) {
   return res;
 }
 
+// A score read into an int. The scores are integers, or -DBL_MAX for an entry
+// the DP has not reached; the conversion of -DBL_MAX to int is undefined, and
+// x86 gives INT_MIN, which is what the DP compares here. Every score below -1
+// compares the same with the -1 the searches start from.
+inline int toIntScore(double score) {
+  if (score < static_cast<double>(std::numeric_limits<int>::min())) {
+    return std::numeric_limits<int>::min();
+  }
+  return static_cast<int>(score);
+}
+
 GraphAlign::GraphAlign(const GraphAlignMngPtr& mng_ptr,
                        const ProteoGraphPtr& proteo_graph_ptr,
                        const SpecGraphPtr& spec_graph_ptr,
@@ -55,30 +66,27 @@ GraphAlign::GraphAlign(const GraphAlignMngPtr& mng_ptr,
   spec_graph_ptr_ = spec_graph_ptr;
   fasta_seq_ptr_ = fasta_seq_ptr;
 
-  dist_vec_ = proteo_graph_ptr_->getDistVec2D();
-  spec_dist_ = spec_graph_ptr_->getDistVec();
-
-  std::vector<int> cutoff = getMinMaxProtDist(dist_vec_);
+  // The distance lists of both graphs are in increasing order of distance,
+  // one Dist per distance (dist.hpp), so they are read in place: neither is
+  // copied or sorted again.
+  std::vector<int> cutoff =
+      getMinMaxProtDist(proteo_graph_ptr_->getDistVec2D());
   cutoff[0] -= mng_ptr_->getIntTolerance();
   cutoff[1] += mng_ptr_->getIntTolerance();
 
-  spec_dist_.erase(std::remove_if(spec_dist_.begin(), spec_dist_.end(),
-                                  [cutoff](Dist d) {
-                                    return d.dist_ < cutoff[0] ||
-                                           d.dist_ > cutoff[1];
-                                  }),
-                   spec_dist_.end());
-
-  std::sort(spec_dist_.begin(), spec_dist_.end(), distVecUp);
-
-  for (int i = 0; i < mng_ptr->max_known_mods_ + 1; i++) {
-    std::sort(dist_vec_[i].begin(), dist_vec_[i].end(), distVecUp);
+  const DistVec& spec_dist = spec_graph_ptr_->getDistVec();
+  for (size_t i = 0; i < spec_dist.size(); i++) {
+    if (spec_dist[i].dist_ >= cutoff[0] && spec_dist[i].dist_ <= cutoff[1]) {
+      spec_dist_.push_back(&spec_dist[i]);
+    }
   }
 
   pg_ = proteo_graph_ptr_->getMassGraphPtr();
   sg_ = spec_graph_ptr_->getMassGraphPtr();
   proteo_ver_num_ = num_vertices(*pg_.get());
   spec_ver_num_ = num_vertices(*sg_.get());
+  shift_layer_num_ = mng_ptr_->n_unknown_shift_ + 1;
+  mod_layer_num_ = mng_ptr_->max_known_mods_ + 1;
   LOG_DEBUG("Graph constructor end");
 }
 
@@ -86,132 +94,119 @@ void GraphAlign::getConsistentPairs() {
   LOG_DEBUG("consistent pair start");
   int tole = mng_ptr_->getIntTolerance();
   LOG_DEBUG("Integer error tolerance " << tole);
-  std::vector<std::pair<int, int>> empty_list;
-  std::vector<std::vector<std::pair<int, int>>> empty_vec(
-      mng_ptr_->max_known_mods_ + 1, empty_list);
-  for (int i = 0; i < proteo_ver_num_; i++) {
-    std::vector<std::vector<std::vector<std::pair<int, int>>>> empty_vec_2d;
-    for (int j = 0; j < spec_ver_num_; j++) {
-      empty_vec_2d.push_back(empty_vec);
-    }
-    cons_pairs_.push_back(empty_vec_2d);
-  }
-
+  const DistVec2D& dist_vec = proteo_graph_ptr_->getDistVec2D();
   int min_dist = mng_ptr_->getIntMinConsistentDist();
-  for (size_t m = 0; m < dist_vec_.size(); m++) {
-    if (dist_vec_[m].size() == 0) continue;
 
-    size_t prot_idx_min = 0, prot_idx_max = 0;
-    for (size_t spec_idx = 0; spec_idx < spec_dist_.size(); spec_idx++) {
-      Dist distance = spec_dist_[spec_idx];
-      int sp_dist = distance.dist_;
-      if (sp_dist < min_dist) continue;
+  // Every pair of a proteoform distance and a spectrum distance within the
+  // tolerance makes the pairs of their vertex pairs consistent. The search
+  // runs twice, first counting the pairs of each cell and modification
+  // number, then storing them, so that they are stored in the order they
+  // are found.
+  size_t key_num = static_cast<size_t>(proteo_ver_num_) * spec_ver_num_ *
+                   mod_layer_num_;
+  std::vector<int> cursors(key_num + 1, 0);
+  for (int pass = 0; pass < 2; pass++) {
+    for (size_t m = 0; m < dist_vec.size(); m++) {
+      const DistVec& prot_dist = dist_vec[m];
+      if (prot_dist.size() == 0) continue;
 
-      bool flag = true;
-      while (prot_idx_min < dist_vec_[m].size() && flag) {
-        if (dist_vec_[m][prot_idx_min].dist_ >= sp_dist - tole) {
-          flag = false;
-        } else {
+      size_t prot_idx_min = 0, prot_idx_max = 0;
+      for (size_t spec_idx = 0; spec_idx < spec_dist_.size(); spec_idx++) {
+        const Dist& distance = *spec_dist_[spec_idx];
+        int sp_dist = distance.dist_;
+        if (sp_dist < min_dist) continue;
+
+        while (prot_idx_min < prot_dist.size() &&
+               prot_dist[prot_idx_min].dist_ < sp_dist - tole) {
           prot_idx_min++;
         }
-      }
 
-      if (prot_idx_min >= dist_vec_[m].size()) continue;
+        if (prot_idx_min >= prot_dist.size()) continue;
 
-      prot_idx_max = std::max(prot_idx_min, prot_idx_max);
+        prot_idx_max = std::max(prot_idx_min, prot_idx_max);
 
-      flag = true;
-
-      while (prot_idx_max < dist_vec_[m].size() && flag) {
-        if (dist_vec_[m][prot_idx_max].dist_ > sp_dist + tole) {
-          flag = false;
-        } else {
+        while (prot_idx_max < prot_dist.size() &&
+               prot_dist[prot_idx_max].dist_ <= sp_dist + tole) {
           prot_idx_max++;
         }
-      }
 
-      for (size_t t = prot_idx_min; t < prot_idx_max; t++) {
-        Dist new_distance = dist_vec_[m][t];
-        if (std::abs(sp_dist - new_distance.dist_) <= tole)
-          addToConsistentPairs(m, distance.pair_ij_, new_distance.pair_ij_);
+        for (size_t t = prot_idx_min; t < prot_idx_max; t++) {
+          const Dist& new_distance = prot_dist[t];
+          if (std::abs(sp_dist - new_distance.dist_) > tole) continue;
+          const std::vector<std::pair<int, int>>& pg_pair_ij =
+              new_distance.pair_ij_;
+          const std::vector<std::pair<int, int>>& sp_pair_ij =
+              distance.pair_ij_;
+          for (size_t k = 0; k < pg_pair_ij.size(); k++) {
+            for (size_t sp = 0; sp < sp_pair_ij.size(); sp++) {
+              size_t key = getCellIdx(pg_pair_ij[k].second,
+                                      sp_pair_ij[sp].second) *
+                               mod_layer_num_ + m;
+              if (pass == 0) {
+                cursors[key + 1]++;
+              } else {
+                cons_prev_cells_[cursors[key]++] = static_cast<int>(
+                    getCellIdx(pg_pair_ij[k].first, sp_pair_ij[sp].first));
+              }
+            }
+          }
+        }
       }
     }
-    dist_vec_[m].clear();
+    if (pass == 0) {
+      for (size_t key = 0; key < key_num; key++) {
+        cursors[key + 1] += cursors[key];
+      }
+      cons_begins_ = cursors;
+      cons_prev_cells_.resize(cursors[key_num]);
+    }
   }
-  dist_vec_.clear();
   LOG_DEBUG("consistent pair end");
-}
-
-void GraphAlign::addToConsistentPairs(
-    int m, const std::vector<std::pair<int, int>>& sp_pair_ij,
-    const std::vector<std::pair<int, int>>& pg_pair_ij) {
-  for (size_t k = 0; k < pg_pair_ij.size(); k++) {
-    for (size_t sp = 0; sp < sp_pair_ij.size(); sp++) {
-      int pr_v1 = pg_pair_ij[k].first;
-      int pr_v2 = pg_pair_ij[k].second;
-      int sp_v1 = sp_pair_ij[sp].first;
-      int sp_v2 = sp_pair_ij[sp].second;
-      std::pair<int, int> pre_pair(pr_v1, sp_v1);
-      cons_pairs_[pr_v2][sp_v2][m].push_back(pre_pair);
-    }
-  }
 }
 
 void GraphAlign::initTable() {
   LOG_DEBUG("init table start");
   double node_score = 1.0;
-  for (int i = 0; i < proteo_ver_num_; i++) {
-    GraphDpNodePtrVec node_vec;
-    for (int j = 0; j < spec_ver_num_; j++) {
-      GraphDpNodePtr node_ptr = std::make_shared<GraphDpNode>(
-          i, j, node_score, mng_ptr_->n_unknown_shift_,
-          mng_ptr_->max_known_mods_);
-      node_vec.push_back(node_ptr);
-    }
-    table_.push_back(node_vec);
-  }
+  size_t entry_num = static_cast<size_t>(proteo_ver_num_) * spec_ver_num_ *
+                     shift_layer_num_ * mod_layer_num_;
+  prev_edge_types_.assign(entry_num, GRAPH_ALIGN_TYPE_NULL);
+  prev_edge_mod_nums_.assign(entry_num, 0);
+  prev_nodes_.assign(entry_num, -1);
+  best_scores_.assign(entry_num, -std::numeric_limits<double>::max());
+  best_shift_nodes_.assign(entry_num, -1);
+  best_shift_scores_.assign(entry_num, -std::numeric_limits<double>::max());
   LOG_DEBUG("init table step 1");
+  int init_aa_num = proteo_ver_num_;
   if (mng_ptr_->whole_protein_only_) {
-    int init_aa_num = 2;
-    if (init_aa_num > proteo_ver_num_) {
-      init_aa_num = proteo_ver_num_;
-    }
-    for (int i = 0; i < init_aa_num; i++) {
-      table_[i][0]->updateTable(0, 0, GRAPH_ALIGN_TYPE_NULL, 0, nullptr,
-                                node_score);
-      table_[i][0]->updateBestShiftNode(0, 0, 0, table_[i][0]);
-      // LOG_DEBUG("type " << table_[i][0]->getType(0) << " first index " <<
-      // table_[i][0]->getFirstIdx() << " second index " <<
-      // table_[i][0]->getSecondIdx());
-    }
-  } else {
-    for (int i = 0; i < proteo_ver_num_; i++) {
-      table_[i][0]->updateTable(0, 0, GRAPH_ALIGN_TYPE_NULL, 0, nullptr,
-                                node_score);
-      table_[i][0]->updateBestShiftNode(0, 0, 0, table_[i][0]);
-      // LOG_DEBUG("type " << table_[i][0]->getType(0) << " first index " <<
-      // table_[i][0]->getFirstIdx() << " second index " <<
-      // table_[i][0]->getSecondIdx());
-    }
+    init_aa_num = std::min(2, proteo_ver_num_);
+  }
+  for (int i = 0; i < init_aa_num; i++) {
+    size_t cell = getCellIdx(i, 0);
+    size_t entry = getEntryIdx(cell, 0, 0);
+    // the start of an alignment: its score is the node score as an int
+    prev_edge_types_[entry] = GRAPH_ALIGN_TYPE_NULL;
+    prev_edge_mod_nums_[entry] = 0;
+    prev_nodes_[entry] = -1;
+    best_scores_[entry] = static_cast<int>(node_score);
+    best_shift_scores_[entry] = 0;
+    best_shift_nodes_[entry] = static_cast<int>(cell);
   }
   LOG_DEBUG("init table end");
 }
 
-GraphDpNodePtr GraphAlign::compBestVariableNode(int i, int j, int s, int m,
-                                                int& best_edge_mod_num) {
+int GraphAlign::compBestVariableNode(size_t cell, int s, int m,
+                                     int& best_edge_mod_num) {
   int best_prev_score = -1;
   best_edge_mod_num = -1;
-  GraphDpNodePtr best_prev_node = nullptr;
+  int best_prev_node = -1;
   for (int p = 0; p <= m; p++) {
-    for (size_t q = 0; q < cons_pairs_[i][j][p].size(); q++) {
-      std::pair<int, int> pair = cons_pairs_[i][j][p][q];
-      int pi = pair.first;
-      int pj = pair.second;
-      // LOG_DEBUG("pi " << pi << " pj " << pj);
-      int score = table_[pi][pj]->getBestScore(s, m - p);
+    size_t key = cell * mod_layer_num_ + p;
+    for (int q = cons_begins_[key]; q < cons_begins_[key + 1]; q++) {
+      int prev_cell = cons_prev_cells_[q];
+      int score = toIntScore(best_scores_[getEntryIdx(prev_cell, s, m - p)]);
       if (score > best_prev_score) {
         best_prev_score = score;
-        best_prev_node = table_[pi][pj];
+        best_prev_node = prev_cell;
         best_edge_mod_num = p;
       }
     }
@@ -219,87 +214,94 @@ GraphDpNodePtr GraphAlign::compBestVariableNode(int i, int j, int s, int m,
   return best_prev_node;
 }
 
-GraphDpNodePtr GraphAlign::compBestShiftNode(int i, int j, int s, int m) {
+int GraphAlign::compBestShiftNode(int i, int j, int s, int m) {
   if (s == 0) {
-    return nullptr;
+    return -1;
   }
   int best_prev_score = -1;
-  GraphDpNodePtr best_prev_node = nullptr;
-  GraphDpNodePtr up_node = table_[i - 1][j];
-  int score = up_node->getBestShiftScore(s - 1, m);
+  int best_prev_node = -1;
+  size_t up_entry = getEntryIdx(getCellIdx(i - 1, j), s - 1, m);
+  int score = toIntScore(best_shift_scores_[up_entry]);
   if (score > best_prev_score) {
     best_prev_score = score;
-    best_prev_node = up_node->getBestShiftNodePtr(s - 1, m);
+    best_prev_node = best_shift_nodes_[up_entry];
   }
 
-  GraphDpNodePtr left_node = table_[i][j - 1];
-  score = left_node->getBestShiftScore(s - 1, m);
+  size_t left_entry = getEntryIdx(getCellIdx(i, j - 1), s - 1, m);
+  score = toIntScore(best_shift_scores_[left_entry]);
   if (score > best_prev_score) {
     best_prev_score = score;
-    best_prev_node = left_node->getBestShiftNodePtr(s - 1, m);
+    best_prev_node = best_shift_nodes_[left_entry];
   }
   return best_prev_node;
 }
 
 void GraphAlign::updateBestShiftNode(int i, int j, int s, int m) {
+  size_t cell = getCellIdx(i, j);
+  size_t entry = getEntryIdx(cell, s, m);
+  size_t up_entry = getEntryIdx(getCellIdx(i - 1, j), s, m);
+  size_t left_entry = getEntryIdx(getCellIdx(i, j - 1), s, m);
   // update best node
-  if (table_[i - 1][j]->getBestShiftScore(s, m) >
-      table_[i][j - 1]->getBestShiftScore(s, m)) {
-    table_[i][j]->updateBestShiftNode(
-        s, m, table_[i - 1][j]->getBestShiftScore(s, m),
-        table_[i - 1][j]->getBestShiftNodePtr(s, m));
+  if (best_shift_scores_[up_entry] > best_shift_scores_[left_entry]) {
+    best_shift_scores_[entry] = best_shift_scores_[up_entry];
+    best_shift_nodes_[entry] = best_shift_nodes_[up_entry];
   } else {
-    table_[i][j]->updateBestShiftNode(
-        s, m, table_[i][j - 1]->getBestShiftScore(s, m),
-        table_[i][j - 1]->getBestShiftNodePtr(s, m));
+    best_shift_scores_[entry] = best_shift_scores_[left_entry];
+    best_shift_nodes_[entry] = best_shift_nodes_[left_entry];
   }
 
-  if (table_[i][j]->getBestScore(s, m) >
-      table_[i][j]->getBestShiftScore(s, m)) {
-    table_[i][j]->updateBestShiftNode(s, m, table_[i][j]->getBestScore(s, m),
-                                      table_[i][j]);
+  if (best_scores_[entry] > best_shift_scores_[entry]) {
+    best_shift_scores_[entry] = best_scores_[entry];
+    best_shift_nodes_[entry] = static_cast<int>(cell);
   }
 }
 
 void GraphAlign::dp() {
   LOG_DEBUG("dp start");
+  double new_score = 1.0;
   for (int i = 1; i < proteo_ver_num_; i++) {
     for (int j = 1; j < spec_ver_num_; j++) {
+      size_t cell = getCellIdx(i, j);
       // compute for zero shift
       for (int s = 0; s <= mng_ptr_->n_unknown_shift_; s++) {
         for (int m = 0; m <= mng_ptr_->max_known_mods_; m++) {
           int edge_mod_num;
-          GraphDpNodePtr best_var_node =
-              compBestVariableNode(i, j, s, m, edge_mod_num);
+          int best_var_node = compBestVariableNode(cell, s, m, edge_mod_num);
           double var_score;
-          if (best_var_node == nullptr) {
+          if (best_var_node < 0) {
             var_score = -std::numeric_limits<double>::max();
           } else {
-            var_score = best_var_node->getBestScore(s, m - edge_mod_num);
+            var_score =
+                best_scores_[getEntryIdx(best_var_node, s, m - edge_mod_num)];
           }
 
-          GraphDpNodePtr best_shift_node = compBestShiftNode(i, j, s, m);
+          int best_shift_node = compBestShiftNode(i, j, s, m);
           double shift_score;
-          if (best_shift_node != nullptr) {
-            shift_score = best_shift_node->getBestScore(s - 1, m);
+          if (best_shift_node >= 0) {
+            shift_score = best_scores_[getEntryIdx(best_shift_node, s - 1, m)];
           } else {
             shift_score = -std::numeric_limits<double>::max();
           }
-          double new_score = table_[i][j]->getNodeScore();
-          // LOG_DEBUG("new score " << new_score);
 
+          // a new score is stored as an int, as the node table did
+          size_t entry = getEntryIdx(cell, s, m);
           if (var_score >= shift_score) {
             if (var_score == -std::numeric_limits<double>::max()) {
-              table_[i][j]->updateTable(s, m, GRAPH_ALIGN_TYPE_NULL, 0, nullptr,
-                                        -std::numeric_limits<int>::max());
+              prev_edge_types_[entry] = GRAPH_ALIGN_TYPE_NULL;
+              prev_edge_mod_nums_[entry] = 0;
+              prev_nodes_[entry] = -1;
+              best_scores_[entry] = -std::numeric_limits<int>::max();
             } else {
-              table_[i][j]->updateTable(s, m, GRAPH_ALIGN_TYPE_VARIABLE,
-                                        edge_mod_num, best_var_node,
-                                        var_score + new_score);
+              prev_edge_types_[entry] = GRAPH_ALIGN_TYPE_VARIABLE;
+              prev_edge_mod_nums_[entry] = edge_mod_num;
+              prev_nodes_[entry] = best_var_node;
+              best_scores_[entry] = toIntScore(var_score + new_score);
             }
           } else {
-            table_[i][j]->updateTable(s, m, GRAPH_ALIGN_TYPE_UNEXPECTED, 0,
-                                      best_shift_node, shift_score + new_score);
+            prev_edge_types_[entry] = GRAPH_ALIGN_TYPE_UNEXPECTED;
+            prev_edge_mod_nums_[entry] = 0;
+            prev_nodes_[entry] = best_shift_node;
+            best_scores_[entry] = toIntScore(shift_score + new_score);
           }
           updateBestShiftNode(i, j, s, m);
         }
@@ -312,22 +314,23 @@ void GraphAlign::dp() {
 GraphResultNodePtrVec GraphAlign::backtrace(int s, int m) {
   // find the best score;
   int best_score = -1;
-  GraphDpNodePtr best_node_ptr = nullptr;
+  int best_node = -1;
 
   // if whole sequence only
   if (mng_ptr_->whole_protein_only_) {
-    int score =
-        table_[proteo_ver_num_ - 1][spec_ver_num_ - 1]->getBestScore(s, m);
+    size_t cell = getCellIdx(proteo_ver_num_ - 1, spec_ver_num_ - 1);
+    int score = toIntScore(best_scores_[getEntryIdx(cell, s, m)]);
     if (score > best_score) {
       best_score = score;
-      best_node_ptr = table_[proteo_ver_num_ - 1][spec_ver_num_ - 1];
+      best_node = static_cast<int>(cell);
     }
   } else {
     for (int i = 0; i < proteo_ver_num_; i++) {
-      int score = table_[i][spec_ver_num_ - 1]->getBestScore(s, m);
+      size_t cell = getCellIdx(i, spec_ver_num_ - 1);
+      int score = toIntScore(best_scores_[getEntryIdx(cell, s, m)]);
       if (score > best_score) {
         best_score = score;
-        best_node_ptr = table_[i][spec_ver_num_ - 1];
+        best_node = static_cast<int>(cell);
       }
     }
   }
@@ -336,18 +339,15 @@ GraphResultNodePtrVec GraphAlign::backtrace(int s, int m) {
   LOG_DEBUG("best score " << best_score);
   GraphResultNodePtrVec results;
   if (best_score > 0) {
-    GraphDpNodePtr cur_node_ptr = best_node_ptr;
-    while (cur_node_ptr != nullptr) {
-      LOG_DEBUG("cur node " << cur_node_ptr);
-      results.push_back(
-          std::make_shared<GraphResultNode>(cur_node_ptr, shift, mod));
-      int type = cur_node_ptr->getPrevEdgeType(shift, mod);
-      LOG_DEBUG("type " << type << " shift " << shift << " first index "
-                        << cur_node_ptr->getFirstIdx() << " second index "
-                        << cur_node_ptr->getSecondIdx());
-      int prev_edge_mod_num = cur_node_ptr->getPrevEdgeModNum(shift, mod);
-      cur_node_ptr = cur_node_ptr->getPrevNodePtr(shift, mod);
-      LOG_DEBUG("get prev node ");
+    int cur_node = best_node;
+    while (cur_node >= 0) {
+      size_t entry = getEntryIdx(cur_node, shift, mod);
+      int type = prev_edge_types_[entry];
+      results.push_back(std::make_shared<GraphResultNode>(
+          cur_node / spec_ver_num_, cur_node % spec_ver_num_, shift, mod,
+          type));
+      int prev_edge_mod_num = prev_edge_mod_nums_[entry];
+      cur_node = prev_nodes_[entry];
       if (type == GRAPH_ALIGN_TYPE_UNEXPECTED) {
         shift--;
       }
