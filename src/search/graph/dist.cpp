@@ -24,44 +24,41 @@ int getVecIndex(int v1, int v2, int gap) {
   return index;
 }
 
-void addToDistVec(const MassGraphPtr& graph_ptr,
-                  std::vector<DistEntry>& entries, DistVec& dist_vec) {
+void addToDistList(std::vector<DistEntry>& entries, DistList& dist_list) {
   // a stable sort keeps the entries of one distance in their order
   std::stable_sort(entries.begin(), entries.end(),
                    [](const DistEntry& a, const DistEntry& b) {
                      return a.dist_ < b.dist_;
                    });
-  size_t bgn = 0;
-  while (bgn < entries.size()) {
-    size_t end = bgn + 1;
-    while (end < entries.size() && entries[end].dist_ == entries[bgn].dist_) {
-      end++;
+  dist_list.pairs_.reserve(entries.size());
+  for (size_t k = 0; k < entries.size(); k++) {
+    if (k == 0 || entries[k].dist_ != entries[k - 1].dist_) {
+      if (k > 0) {
+        dist_list.begins_.push_back(static_cast<int>(k));
+      }
+      dist_list.dists_.push_back(entries[k].dist_);
     }
-    Dist dist(graph_ptr, entries[bgn].dist_, entries[bgn].i_, entries[bgn].j_);
-    dist.pair_ij_.reserve(end - bgn);
-    for (size_t k = bgn + 1; k < end; k++) {
-      dist.pair_ij_.push_back(std::pair<int, int>(entries[k].i_, entries[k].j_));
-    }
-    dist_vec.push_back(std::move(dist));
-    bgn = end;
+    dist_list.pairs_.push_back(std::pair<int, int>(entries[k].i_, entries[k].j_));
+  }
+  if (entries.size() > 0) {
+    dist_list.begins_.push_back(static_cast<int>(entries.size()));
   }
 }
 
-void addToDistVec(const MassGraphPtr& graph_ptr,
-                  const std::vector<std::vector<std::set<int>>>& dist_vecs,
-                  int node_num, int mod_num, DistVec& dist_vec, int gap) {
+void addToDistList(const std::vector<std::vector<std::vector<int>>>& dist_vecs,
+                   int node_num, int mod_num, DistList& dist_list, int gap) {
   std::vector<DistEntry> entries;
   for (int i = 0; i < node_num - 1; i++) {
     for (int j = i + 1; j < node_num && j <= i + gap; j++) {
       int index = getVecIndex(i, j, gap);
-      for (std::set<int>::iterator it = dist_vecs[index][mod_num].begin();
-           it != dist_vecs[index][mod_num].end(); it++) {
-        if (*it == 0) continue;
-        entries.push_back(DistEntry{*it, i, j});
+      const std::vector<int>& dists = dist_vecs[index][mod_num];
+      for (size_t k = 0; k < dists.size(); k++) {
+        if (dists[k] == 0) continue;
+        entries.push_back(DistEntry{dists[k], i, j});
       }
     }
   }
-  addToDistVec(graph_ptr, entries, dist_vec);
+  addToDistList(entries, dist_list);
 }
 
 }  // namespace toppic

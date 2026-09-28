@@ -37,7 +37,7 @@ class SpecGraph {
 
   MassGraphPtr getMassGraphPtr() { return graph_ptr_; }
 
-  const DistVec& getDistVec() { return dist_; }
+  const DistList& getDistList() { return dist_list_; }
 
   PrmPeakPtr getPrmPeakPtr(int i) { return peak_vec_[i]; }
 
@@ -58,7 +58,7 @@ class SpecGraph {
 
   PrmPeakPtrVec peak_vec_;
 
-  DistVec dist_;
+  DistList dist_list_;
 
   int getVecIndex(int v1, int v2);
 

@@ -57,9 +57,9 @@ class GraphAlign {
 
   int spec_ver_num_;
 
-  // the spectrum distances within the range of the proteoform distances, in
-  // increasing order
-  std::vector<const Dist*> spec_dist_;
+  // the spectrum distances within the range of the proteoform distances, as
+  // indexes of the spectrum graph's distance list, in increasing order
+  std::vector<int> spec_dist_idxes_;
 
   // The DP table: a cell per pair of a proteoform graph vertex i and a
   // spectrum graph vertex j, cell index i * spec_ver_num_ + j, and in each

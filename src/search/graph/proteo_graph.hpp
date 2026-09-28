@@ -41,7 +41,7 @@ class ProteoGraph {
 
   bool isNme() { return is_nme_; }
 
-  const DistVec2D& getDistVec2D() { return dist_vec_; }
+  const DistList2D& getDistList2D() { return dist_lists_; }
 
  private:
   ProteoformPtr db_proteo_ptr_;
@@ -60,7 +60,7 @@ class ProteoGraph {
 
   int var_ptm_in_gap_;
 
-  DistVec2D dist_vec_;
+  DistList2D dist_lists_;
 
   void compSeqMasses(double convert_ratio);
 

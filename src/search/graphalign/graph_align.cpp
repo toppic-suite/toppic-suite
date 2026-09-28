@@ -30,12 +30,12 @@
 
 namespace toppic {
 
-std::vector<int> getMinMaxProtDist(const DistVec2D& dist_vec) {
+std::vector<int> getMinMaxProtDist(const DistList2D& dist_lists) {
   std::vector<int> min_dist, max_dist;
-  for (size_t i = 0; i < dist_vec.size(); i++) {
-    if (dist_vec[i].size() == 0) continue;
-    min_dist.push_back(dist_vec[i][0].dist_);
-    max_dist.push_back(dist_vec[i][dist_vec[i].size() - 1].dist_);
+  for (size_t i = 0; i < dist_lists.size(); i++) {
+    if (dist_lists[i].size() == 0) continue;
+    min_dist.push_back(dist_lists[i].dists_[0]);
+    max_dist.push_back(dist_lists[i].dists_[dist_lists[i].size() - 1]);
   }
   std::sort(min_dist.begin(), min_dist.end());
   std::sort(max_dist.begin(), max_dist.end());
@@ -67,17 +67,17 @@ GraphAlign::GraphAlign(const GraphAlignMngPtr& mng_ptr,
   fasta_seq_ptr_ = fasta_seq_ptr;
 
   // The distance lists of both graphs are in increasing order of distance,
-  // one Dist per distance (dist.hpp), so they are read in place: neither is
+  // one entry per distance (dist.hpp), so they are read in place: neither is
   // copied or sorted again.
   std::vector<int> cutoff =
-      getMinMaxProtDist(proteo_graph_ptr_->getDistVec2D());
+      getMinMaxProtDist(proteo_graph_ptr_->getDistList2D());
   cutoff[0] -= mng_ptr_->getIntTolerance();
   cutoff[1] += mng_ptr_->getIntTolerance();
 
-  const DistVec& spec_dist = spec_graph_ptr_->getDistVec();
+  const DistList& spec_dist = spec_graph_ptr_->getDistList();
   for (size_t i = 0; i < spec_dist.size(); i++) {
-    if (spec_dist[i].dist_ >= cutoff[0] && spec_dist[i].dist_ <= cutoff[1]) {
-      spec_dist_.push_back(&spec_dist[i]);
+    if (spec_dist.dists_[i] >= cutoff[0] && spec_dist.dists_[i] <= cutoff[1]) {
+      spec_dist_idxes_.push_back(static_cast<int>(i));
     }
   }
 
@@ -94,7 +94,8 @@ void GraphAlign::getConsistentPairs() {
   LOG_DEBUG("consistent pair start");
   int tole = mng_ptr_->getIntTolerance();
   LOG_DEBUG("Integer error tolerance " << tole);
-  const DistVec2D& dist_vec = proteo_graph_ptr_->getDistVec2D();
+  const DistList2D& prot_lists = proteo_graph_ptr_->getDistList2D();
+  const DistList& spec_list = spec_graph_ptr_->getDistList();
   int min_dist = mng_ptr_->getIntMinConsistentDist();
 
   // Every pair of a proteoform distance and a spectrum distance within the
@@ -106,47 +107,47 @@ void GraphAlign::getConsistentPairs() {
                    mod_layer_num_;
   std::vector<int> cursors(key_num + 1, 0);
   for (int pass = 0; pass < 2; pass++) {
-    for (size_t m = 0; m < dist_vec.size(); m++) {
-      const DistVec& prot_dist = dist_vec[m];
-      if (prot_dist.size() == 0) continue;
+    for (size_t m = 0; m < prot_lists.size(); m++) {
+      const DistList& prot_list = prot_lists[m];
+      if (prot_list.size() == 0) continue;
 
       size_t prot_idx_min = 0, prot_idx_max = 0;
-      for (size_t spec_idx = 0; spec_idx < spec_dist_.size(); spec_idx++) {
-        const Dist& distance = *spec_dist_[spec_idx];
-        int sp_dist = distance.dist_;
+      for (size_t spec_idx = 0; spec_idx < spec_dist_idxes_.size();
+           spec_idx++) {
+        int sd = spec_dist_idxes_[spec_idx];
+        int sp_dist = spec_list.dists_[sd];
         if (sp_dist < min_dist) continue;
 
-        while (prot_idx_min < prot_dist.size() &&
-               prot_dist[prot_idx_min].dist_ < sp_dist - tole) {
+        while (prot_idx_min < prot_list.size() &&
+               prot_list.dists_[prot_idx_min] < sp_dist - tole) {
           prot_idx_min++;
         }
 
-        if (prot_idx_min >= prot_dist.size()) continue;
+        if (prot_idx_min >= prot_list.size()) continue;
 
         prot_idx_max = std::max(prot_idx_min, prot_idx_max);
 
-        while (prot_idx_max < prot_dist.size() &&
-               prot_dist[prot_idx_max].dist_ <= sp_dist + tole) {
+        while (prot_idx_max < prot_list.size() &&
+               prot_list.dists_[prot_idx_max] <= sp_dist + tole) {
           prot_idx_max++;
         }
 
         for (size_t t = prot_idx_min; t < prot_idx_max; t++) {
-          const Dist& new_distance = prot_dist[t];
-          if (std::abs(sp_dist - new_distance.dist_) > tole) continue;
-          const std::vector<std::pair<int, int>>& pg_pair_ij =
-              new_distance.pair_ij_;
-          const std::vector<std::pair<int, int>>& sp_pair_ij =
-              distance.pair_ij_;
-          for (size_t k = 0; k < pg_pair_ij.size(); k++) {
-            for (size_t sp = 0; sp < sp_pair_ij.size(); sp++) {
-              size_t key = getCellIdx(pg_pair_ij[k].second,
-                                      sp_pair_ij[sp].second) *
-                               mod_layer_num_ + m;
+          if (std::abs(sp_dist - prot_list.dists_[t]) > tole) continue;
+          for (int k = prot_list.begins_[t]; k < prot_list.begins_[t + 1];
+               k++) {
+            const std::pair<int, int>& pg_pair = prot_list.pairs_[k];
+            for (int sp = spec_list.begins_[sd]; sp < spec_list.begins_[sd + 1];
+                 sp++) {
+              const std::pair<int, int>& sp_pair = spec_list.pairs_[sp];
+              size_t key =
+                  getCellIdx(pg_pair.second, sp_pair.second) * mod_layer_num_ +
+                  m;
               if (pass == 0) {
                 cursors[key + 1]++;
               } else {
                 cons_prev_cells_[cursors[key]++] = static_cast<int>(
-                    getCellIdx(pg_pair_ij[k].first, sp_pair_ij[sp].first));
+                    getCellIdx(pg_pair.first, sp_pair.first));
               }
             }
           }

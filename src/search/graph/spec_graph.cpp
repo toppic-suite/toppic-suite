@@ -64,7 +64,7 @@ void SpecGraph::compSpecDistances(double convert_ratio) {
     }
   }
   LOG_DEBUG("count " << count);
-  addToDistVec(graph_ptr_, entries, dist_);
+  addToDistList(entries, dist_list_);
 }
 
 }  // namespace toppic

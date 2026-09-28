@@ -15,7 +15,8 @@
 
 #include "search/graph/proteo_graph.hpp"
 
-#include <set>
+#include <algorithm>
+#include <cstdlib>
 #include <vector>
 
 #include "common/base/mod_base.hpp"
@@ -75,21 +76,16 @@ void ProteoGraph::compSeqMasses(double convert_ratio) {
 
 void ProteoGraph::compDistances(int max_mod_num, int max_ptm_sum_mass) {
   MassGraph* g_p = graph_ptr_.get();
-  // get mass without ptms
-
-  std::vector<std::vector<std::set<int> > > dist_vecs;
-  for (int i = 0; i < pair_num_; i++) {
-    std::set<int> empty_set;
-    std::vector<std::set<int> > one_pair_vec;
-    for (int j = 0; j < max_mod_num + 1; j++) {
-      one_pair_vec.push_back(empty_set);
-    }
-    dist_vecs.push_back(one_pair_vec);
-  }
+  // The distances of each pair (i, j) with each number of variable
+  // modifications, sorted and unique: those of the pair (i, j - 1) plus the
+  // mass of an edge from j - 1 to j, collected and then sorted, which gives
+  // the set of them.
+  std::vector<std::vector<std::vector<int>>> dist_vecs(
+      pair_num_, std::vector<std::vector<int>>(max_mod_num + 1));
   // initialize pair (i, i)
   for (int i = 0; i < node_num_; i++) {
     int index = getVecIndex(i, i);
-    dist_vecs[index][0].insert(0);
+    dist_vecs[index][0].push_back(0);
   }
   for (int i = 0; i < node_num_ - 1; i++) {
     for (int j = i + 1; j < node_num_ && j <= i + proteo_graph_gap_; j++) {
@@ -104,39 +100,34 @@ void ProteoGraph::compDistances(int max_mod_num, int max_ptm_sum_mass) {
           MassGraph::edge_descriptor e = *ei;
           int d = (*g_p)[e].int_mass_;
           int change = (*g_p)[e].alter_type_;
+          bool var_change = change == AlterType::PROTEIN_VARIABLE->getId() ||
+                            change == AlterType::VARIABLE->getId();
           for (int k = 0; k < var_ptm_in_gap_ + 1; k++) {
-            if (k == max_mod_num &&
-                (change == AlterType::PROTEIN_VARIABLE->getId() ||
-                 change == AlterType::VARIABLE->getId())) {
+            if (k == max_mod_num && var_change) {
               continue;
             }
-            for (std::set<int>::iterator it = dist_vecs[pre_index][k].begin();
-                 it != dist_vecs[pre_index][k].end(); it++) {
-              int new_d = d + *it;
+            const std::vector<int>& pre_dists = dist_vecs[pre_index][k];
+            std::vector<int>& dists = dist_vecs[index][var_change ? k + 1 : k];
+            for (size_t t = 0; t < pre_dists.size(); t++) {
+              int new_d = d + pre_dists[t];
               if (std::abs(new_d - seq_masses_[index]) <= max_ptm_sum_mass) {
-                if (change == AlterType::PROTEIN_VARIABLE->getId() ||
-                    change == AlterType::VARIABLE->getId()) {
-                  dist_vecs[index][k + 1].insert(new_d);
-                } else {
-                  dist_vecs[index][k].insert(new_d);
-                }
+                dists.push_back(new_d);
               }
             }
           }
         }
       }
+      for (int k = 0; k < max_mod_num + 1; k++) {
+        std::vector<int>& dists = dist_vecs[index][k];
+        std::sort(dists.begin(), dists.end());
+        dists.erase(std::unique(dists.begin(), dists.end()), dists.end());
+      }
     }
   }
 
-  dist_vec_.reserve(max_mod_num);
-  DistVec tmp;
+  dist_lists_.resize(max_mod_num + 1);
   for (int k = 0; k < max_mod_num + 1; k++) {
-    dist_vec_.push_back(tmp);
-  }
-
-  for (int k = 0; k < max_mod_num + 1; k++) {
-    addToDistVec(graph_ptr_, dist_vecs, node_num_, k, dist_vec_[k],
-                 proteo_graph_gap_);
+    addToDistList(dist_vecs, node_num_, k, dist_lists_[k], proteo_graph_gap_);
   }
 }
 
