@@ -47,6 +47,21 @@ class Dist {
 using DistVec = std::vector<Dist>;
 using DistVec2D = std::vector<DistVec>;
 
+// a distance between the vertices i and j of a graph
+struct DistEntry {
+  int dist_;
+  int i_;
+  int j_;
+};
+
+// Appends to dist_vec one Dist per distance of the entries, in increasing
+// order of distance, each holding its (i, j) pairs in the order of the
+// entries: what a std::set<Dist> ordered by distance gives when the entries
+// are added to it one by one, the pair of an entry whose distance is already
+// there appended to that Dist. The entries are reordered.
+void addToDistVec(const MassGraphPtr& graph_ptr,
+                  std::vector<DistEntry>& entries, DistVec& dist_vec);
+
 inline bool distVecUp(const Dist& a, const Dist& b) {
   return a.dist_ < b.dist_;
 }
