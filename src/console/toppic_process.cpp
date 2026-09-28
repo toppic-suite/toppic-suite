@@ -416,7 +416,8 @@ std::string TopPIC_identify(std::map<std::string, std::string>& arguments) {
 // database preprocessing and the spectrum index, the ASF-One PTM filtering
 // with the variable modification file, the ASF-Diagonal filtering when it is
 // asked for, the merge of their results, the proteoform-graph alignment, its
-// post-processing, the E-value computation by MCMC and the top PrSM
+// post-processing, the E-value computation by MCMC (by the generating
+// function with the hidden --topmg-use-tdgf) and the top PrSM
 // selection. Only the initialisation of the base data and the echo of the
 // arguments are left out, because toppic has done them before this runs.
 //
@@ -610,18 +611,41 @@ std::string TopPIC_topmg_identify(
     ga_post_processor_ptr = nullptr;
     std::cout << "Graph alignment post-processing - finished." << std::endl;
 
-    std::cout << "E-value computation using MCMC - started." << std::endl;
-    MCMCMngPtr mcmc_mng_ptr = std::make_shared<MCMCMng>(
-        prsm_para_ptr, "toppic_topmg_graph_post", "toppic_topmg_evalue",
-        var_mod_file_name, max_mod_num, thread_num);
-    DprProcessorPtr processor = std::make_shared<DprProcessor>(mcmc_mng_ptr);
-    processor->process();
-    processor = nullptr;
-    std::cout << "E-value computation using MCMC - finished." << std::endl;
+    if (arguments["topmgUseTdgf"] == "true") {
+      // The generating function of toppic's own E-value stages. Its table
+      // has one layer per unexpected shift, so it takes the graph
+      // alignment's shift number; the maximum shift mass the graph alignment
+      // allowed bounds the candidate count of a shifted PrSM, and the
+      // variable PTM type number that TopPIC_identify counted from the same
+      // modification file multiplies it for every variable PTM, as it does
+      // for toppic's own PrSMs.
+      std::cout << "E-value computation using TDGF - started." << std::endl;
+      int var_ptm_type_num = arguments["varPtmTypeNum"] == ""
+                                 ? 0
+                                 : std::stoi(arguments["varPtmTypeNum"]);
+      TdgfMngPtr tdgf_mng_ptr = std::make_shared<TdgfMng>(
+          prsm_para_ptr, shift_num, max_shift_mass, var_ptm_type_num,
+          thread_num, "toppic_topmg_graph_post", "toppic_topmg_evalue");
+      EValueProcessorPtr processor =
+          std::make_shared<EValueProcessor>(tdgf_mng_ptr);
+      processor->init();
+      processor->process(false);
+      processor = nullptr;
+      std::cout << "E-value computation using TDGF - finished." << std::endl;
+    } else {
+      std::cout << "E-value computation using MCMC - started." << std::endl;
+      MCMCMngPtr mcmc_mng_ptr = std::make_shared<MCMCMng>(
+          prsm_para_ptr, "toppic_topmg_graph_post", "toppic_topmg_evalue",
+          var_mod_file_name, max_mod_num, thread_num);
+      DprProcessorPtr processor = std::make_shared<DprProcessor>(mcmc_mng_ptr);
+      processor->process();
+      processor = nullptr;
+      std::cout << "E-value computation using MCMC - finished." << std::endl;
+    }
 
-    // the PrSMs of this stage, whose E-values the MCMC gave, and those of the
-    // stage before it, so that the best PrSM of every spectrum is chosen
-    // between the two searches
+    // the PrSMs of this stage, whose E-values the MCMC (or the generating
+    // function) gave, and those of the stage before it, so that the best
+    // PrSM of every spectrum is chosen between the two searches
     std::cout << "Merging TopMG and TopPIC PrSMs - started." << std::endl;
     {
       std::vector<std::string> all_exts = {"toppic_topmg_evalue",
