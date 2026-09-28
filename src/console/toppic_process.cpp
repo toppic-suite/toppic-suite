@@ -545,6 +545,13 @@ std::string TopPIC_topmg_identify(
     one_ptm_filter_mng_ptr->inte_num_ = 4;
     one_ptm_filter_mng_ptr->pref_suff_num_ = 4;
     one_ptm_filter_mng_ptr->comp_num_ = 4;
+    // The filter scores only the spectra the graph alignment searches. The
+    // candidates of a spectrum do not depend on the other spectra, and the
+    // graph alignment drops those of every other spectrum, so from the graph
+    // alignment on nothing changes; the filtering files hold the searched
+    // spectra only.
+    one_ptm_filter_mng_ptr->search_spec_ids_ = search_spec_ids;
+    one_ptm_filter_mng_ptr->search_all_ = false;
     one_ptm_filter_processor::process(one_ptm_filter_mng_ptr);
     std::cout << "TopMG ASF-One PTM filtering - finished." << std::endl;
 

@@ -17,6 +17,7 @@
 #define TOPPIC_FILTER_MNG_ONE_PTM_FILTER_MNG_HPP_
 
 #include <mutex>
+#include <set>
 
 #include "filter/mng/ptm_diag_index.hpp"
 #include "para/prsm_para.hpp"
@@ -76,6 +77,15 @@ class OnePtmFilterMng {
   std::string residueModFileName_ = "";
 
   int var_num_ = 0;
+
+  // The spectra the variable-PTM variants are filtered for (var_num_ > 0),
+  // by spectrum id. A topmg run filters every spectrum and leaves
+  // search_all_ true; toppic's --topmg-identify filters only the spectra its
+  // graph alignment searches, the ones its earlier stages have not
+  // identified.
+  bool search_all_ = true;
+
+  std::set<int> search_spec_ids_;
 
   int n_spec_block_ = 0;
 

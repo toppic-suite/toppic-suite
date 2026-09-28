@@ -106,6 +106,11 @@ inline FilterSpecPtrVec readSpectrumVariants(
         if (!spec_set_ptr->isValid()) {
           continue;
         }
+        if (!mng_ptr->search_all_ &&
+            mng_ptr->search_spec_ids_.count(spec_set_ptr->getSpectrumId()) ==
+                0) {
+          continue;
+        }
         DeconvMsPtrVec set_ms_ptr_vec = spec_set_ptr->getDeconvMsPtrVec();
         double prec_mono_mass = spec_set_ptr->getPrecMonoMass();
         double n_term_label_mass = spec_set_ptr->getNTermLabelMass();
