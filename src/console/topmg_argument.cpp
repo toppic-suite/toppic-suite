@@ -46,7 +46,9 @@ std::map<std::string, std::string> TopmgArgument::initArguments() {
   arguments["activation"] = "FILE";
   arguments["searchType"] = "TARGET";
   arguments["fixedMod"] = "";
-  arguments["shiftNumber"] = "0";
+  // the unexpected shifts of the graph alignment, TopMG's own number,
+  // kept apart from toppic's shiftNumber (PrsmPara::getTopmgShiftNum)
+  arguments["topmgShiftNumber"] = "1";
   arguments["precErrorTolerance"] = "10";
   arguments["fragErrorTolerance"] = "10";
   arguments["envCnnCutoff"] = "0.4";
@@ -66,7 +68,10 @@ std::map<std::string, std::string> TopmgArgument::initArguments() {
   arguments["resourceDir"] = "";
   arguments["keepTempFiles"] = "false";
   arguments["groupSpectrumNumber"] = "1";
-  arguments["filteringResultNumber"] = "20";
+  // the number of results the ASF filtering keeps per spectrum. TopMG's own
+  // number: toppic's filteringResultNumber belongs to toppic's stages. The
+  // default is the 15 that the ASF-Diagonal filtering used to hardcode.
+  arguments["asfFilteringResultNumber"] = "15";
   arguments["varModFileName"] = "";
   arguments["threadNumber"] = "1";
   arguments["useFeatureFile"] = "true";
@@ -74,7 +79,6 @@ std::map<std::string, std::string> TopmgArgument::initArguments() {
   arguments["useAsfDiag"] = "false";
   arguments["varPtmNumber"] = "5";
   arguments["varPtmNumInGap"] = "5";
-  arguments["wholeProteinOnly"] = "false";
   arguments["keepDecoyResults"] = "false";
   arguments["version"] = "";
   return arguments;
@@ -147,7 +151,7 @@ void TopmgArgument::outputArguments(
 
   output << std::setw(gap) << std::left
          << "Maximum number of unexpected modifications:" << sep
-         << arguments["shiftNumber"] << std::endl;
+         << arguments["topmgShiftNumber"] << std::endl;
   output << std::setw(gap) << std::left
          << "Maximum mass shift of modifications:" << sep
          << arguments["maxShiftMass"] << " Da" << std::endl;
@@ -157,7 +161,8 @@ void TopmgArgument::outputArguments(
          << "Maximum number of variable PTMs in a graph gap:" << sep
          << arguments["varPtmNumInGap"] << std::endl;
 
-  if (arguments["wholeProteinOnly"] == "true") {
+  // whole proteins only is the proteoform type COMPLETE alone
+  if (arguments["allowProtType"] == "COMPLETE") {
     output << std::setw(gap) << std::left
            << "Report only proteoforms from whole proteins:" << sep << "True"
            << std::endl;
@@ -349,7 +354,9 @@ bool TopmgArgument::parse(int argc, char* argv[]) {
         "5.")("num-shift,s", po::value<std::string>(&shift_num),
               "<0|1|2>. Maximum number of unexpected modifications in a "
               "proteoform spectrum-match. Default value: 0.")(
-        "whole-protein-only,w", "Report only proteoforms from whole proteins.")(
+        "whole-protein-only,w",
+        "Report only proteoforms from whole proteins, that is, allow the "
+        "proteoform type COMPLETE alone.")(
         "combined-file-name,c", po::value<std::string>(&combined_output_name),
         "Specify a file name for the combined spectrum data file and analysis "
         "results.")("keep-temp-files,k", "Keep intermediate files.")(
@@ -381,7 +388,8 @@ bool TopmgArgument::parse(int argc, char* argv[]) {
         "protein-cutoff-value,Y", po::value<std::string>(&cutoff_protein_value),
         "")("filtering-result-number",
             po::value<std::string>(&filtering_result_num),
-            "Filtering result number. Default value: 20.")("full-binary-path,b",
+            "ASF filtering result number. Default value: 15.")(
+        "full-binary-path,b",
                                                            "Full binary path.")(
         "mod-file-name,i", po::value<std::string>(&var_mod_file_name), "")(
         "thread-number,u", po::value<std::string>(&thread_number), "")(
@@ -521,7 +529,7 @@ bool TopmgArgument::parse(int argc, char* argv[]) {
     }
 
     if (vm.count("filtering-result-number")) {
-      arguments_["filteringResultNumber"] = filtering_result_num;
+      arguments_["asfFilteringResultNumber"] = filtering_result_num;
     }
 
     if (vm.count("mod-file-name")) {
@@ -549,15 +557,17 @@ bool TopmgArgument::parse(int argc, char* argv[]) {
     }
 
     if (vm.count("num-shift")) {
-      arguments_["shiftNumber"] = shift_num;
+      arguments_["topmgShiftNumber"] = shift_num;
     }
 
     if (vm.count("var-ptm-in-gap")) {
       arguments_["varPtmNumInGap"] = var_ptm_in_gap;
     }
 
+    // --whole-protein-only is the proteoform type COMPLETE alone, from which
+    // TopMG_identify reads it; there is no separate wholeProteinOnly argument
     if (vm.count("whole-protein-only")) {
-      arguments_["wholeProteinOnly"] = "true";
+      arguments_["allowProtType"] = "COMPLETE";
     }
 
     if (vm.count("keep-temp-files")) {
@@ -679,7 +689,7 @@ bool TopmgArgument::validateArguments() {
               << " error! The value should be TARGET|TARGET+DECOY!");
     return false;
   }
-  std::string shift_number = arguments_["shiftNumber"];
+  std::string shift_number = arguments_["topmgShiftNumber"];
   if (shift_number != "0" && shift_number != "1" && shift_number != "2") {
     LOG_ERROR("Shift number " << shift_number
                               << " error! The value should be 0|1|2!");

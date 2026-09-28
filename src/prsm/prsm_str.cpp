@@ -25,7 +25,12 @@ namespace toppic {
 
 PrsmStr::PrsmStr(const std::vector<std::string>& str_vec) {
   str_vec_ = str_vec;
-  std::string line = prsm_util::getXmlLine(str_vec_, "<file_name>");
+  std::string line = prsm_util::getXmlLine(str_vec_, "<tool>");
+  // PrSM files written before the tool element have none
+  if (line != "") {
+    tool_ = prsm_util::getValueStr(line);
+  }
+  line = prsm_util::getXmlLine(str_vec_, "<file_name>");
   file_name_ = prsm_util::getValueStr(line);
   line = prsm_util::getXmlLine(str_vec_, "<spectrum_id>");
   spectrum_id_ = std::stoi(prsm_util::getValueStr(line));

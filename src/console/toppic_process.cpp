@@ -15,6 +15,7 @@
 
 #include "console/toppic_process.hpp"
 
+#include <algorithm>
 #include <cstdlib>
 #include <ctime>
 #include <filesystem>
@@ -63,11 +64,15 @@
 #include "prsm/prsm_prot_filter.hpp"
 #include "prsm/prsm_reader_util.hpp"
 #include "prsm/prsm_simple_cluster.hpp"
+#include "prsm/simple_prsm_str_merge.hpp"
 #include "prsm/prsm_sql_output.hpp"
 #include "prsm/prsm_str_merge.hpp"
 #include "prsm/prsm_top_selector.hpp"
 #include "prsm/prsm_util.hpp"
 #include "prsm/prsm_xml_writer.hpp"
+#include "search/graphalign/graph_align_mng.hpp"
+#include "search/graphalign/graph_align_processor.hpp"
+#include "search/graphalign/graph_post_processor.hpp"
 #include "search/oneptmsearch/one_ptm_search_processor.hpp"
 #include "search/oneptmsearch/ptm_search_mng.hpp"
 #include "search/ptmsearch/ptm_search_processor.hpp"
@@ -79,6 +84,8 @@
 #include "seq/fasta_util.hpp"
 #include "stat/local/local_mng.hpp"
 #include "stat/local/local_processor.hpp"
+#include "stat/mcmc/mcmc_dpr_processor.hpp"
+#include "stat/mcmc/mcmc_mng.hpp"
 #include "stat/tdgf/cluster_prot_corrector.hpp"
 #include "stat/tdgf/evalue_processor.hpp"
 #include "stat/tdgf/tdgf_mng.hpp"
@@ -146,6 +153,9 @@ void cleanToppicDir(const std::string& fa_name, const std::string& sp_name,
     file_util::delFile(sp_base + ".toppic_multi_evalue");
     file_util::delFile(sp_base + ".toppic_multi_evalue_all");
     file_util::delFile(sp_base + ".toppic_pre_raw_prsm");
+    file_util::delFile(sp_base + ".toppic_multi_ptm_raw_prsm");
+    file_util::delFile(sp_base + ".toppic_topmg_evalue_all");
+    file_util::delFile(sp_base + ".toppic_topmg_raw_prsm");
     file_util::delFile(sp_base + ".toppic_raw_prsm");
     file_util::delFile(sp_base + ".toppic_multi_shift");
     file_util::cleanPrefix(sp_name, sp_base + ".toppic_multi_shift_");
@@ -197,7 +207,7 @@ int TopPIC_testModFile(std::map<std::string, std::string>& arguments) {
 }
 
 // protein filtering + database searching + E-value computation
-int TopPIC_identify(std::map<std::string, std::string>& arguments) {
+std::string TopPIC_identify(std::map<std::string, std::string>& arguments) {
   try {
     std::time_t start = time(nullptr);
     char buf[50];
@@ -224,7 +234,7 @@ int TopPIC_identify(std::map<std::string, std::string>& arguments) {
         LOG_ERROR(
             "Please use -x option in command line or select 'Missing MS1 "
             "feature file in GUI'.");
-        return 1;
+        return "";
       }
     }
 
@@ -396,20 +406,280 @@ int TopPIC_identify(std::map<std::string, std::string>& arguments) {
   } catch (const char* e) {
     std::cout << "[Exception]" << std::endl;
     std::cout << e << std::endl;
+    return "";
   }
-  return 0;
+  return "toppic_pre_raw_prsm";
+}
+
+// TopMG's identification hosted in toppic, behind the hidden
+// --topmg-identify option. Every stage of TopMG_identify, in its order: the
+// database preprocessing and the spectrum index, the ASF-One PTM filtering
+// with the variable modification file, the ASF-Diagonal filtering when it is
+// asked for, the merge of their results, the proteoform-graph alignment, its
+// post-processing, the E-value computation by the generating function (by
+// MCMC with the hidden --topmg-use-mcmc) and the top PrSM selection. Only the initialisation of the base data and the echo of the
+// arguments are left out, because toppic has done them before this runs.
+//
+// The files are named toppic_topmg_*, so they collide neither with TopMG's
+// own nor with toppic's. The PrSMs end in toppic_topmg_raw_prsm and are not
+// merged into toppic's recounting, clustering, FDR, cutoffs or tables: the
+// two searches' E-values come from different models.
+std::string TopPIC_topmg_identify(
+    std::map<std::string, std::string>& arguments,
+    const std::string& raw_prsm_ext) {
+  try {
+    std::string db_file_name = arguments["databaseFileName"];
+    std::string sp_file_name = arguments["spectrumFileName"];
+    std::string ori_db_file_name = arguments["oriDatabaseFileName"];
+    std::string var_mod_file_name = arguments["variablePtmFileName"];
+    if (var_mod_file_name == "") {
+      LOG_ERROR("TopMG's identification needs a variable modification file. "
+                "Please use the -b option.");
+      return raw_prsm_ext;
+    }
+
+    int n_top = std::stoi(arguments["numOfTopPrsms"]);
+    // the ASF filtering of these stages keeps this many results per
+    // spectrum: TopMG's own number, not toppic's filteringResultNumber
+    int filter_result_num = std::stoi(arguments["asfFilteringResultNumber"]);
+    double max_shift_mass = std::stod(arguments["maxShiftMass"]);
+    int thread_num = std::stoi(arguments["threadNumber"]);
+
+    bool decoy = false;
+    if (arguments["searchType"] == "TARGET+DECOY") {
+      decoy = true;
+    }
+    int db_block_size = std::stoi(arguments["databaseBlockSize"]);
+    int max_frag_len = std::stoi(arguments["maxFragmentLength"]);
+    int min_block_num = std::stoi(arguments["minBlockNum"]);
+    // every step of dbPreprocess is guarded by an existence check, so calling
+    // it again after TopPIC_identify rebuilds nothing and does not reshuffle
+    // the decoy database
+    fasta_util::dbPreprocess(ori_db_file_name, db_file_name, decoy,
+                             db_block_size, max_frag_len, min_block_num);
+    msalign_util::geneSpIndex(sp_file_name);
+
+    PrsmParaPtr prsm_para_ptr = std::make_shared<PrsmPara>(arguments);
+    // the unexpected shifts of the graph alignment: TopMG's own number, not
+    // toppic's --num-shift
+    int shift_num = prsm_para_ptr->getTopmgShiftNum();
+    // The +-1 Da precursor error of the one-shift filtering is off in SpPara
+    // and in toppic's arguments alike, so these stages filter as TopMG
+    // filters without setting it here. It used to be on in SpPara, which is
+    // what toppic_test experiment 71 had to work around.
+
+    IndexFileNamePtr file_name_ptr = std::make_shared<IndexFileName>();
+    std::string index_file_para = file_name_ptr->geneFileName(arguments);
+
+    // The spectra to search: the ones no earlier stage has identified, as the
+    // multiple-shift stage chooses them. A spectrum counts as identified when
+    // its best PrSM in the set this stage was given has an E-value strictly
+    // below the skip E-value, which with a decoy database is the smallest
+    // E-value of a decoy PrSM of that set. Every spectrum a decoy could
+    // compete with is searched, so TopMG's decoys are those of a full search
+    // over the spectra it searches, and the spectra no decoy can reach keep
+    // the PrSM they have. The hidden --multi-skip-evalue overrides it. A
+    // spectrum with no PrSM at all is searched, which is why the list is built
+    // from every spectrum of the file and not from the PrSMs.
+    std::string base_name = file_util::basename(sp_file_name);
+    std::set<int> identified_spec_ids;
+    PrsmStrPtrVec prev_ptrs =
+        prsm_reader_util::readAllPrsmStrs(base_name + "." + raw_prsm_ext);
+    double skip_evalue;
+    std::string skip_source;
+    if (arguments["multiSkipEvalue"] != "") {
+      skip_evalue = std::stod(arguments["multiSkipEvalue"]);
+      skip_source = "--multi-skip-evalue";
+    } else if (arguments["searchType"] == "TARGET+DECOY") {
+      skip_evalue = std::numeric_limits<double>::max();
+      for (size_t i = 0; i < prev_ptrs.size(); i++) {
+        if (prev_ptrs[i]->getSeqName().find("DECOY_") == 0 &&
+            prev_ptrs[i]->getEValue() < skip_evalue) {
+          skip_evalue = prev_ptrs[i]->getEValue();
+        }
+      }
+      skip_source = "the smallest E-value of a decoy PrSM";
+    } else {
+      skip_evalue = 0.01;
+      skip_source = "the default without a decoy database";
+    }
+    int skipped_target_num = 0;
+    int skipped_decoy_num = 0;
+    for (size_t i = 0; i < prev_ptrs.size(); i++) {
+      if (prev_ptrs[i]->getEValue() < skip_evalue) {
+        int spec_id = prev_ptrs[i]->getSpectrumId();
+        if (identified_spec_ids.insert(spec_id).second) {
+          if (prev_ptrs[i]->getSeqName().find("DECOY_") == 0) {
+            skipped_decoy_num++;
+          } else {
+            skipped_target_num++;
+          }
+        }
+      }
+    }
+    std::set<int> search_spec_ids;
+    int spectrum_num = msalign_util::getSpNum(sp_file_name);
+    for (int spec_id = 0; spec_id < spectrum_num; spec_id++) {
+      if (identified_spec_ids.count(spec_id) == 0) {
+        search_spec_ids.insert(spec_id);
+      }
+    }
+    std::cout << "TopMG's identification - " << search_spec_ids.size()
+              << " spectra to search, " << identified_spec_ids.size()
+              << " identified by the earlier stages (" << skipped_target_num
+              << " target, " << skipped_decoy_num << " decoy; E-value < "
+              << skip_evalue << ", " << skip_source << ")." << std::endl;
+
+    std::vector<std::string> input_exts;
+
+    std::cout << "TopMG ASF-One PTM filtering - started." << std::endl;
+    int filter_thread_num =
+        mem_check::getStageThreadNum("ASF-One PTM filtering", thread_num);
+    LOG_DEBUG("Filter thread number " << filter_thread_num);
+    int var_ptm_num_in_filtering = 1;
+    OnePtmFilterMngPtr one_ptm_filter_mng_ptr =
+        std::make_shared<OnePtmFilterMng>(
+            prsm_para_ptr, index_file_para, "toppic_topmg_one_filter",
+            filter_thread_num, -max_shift_mass, max_shift_mass,
+            var_mod_file_name, var_ptm_num_in_filtering);
+    one_ptm_filter_mng_ptr->inte_num_ = 4;
+    one_ptm_filter_mng_ptr->pref_suff_num_ = 4;
+    one_ptm_filter_mng_ptr->comp_num_ = 4;
+    one_ptm_filter_processor::process(one_ptm_filter_mng_ptr);
+    std::cout << "TopMG ASF-One PTM filtering - finished." << std::endl;
+
+    input_exts.push_back("toppic_topmg_one_filter_COMPLETE");
+    input_exts.push_back("toppic_topmg_one_filter_PREFIX");
+    input_exts.push_back("toppic_topmg_one_filter_SUFFIX");
+    input_exts.push_back("toppic_topmg_one_filter_INTERNAL");
+
+    if (arguments["useAsfDiag"] == "true") {
+      std::cout << "TopMG ASF-Diagonal PTM filtering - started." << std::endl;
+      int diag_filter_thread_num = mem_check::getStageThreadNum(
+          "ASF-Diagonal PTM filtering", thread_num);
+      LOG_DEBUG("Diagonal filter thread number " << diag_filter_thread_num);
+      DiagFilterMngPtr diag_filter_mng_ptr = std::make_shared<DiagFilterMng>(
+          prsm_para_ptr, index_file_para, filter_result_num,
+          diag_filter_thread_num, "toppic_topmg_multi_filter",
+          var_mod_file_name, 1);
+      DiagFilterProcessorPtr diag_filter_processor =
+          std::make_shared<DiagFilterProcessor>(diag_filter_mng_ptr);
+      diag_filter_processor->process();
+      diag_filter_processor = nullptr;
+      std::cout << "TopMG ASF-Diagonal filtering - finished." << std::endl;
+
+      input_exts.push_back("toppic_topmg_multi_filter");
+    }
+
+    std::cout << "TopMG combining filtering results - started." << std::endl;
+    SimplePrsmStrMergePtr asf_filter_merger =
+        std::make_shared<SimplePrsmStrMerge>(sp_file_name, input_exts,
+                                             "toppic_topmg_graph_filter",
+                                             20 * input_exts.size());
+    asf_filter_merger->process();
+    asf_filter_merger = nullptr;
+    std::cout << "TopMG combining filtering results - finished." << std::endl;
+
+    int max_mod_num = std::stoi(arguments["variablePtmNum"]);
+    int gap = std::stoi(arguments["proteoGraphGap"]);
+    int var_ptm_in_gap =
+        std::min(std::stoi(arguments["varPtmNumInGap"]), max_mod_num);
+    // whole proteins only is the proteoform type COMPLETE alone, which is one
+    // of the two values the argument check allows with --topmg-identify
+    bool whole_protein_only = (arguments["allowProtType"] == "COMPLETE");
+    GraphAlignMngPtr ga_mng_ptr = std::make_shared<GraphAlignMng>(
+        prsm_para_ptr, var_mod_file_name, shift_num, max_mod_num, gap,
+        var_ptm_in_gap, max_shift_mass, thread_num, whole_protein_only,
+        "toppic_topmg_graph_filter", "toppic_topmg_graph_align");
+    // the graph alignment searches these spectra and no others
+    ga_mng_ptr->search_spec_ids_ = search_spec_ids;
+    ga_mng_ptr->search_all_ = false;
+    std::cout << "Graph alignment - started." << std::endl;
+    GraphAlignProcessorPtr ga_processor_ptr =
+        std::make_shared<GraphAlignProcessor>(ga_mng_ptr);
+    ga_processor_ptr->process();
+    ga_processor_ptr = nullptr;
+    std::cout << "Graph alignment - finished." << std::endl;
+
+    std::cout << "Graph alignment post-processing - started." << std::endl;
+    GraphPostProcessorPtr ga_post_processor_ptr =
+        std::make_shared<GraphPostProcessor>(ga_mng_ptr,
+                                             "toppic_topmg_graph_align",
+                                             "toppic_topmg_graph_post");
+    ga_post_processor_ptr->process();
+    ga_post_processor_ptr = nullptr;
+    std::cout << "Graph alignment post-processing - finished." << std::endl;
+
+    if (arguments["topmgUseMcmc"] != "true") {
+      // The generating function of toppic's own E-value stages. Its table
+      // has one layer per unexpected shift, so it takes the graph
+      // alignment's shift number; the maximum shift mass the graph alignment
+      // allowed bounds the candidate count of a shifted PrSM, and the
+      // variable PTM type number that TopPIC_identify counted from the same
+      // modification file multiplies it for every variable PTM, as it does
+      // for toppic's own PrSMs.
+      std::cout << "E-value computation using TDGF - started." << std::endl;
+      int var_ptm_type_num = arguments["varPtmTypeNum"] == ""
+                                 ? 0
+                                 : std::stoi(arguments["varPtmTypeNum"]);
+      TdgfMngPtr tdgf_mng_ptr = std::make_shared<TdgfMng>(
+          prsm_para_ptr, shift_num, max_shift_mass, var_ptm_type_num,
+          thread_num, "toppic_topmg_graph_post", "toppic_topmg_evalue");
+      EValueProcessorPtr processor =
+          std::make_shared<EValueProcessor>(tdgf_mng_ptr);
+      processor->init();
+      processor->process(false);
+      processor = nullptr;
+      std::cout << "E-value computation using TDGF - finished." << std::endl;
+    } else {
+      std::cout << "E-value computation using MCMC - started." << std::endl;
+      MCMCMngPtr mcmc_mng_ptr = std::make_shared<MCMCMng>(
+          prsm_para_ptr, "toppic_topmg_graph_post", "toppic_topmg_evalue",
+          var_mod_file_name, max_mod_num, thread_num);
+      DprProcessorPtr processor = std::make_shared<DprProcessor>(mcmc_mng_ptr);
+      processor->process();
+      processor = nullptr;
+      std::cout << "E-value computation using MCMC - finished." << std::endl;
+    }
+
+    // the PrSMs of this stage, whose E-values the generating function (or
+    // the MCMC) gave, and those of the stage before it, so that the best
+    // PrSM of every spectrum is chosen between the two searches
+    std::cout << "Merging TopMG and TopPIC PrSMs - started." << std::endl;
+    {
+      std::vector<std::string> all_exts = {"toppic_topmg_evalue",
+                                           raw_prsm_ext};
+      PrsmStrMergePtr all_merge_ptr = std::make_shared<PrsmStrMerge>(
+          sp_file_name, all_exts, "toppic_topmg_evalue_all",
+          std::numeric_limits<int>::max(), false, false);
+      all_merge_ptr->process();
+      all_merge_ptr = nullptr;
+    }
+    std::cout << "Merging TopMG and TopPIC PrSMs - finished." << std::endl;
+
+    std::cout << "TopMG top PrSM selecting - started" << std::endl;
+    prsm_top_selector::process(sp_file_name, "toppic_topmg_evalue_all",
+                               "toppic_topmg_raw_prsm", n_top);
+    std::cout << "TopMG top PrSM selecting - finished." << std::endl;
+  } catch (const char* e) {
+    std::cout << "[Exception]" << std::endl;
+    std::cout << e << std::endl;
+  }
+  // its PrSMs, merged with those of the stage before it, are the set now
+  return "toppic_topmg_raw_prsm";
 }
 
 // The multiple unexpected shifts stage (-s 2): the diagonal filter and the
 // PTM search on the spectra that TopPIC_identify left without a PrSM passing
 // the spectrum-level cutoff, then the merge, E-value computation and top
 // PrSM selection of the new PrSMs alone.
-int TopPIC_multi_ptm_search(std::map<std::string, std::string>& arguments) {
+std::string TopPIC_multi_ptm_search(
+    std::map<std::string, std::string>& arguments,
+    const std::string& raw_prsm_ext) {
   try {
+    // the search and the E-value computation of this stage take the number of
+    // unexpected shifts; TopPICProgress calls the stage only when it is 2
     int shift_num = std::stoi(arguments["shiftNumber"]);
-    if (shift_num < 2) {
-      return 0;
-    }
     std::string resource_dir = arguments["resourceDir"];
     base_data::init(resource_dir);
 
@@ -545,8 +815,9 @@ int TopPIC_multi_ptm_search(std::map<std::string, std::string>& arguments) {
     // estimation of the multiple-shift pass.
     std::cout << "Multiple-shift top PrSM selecting - started" << std::endl;
     {
+      // the PrSMs of this stage and those of the stage before it
       std::vector<std::string> all_exts = {"toppic_multi_evalue",
-                                           "toppic_pre_raw_prsm"};
+                                           raw_prsm_ext};
       PrsmStrMergePtr all_merge_ptr = std::make_shared<PrsmStrMerge>(
           sp_file_name, all_exts, "toppic_multi_evalue_all",
           std::numeric_limits<int>::max(), false, false);
@@ -554,24 +825,28 @@ int TopPIC_multi_ptm_search(std::map<std::string, std::string>& arguments) {
       all_merge_ptr = nullptr;
     }
     prsm_top_selector::process(sp_file_name, "toppic_multi_evalue_all",
-                               "toppic_raw_prsm", n_top);
+                               "toppic_multi_ptm_raw_prsm", n_top);
     std::cout << "Multiple-shift top PrSM selecting - finished." << std::endl;
   } catch (const char* e) {
     std::cout << "[Exception]" << std::endl;
     std::cout << e << std::endl;
+    // the set is still the one this stage was given
+    return raw_prsm_ext;
   }
-  return 0;
+  return "toppic_multi_ptm_raw_prsm";
 }
 
 // Post-processing of the identifications. With -s 2 the set is the best PrSM
 // of every spectrum: the first-pass PrSM of the skipped spectra and, for the
 // searched spectra, the best of their first-pass and multiple-shift PrSMs
-// (toppic_raw_prsm); without -s 2 it is toppic_pre_raw_prsm. The set is
+// (toppic_multi_ptm_raw_prsm); without -s 2 it is toppic_pre_raw_prsm.
+// Either becomes toppic_raw_prsm, the name the steps below read. The set is
 // clustered and protein-corrected, recounted against the full spectra, then
 // post-matched (the added masses are in every later step), characterized
 // and given one FDR; the best PrSM of every spectrum is kept as
 // toppic_record_prsm, from which TopPIC_report writes the results.
-int TopPIC_postprocess(std::map<std::string, std::string>& arguments) {
+int TopPIC_postprocess(std::map<std::string, std::string>& arguments,
+                       const std::string& raw_prsm_ext) {
   try {
     std::string resource_dir = arguments["resourceDir"];
     base_data::init(resource_dir);
@@ -586,16 +861,32 @@ int TopPIC_postprocess(std::map<std::string, std::string>& arguments) {
     PrsmParaPtr prsm_para_ptr = std::make_shared<PrsmPara>(arguments);
     msalign_util::geneSpIndex(sp_file_name);
     std::string base_name = file_util::basename(sp_file_name);
-
-    // with -s 2 the multiple-shift stage wrote toppic_raw_prsm;
-    // otherwise the set is toppic_pre_raw_prsm, copied to that name --
-    // unconditionally, so that a toppic_raw_prsm left in the directory
-    // by an earlier -s 2 run is not picked up
+    // the E-value model of the cluster protein correction below. The PrSMs it
+    // scores carry the proteoform of their cluster's best PrSM: one of
+    // toppic's own, or with --topmg-identify one of the graph alignment's,
+    // which carries up to TopMG's own number of unexpected shifts. The
+    // generating function needs a table layer for every shift, so it takes
+    // the larger of the two numbers.
     int shift_num = std::stoi(arguments["shiftNumber"]);
-    if (shift_num < 2) {
-      file_util::copyFile(base_name + ".toppic_pre_raw_prsm",
-                          base_name + ".toppic_raw_prsm", true);
+    if (arguments["topmgIdentify"] == "true" &&
+        arguments["topmgShiftNumber"] != "") {
+      shift_num = std::max(shift_num, std::stoi(arguments["topmgShiftNumber"]));
     }
+    // The other proteins' PrSMs of a cluster whose best PrSM comes from the
+    // graph alignment are dropped, not corrected, only when the graph
+    // alignment's E-values come from MCMC (--topmg-use-mcmc): a corrected
+    // PrSM gets a generating-function E-value, which is not comparable with
+    // the MCMC one of the PrSM it would be counted with.
+    bool remove_topmg_others = arguments["topmgIdentify"] == "true" &&
+                               arguments["topmgUseMcmc"] == "true";
+
+    // raw_prsm_ext is the file the last stage that produced a PrSM set
+    // reported: toppic_pre_raw_prsm, or toppic_multi_ptm_raw_prsm after the
+    // multiple-shift stage. It is copied to toppic_raw_prsm, the name every
+    // step below reads, unconditionally, so that a toppic_raw_prsm left in
+    // the directory by an earlier run is never picked up.
+    file_util::copyFile(base_name + "." + raw_prsm_ext,
+                        base_name + ".toppic_raw_prsm", true);
 
     bool is_proteoform_ppm_error = (arguments["proteoformPpmError"] == "true");
     double proteoform_error_tole =
@@ -624,9 +915,10 @@ int TopPIC_postprocess(std::map<std::string, std::string>& arguments) {
 
     // In every proteoform cluster, the PrSMs whose protein differs from the
     // protein of the cluster's best-E-value PrSM (the same proteoform mass
-    // matched to another protein) get that PrSM's proteoform; their matched
-    // fragment numbers and E-values are recomputed on the spectra as the
-    // search read them (EnvCNN cutoff, deduplicated masses). The recount,
+    // matched to another protein) get that PrSM's proteoform and its tool;
+    // their matched fragment numbers and E-values are recomputed on the
+    // spectra as the search read them (EnvCNN cutoff, deduplicated masses).
+    // The recount,
     // the post mass matching, the PTM characterization and the FDR run on
     // the corrected PrSMs.
     std::cout << "Cluster protein correction - started." << std::endl;
@@ -638,8 +930,15 @@ int TopPIC_postprocess(std::map<std::string, std::string>& arguments) {
           prsm_para_ptr, shift_num,
           std::max(std::abs(max_shift_mass), std::abs(min_shift_mass)),
           var_ptm_type_num, std::stoi(arguments["threadNumber"]), "", "");
+      int removed_num = 0;
       int corrected_num = cluster_prot_corrector::process(
-          prsm_para_ptr, tdgf_mng_ptr, cur_suffix, "toppic_cluster_prot");
+          prsm_para_ptr, tdgf_mng_ptr, cur_suffix, "toppic_cluster_prot",
+          remove_topmg_others, &removed_num);
+      if (removed_num > 0) {
+        std::cout << "Cluster protein correction - removed " << removed_num
+                  << " PrSMs of other proteins in clusters whose best PrSM "
+                     "comes from the graph alignment." << std::endl;
+      }
       std::cout << "Cluster protein correction - corrected " << corrected_num
                 << " PrSMs." << std::endl;
     }
@@ -902,9 +1201,18 @@ int TopPIC_report(std::map<std::string, std::string>& arguments) {
 }
 
 int TopPICProgress(std::map<std::string, std::string>& arguments) {
-  TopPIC_identify(arguments);
-  TopPIC_multi_ptm_search(arguments);
-  TopPIC_postprocess(arguments);
+  std::string raw_prsm_ext = TopPIC_identify(arguments);
+  if (raw_prsm_ext.empty()) {
+    return 1;
+  }
+  // the multiple unexpected shifts stage is the -s 2 stage
+  if (std::stoi(arguments["shiftNumber"]) >= 2) {
+    raw_prsm_ext = TopPIC_multi_ptm_search(arguments, raw_prsm_ext);
+  }
+  if (arguments["topmgIdentify"] == "true") {
+    raw_prsm_ext = TopPIC_topmg_identify(arguments, raw_prsm_ext);
+  }
+  TopPIC_postprocess(arguments, raw_prsm_ext);
   TopPIC_report(arguments);
   return 0;
 }

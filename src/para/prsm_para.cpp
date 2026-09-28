@@ -131,6 +131,12 @@ PrsmPara::PrsmPara(const std::map<std::string, std::string>& arguments) {
   }
   // toppic hidden --disable-multi-type-align; default true
   use_multi_type_align_ = (getArg(arguments, "multiTypeAlign") != "false");
+
+  // the unexpected shifts of the proteoform-graph alignment: TopMG's own
+  // number, not the shiftNumber of toppic's stages; an absent key keeps 1
+  if (getArg(arguments, "topmgShiftNumber") != "") {
+    topmg_shift_num_ = std::stoi(getArg(arguments, "topmgShiftNumber"));
+  }
 }
 
 bool PrsmPara::allowProtType(const ProteoformTypePtr& type_ptr) const {

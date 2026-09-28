@@ -34,6 +34,9 @@ class PrsmStr {
 
   std::string getFileName() { return file_name_; }
 
+  // the search that found the PrSM, "toppic" or "topmg" (Prsm::getTool)
+  std::string getTool() { return tool_; }
+
   int getSpectrumId() { return spectrum_id_; }
 
   int getSpectrumScan() { return spectrum_scan_; }
@@ -154,6 +157,8 @@ class PrsmStr {
   std::vector<std::string> str_vec_;
 
   std::string file_name_;
+
+  std::string tool_ = "toppic";
 
   int spectrum_id_;
 

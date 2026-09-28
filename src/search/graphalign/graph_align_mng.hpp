@@ -17,6 +17,7 @@
 #define TOPPIC_SEARCH_GRAPHALIGN_GRAPH_ALIGN_MNG_HPP_
 
 #include <cmath>
+#include <set>
 #include <string>
 
 #include "para/prsm_para.hpp"
@@ -83,6 +84,14 @@ class GraphAlignMng {
   int thread_num_ = 1;
 
   bool whole_protein_only_ = false;
+
+  // The spectra to search, by spectrum id. A topmg run searches every
+  // spectrum of the file and leaves search_all_ true; toppic's
+  // --topmg-identify sets the list to the spectra its earlier stages have not
+  // identified and clears search_all_.
+  bool search_all_ = true;
+
+  std::set<int> search_spec_ids_;
 
   std::string input_file_ext_;
 

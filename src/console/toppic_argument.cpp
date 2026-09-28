@@ -53,6 +53,20 @@ std::map<std::string, std::string> ToppicArgument::initArguments() {
   arguments["useApproxSpectra"] = "false";
   arguments["variablePtmNum"] = "3";
   arguments["variablePtmFileName"] = "";
+  // TopMG's identification hosted in toppic, behind the hidden
+  // --topmg-identify option: TopMG's own defaults, so that the two agree
+  // when neither is set
+  arguments["topmgIdentify"] = "false";
+  // the E-values of that stage: the generating function of toppic's own
+  // stages, or with the hidden --topmg-use-mcmc TopMG's MCMC
+  arguments["topmgUseMcmc"] = "false";
+  arguments["topmgShiftNumber"] = "1";
+  // the results the ASF filtering of that stage keeps per spectrum, TopMG's
+  // own number; toppic's own stages keep filteringResultNumber
+  arguments["asfFilteringResultNumber"] = "15";
+  arguments["proteoGraphGap"] = "40";
+  arguments["varPtmNumInGap"] = "5";
+  arguments["useAsfDiag"] = "false";
   arguments["shiftNumber"] = "1";
   arguments["minShiftMass"] = "-500";
   arguments["maxShiftMass"] = "500";
@@ -319,6 +333,8 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
   std::string variable_ptm_num = "";
   std::string variable_ptm_file_name = "";
   std::string shift_num = "";
+  std::string topmg_shift_num = "";
+  std::string asf_filtering_result_num = "";
   std::string min_shift_mass = "";
   std::string max_shift_mass = "";
   std::string frag_error_tole = "";
@@ -532,7 +548,11 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
         "frag-mass-dedup", "")(
         "frag-extend-min-mass", po::value<std::string>(&frag_extend_min_mass),
         "")("multi-skip-evalue", po::value<std::string>(&multi_skip_evalue),
-            "")("disable-multi-type-align", "")(
+            "")("disable-multi-type-align", "")("topmg-identify", "")(
+        "topmg-use-mcmc", "")(
+        "topmg-num-shift", po::value<std::string>(&topmg_shift_num), "")(
+        "asf-filtering-result-number",
+        po::value<std::string>(&asf_filtering_result_num), "")(
         "filtering-result-number",
         po::value<std::string>(&filtering_result_num),
         "Filtering result number. Default value: 20.")(
@@ -728,6 +748,29 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
     // PsAlign search.
     if (vm.count("disable-multi-type-align")) {
       arguments_["multiTypeAlign"] = "false";
+    }
+
+    // hidden: run TopMG's identification - the ASF filtering with the
+    // variable modification file, the graph alignment, its post-processing,
+    // the MCMC E-value and the top PrSM selection - on the same spectra,
+    // after toppic's own identification stages
+    if (vm.count("topmg-identify")) {
+      arguments_["topmgIdentify"] = "true";
+    }
+    // hidden: compute the E-values of that stage with TopMG's MCMC instead
+    // of the generating function (TDGF)
+    if (vm.count("topmg-use-mcmc")) {
+      arguments_["topmgUseMcmc"] = "true";
+    }
+    // hidden: the unexpected shifts of that graph alignment, TopMG's own
+    // number, which --num-shift does not change
+    if (vm.count("topmg-num-shift")) {
+      arguments_["topmgShiftNumber"] = topmg_shift_num;
+    }
+    // hidden: the ASF filtering result number of that stage, TopMG's own,
+    // which --filtering-result-number does not change
+    if (vm.count("asf-filtering-result-number")) {
+      arguments_["asfFilteringResultNumber"] = asf_filtering_result_num;
     }
 
     if (vm.count("combine-result-only")) {
@@ -1138,6 +1181,36 @@ bool ToppicArgument::validateArguments() {
   } catch (const std::exception& ex) {
     LOG_ERROR("Fragment extension minimum mass " << frag_extend_min_mass
                                                  << " should be a number.");
+    return false;
+  }
+
+  // TopMG's identification (hidden --topmg-identify) searches whole proteins
+  // or whole proteins and their fragments; no other combination of the
+  // proteoform types is meaningful for its proteoform graphs
+  if (arguments_["topmgIdentify"] == "true") {
+    std::string prot_type = arguments_["allowProtType"];
+    if (prot_type != "COMPLETE,PREFIX,SUFFIX,INTERNAL" &&
+        prot_type != "COMPLETE") {
+      LOG_ERROR("Proteoform type "
+                << prot_type
+                << " error! With TopMG's identification, the value should be "
+                   "COMPLETE,PREFIX,SUFFIX,INTERNAL or COMPLETE!");
+      return false;
+    }
+    // its proteoform graphs carry no N-terminal label mass; the value has
+    // already been checked to be a non-negative number above
+    if (std::stod(arguments_["nTermLabelMass"]) != 0.0) {
+      LOG_ERROR("N-terminal label mass "
+                << arguments_["nTermLabelMass"]
+                << " error! With TopMG's identification, the value should be "
+                   "0!");
+      return false;
+    }
+  }
+  // the E-value method of TopMG's identification means nothing without it
+  if (arguments_["topmgUseMcmc"] == "true" &&
+      arguments_["topmgIdentify"] != "true") {
+    LOG_ERROR("--topmg-use-mcmc error! It needs --topmg-identify.");
     return false;
   }
 

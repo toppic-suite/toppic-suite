@@ -164,9 +164,9 @@ int TopMG_identify(std::map<std::string, std::string>& arguments) {
       }
     }
 
-    int shift_num = std::stoi(arguments["shiftNumber"]);
-    LOG_DEBUG("num of unknown shift " << shift_num);
-    int filter_result_num = std::stoi(arguments["filteringResultNumber"]);
+    // the ASF filtering keeps this many results per spectrum: TopMG's own
+    // number, not the filteringResultNumber of toppic's stages
+    int filter_result_num = std::stoi(arguments["asfFilteringResultNumber"]);
     double max_shift_mass = std::stod(arguments["maxShiftMass"]);
 
     int thread_num = std::stoi(arguments["threadNumber"]);
@@ -185,6 +185,10 @@ int TopMG_identify(std::map<std::string, std::string>& arguments) {
     msalign_util::geneSpIndex(sp_file_name);
 
     PrsmParaPtr prsm_para_ptr = std::make_shared<PrsmPara>(arguments);
+    // the unexpected shifts of the graph alignment: TopMG's own --num-shift,
+    // which is not toppic's shiftNumber (PrsmPara::getTopmgShiftNum)
+    int shift_num = prsm_para_ptr->getTopmgShiftNum();
+    LOG_DEBUG("num of unknown shift " << shift_num);
 
     // index file name
     IndexFileNamePtr file_name_ptr = std::make_shared<IndexFileName>();
@@ -222,7 +226,6 @@ int TopMG_identify(std::map<std::string, std::string>& arguments) {
           mem_check::getStageThreadNum("ASF-Diagonal PTM filtering",
                                        thread_num);
       LOG_DEBUG("Diagonal filter thread number " << diag_filter_thread_num);
-      filter_result_num = 15;
       DiagFilterMngPtr diag_filter_mng_ptr = std::make_shared<DiagFilterMng>(
           prsm_para_ptr, index_file_para, filter_result_num,
           diag_filter_thread_num, "topmg_multi_filter", var_mod_file_name, 1);
@@ -248,7 +251,8 @@ int TopMG_identify(std::map<std::string, std::string>& arguments) {
     int gap = std::stoi(arguments["proteoGraphGap"]);
     int var_ptm_in_gap =
         std::min(std::stoi(arguments["varPtmNumInGap"]), max_mod_num);
-    bool whole_protein_only = (arguments["wholeProteinOnly"] == "true");
+    // whole proteins only is the proteoform type COMPLETE alone
+    bool whole_protein_only = (arguments["allowProtType"] == "COMPLETE");
     GraphAlignMngPtr ga_mng_ptr = std::make_shared<GraphAlignMng>(
         prsm_para_ptr, var_mod_file_name, shift_num, max_mod_num, gap,
         var_ptm_in_gap, max_shift_mass, thread_num, whole_protein_only,

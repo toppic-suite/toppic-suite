@@ -142,8 +142,8 @@ void TopmgWindow::on_defaultButton_clicked() {
   ui->cutoffProteinTypeComboBox->setCurrentIndex(0);
   // number of variable PTMs: 5
   ui->numModComboBox->setCurrentIndex(4);
-  // number of unknown mass shifts: 0
-  ui->numUnknownShiftComboBox->setCurrentIndex(0);
+  // number of unknown mass shifts: 1, TopMG's own number (topmgShiftNumber)
+  ui->numUnknownShiftComboBox->setCurrentIndex(1);
   ui->NONECheckBox->setChecked(true);
   ui->NMECheckBox->setChecked(true);
   ui->NMEACCheckBox->setChecked(true);
@@ -287,7 +287,7 @@ std::map<std::string, std::string> TopmgWindow::getArguments() {
     arguments_["fixedMod"] = ui->fixedModFileEdit->text().toStdString();
   }
   arguments_["varPtmNumber"] = ui->numModComboBox->currentText().toStdString();
-  arguments_["shiftNumber"] =
+  arguments_["topmgShiftNumber"] =
       ui->numUnknownShiftComboBox->currentText().toStdString();
   arguments_["fragErrorTolerance"] =
       ui->errorToleranceEdit->text().toStdString();
@@ -328,7 +328,7 @@ std::map<std::string, std::string> TopmgWindow::getArguments() {
   arguments_["maxShiftMass"] = ui->maxModEdit->text().toStdString();
   arguments_["proteoGraphGap"] = ui->maxGapLength->text().toStdString();
   arguments_["varPtmNumber"] = ui->numModComboBox->currentText().toStdString();
-  arguments_["shiftNumber"] =
+  arguments_["topmgShiftNumber"] =
       ui->numUnknownShiftComboBox->currentText().toStdString();
   arguments_["varPtmNumInGap"] = ui->maxVarPTMGap->text().toStdString();
   arguments_["varModFileName"] = ui->modFileEdit->text().toStdString();
@@ -353,10 +353,11 @@ std::map<std::string, std::string> TopmgWindow::getArguments() {
   } else {
     arguments_["useAsfDiag"] = "false";
   }
+  // whole proteins only is the proteoform type COMPLETE alone
   if (ui->wholeProteinCheckBox->isChecked()) {
-    arguments_["wholeProteinOnly"] = "true";
+    arguments_["allowProtType"] = "COMPLETE";
   } else {
-    arguments_["wholeProteinOnly"] = "false";
+    arguments_["allowProtType"] = "COMPLETE,PREFIX,SUFFIX,INTERNAL";
   }
   // showArguments();
   return arguments_;
@@ -678,7 +679,7 @@ void TopmgWindow::showArguments() {
        "\ncombinedOutputName:" + arguments_["combinedOutputName"] +
        "\nactivation:" + arguments_["activation"] + "\nsearchType:" +
        arguments_["searchType"] + "\nfixedMod:" + arguments_["fixedMod"] +
-       "\nshiftNumber:" + arguments_["shiftNumber"] +
+       "\ntopmgShiftNumber:" + arguments_["topmgShiftNumber"] +
        "\nprecErrorTolerance:" + arguments_["precErrorTolerance"] +
        "\nfragErrorTolerance:" + arguments_["fragErrorTolerance"] +
        "\nformErrorTolerance:" + arguments_["proteoformErrorTolerance"] +
@@ -693,7 +694,7 @@ void TopmgWindow::showArguments() {
        "\nmaxShiftMass:" + arguments_["maxShiftMass"] +
        "\nkeepTempFiles:" + arguments_["keepTempFiles"] +
        "\ngroupSpectrumNumber:" + arguments_["groupSpectrumNumber"] +
-       "\nfilteringResultNumber:" + arguments_["filteringResultNumber"] +
+       "\nasfFilteringResultNumber:" + arguments_["asfFilteringResultNumber"] +
        "\nvarModFileName:" + arguments_["varModFileName"] +
        "\nthreadNumber:" + arguments_["threadNumber"] + "\nuseFeatureFile:" +
        arguments_["useFeatureFile"] + "\nskipList:" + arguments_["skipList"] +

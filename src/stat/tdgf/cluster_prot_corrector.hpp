@@ -31,18 +31,34 @@ namespace cluster_prot_corrector {
 // differs from the protein of the cluster's PrSM with the lowest E-value
 // (ties: the lowest sequence name) are the same proteoform mass matched to
 // another protein; each of them is given the best PrSM's proteoform (and
-// its mass as adjusted precursor mass), and its matched experimental and
+// its mass as adjusted precursor mass) and tool (toppic or topmg, so that it
+// is counted with the best PrSM's search in the per-search FDR), and its
+// matched experimental and
 // theoretical fragment numbers and its E-value (the generating-function
 // method of tdgf_mng_ptr) are recomputed on its spectra read as the search
 // and the E-value computation read them: the masses below the EnvCNN score
 // cutoff (SpPara::getEnvCnnCutoff) removed and, with --frag-mass-dedup, the
 // close masses combined (SpPara::getFragDedupPpo). The matched numbers are
 // only for the E-value: TopPIC_postprocess recounts every PrSM against the
-// full spectra afterwards. All PrSMs are written, in the input order, to
-// <base>.<output_file_ext>. Returns the number of corrected PrSMs.
+// full spectra afterwards.
+//
+// A graph-alignment proteoform (TopMG's variable PTMs and unexpected shifts)
+// is scored like any other, so tdgf_mng_ptr needs a table layer for every
+// unexpected shift it may carry (toppic sets max(-s, --topmg-num-shift)).
+// One exception, remove_topmg_others (toppic's --topmg-use-mcmc): when the
+// cluster's best PrSM comes from the graph alignment (its tool element is
+// topmg) and so has an MCMC E-value, the PrSMs of the other proteins are
+// dropped rather than given a generating-function E-value that would be
+// counted against the MCMC ones; the cluster keeps the graph alignment's own
+// protein.
+//
+// The surviving PrSMs are written, in the input order, to
+// <base>.<output_file_ext>. Returns the number of corrected PrSMs, and sets
+// *removed_num, when it is given, to the number dropped.
 int process(const PrsmParaPtr& prsm_para_ptr, const TdgfMngPtr& tdgf_mng_ptr,
             const std::string& input_file_ext,
-            const std::string& output_file_ext);
+            const std::string& output_file_ext, bool remove_topmg_others,
+            int* removed_num = nullptr);
 
 }  // namespace cluster_prot_corrector
 

@@ -73,6 +73,15 @@ class PrsmPara {
   // falls back to the original one-pass-per-type PsAlign.
   bool useMultiTypeAlign() const { return use_multi_type_align_; }
 
+  // The number of unexpected mass shifts of TopMG's proteoform-graph
+  // alignment, separate from toppic's --num-shift, which governs toppic's own
+  // one-shift and multiple-shift stages. topmg sets it with its --num-shift
+  // (default 1); toppic sets it with the hidden --topmg-num-shift of its
+  // --topmg-identify stage.
+  int getTopmgShiftNum() const { return topmg_shift_num_; }
+
+  void setTopmgShiftNum(int shift_num) { topmg_shift_num_ = shift_num; }
+
  private:
   std::string ori_db_name_;
 
@@ -96,6 +105,8 @@ class PrsmPara {
   SpParaPtr sp_para_ptr_;
 
   bool use_multi_type_align_ = true;
+
+  int topmg_shift_num_ = 1;
 };
 
 using PrsmParaPtr = std::shared_ptr<PrsmPara>;
