@@ -405,9 +405,6 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
         "max-shift,M", po::value<std::string>(&max_shift_mass),
         "Maximum value of the mass shift of an unexpected modification. "
         "Default value: 500 Dalton.")
-        //("n-terminal-label,N", po::value<std::string> (&n_term_label_mass),
-        //"N-terminal modification mass for iTRAQ or TMT labeling. Default
-        // value: 0")
         ("variable-ptm-num,S", po::value<std::string>(&variable_ptm_num),
          "Maximum number of variable modifications in a "
          "proteoform-spectrum-match. Default value: 3.")(
