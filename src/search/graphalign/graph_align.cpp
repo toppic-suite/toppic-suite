@@ -527,7 +527,7 @@ void GraphAlign::geneHeaders() {
   for (size_t i = 0; i < diag_headers_.size(); i++) {
     double n_shift = diag_headers_[i]->getProtNTermShift();
     double prec_mono_mass =
-        spec_graph_ptr_->getSpectrumSetPtr()->getPrecMonoMass();
+        spec_graph_ptr_->getSpectrumSetPtr()->getLabelFreePrecMonoMass();
     double c_shift =
         prec_mono_mass -
         proteo_graph_ptr_->getProteoformPtr()->getResSeqPtr()->getSeqMass() -

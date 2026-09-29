@@ -156,7 +156,9 @@ void CompPValueArray::compSingleExpectedValue(const DeconvMsPtrVec& ms_ptr_vec,
                                               const PrsmPtr& prsm_ptr,
                                               double ppo,
                                               double n_term_label_mass) {
-  double refine_prec_mass = prsm_ptr->getAdjustedPrecMass();
+  // the adjusted precursor mass of a PrSM is label-free (toppic -N); the PRM
+  // spectra are built from the observed one and subtract the label
+  double refine_prec_mass = prsm_ptr->getAdjustedPrecMass() + n_term_label_mass;
   DeconvMsPtrVec refine_ms_ptr_vec =
       deconv_ms_util::getRefineMsPtrVec(ms_ptr_vec, refine_prec_mass);
 

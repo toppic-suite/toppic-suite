@@ -59,7 +59,9 @@ double compScore(const ExtendMsPtr& ms_ptr, const ProteoformPtr& proteo_ptr,
   IonTypePtr n_ion_type_ptr = activation->getNIonTypePtr();
   std::vector<double> masses =
       proteo_ptr->getBpSpecPtr()->getBreakPointMasses(n_ion_type_ptr);
-  double score = compDiagScr(ms_ptr, masses, n_shift);
+  // the N-terminal fragments of a labeled run (toppic -N) carry the label
+  double score = compDiagScr(
+      ms_ptr, masses, n_shift + header_ptr->getNTermLabelMass());
 
   IonTypePtr c_ion_type_ptr = activation->getCIonTypePtr();
   masses = proteo_ptr->getBpSpecPtr()->getBreakPointMasses(c_ion_type_ptr);
@@ -181,7 +183,10 @@ ZpFastMatchPtr computeInternalMatch(const ExtendMsPtrVec& ms_ptr_vec,
       double c_term_shift = prms[mass_end] - prms[prms.size() - 1];
       double cur_score = 0;
       for (size_t i = 0; i < ms_ptr_vec.size(); i++) {
-        cur_score += compDiagScr(ms_ptr_vec[i], n_masses, n_term_shift);
+        double n_term_label_mass =
+            ms_ptr_vec[i]->getMsHeaderPtr()->getNTermLabelMass();
+        cur_score += compDiagScr(ms_ptr_vec[i], n_masses,
+                                 n_term_shift + n_term_label_mass);
         cur_score += compDiagScr(ms_ptr_vec[i], c_masses, c_term_shift);
       }
 

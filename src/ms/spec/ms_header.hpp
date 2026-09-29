@@ -65,6 +65,13 @@ class MsHeader {
 
   ActivationPtr getActivationPtr() const { return activation_ptr_; }
 
+  // The N-terminal label mass (toppic -N) of an extended spectrum: the
+  // precursor mass of its header is then the label-free one, and its
+  // N-terminal fragment masses still carry the label, which the matching of
+  // theoretical N-terminal ions adds back (see extend_ms_factory). 0 for the
+  // other spectra.
+  double getNTermLabelMass() const { return n_term_label_mass_; }
+
   // get functions for precursor
   int getPrecNum() const { return prec_ptr_vec_.size(); }
 
@@ -133,6 +140,10 @@ class MsHeader {
     activation_ptr_ = std::move(acti_ptr);
   }
 
+  void setNTermLabelMass(double n_term_label_mass) {
+    n_term_label_mass_ = n_term_label_mass;
+  }
+
   // set function for precursor
   void setSinglePrecPtr(const PrecursorPtr& prec_ptr);
 
@@ -186,6 +197,8 @@ class MsHeader {
   double prec_target_mz_ = -1;
   // activation type
   ActivationPtr activation_ptr_;
+  // N-terminal label mass of an extended spectrum (getNTermLabelMass)
+  double n_term_label_mass_ = 0;
 
   // Precursor information
   PrecursorPtrVec prec_ptr_vec_;

@@ -185,8 +185,9 @@ void DprProcessor::process() {
     MsHeaderPtr header_ptr = deconv_ms_ptr_vec[0]->getMsHeaderPtr();
     if (header_ptr->containsPrec()) {
       deconv_ms_util::keepTopPeaks(deconv_ms_ptr_vec, peak_num_limit);
-      double prec_mono_mass = header_ptr->getFirstPrecMonoMass() -
-                              sp_para_ptr_->getNTermLabelMass();
+      // the observed precursor mass: the spectrum set subtracts the N-terminal
+      // label (toppic -N) itself, for its PRM and extended spectra
+      double prec_mono_mass = header_ptr->getFirstPrecMonoMass();
       SpectrumSetPtr spec_set_ptr = spectrum_set_factory::geneSpectrumSetPtr(
           deconv_ms_ptr_vec, sp_para_ptr_, prec_mono_mass);
 

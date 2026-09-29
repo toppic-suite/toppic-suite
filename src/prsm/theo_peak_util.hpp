@@ -33,9 +33,12 @@ TheoPeakPtrVec geneTheoPeak(const BpSpecPtr& bp_spec_ptr,
                             double n_term_shift, double c_term_shift, int bgn,
                             int end, double min_mass, double max_mass);
 
+// n_term_label_mass: the N-terminal label (toppic -N), which every
+// N-terminal ion carries and the proteoform does not
 TheoPeakPtrVec geneProteoformTheoPeak(const ProteoformPtr& proteoform_ptr,
                                       const ActivationPtr& activation_ptr,
-                                      double min_mass);
+                                      double min_mass,
+                                      double n_term_label_mass = 0);
 
 }  // namespace theo_peak_util
 

@@ -27,10 +27,14 @@ namespace toppic {
 
 namespace diagonal_util {
 
+// header_ptr: the header of the extended spectrum the peaks are matched
+// with; its activation gives the ion types and its N-terminal label (toppic
+// -N) is carried by the N-terminal ions
 inline TheoPeakPtrVec getDiagonalTheoPeak(const ProteoformPtr& proteo_ptr,
-                                          const ActivationPtr& activation_ptr,
+                                          const MsHeaderPtr& header_ptr,
                                           const DiagHeaderPtrVec& header_ptrs,
                                           int i, double min_mass) {
+  ActivationPtr activation_ptr = header_ptr->getActivationPtr();
   DiagHeaderPtr first_header_ptr = header_ptrs[0];
   DiagHeaderPtr last_header_ptr = header_ptrs[header_ptrs.size() - 1];
   int first_res_pos = first_header_ptr->getTruncFirstResPos();
@@ -40,7 +44,8 @@ inline TheoPeakPtrVec getDiagonalTheoPeak(const ProteoformPtr& proteo_ptr,
   BpSpecPtr pep_ptr = std::make_shared<BpSpec>(subseq_ptr);
   double pep_n_term_shift = header_ptrs[i]->getProtNTermShift() -
                             first_header_ptr->getProtNTermShift() +
-                            first_header_ptr->getPepNTermShift();
+                            first_header_ptr->getPepNTermShift() +
+                            header_ptr->getNTermLabelMass();
   double pep_c_term_shift = header_ptrs[i]->getProtCTermShift() -
                             last_header_ptr->getProtCTermShift() +
                             last_header_ptr->getPepCTermShift();
@@ -103,7 +108,7 @@ double refinePrecursorAndHeaderShift(const ProteoformPtr& proteo_ptr,
   for (size_t i = 0; i < header_ptrs.size() - 1; i++) {
     for (size_t j = 0; j < ms_three_ptr_vec.size(); j++) {
       TheoPeakPtrVec theo_peak_ptrs = getDiagonalTheoPeak(
-          proteo_ptr, ms_three_ptr_vec[j]->getMsHeaderPtr()->getActivationPtr(),
+          proteo_ptr, ms_three_ptr_vec[j]->getMsHeaderPtr(),
           header_ptrs, i, min_mass);
       TheoPeakPtrVec c_term_peak_ptrs = getCTermTheoPeakPtrs(theo_peak_ptrs);
 
@@ -120,7 +125,7 @@ double refinePrecursorAndHeaderShift(const ProteoformPtr& proteo_ptr,
   /* for last diagonal, obtain the distribution of errors of n-term ions */
   for (size_t j = 0; j < ms_three_ptr_vec.size(); j++) {
     TheoPeakPtrVec theo_peak_ptrs = getDiagonalTheoPeak(
-        proteo_ptr, ms_three_ptr_vec[j]->getMsHeaderPtr()->getActivationPtr(),
+        proteo_ptr, ms_three_ptr_vec[j]->getMsHeaderPtr(),
         header_ptrs, header_ptrs.size() - 1, min_mass);
     TheoPeakPtrVec n_term_peak_ptrs = getNTermTheoPeakPtrs(theo_peak_ptrs);
 
@@ -181,7 +186,7 @@ DiagHeaderPtrVec refineHeadersBgnEnd(const ProteoformPtr& proteo_ptr,
     PeakIonPairPtrVec pair_ptrs;
     for (size_t j = 0; j < ms_three_ptr_vec.size(); j++) {
       TheoPeakPtrVec theo_peak_ptrs = getDiagonalTheoPeak(
-          proteo_ptr, ms_three_ptr_vec[j]->getMsHeaderPtr()->getActivationPtr(),
+          proteo_ptr, ms_three_ptr_vec[j]->getMsHeaderPtr(),
           header_ptrs, i, min_mass);
       PeakIonPairPtrVec cur_pair_ptrs = peak_ion_pair_util::findPairs(
           ms_three_ptr_vec[j], theo_peak_ptrs, bgn, end, 0);
@@ -233,7 +238,7 @@ DiagHeaderPtrVec refineVarPtmHeadersBgnEnd(
     PeakIonPairPtrVec pair_ptrs;
     for (size_t j = 0; j < ms_three_ptr_vec.size(); j++) {
       TheoPeakPtrVec theo_peak_ptrs = getDiagonalTheoPeak(
-          proteo_ptr, ms_three_ptr_vec[j]->getMsHeaderPtr()->getActivationPtr(),
+          proteo_ptr, ms_three_ptr_vec[j]->getMsHeaderPtr(),
           header_ptrs, i, min_mass);
       PeakIonPairPtrVec cur_pair_ptrs = peak_ion_pair_util::findPairs(
           ms_three_ptr_vec[j], theo_peak_ptrs, bgn, end, 0);
@@ -298,7 +303,7 @@ DiagHeaderPtrVec2D refineHeadersBgnEnd(const ProteoformPtr& proteo_ptr,
       for (size_t k = 0; k < ms_three_ptr_vec.size(); k++) {
         TheoPeakPtrVec theo_peak_ptrs = getDiagonalTheoPeak(
             proteo_ptr,
-            ms_three_ptr_vec[k]->getMsHeaderPtr()->getActivationPtr(),
+            ms_three_ptr_vec[k]->getMsHeaderPtr(),
             header_ptrs_1d, index, min_mass);
         PeakIonPairPtrVec cur_pair_ptrs = peak_ion_pair_util::findPairs(
             ms_three_ptr_vec[k], theo_peak_ptrs, bgn, end, 0);
