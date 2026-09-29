@@ -502,8 +502,9 @@ instead of the input. Facts to keep straight:
   the recount that follows replaces the matched numbers with full-spectrum
   counts (a `TdgfMng` built from the same values as the search's, with
   `varPtmTypeNum` from the argument map, 0 if absent, and, with
-  `--topmg-identify`, max(`-s`, `--topmg-num-shift`) unexpected shifts, since
-  a graph-alignment proteoform is corrected like any other). A corrected PrSM
+  `--topmg pipeline` or `topmg-only`, max(`-s`, `--topmg-num-shift`)
+  unexpected shifts, since a graph-alignment proteoform is corrected like
+  any other). A corrected PrSM
   also takes the best PrSM's `<tool>` (toppic or topmg), so the per-search
   FDR counts it with that search. Only with `--topmg-use-mcmc` are the other
   proteins' PrSMs of a cluster whose best PrSM comes from the graph alignment
@@ -603,11 +604,13 @@ instead of the input. Facts to keep straight:
   → `toppic_form_cutoff_form` / `toppic_prot_cutoff` → `toppic_prot_cutoff_prot`.
   Do not reintroduce a separate FDR for the multiple-shift PrSMs: with the
   skipped targets missing from its denominator it under-reports (toppic_test
-  reports 0023/0024). With the hidden `--topmg-identify`,
+  reports 0023/0024). TopMG's identification is hosted behind the hidden
+  `--topmg <disabled|pipeline|topmg-only>` (argument key `topmgMode`,
+  default `disabled`; any other value is refused). With `pipeline`,
   `TopPIC_topmg_identify` runs after the multiple-shift stage on the spectra
   the earlier stages left unidentified and hands `toppic_topmg_raw_prsm` to
-  `TopPIC_postprocess`; with the hidden `--topmg-only` (which implies it and
-  needs `-b`) `TopPICProgress` skips `TopPIC_identify` and
+  `TopPIC_postprocess`; with `topmg-only` (which needs `-b`)
+  `TopPICProgress` skips `TopPIC_identify` and
   `TopPIC_multi_ptm_search` altogether, runs `TopPIC_init` (start time,
   argument echo, base data, feature file check) and sets `varPtmTypeNum`
   from the modification file itself, and `TopPIC_topmg_identify` searches

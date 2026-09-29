@@ -77,7 +77,7 @@ class PrsmPara {
   // alignment, separate from toppic's --num-shift, which governs toppic's own
   // one-shift and multiple-shift stages. topmg sets it with its --num-shift
   // (default 1); toppic sets it with the hidden --topmg-num-shift of its
-  // --topmg-identify stage.
+  // --topmg stage.
   int getTopmgShiftNum() const { return topmg_shift_num_; }
 
   void setTopmgShiftNum(int shift_num) { topmg_shift_num_ = shift_num; }
