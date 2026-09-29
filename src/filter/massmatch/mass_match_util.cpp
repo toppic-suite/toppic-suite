@@ -746,26 +746,42 @@ ProtCandidatePtrVec findVarPtmTopProteins(
   return proteins;
 }
 
+// The noted rows are marked in a bit set of the index's rows and read back
+// in ascending order, which also groups them by proteoform, and a count per
+// proteoform gives the ranges. Putting each row into a list of its
+// proteoform and sorting the lists cost 39 ns a row, a cache miss or two
+// each, for 20,000 rows per spectrum and block with four PTMs (toppic_test
+// experiment 77). The row scan this replaced visited the rows of a
+// proteoform in ascending order, and the search below keeps the first pair
+// with the best score, so the order is part of the result.
 void compPrecMatchRows(const MassMatchPtr& index_ptr,
                        const std::vector<int>& prec_rows,
-                       std::vector<std::vector<int>>& prec_match_rows) {
+                       PrecMatchRows& prec_match_rows) {
   const std::vector<int>& row_proteo_ids = index_ptr->getRowProteoIds();
   size_t proteo_num = index_ptr->getProteoRowBegins().size();
-  if (prec_match_rows.size() != proteo_num) {
-    prec_match_rows.resize(proteo_num);
-  }
-  for (size_t i = 0; i < proteo_num; i++) {
-    prec_match_rows[i].clear();
-  }
+  size_t word_num = (row_proteo_ids.size() + 63) / 64;
+  std::vector<uint64_t>& words = prec_match_rows.words_;
+  words.assign(word_num, 0);
   for (size_t i = 0; i < prec_rows.size(); i++) {
-    prec_match_rows[row_proteo_ids[prec_rows[i]]].push_back(prec_rows[i]);
+    int row = prec_rows[i];
+    words[row >> 6] |= uint64_t{1} << (row & 63);
   }
-  // the row scan this replaces visited the rows of a proteoform in ascending
-  // order, and the search below keeps the first pair with the best score
-  for (size_t i = 0; i < proteo_num; i++) {
-    if (prec_match_rows[i].size() > 1) {
-      std::sort(prec_match_rows[i].begin(), prec_match_rows[i].end());
+  std::vector<int>& rows = prec_match_rows.rows_;
+  rows.clear();
+  for (size_t w = 0; w < word_num; w++) {
+    uint64_t word = words[w];
+    while (word != 0) {
+      rows.push_back(static_cast<int>(w * 64) + __builtin_ctzll(word));
+      word &= word - 1;
     }
+  }
+  std::vector<int>& begins = prec_match_rows.begins_;
+  begins.assign(proteo_num + 1, 0);
+  for (size_t i = 0; i < rows.size(); i++) {
+    begins[row_proteo_ids[rows[i]] + 1]++;
+  }
+  for (size_t i = 0; i < proteo_num; i++) {
+    begins[i + 1] += begins[i];
   }
 }
 
@@ -813,8 +829,8 @@ const double kVarPtmWindowPad = 1e-4;
 // only a strictly higher score replaces the best pair.
 ProtCandidatePtrVec findVarPtmTopProteins(
     const std::vector<short>& scores, const std::vector<short>& rev_scores,
-    const std::vector<std::vector<int>>& prec_match_rows_2d,
-    const std::vector<std::vector<int>>& rev_prec_match_rows_2d,
+    const PrecMatchRows& prec_match_rows_2d,
+    const PrecMatchRows& rev_prec_match_rows_2d,
     const MassMatchPtr& index_ptr, const MassMatchPtr& rev_index_ptr,
     double prec_minus_water_mass, double prec_error_tole,
     std::vector<double>& ptm_shifts, int threshold, int top_num) {
@@ -834,13 +850,19 @@ ProtCandidatePtrVec findVarPtmTopProteins(
   std::vector<int> cand_pos;
 
   BoundedProtScores best(top_num);
-  for (size_t i = 0; i < prec_match_rows_2d.size(); i++) {
-    const std::vector<int>& prec_match_rows = prec_match_rows_2d[i];
-    const std::vector<int>& rev_prec_match_rows = rev_prec_match_rows_2d[i];
-    if (prec_match_rows.empty() || rev_prec_match_rows.empty()) {
+  const std::vector<int>& begins = prec_match_rows_2d.begins_;
+  const std::vector<int>& rev_begins = rev_prec_match_rows_2d.begins_;
+  size_t proteo_num = begins.size() - 1;
+  for (size_t i = 0; i < proteo_num; i++) {
+    if (begins[i] == begins[i + 1] || rev_begins[i] == rev_begins[i + 1]) {
       continue;
     }
-    size_t rev_num = rev_prec_match_rows.size();
+    // the rows of proteoform i in the two indexes, in ascending order
+    const int* prec_match_rows = prec_match_rows_2d.rows_.data() + begins[i];
+    size_t row_num = begins[i + 1] - begins[i];
+    const int* rev_prec_match_rows =
+        rev_prec_match_rows_2d.rows_.data() + rev_begins[i];
+    size_t rev_num = rev_begins[i + 1] - rev_begins[i];
     int max_rev_score = 0;
     for (size_t k = 0; k < rev_num; k++) {
       int rev_score = rev_scores[rev_prec_match_rows[k]];
@@ -858,7 +880,7 @@ ProtCandidatePtrVec findVarPtmTopProteins(
     int best_score = 0;
     double best_n_trunc_shift = 0;
     double best_c_trunc_shift = 0;
-    for (size_t j = 0; j < prec_match_rows.size(); j++) {
+    for (size_t j = 0; j < row_num; j++) {
       int score_j = scores[prec_match_rows[j]];
       if (score_j + max_rev_score <= best_score) {
         continue;

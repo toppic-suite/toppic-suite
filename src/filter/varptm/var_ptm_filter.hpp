@@ -18,6 +18,7 @@
 
 #include "filter/massmatch/filter_spec.hpp"
 #include "filter/massmatch/mass_match.hpp"
+#include "filter/massmatch/mass_match_util.hpp"
 #include "filter/mng/var_ptm_filter_mng.hpp"
 #include "ms/spec/prm_ms.hpp"
 #include "prsm/simple_prsm.hpp"
@@ -65,10 +66,10 @@ class VarPtmFilter {
   std::vector<int> diag_prec_rows_;
   std::vector<int> rev_term_prec_rows_;
   std::vector<int> rev_diag_prec_rows_;
-  std::vector<std::vector<int>> term_rows_2d_;
-  std::vector<std::vector<int>> diag_rows_2d_;
-  std::vector<std::vector<int>> rev_term_rows_2d_;
-  std::vector<std::vector<int>> rev_diag_rows_2d_;
+  mass_match_util::PrecMatchRows term_rows_2d_;
+  mass_match_util::PrecMatchRows diag_rows_2d_;
+  mass_match_util::PrecMatchRows rev_term_rows_2d_;
+  mass_match_util::PrecMatchRows rev_diag_rows_2d_;
 
   MassMatchPtr diag_index_ptr_;
   MassMatchPtr rev_diag_index_ptr_;
