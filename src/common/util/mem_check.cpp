@@ -62,8 +62,9 @@ const std::map<std::string, double> memory_per_thread_list{
     // the stage's peak memory inside the machine (toppic_test experiment 66
     // measured 14.0 gb peak at 12 threads on a 14 gb machine without this).
     // The variable PTM filter reads the same four files per block and
-    // budgets with this entry too (experiment 77: 13.8 gb peak and swapping
-    // at 13 threads on the same machine with the 1.0 gb entry)
+    // budgets with this entry too (toppic_test report 0077_bfb05226: 13.8
+    // gb peak and swapping at 13 threads on a 14 gb machine with the 1.0 gb
+    // entry)
     {"zero_shift_filter", 1.25},
     // diag filter memory requirement per thread: about 0.4 gb
     {"diag_filter", 0.5}};

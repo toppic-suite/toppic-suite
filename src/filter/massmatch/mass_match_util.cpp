@@ -751,7 +751,7 @@ ProtCandidatePtrVec findVarPtmTopProteins(
 // proteoform gives the ranges. Putting each row into a list of its
 // proteoform and sorting the lists cost 39 ns a row, a cache miss or two
 // each, for 20,000 rows per spectrum and block with four PTMs (toppic_test
-// experiment 77). The row scan this replaced visited the rows of a
+// report 0077_bfb05226). The row scan this replaced visited the rows of a
 // proteoform in ascending order, and the search below keeps the first pair
 // with the best score, so the order is part of the result.
 void compPrecMatchRows(const MassMatchPtr& index_ptr,
@@ -844,7 +844,7 @@ inline void sortRevRows(const int* rev_rows, size_t rev_num,
 // the highest score. The pair loop tests every pair against every PTM shift,
 // which with the 35 shifts of four PTMs was nearly all of the stage: almost
 // no pair matches, so the loop runs through all the shifts for almost every
-// pair (toppic_test experiment 77). The masses that can match are the
+// pair (toppic_test report 0077_bfb05226). The masses that can match are the
 // windows [min_mass - shift, max_mass - shift], one per PTM shift, which
 // depend on the spectrum only and span a few hundred Da. For a row j of the
 // first index the rows of the second index that put the mass inside that
