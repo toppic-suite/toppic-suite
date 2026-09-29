@@ -36,12 +36,25 @@ class CompShiftLowMem {
                                               int total, int minimum_gap);
 
  private:
+  // A kept shift: its bin (an index of num_ until the end of the call) and its
+  // count.
+  struct Shift {
+    int bin;
+    int count;
+  };
+
   std::vector<short> num_;
+  // The best shifts of the current call, count decreasing, at most total + 1
+  // entries; reused by the calls of a thread like num_, so that checkShift
+  // allocates nothing.
+  std::vector<Shift> best_;
+
   std::vector<std::vector<int>> findBestShift(const std::vector<int>& a,
                                               const std::vector<int>& b,
                                               int total, int minimum_gap);
-  int checkShift(std::vector<std::vector<int>>& best_shifts, int d, int cur_min,
-                 int total, int min_gap);
+  void initBestShifts(int total);
+  std::vector<std::vector<int>> getBestShifts(int min_d);
+  int checkShift(int d, int cur_min, int total, int min_gap);
 
   void resetNumbers(const std::vector<int>& a, const std::vector<int>& errors,
                     const std::vector<int>& b);
