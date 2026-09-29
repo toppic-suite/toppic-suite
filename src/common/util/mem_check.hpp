@@ -35,6 +35,14 @@ int getMaxThreads(const std::string& app_name);
 // the start of the run.
 int getStageThreadNum(const std::string& stage_name, int thread_num);
 
+// The thread number of the graph alignment of topmg and of toppic's --topmg:
+// a thread holds one alignment's DP table, consistent pairs and proteoform
+// graph, whose size grows with the table's layer number, (unexpected shift
+// number + 1) x (variable modification number + 1). The budget per thread
+// is applied to the memory available now and lowered to thread_num; the
+// function reports the number when it is lower.
+int getGraphAlignThreadNum(int thread_num, int layer_num);
+
 double getTotalMemInGb();
 
 double getAvailMemInGb();
