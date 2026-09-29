@@ -18,6 +18,7 @@
 #include <algorithm>
 #include <atomic>
 #include <filesystem>
+#include <functional>
 #include <iostream>
 #include <limits>
 
@@ -745,33 +746,117 @@ ProtCandidatePtrVec findVarPtmTopProteins(
   return proteins;
 }
 
+// The noted rows are marked in a bit set of the index's rows and read back
+// in ascending order, which also groups them by proteoform, and a count per
+// proteoform gives the ranges. Putting each row into a list of its
+// proteoform and sorting the lists cost 39 ns a row, a cache miss or two
+// each, for 20,000 rows per spectrum and block with four PTMs (toppic_test
+// report 0077_bfb05226). The row scan this replaced visited the rows of a
+// proteoform in ascending order, and the search below keeps the first pair
+// with the best score, so the order is part of the result.
 void compPrecMatchRows(const MassMatchPtr& index_ptr,
                        const std::vector<int>& prec_rows,
-                       std::vector<std::vector<int>>& prec_match_rows) {
+                       PrecMatchRows& prec_match_rows) {
   const std::vector<int>& row_proteo_ids = index_ptr->getRowProteoIds();
   size_t proteo_num = index_ptr->getProteoRowBegins().size();
-  if (prec_match_rows.size() != proteo_num) {
-    prec_match_rows.resize(proteo_num);
-  }
-  for (size_t i = 0; i < proteo_num; i++) {
-    prec_match_rows[i].clear();
-  }
+  size_t word_num = (row_proteo_ids.size() + 63) / 64;
+  std::vector<uint64_t>& words = prec_match_rows.words_;
+  words.assign(word_num, 0);
   for (size_t i = 0; i < prec_rows.size(); i++) {
-    prec_match_rows[row_proteo_ids[prec_rows[i]]].push_back(prec_rows[i]);
+    int row = prec_rows[i];
+    words[row >> 6] |= uint64_t{1} << (row & 63);
   }
-  // the row scan this replaces visited the rows of a proteoform in ascending
-  // order, and the search below keeps the first pair with the best score
-  for (size_t i = 0; i < proteo_num; i++) {
-    if (prec_match_rows[i].size() > 1) {
-      std::sort(prec_match_rows[i].begin(), prec_match_rows[i].end());
+  std::vector<int>& rows = prec_match_rows.rows_;
+  rows.clear();
+  for (size_t w = 0; w < word_num; w++) {
+    uint64_t word = words[w];
+    while (word != 0) {
+      rows.push_back(static_cast<int>(w * 64) + __builtin_ctzll(word));
+      word &= word - 1;
     }
+  }
+  std::vector<int>& begins = prec_match_rows.begins_;
+  begins.assign(proteo_num + 1, 0);
+  for (size_t i = 0; i < rows.size(); i++) {
+    begins[row_proteo_ids[rows[i]] + 1]++;
+  }
+  for (size_t i = 0; i < proteo_num; i++) {
+    begins[i + 1] += begins[i];
   }
 }
 
+namespace {
+
+// Whether mass plus one of the PTM shifts is inside [min_mass, max_mass]:
+// the test of the pair loop below, and the one that decides every pair.
+inline bool varPtmMassMatch(double mass, const std::vector<double>& ptm_shifts,
+                            double min_mass, double max_mass) {
+  for (size_t s = 0; s < ptm_shifts.size(); s++) {
+    double shift_mass = mass + ptm_shifts[s];
+    if (shift_mass >= min_mass && shift_mass <= max_mass) {
+      return true;
+    }
+  }
+  return false;
+}
+
+// The pairs of one proteoform are searched through the mass windows when the
+// pair loop would test more than this many shift conditions.
+const size_t kVarPtmWindowMinTests = 64;
+
+// A mass window is widened by this much on both sides, so that it contains
+// every mass the exact test accepts: the window ends are computed in a
+// different order from that test, and their rounding errors are about 1e-9
+// Da for the masses of the index.
+const double kVarPtmWindowPad = 1e-4;
+
+// A proteoform's rows of the second index, (truncation shift, position),
+// in ascending order of shift. The shifts of a diagonal index's rows fall
+// with the row (the n-th row of a proteoform removes its first n residues),
+// so the reversed rows are usually sorted already.
+inline void sortRevRows(const int* rev_rows, size_t rev_num,
+                        const std::vector<double>& rev_trunc_shifts,
+                        std::vector<std::pair<double, int>>& sorted_rev) {
+  sorted_rev.clear();
+  bool falling = true;
+  for (size_t k = 1; k < rev_num && falling; k++) {
+    falling = rev_trunc_shifts[rev_rows[k]] < rev_trunc_shifts[rev_rows[k - 1]];
+  }
+  if (falling) {
+    for (size_t k = rev_num; k > 0; k--) {
+      sorted_rev.emplace_back(rev_trunc_shifts[rev_rows[k - 1]],
+                              static_cast<int>(k - 1));
+    }
+    return;
+  }
+  for (size_t k = 0; k < rev_num; k++) {
+    sorted_rev.emplace_back(rev_trunc_shifts[rev_rows[k]],
+                            static_cast<int>(k));
+  }
+  std::sort(sorted_rev.begin(), sorted_rev.end());
+}
+
+}  // namespace
+
+// A pair of rows matches when the proteoform mass with the two truncation
+// shifts plus one of the PTM shifts is within the precursor error tolerance,
+// and each proteoform keeps the first pair, in the order of the rows, with
+// the highest score. The pair loop tests every pair against every PTM shift,
+// which with the 35 shifts of four PTMs was nearly all of the stage: almost
+// no pair matches, so the loop runs through all the shifts for almost every
+// pair (toppic_test report 0077_bfb05226). The masses that can match are the
+// windows [min_mass - shift, max_mass - shift], one per PTM shift, which
+// depend on the spectrum only and span a few hundred Da. For a row j of the
+// first index the rows of the second index that put the mass inside that
+// span are found by a binary search over their sorted shifts, and a row
+// whose mass is inside one of the windows is decided by the loop's own test,
+// in the order of the rows, with the loop's update rule, so the result is
+// the same pair. A row j whose score cannot beat the best score so far is
+// skipped, since only a strictly higher score replaces the best pair.
 ProtCandidatePtrVec findVarPtmTopProteins(
     const std::vector<short>& scores, const std::vector<short>& rev_scores,
-    const std::vector<std::vector<int>>& prec_match_rows_2d,
-    const std::vector<std::vector<int>>& rev_prec_match_rows_2d,
+    const PrecMatchRows& prec_match_rows_2d,
+    const PrecMatchRows& rev_prec_match_rows_2d,
     const MassMatchPtr& index_ptr, const MassMatchPtr& rev_index_ptr,
     double prec_minus_water_mass, double prec_error_tole,
     std::vector<double>& ptm_shifts, int threshold, int top_num) {
@@ -782,36 +867,115 @@ ProtCandidatePtrVec findVarPtmTopProteins(
   const std::vector<double>& trunc_shifts = index_ptr->getTruncShifts();
   const std::vector<double>& rev_trunc_shifts = rev_index_ptr->getTruncShifts();
 
+  // the mass windows, padded, sorted and merged where they overlap
+  std::vector<std::pair<double, double>> windows;
+  for (size_t s = 0; s < ptm_shifts.size(); s++) {
+    windows.emplace_back(min_mass - ptm_shifts[s] - kVarPtmWindowPad,
+                         max_mass - ptm_shifts[s] + kVarPtmWindowPad);
+  }
+  std::sort(windows.begin(), windows.end());
+  std::vector<double> win_lows;
+  std::vector<double> win_highs;
+  for (size_t w = 0; w < windows.size(); w++) {
+    if (!win_highs.empty() && windows[w].first <= win_highs.back()) {
+      win_highs.back() = std::max(win_highs.back(), windows[w].second);
+    } else {
+      win_lows.push_back(windows[w].first);
+      win_highs.push_back(windows[w].second);
+    }
+  }
+  // per proteoform: the second index's rows sorted by shift, and the
+  // positions of the rows whose mass is inside a window
+  std::vector<std::pair<double, int>> sorted_rev;
+  std::vector<int> cand_pos;
+
   BoundedProtScores best(top_num);
-  for (size_t i = 0; i < prec_match_rows_2d.size(); i++) {
-    const std::vector<int>& prec_match_rows = prec_match_rows_2d[i];
-    const std::vector<int>& rev_prec_match_rows = rev_prec_match_rows_2d[i];
-    if (prec_match_rows.empty() || rev_prec_match_rows.empty()) {
+  const std::vector<int>& begins = prec_match_rows_2d.begins_;
+  const std::vector<int>& rev_begins = rev_prec_match_rows_2d.begins_;
+  size_t proteo_num = begins.size() - 1;
+  for (size_t i = 0; i < proteo_num; i++) {
+    if (begins[i] == begins[i + 1] || rev_begins[i] == rev_begins[i + 1]) {
       continue;
+    }
+    // the rows of proteoform i in the two indexes, in ascending order
+    const int* prec_match_rows = prec_match_rows_2d.rows_.data() + begins[i];
+    size_t row_num = begins[i + 1] - begins[i];
+    const int* rev_prec_match_rows =
+        rev_prec_match_rows_2d.rows_.data() + rev_begins[i];
+    size_t rev_num = rev_begins[i + 1] - rev_begins[i];
+    int max_rev_score = 0;
+    for (size_t k = 0; k < rev_num; k++) {
+      int rev_score = rev_scores[rev_prec_match_rows[k]];
+      max_rev_score = std::max(max_rev_score, rev_score);
+    }
+    bool use_windows = rev_num * ptm_shifts.size() > kVarPtmWindowMinTests;
+    if (use_windows) {
+      sortRevRows(rev_prec_match_rows, rev_num, rev_trunc_shifts, sorted_rev);
     }
     int best_score = 0;
     double best_n_trunc_shift = 0;
     double best_c_trunc_shift = 0;
-    for (size_t j = 0; j < prec_match_rows.size(); j++) {
-      for (size_t k = 0; k < rev_prec_match_rows.size(); k++) {
-        double n_trunc_shift = trunc_shifts[prec_match_rows[j]];
+    for (size_t j = 0; j < row_num; j++) {
+      int score_j = scores[prec_match_rows[j]];
+      if (score_j + max_rev_score <= best_score) {
+        continue;
+      }
+      double n_trunc_shift = trunc_shifts[prec_match_rows[j]];
+      double base_mass = proteo_minus_water_masses[i] + n_trunc_shift;
+      if (!use_windows) {
+        for (size_t k = 0; k < rev_num; k++) {
+          int score = score_j + rev_scores[rev_prec_match_rows[k]];
+          if (score <= best_score) {
+            continue;
+          }
+          double c_trunc_shift = rev_trunc_shifts[rev_prec_match_rows[k]];
+          double mass = base_mass + c_trunc_shift;
+          if (mass < 0) {
+            continue;
+          }
+          if (varPtmMassMatch(mass, ptm_shifts, min_mass, max_mass)) {
+            best_score = score;
+            best_n_trunc_shift = n_trunc_shift;
+            best_c_trunc_shift = c_trunc_shift;
+          }
+        }
+        continue;
+      }
+      // the rows whose mass is within the span of the windows, and of them
+      // the ones inside a window
+      double shift_low = win_lows.front() - base_mass;
+      double shift_high = win_highs.back() - base_mass;
+      auto it = std::lower_bound(sorted_rev.begin(), sorted_rev.end(),
+                                 shift_low,
+                                 [](const std::pair<double, int>& a, double v) {
+                                   return a.first < v;
+                                 });
+      cand_pos.clear();
+      for (; it != sorted_rev.end() && it->first <= shift_high; ++it) {
+        double mass = base_mass + it->first;
+        size_t w = std::upper_bound(win_lows.begin(), win_lows.end(), mass) -
+                   win_lows.begin();
+        if (w > 0 && mass <= win_highs[w - 1]) {
+          cand_pos.push_back(it->second);
+        }
+      }
+      if (cand_pos.empty()) {
+        continue;
+      }
+      // the order of the rows
+      std::sort(cand_pos.begin(), cand_pos.end());
+      for (size_t c = 0; c < cand_pos.size(); c++) {
+        int k = cand_pos[c];
+        int score = score_j + rev_scores[rev_prec_match_rows[k]];
+        if (score <= best_score) {
+          continue;
+        }
         double c_trunc_shift = rev_trunc_shifts[rev_prec_match_rows[k]];
-        double mass =
-            proteo_minus_water_masses[i] + n_trunc_shift + c_trunc_shift;
+        double mass = base_mass + c_trunc_shift;
         if (mass < 0) {
           continue;
         }
-        double score =
-            scores[prec_match_rows[j]] + rev_scores[rev_prec_match_rows[k]];
-        bool mass_match = false;
-        for (size_t s = 0; s < ptm_shifts.size(); s++) {
-          double shift_mass = mass + ptm_shifts[s];
-          if (shift_mass >= min_mass && shift_mass <= max_mass) {
-            mass_match = true;
-            break;
-          }
-        }
-        if (mass_match && score > best_score) {
+        if (varPtmMassMatch(mass, ptm_shifts, min_mass, max_mass)) {
           best_score = score;
           best_n_trunc_shift = n_trunc_shift;
           best_c_trunc_shift = c_trunc_shift;

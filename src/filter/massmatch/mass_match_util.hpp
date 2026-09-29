@@ -16,6 +16,9 @@
 #ifndef TOPPIC_FILTER_MASSMATCH_MASS_MATCH_UTIL_HPP_
 #define TOPPIC_FILTER_MASSMATCH_MASS_MATCH_UTIL_HPP_
 
+#include <cstdint>
+#include <vector>
+
 #include "filter/massmatch/mass_match.hpp"
 #include "seq/prot_candidate.hpp"
 
@@ -93,22 +96,32 @@ ProtCandidatePtrVec findVarPtmTopProteins(
     double prec_minus_water_mass, double prec_error_tole,
     std::vector<double>& ptm_shifts, int threshold, int top_num);
 
-// prec_match_rows[i]: the rows of proteoform i that received the precursor
-// bonus, in ascending row order, collected from the rows the scoring noted
-// instead of a pass over every row of the index. A row without the bonus
-// scores at most the number of masses of the spectrum, far below the bonus,
-// and the threshold of the variable-PTM filter is twice the bonus, so no
-// other row can belong to a candidate.
+// The rows of an index that received the precursor bonus, grouped by
+// proteoform: rows_ in ascending order, and the rows of proteoform i are
+// rows_[begins_[i]] to rows_[begins_[i + 1] - 1] (the rows of a proteoform
+// are one range of the index, so ascending order groups them). words_ is
+// scratch space, kept with the lists so that it is allocated once per block.
+struct PrecMatchRows {
+  std::vector<int> rows_;
+  std::vector<int> begins_;
+  std::vector<uint64_t> words_;
+};
+
+// The rows of each proteoform that received the precursor bonus, collected
+// from the rows the scoring noted instead of a pass over every row of the
+// index. A row without the bonus scores at most the number of masses of the
+// spectrum, far below the bonus, and the threshold of the variable-PTM filter
+// is twice the bonus, so no other row can belong to a candidate.
 void compPrecMatchRows(const MassMatchPtr& index_ptr,
                        const std::vector<int>& prec_rows,
-                       std::vector<std::vector<int>>& prec_match_rows);
+                       PrecMatchRows& prec_match_rows);
 
 // The same candidates from those row lists, which the four proteoform types
 // of a spectrum share.
 ProtCandidatePtrVec findVarPtmTopProteins(
     const std::vector<short>& scores, const std::vector<short>& rev_scores,
-    const std::vector<std::vector<int>>& prec_match_rows,
-    const std::vector<std::vector<int>>& rev_prec_match_rows,
+    const PrecMatchRows& prec_match_rows,
+    const PrecMatchRows& rev_prec_match_rows,
     const MassMatchPtr& index_ptr, const MassMatchPtr& rev_index_ptr,
     double prec_minus_water_mass, double prec_error_tole,
     std::vector<double>& ptm_shifts, int threshold, int top_num);
