@@ -19,6 +19,7 @@
 #include <atomic>
 #include <filesystem>
 #include <iostream>
+#include <limits>
 
 #include "common/util/file_util.hpp"
 #include "common/util/logger.hpp"
@@ -151,13 +152,56 @@ inline void addBestRowPair(const TruncScorePosition& pair_score, int keep_num,
 // an N-terminal and a C-terminal truncation row whose proteoform mass is in
 // the precursor mass window. Only the best term_group_num pairs are kept
 // while the window is scanned, instead of collecting and sorting every pair.
+std::vector<char> compNonincreasingShifts(const MassMatchPtr& index_ptr) {
+  const std::vector<int>& row_begins = index_ptr->getProteoRowBegins();
+  const std::vector<int>& row_ends = index_ptr->getProteoRowEnds();
+  const std::vector<double>& trunc_shifts = index_ptr->getTruncShifts();
+  std::vector<char> nonincr(row_begins.size(), 1);
+  for (size_t i = 0; i < row_begins.size(); i++) {
+    for (int j = row_begins[i] + 1; j <= row_ends[i]; j++) {
+      if (trunc_shifts[j] > trunc_shifts[j - 1]) {
+        nonincr[i] = 0;
+        break;
+      }
+    }
+  }
+  return nonincr;
+}
+
+// The truncation window of a row, [k_end, k_start], is found by moving two
+// pointers down from where the previous row left them: k_start to the first
+// row of the reverse index whose mass reaches min_mass, k_end to the first
+// whose mass exceeds max_mass. When the truncation shifts of the proteoform
+// do not increase from row to row, the mass of a reverse row does not
+// increase either (floating-point addition is monotone), so a pointer that
+// passes over rows of the reverse index for a row would pass over them for
+// every later row too: moving the pointers only for the rows whose window
+// is scanned leaves them where moving them for every row does.
+inline void moveTruncWindow(double proteo_mass, double n_trunc_shift,
+                            const std::vector<double>& rev_trunc_shifts,
+                            int rev_bgn, double min_mass, double max_mass,
+                            int& k_start, int& k_end) {
+  for (; k_start > rev_bgn; k_start--) {
+    double mass = proteo_mass + n_trunc_shift + rev_trunc_shifts[k_start];
+    if (mass >= min_mass) {
+      break;
+    }
+  }
+  for (; k_end > rev_bgn; k_end--) {
+    double mass = proteo_mass + n_trunc_shift + rev_trunc_shifts[k_end];
+    if (mass > max_mass) {
+      break;
+    }
+  }
+}
+
 void addTruncShiftsWithRestriction(
     ProtCandidatePtrVec& prot_ptrs, const MassMatchPtr& index_ptr,
     const MassMatchPtr& rev_index_ptr,
     const std::vector<double>& proteo_minus_water_masses,
     std::vector<short>& scores, std::vector<short>& rev_scores,
     const std::vector<int>& rev_max_scores, double min_mass, double max_mass,
-    int term_group_num) {
+    int term_group_num, const std::vector<char>* nonincr_shifts) {
   const std::vector<int>& row_begins = index_ptr->getProteoRowBegins();
   const std::vector<int>& row_ends = index_ptr->getProteoRowEnds();
   const std::vector<double>& trunc_shifts = index_ptr->getTruncShifts();
@@ -181,25 +225,27 @@ void addTruncShiftsWithRestriction(
     k_end = rev_end;
 
     best.clear();
+    bool lazy = nonincr_shifts != nullptr && (*nonincr_shifts)[prot_id];
     for (int j = bgn; j <= end; j++) {
+      // a row that cannot beat the worst kept pair adds nothing: once the
+      // list is full, a row adds something when its score is at least
+      // row_cutoff
+      bool full = static_cast<int>(best.size()) >= term_group_num;
+      int row_cutoff = full ? best.back().score_ + 1 - rev_max_scores[prot_id]
+                            : std::numeric_limits<int>::min();
+      if (lazy) {
+        // the window is moved for the rows that are scanned only
+        while (j <= end && scores[j] < row_cutoff) {
+          j++;
+        }
+        if (j > end) {
+          break;
+        }
+      }
       double n_trunc_shift = trunc_shifts[j];
-      // find k_start
-      for (; k_start > rev_bgn; k_start--) {
-        double mass = proteo_mass + n_trunc_shift + rev_trunc_shifts[k_start];
-        if (mass >= min_mass) {
-          break;
-        }
-      }
-      // find k_end
-      for (; k_end > rev_bgn; k_end--) {
-        double mass = proteo_mass + n_trunc_shift + rev_trunc_shifts[k_end];
-        if (mass > max_mass) {
-          break;
-        }
-      }
-      // a row that cannot beat the worst kept pair adds nothing
-      if (static_cast<int>(best.size()) >= term_group_num &&
-          scores[j] + rev_max_scores[prot_id] <= best.back().score_) {
+      moveTruncWindow(proteo_mass, n_trunc_shift, rev_trunc_shifts, rev_bgn,
+                      min_mass, max_mass, k_start, k_end);
+      if (scores[j] < row_cutoff) {
         continue;
       }
 
@@ -471,7 +517,8 @@ inline ProtCandidatePtrVec findOneShiftTopProteinsWithRestrict(
     const std::vector<int>& max_scores, const std::vector<int>& rev_max_scores,
     const MassMatchPtr& index_ptr, const MassMatchPtr& rev_index_ptr,
     double prec_minus_water_mass, double prec_error_tole, double min_shift,
-    double max_shift, int term_shift_num, int threshold, int top_num) {
+    double max_shift, int term_shift_num, int threshold, int top_num,
+    const std::vector<char>* nonincr_shifts) {
   double min_mass = prec_minus_water_mass - max_shift - prec_error_tole;
   double max_mass = prec_minus_water_mass - min_shift + prec_error_tole;
   // LOG_DEBUG("min mass " << min_mass << " max mass " << max_mass);
@@ -511,23 +558,28 @@ inline ProtCandidatePtrVec findOneShiftTopProteinsWithRestrict(
     int best_score = 0;
     double best_n_term_shift = 0;
     double best_c_term_shift = 0;
+    bool lazy = nonincr_shifts != nullptr && (*nonincr_shifts)[i];
     for (int j = bgn; j <= end; j++) {
+      // A row that cannot beat the best pair so far, or reach the cutoff,
+      // adds nothing: a pair below the cutoff cannot be kept, and the pair
+      // that gives the proteoform's best score is the first to reach it,
+      // which no skipped row can be. A row adds something when its score
+      // is at least row_cutoff.
+      int row_cutoff = std::max(best_score + 1, cutoff) - rev_max_score;
+      if (lazy) {
+        // the window is moved for the rows that are scanned only, so the
+        // rows before the next one to scan are passed over at once
+        while (j <= end && scores[j] < row_cutoff) {
+          j++;
+        }
+        if (j > end) {
+          break;
+        }
+      }
       double n_trunc_shift = trunc_shifts[j];
-      // find k_start
-      for (; k_start > rev_bgn; k_start--) {
-        double mass = proteo_mass + n_trunc_shift + rev_trunc_shifts[k_start];
-        if (mass >= min_mass) {
-          break;
-        }
-      }
-      // find k_end
-      for (; k_end > rev_bgn; k_end--) {
-        double mass = proteo_mass + n_trunc_shift + rev_trunc_shifts[k_end];
-        if (mass > max_mass) {
-          break;
-        }
-      }
-      if (scores[j] + rev_max_score <= best_score) {
+      moveTruncWindow(proteo_mass, n_trunc_shift, rev_trunc_shifts, rev_bgn,
+                      min_mass, max_mass, k_start, k_end);
+      if (scores[j] < row_cutoff) {
         continue;
       }
 
@@ -566,7 +618,7 @@ inline ProtCandidatePtrVec findOneShiftTopProteinsWithRestrict(
   addTruncShiftsWithRestriction(proteins, index_ptr, rev_index_ptr,
                                 proteo_minus_water_masses, scores, rev_scores,
                                 rev_max_scores, min_mass, max_mass,
-                                term_shift_num);
+                                term_shift_num, nonincr_shifts);
   return proteins;
 }
 
@@ -575,13 +627,14 @@ ProtCandidatePtrVec findOneShiftTopProteins(
     const std::vector<int>& max_scores, const std::vector<int>& rev_max_scores,
     const MassMatchPtr& index_ptr, const MassMatchPtr& rev_index_ptr,
     double prec_minus_water_mass, double prec_error_tole, double min_shift,
-    double max_shift, int term_shift_num, int threshold, int top_num) {
+    double max_shift, int term_shift_num, int threshold, int top_num,
+    const std::vector<char>* nonincr_shifts) {
   // if allowed mass shifts is small, use restricted search
   if ((max_shift - min_shift) <= 2000) {
     return findOneShiftTopProteinsWithRestrict(
         scores, rev_scores, max_scores, rev_max_scores, index_ptr,
         rev_index_ptr, prec_minus_water_mass, prec_error_tole, min_shift,
-        max_shift, term_shift_num, threshold, top_num);
+        max_shift, term_shift_num, threshold, top_num, nonincr_shifts);
   } else {
     ProtCandidatePtrVec cand_prots;
     double adjust_max_shift = 1000;
@@ -597,7 +650,7 @@ ProtCandidatePtrVec findOneShiftTopProteins(
           scores, rev_scores, max_scores, rev_max_scores, index_ptr,
           rev_index_ptr, prec_minus_water_mass, prec_error_tole,
           adjust_min_shift, adjust_max_shift, term_shift_num, threshold,
-          top_num);
+          top_num, nonincr_shifts);
     }
     ProtCandidatePtrVec unrestrict_cand_prots =
         findOneShiftTopProteinsWithoutRestrict(

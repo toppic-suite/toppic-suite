@@ -21,15 +21,20 @@
 
 namespace toppic {
 
+// the type of the edge a DP entry of the graph alignment was reached by
+#define GRAPH_ALIGN_TYPE_NULL -1
+#define GRAPH_ALIGN_TYPE_VARIABLE 0
+#define GRAPH_ALIGN_TYPE_UNEXPECTED 1
+
 class GraphResultNode {
  public:
-  GraphResultNode(const GraphDpNodePtr& node_ptr, int s, int m) {
-    first_idx_ = node_ptr->getFirstIdx();
-    second_idx_ = node_ptr->getSecondIdx();
-    shift_num_ = s;
-    mod_num_ = m;
-    prev_edge_type_ = node_ptr->getPrevEdgeType(s, m);
-  }
+  GraphResultNode(int first_idx, int second_idx, int s, int m,
+                  int prev_edge_type)
+      : first_idx_(first_idx),
+        second_idx_(second_idx),
+        shift_num_(s),
+        mod_num_(m),
+        prev_edge_type_(prev_edge_type) {}
 
   int getFirstIdx() { return first_idx_; }
   int getSecondIdx() { return second_idx_; }

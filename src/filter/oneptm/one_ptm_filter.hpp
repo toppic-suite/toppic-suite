@@ -55,6 +55,11 @@ class OnePtmFilter {
   MassMatchPtr term_index_ptr_;
   MassMatchPtr rev_term_index_ptr_;
 
+  // mass_match_util::compNonincreasingShifts of the two N-terminal side
+  // indexes, computed once for the block
+  std::vector<char> term_nonincr_shifts_;
+  std::vector<char> diag_nonincr_shifts_;
+
   // Score arrays of the four indexes and their per-proteoform maxima. They
   // are reused by the spectra of the database block, not reallocated for each
   // spectrum.

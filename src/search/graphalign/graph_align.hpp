@@ -22,14 +22,10 @@
 #include "search/graph/proteo_graph.hpp"
 #include "search/graph/spec_graph.hpp"
 #include "search/graphalign/graph_align_mng.hpp"
-#include "search/graphalign/graph_dp_node.hpp"
 #include "search/graphalign/graph_result_node.hpp"
 #include "seq/fasta_seq.hpp"
 
 namespace toppic {
-
-using ConsistentPairs =
-    std::vector<std::vector<std::vector<std::vector<std::pair<int, int>>>>>;
 
 class GraphAlign {
  public:
@@ -61,13 +57,29 @@ class GraphAlign {
 
   int spec_ver_num_;
 
-  DistVec spec_dist_;
+  // the spectrum distances within the range of the proteoform distances, as
+  // indexes of the spectrum graph's distance list, in increasing order
+  std::vector<int> spec_dist_idxes_;
 
-  DistVec2D dist_vec_;
+  // The DP table: a cell per pair of a proteoform graph vertex i and a
+  // spectrum graph vertex j, cell index i * spec_ver_num_ + j, and in each
+  // cell a layer per unexpected shift number s and variable modification
+  // number m, entry index (cell * shift_layer_num_ + s) * mod_layer_num_ + m.
+  // A previous node is a cell index, -1 for none.
+  int shift_layer_num_;
+  int mod_layer_num_;
+  std::vector<signed char> prev_edge_types_;
+  std::vector<signed char> prev_edge_mod_nums_;
+  std::vector<int> prev_nodes_;
+  std::vector<double> best_scores_;
+  std::vector<int> best_shift_nodes_;
+  std::vector<double> best_shift_scores_;
 
-  ConsistentPairs cons_pairs_;
-
-  GraphDpNodePtrVec2D table_;
+  // The consistent pairs of a cell and a variable modification number m:
+  // the cells cons_prev_cells_[cons_begins_[k]] ... [cons_begins_[k + 1] - 1]
+  // with k = cell * mod_layer_num_ + m, in the order they were found.
+  std::vector<int> cons_begins_;
+  std::vector<int> cons_prev_cells_;
 
   GraphResultNodePtrVec3D result_nodes_;
 
@@ -77,18 +89,21 @@ class GraphAlign {
 
   DiagHeaderPtrVec2D diag_headers_2d_;
 
-  void getConsistentPairs();
+  size_t getCellIdx(int i, int j) {
+    return static_cast<size_t>(i) * spec_ver_num_ + j;
+  }
 
-  void addToConsistentPairs(int m,
-                            const std::vector<std::pair<int, int>>& sp_pair_ij,
-                            const std::vector<std::pair<int, int>>& pg_pair_ij);
+  size_t getEntryIdx(size_t cell, int s, int m) {
+    return (cell * shift_layer_num_ + s) * mod_layer_num_ + m;
+  }
+
+  void getConsistentPairs();
 
   void initTable();
 
-  GraphDpNodePtr compBestVariableNode(int i, int j, int s, int m,
-                                      int& best_edge_mod_num);
+  int compBestVariableNode(size_t cell, int s, int m, int& best_edge_mod_num);
 
-  GraphDpNodePtr compBestShiftNode(int i, int j, int s, int m);
+  int compBestShiftNode(int i, int j, int s, int m);
 
   void updateBestShiftNode(int i, int j, int s, int m);
 

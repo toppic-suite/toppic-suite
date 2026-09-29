@@ -72,12 +72,20 @@ ProtCandidatePtrVec simpleFindZeroShiftTopProteins(
 // scans of the score arrays, and they bound the total score of a proteoform,
 // which keeps the truncation row scan to the proteoforms that can be
 // reported.
+// For each proteoform of an index, whether its truncation shifts do not
+// increase from one row to the next (1) or do somewhere (0).
+std::vector<char> compNonincreasingShifts(const MassMatchPtr& index_ptr);
+
+// nonincr_shifts, when given, is compNonincreasingShifts of index_ptr: the
+// truncation window of a proteoform whose shifts do not increase is then
+// moved only for the rows that are scanned, which gives the same window.
 ProtCandidatePtrVec findOneShiftTopProteins(
     std::vector<short>& scores, std::vector<short>& rev_scores,
     const std::vector<int>& max_scores, const std::vector<int>& rev_max_scores,
     const MassMatchPtr& index_ptr, const MassMatchPtr& rev_index_ptr,
     double prec_minus_water_mass, double prec_error_tole, double min_shift,
-    double max_shift, int term_shift_num, int threshold, int top_num);
+    double max_shift, int term_shift_num, int threshold, int top_num,
+    const std::vector<char>* nonincr_shifts = nullptr);
 
 ProtCandidatePtrVec findVarPtmTopProteins(
     std::vector<short>& scores, std::vector<short>& rev_scores,

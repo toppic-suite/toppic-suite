@@ -142,6 +142,10 @@ OnePtmFilter::OnePtmFilter(const ProteoformPtrVec& proteo_ptrs,
         proteo_ptrs, n_term_acet_2d, mng_ptr->max_proteoform_mass_,
         mng_ptr->filter_scale_);
   };
+  term_nonincr_shifts_ =
+      mass_match_util::compNonincreasingShifts(term_index_ptr_);
+  diag_nonincr_shifts_ =
+      mass_match_util::compNonincreasingShifts(diag_index_ptr_);
 }
 
 FilterSpecPtr OnePtmFilter::geneFilterSpec(
@@ -207,7 +211,8 @@ void OnePtmFilter::computeBestMatch(const FilterSpecPtr& spec_ptr) {
       term_index_ptr_, rev_term_index_ptr_,
       prec_minus_water_mass, prec_error_tole, mng_ptr_->min_shift_,
       mng_ptr_->max_shift_, mng_ptr_->comp_cand_shift_num_,
-      mng_ptr_->threshold_, mng_ptr_->comp_num_);
+      mng_ptr_->threshold_, mng_ptr_->comp_num_,
+      &term_nonincr_shifts_);
   comp_match_ptrs_.clear();
   int group_spec_num = spec_ptr->getGroupSpecNum();
   for (size_t i = 0; i < comp_prots.size(); i++) {
@@ -223,7 +228,8 @@ void OnePtmFilter::computeBestMatch(const FilterSpecPtr& spec_ptr) {
       term_index_ptr_, rev_diag_index_ptr_,
       prec_minus_water_mass, prec_error_tole, mng_ptr_->min_shift_,
       mng_ptr_->max_shift_, mng_ptr_->cand_shift_num_, mng_ptr_->threshold_,
-      mng_ptr_->pref_suff_num_);
+      mng_ptr_->pref_suff_num_,
+      &term_nonincr_shifts_);
   pref_match_ptrs_.clear();
   for (size_t i = 0; i < pref_prots.size(); i++) {
     int id = pref_prots[i]->getProteinId();
@@ -241,7 +247,8 @@ void OnePtmFilter::computeBestMatch(const FilterSpecPtr& spec_ptr) {
       diag_index_ptr_, rev_term_index_ptr_,
       prec_minus_water_mass, prec_error_tole, mng_ptr_->min_shift_,
       mng_ptr_->max_shift_, mng_ptr_->cand_shift_num_, mng_ptr_->threshold_,
-      mng_ptr_->pref_suff_num_);
+      mng_ptr_->pref_suff_num_,
+      &diag_nonincr_shifts_);
   suff_match_ptrs_.clear();
   for (size_t i = 0; i < suff_prots.size(); i++) {
     int id = suff_prots[i]->getProteinId();
@@ -258,7 +265,8 @@ void OnePtmFilter::computeBestMatch(const FilterSpecPtr& spec_ptr) {
       diag_index_ptr_, rev_diag_index_ptr_,
       prec_minus_water_mass, prec_error_tole, mng_ptr_->min_shift_,
       mng_ptr_->max_shift_, mng_ptr_->cand_shift_num_, mng_ptr_->threshold_,
-      mng_ptr_->inte_num_);
+      mng_ptr_->inte_num_,
+      &diag_nonincr_shifts_);
   internal_match_ptrs_.clear();
   for (size_t i = 0; i < internal_prots.size(); i++) {
     int id = internal_prots[i]->getProteinId();

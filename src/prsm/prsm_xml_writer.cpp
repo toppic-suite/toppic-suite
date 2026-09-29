@@ -59,17 +59,24 @@ void PrsmXmlWriter::writeVector(const PrsmStrPtrVec& prsm_str_ptr_vec) {
 
 void PrsmXmlWriter::write(const PrsmPtr& prsm_ptr) {
   if (prsm_ptr != nullptr) {
-    // pugixml has no detached nodes, so build the prsm element under a
-    // throwaway document root and serialize just that element.
-    XmlDOMDocument doc("prsm_list");
-    XmlDOMElement root = doc.getDocumentElement();
-    if (prsm_ptr->getFileName() == "") {
-      prsm_ptr->setFileName(file_name_);
-    }
-    XmlDOMElement element = prsm_ptr->toXmlElement(&doc, root);
-    std::string str = xml_dom_util::writeToString(element);
-    xml_dom_util::writeToStreamByRemovingDoubleLF(file_, str);
+    writeXmlString(toXmlString(prsm_ptr));
   }
+}
+
+std::string PrsmXmlWriter::toXmlString(const PrsmPtr& prsm_ptr) {
+  // pugixml has no detached nodes, so build the prsm element under a
+  // throwaway document root and serialize just that element.
+  XmlDOMDocument doc("prsm_list");
+  XmlDOMElement root = doc.getDocumentElement();
+  if (prsm_ptr->getFileName() == "") {
+    prsm_ptr->setFileName(file_name_);
+  }
+  XmlDOMElement element = prsm_ptr->toXmlElement(&doc, root);
+  return xml_dom_util::writeToString(element);
+}
+
+void PrsmXmlWriter::writeXmlString(const std::string& str) {
+  xml_dom_util::writeToStreamByRemovingDoubleLF(file_, str);
 }
 
 void PrsmXmlWriter::writeVector(const PrsmPtrVec& prsm_ptrs) {
