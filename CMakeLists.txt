@@ -286,9 +286,20 @@ file(GLOB_RECURSE COMMON_SRCS CONFIGURE_DEPENDS
   ${CMAKE_CURRENT_SOURCE_DIR}/src/filter/*.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/search/*.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/stat/*.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/merge/*.cpp)
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/merge/*.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/toplib/*.cpp)
 
 add_library(toppic_common OBJECT ${COMMON_SRCS})
+
+# src/toplib reproduces the arithmetic of TopLib's Python script (numpy,
+# SciPy, numba), none of which fuses a multiply and an add; the only fused
+# multiply-adds there are the explicit std::fma calls that mirror OpenBLAS.
+if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+  file(GLOB TOPLIB_SRCS CONFIGURE_DEPENDS
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/toplib/*.cpp)
+  set_source_files_properties(${TOPLIB_SRCS} PROPERTIES
+    COMPILE_OPTIONS "-ffp-contract=off")
+endif()
 target_include_directories(toppic_common PUBLIC
   ${CMAKE_CURRENT_SOURCE_DIR}/src
   ${CMAKE_CURRENT_BINARY_DIR}/gen)
@@ -389,6 +400,9 @@ toppic_console_exe(topdiff
   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topdiff.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topdiff_argument.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topdiff_process.cpp)
+toppic_console_exe(toplib_build
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/console/toplib_build.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/console/toplib_build_argument.cpp)
 
 # ---------------------------------------------------------------------------
 # GUI executables (Qt6)
@@ -453,7 +467,7 @@ toppic_gui_exe(topdia_gui   topdia   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/top
 # extra is installed there.
 # ---------------------------------------------------------------------------
 set(TOPPIC_EXECUTABLES
-  topfd topdia topindex toppic topmg topdiff
+  topfd topdia topindex toppic topmg topdiff toplib_build
   topfd_gui topdia_gui topindex_gui toppic_gui topmg_gui topdiff_gui)
 
 install(TARGETS ${TOPPIC_EXECUTABLES}
