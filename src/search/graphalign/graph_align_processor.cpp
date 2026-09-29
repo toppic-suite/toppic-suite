@@ -180,7 +180,9 @@ void GraphAlignProcessor::process() {
   // smaller: every thread holds an alignment's DP table and consistent
   // pairs, and mem_check lowers the number of threads to the memory
   // available (toppic_test experiment 77). The output does not depend on
-  // the pool's size, only on the number of files.
+  // the pool's size, nor on the number of files: the merge orders the
+  // PrSMs of a spectrum completely (PrsmStr::cmpNormMatchTheoFragDecProtInc)
+  // before it keeps the first of each protein (experiment 78).
   int thread_num = mng_ptr_->thread_num_;
   int layer_num = (mng_ptr_->n_unknown_shift_ + 1) *
                   (mng_ptr_->max_known_mods_ + 1);

@@ -134,6 +134,9 @@ class PrsmStr {
   static bool cmpMatchTheoFragDecMatchExpFragDecProtInc(const PrsmStrPtr& a,
                                                         const PrsmStrPtr& b);
 
+  // equal scores in increasing order of the protein, then of the unexpected
+  // and variable PTM numbers, the start and end positions, ... and last the
+  // whole record: a total order, so the order does not depend on the input
   static bool cmpNormMatchTheoFragDecProtInc(const PrsmStrPtr& a,
                                              const PrsmStrPtr& b);
 
