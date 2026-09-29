@@ -15,6 +15,7 @@
 
 #include "common/util/mem_check.hpp"
 
+#include <algorithm>
 #include <cmath>
 #include <fstream>
 #include <iomanip>
@@ -63,7 +64,24 @@ const std::map<std::string, double> memory_per_thread_list{
     // measured 14.0 gb peak at 12 threads on a 14 gb machine without this)
     {"zero_shift_filter", 1.25},
     // diag filter memory requirement per thread: about 0.4 gb
-    {"diag_filter", 0.5}};
+    {"diag_filter", 0.5},
+    // graph alignment memory requirement per thread, for a DP table of
+    // kGraphAlignLayers layers and scaled by the layer number
+    // (getGraphAlignThreadNum). A thread holds one alignment: its DP table
+    // (26 bytes for each of proteoform graph vertices x spectrum graph
+    // vertices x layers), its consistent pairs and the proteoform graph's
+    // distance lists. On the first 500 spectra of 480_F3_02 the largest was
+    // 329 MiB at 8 layers (a 2,001-vertex proteoform graph against a
+    // 592-vertex spectrum graph; 235 MiB of it the DP table), 0.32 GiB, and
+    // 686 MiB at 18 layers (-S 5, --topmg-num-shift 2), 0.67 GiB; 0.5 gb at
+    // 8 layers leaves room for spectra with more peaks (toppic_test
+    // experiment 77)
+    {"graph_align", 0.5}};
+
+// the layer number the graph_align entry is for: one unexpected shift (TopMG's
+// default) and three variable modifications (toppic's default -S), (1 + 1) x
+// (3 + 1)
+const int kGraphAlignLayers = 8;
 
 // The protein sequence filtering stages of toppic and topmg budget their
 // thread number per stage (see toppic_process.cpp and topmg_process.cpp):
@@ -127,6 +145,27 @@ int getStageStartThreadNum(const std::string& stage_name, int thread_num) {
 }
 
 }  // namespace
+
+int getGraphAlignThreadNum(int thread_num, int layer_num) {
+  double avail_mem_in_gb = getAvailMemInGb();
+  double mem_per_thread =
+      memory_per_thread_list.at("graph_align") *
+      std::max(1.0, static_cast<double>(layer_num) / kGraphAlignLayers);
+  int align_thread_num = std::floor(avail_mem_in_gb / mem_per_thread);
+  if (align_thread_num < 1) {
+    align_thread_num = 1;
+  }
+  if (align_thread_num >= thread_num) {
+    return thread_num;
+  }
+  std::cout << "WARNING: Graph alignment will use " << align_thread_num
+            << " threads, not the " << thread_num << " requested: "
+            << std::setprecision(4) << avail_mem_in_gb
+            << " GiB of memory is available and each thread may need "
+            << mem_per_thread << " GiB." << std::endl;
+  std::cout << std::setprecision(6);
+  return align_thread_num;
+}
 
 double getTotalMemInGb() {
 #if defined(_WIN32) || defined(_WIN64) || defined(__MINGW32__) || \

@@ -26,6 +26,7 @@
 #include "common/base/mod_util.hpp"
 #include "common/thread/simple_thread_pool.hpp"
 #include "common/util/file_util.hpp"
+#include "common/util/mem_check.hpp"
 #include "ms/factory/spectrum_set_factory.hpp"
 #include "ms/spec/msalign_util.hpp"
 #include "prsm/prsm_reader.hpp"
@@ -174,7 +175,17 @@ void GraphAlignProcessor::process() {
   // aligned, which leaves the merged file as it was. A thread's turn could
   // not get past a candidate whose spectrum it never met, so such a
   // candidate stops its file here too.
+  //
+  // The files are still thread_num_ of them, but the thread pool may be
+  // smaller: every thread holds an alignment's DP table and consistent
+  // pairs, and mem_check lowers the number of threads to the memory
+  // available (toppic_test experiment 77). The output does not depend on
+  // the pool's size, only on the number of files.
   int thread_num = mng_ptr_->thread_num_;
+  int layer_num = (mng_ptr_->n_unknown_shift_ + 1) *
+                  (mng_ptr_->max_known_mods_ + 1);
+  int pool_thread_num =
+      mem_check::getGraphAlignThreadNum(thread_num, layer_num);
   SimplePrsmStrPtrVec cands;
   {
     SimplePrsmReader cand_reader(file_util::basename(sp_file_name) +
@@ -194,6 +205,8 @@ void GraphAlignProcessor::process() {
     writer_ptrs.push_back(std::make_shared<PrsmXmlWriter>(
         file_util::basename(sp_file_name) + "." + mng_ptr_->output_file_ext_ +
         "_" + std::to_string(i)));
+  }
+  for (int i = 0; i < pool_thread_num; i++) {
     // what a thread changes or holds open: one per thread of the pool
     reader_ptrs.push_back(std::make_shared<FastaIndexReader>(db_file_name));
     proteo_anno_ptrs.push_back(std::make_shared<ProteoAnno>(
@@ -203,7 +216,8 @@ void GraphAlignProcessor::process() {
   std::vector<std::vector<std::string>> results(cands.size());
   std::vector<bool> file_stopped(thread_num, false);
 
-  SimpleThreadPoolPtr pool_ptr = std::make_shared<SimpleThreadPool>(thread_num);
+  SimpleThreadPoolPtr pool_ptr =
+      std::make_shared<SimpleThreadPool>(pool_thread_num);
   int group_spec_num = prsm_para_ptr->getGroupSpecNum();
   MsAlignReaderPtr ms_reader_ptr = std::make_shared<MsAlignReader>(
       sp_file_name, group_spec_num, sp_para_ptr->getActivationPtr(),
@@ -249,7 +263,7 @@ void GraphAlignProcessor::process() {
             }
             // a short queue, so that only a few spectra are held
             while (pool_ptr->getQueueSize() >=
-                   static_cast<size_t>(2 * thread_num)) {
+                   static_cast<size_t>(2 * pool_thread_num)) {
               std::this_thread::sleep_for(std::chrono::milliseconds(1));
             }
             GraphAlignMngPtr mng_ptr = mng_ptr_;
