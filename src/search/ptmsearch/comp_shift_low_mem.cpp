@@ -23,6 +23,10 @@
 namespace toppic {
 
 namespace {
+// How many (spectrum mass, prefix mass) pairs ahead the counting loop of the
+// ppm findBestShift prefetches the count bins of a pair's window.
+const int prefetch_pair_num = 32;
+
 // The count buffer is kept for the next candidate (it is reused by the
 // candidates of a thread) unless it is larger than this, which happens only
 // for a very long protein: one bin per 0.01 Da of the range of the
@@ -52,28 +56,6 @@ std::vector<double> CompShiftLowMem::findBestShift(
     result.push_back(list[i][0] / scale);
   }
   return result;
-}
-
-inline void CompShiftLowMem::resetNumbers(const std::vector<int>& a,
-                                          const std::vector<int>& errors,
-                                          const std::vector<int>& b) {
-  int a_length = a.size();
-  int b_length = b.size();
-  int delta = a[0] - b[b_length - 1];
-  int minD = delta - 1;
-  for (int i = 0; i < a_length; i++) {
-    int a_value = a[i];
-    for (int j = 0; j < b_length; j++) {
-      int d = a_value - b[j] - minD;
-      int start = 0;
-      if (d > errors[i]) {
-        start = d - errors[i];
-      }
-      for (int k = start; k <= d + errors[i]; k++) {
-        num_[k] = 0;
-      }
-    }
-  }
 }
 
 inline void CompShiftLowMem::resetNumbers(const std::vector<int>& a,
@@ -114,23 +96,46 @@ std::vector<std::vector<int>> CompShiftLowMem::findBestShift(
     num_.resize(maxD - minD + 1, 0);
   }
 
-  resetNumbers(a, errors, b);
+  // One sequential fill of the bins of this call. On 16 threads it is cheaper
+  // than zeroing the window of every pair, one random cache line per pair,
+  // although it writes more bytes (toppic_test experiment 78).
+  std::fill(num_.begin(), num_.begin() + (maxD - minD + 1), 0);
   initBestShifts(total);
 
   int current_minimum = 1;
+  short* num = num_.data();
 
+  // The pairs touch a random cache line each, so the loop is bound by memory
+  // latency: the window of the pair prefetch_pair_num pairs ahead is
+  // prefetched, and a pair's window is incremented as a whole (vectorised,
+  // no branch per bin) before it is scanned for bins that reach the current
+  // minimum, which happens for about 1 in 5,000 increments. checkShift reads
+  // only the count of the bin it is given and a window holds each bin once,
+  // so the bins, the order and the counts checkShift sees are those of an
+  // increment-and-check loop over the bins.
   for (int i = 0; i < a_length; i++) {
-    int a_value = a[i];
+    int base = a[i] - minD;
+    int error = errors[i];
     for (int j = 0; j < b_length; j++) {
-      int d = a_value - b[j] - minD;
-      int start = 0;
-      if (d > errors[i]) {
-        start = d - errors[i];
+      if (j + prefetch_pair_num < b_length) {
+        int ahead = base - b[j + prefetch_pair_num] - error;
+        __builtin_prefetch(num + (ahead > 0 ? ahead : 0), 1);
       }
-      for (int k = start; k <= d + errors[i]; k++) {
-        // checkShift returns cur_min unchanged when num_[k] < cur_min
-        if (++num_[k] >= current_minimum) {
-          current_minimum = checkShift(k, current_minimum, total, minimum_gap);
+      int d = base - b[j];
+      int start = d > error ? d - error : 0;
+      int end = d + error;
+      short max_count = 0;
+      for (int k = start; k <= end; k++) {
+        short count = ++num[k];
+        max_count = count > max_count ? count : max_count;
+      }
+      if (max_count >= current_minimum) {
+        for (int k = start; k <= end; k++) {
+          // checkShift returns cur_min unchanged when num[k] < cur_min
+          if (num[k] >= current_minimum) {
+            current_minimum =
+                checkShift(k, current_minimum, total, minimum_gap);
+          }
         }
       }
     }

@@ -56,8 +56,6 @@ class CompShiftLowMem {
   std::vector<std::vector<int>> getBestShifts(int min_d);
   int checkShift(int d, int cur_min, int total, int min_gap);
 
-  void resetNumbers(const std::vector<int>& a, const std::vector<int>& errors,
-                    const std::vector<int>& b);
   void resetNumbers(const std::vector<int>& a, const std::vector<int>& b);
   void resetNumbers();
 };
