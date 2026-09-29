@@ -68,6 +68,7 @@ void PrsmSqlWriter::createPrsmTable(const std::string& table_name) {
                                  "charge INT NOT NULL,"
                                  "precursor_mass REAL NOT NULL,"
                                  "adjusted_precursor_mass REAL NOT NULL,"
+                                 "n_terminal_label_mass REAL NOT NULL,"
                                  "proteoform_id INT NOT NULL,"
                                  "proteoform_intensity REAL NOT NULL,"
                                  "feature_id INT,"
@@ -111,7 +112,7 @@ void PrsmSqlWriter::write(const std::string& input_file_ext,
       sql_db_, "INSERT INTO " + table_name +
                    " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, "
                    "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, "
-                   "?, ?, ?, ?);");
+                   "?, ?, ?, ?, ?);");
   sqlite3_stmt* shift_stmt = nullptr;
   sqlite3_stmt* match_stmt = nullptr;
   if (write_details) {
@@ -186,6 +187,7 @@ void PrsmSqlWriter::writePrsm(sqlite3_stmt* stmt, const PrsmPtr& prsm_ptr) {
   sqlite3_bind_int(stmt, idx++, first_header_ptr->getFirstPrecCharge());
   sqlite3_bind_double(stmt, idx++, prsm_ptr->getOriPrecMass());
   sqlite3_bind_double(stmt, idx++, prsm_ptr->getAdjustedPrecMass());
+  sqlite3_bind_double(stmt, idx++, prsm_ptr->getNTermLabelMass());
   sqlite3_bind_int(stmt, idx++, form_ptr->getProteoClusterId());
   sqlite3_bind_double(stmt, idx++, form_ptr->getProteoInte());
   if (prsm_ptr->getFracFeatureInte() > 0) {

@@ -40,6 +40,7 @@ Prsm::Prsm(const ProteoformPtr& proteoform_ptr,
   spectrum_num_ = deconv_ms_ptr_vec.size();
   ori_prec_mass_ = header_ptr->getFirstPrecMonoMass();
   frac_feature_id_ = header_ptr->getFirstPrecFeatureId();
+  n_term_label_mass_ = sp_para_ptr->getNTermLabelMass();
   init(sp_para_ptr);
 }
 
@@ -135,6 +136,8 @@ XmlDOMElement Prsm::toXmlElement(XmlDOMDocument* xml_doc,
   xml_doc->addElement(element, "ori_prec_mass", str.c_str());
   str = str_util::toString(adjusted_prec_mass_);
   xml_doc->addElement(element, "adjusted_prec_mass", str.c_str());
+  str = str_util::toString(n_term_label_mass_);
+  xml_doc->addElement(element, "n_term_label_mass", str.c_str());
   str = str_util::toString(match_exp_frag_num_);
   xml_doc->addElement(element, "match_exp_frag_num", str.c_str());
   str = str_util::toString(match_theo_frag_num_);
@@ -199,6 +202,12 @@ void Prsm::parseXml(XmlDOMElement element) {
       xml_dom_util::getDoubleChildValue(element, "ori_prec_mass", 0);
   adjusted_prec_mass_ =
       xml_dom_util::getDoubleChildValue(element, "adjusted_prec_mass", 0);
+  // PrSM files written before <n_term_label_mass> was added have no such
+  // element
+  if (xml_dom_util::getChildCount(element, "n_term_label_mass") > 0) {
+    n_term_label_mass_ =
+        xml_dom_util::getDoubleChildValue(element, "n_term_label_mass", 0);
+  }
   fdr_ = xml_dom_util::getDoubleChildValue(element, "fdr", 0);
   proteoform_fdr_ =
       xml_dom_util::getDoubleChildValue(element, "proteoform_fdr", 0);
