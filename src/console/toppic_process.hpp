@@ -32,13 +32,13 @@ int TopPICProgress(std::map<std::string, std::string>& arguments);
 // toppic_pre_raw_prsm and returns its extension, or "" if it failed
 std::string TopPIC_identify(std::map<std::string, std::string>& arguments);
 
-// TopMG's identification hosted here (hidden --topmg-identify): the ASF
-// filtering with the variable modification file, the proteoform-graph
-// alignment, its post-processing, the generating-function E-value (the MCMC
-// one with the hidden --topmg-use-mcmc) and the top PrSM selection, which
-// chooses between its PrSMs and those of the set it was given (none with
-// the hidden --topmg-only, when raw_prsm_ext is empty and every spectrum is
-// searched); returns toppic_topmg_raw_prsm
+// TopMG's identification hosted here (hidden --topmg pipeline or
+// topmg-only): the ASF filtering with the variable modification file, the
+// proteoform-graph alignment, its post-processing, the generating-function
+// E-value (the MCMC one with the hidden --topmg-use-mcmc) and the top PrSM
+// selection, which chooses between its PrSMs and those of the set it was
+// given (none with topmg-only, when raw_prsm_ext is empty and every spectrum
+// is searched); returns toppic_topmg_raw_prsm
 std::string TopPIC_topmg_identify(
     std::map<std::string, std::string>& arguments,
     const std::string& raw_prsm_ext);

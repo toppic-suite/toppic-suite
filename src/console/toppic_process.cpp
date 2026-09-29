@@ -423,8 +423,8 @@ std::string TopPIC_identify(std::map<std::string, std::string>& arguments) {
   return "toppic_pre_raw_prsm";
 }
 
-// TopMG's identification hosted in toppic, behind the hidden
-// --topmg-identify option. Every stage of TopMG_identify, in its order: the
+// TopMG's identification hosted in toppic, behind the hidden --topmg option
+// (pipeline or topmg-only). Every stage of TopMG_identify, in its order: the
 // database preprocessing and the spectrum index, the ASF-One PTM filtering
 // with the variable modification file, the ASF-Diagonal filtering when it is
 // asked for, the merge of their results, the proteoform-graph alignment, its
@@ -438,8 +438,9 @@ std::string TopPIC_identify(std::map<std::string, std::string>& arguments) {
 // set raw_prsm_ext names (the stages before this one) left unidentified, and
 // the top PrSM selection chooses between its PrSMs and that set's, writing
 // toppic_topmg_raw_prsm, which the post-processing reads. With the hidden
-// --topmg-only there is no set before this stage (raw_prsm_ext is empty):
-// every spectrum is searched and only this stage's PrSMs are selected.
+// --topmg topmg-only there is no set before this stage (raw_prsm_ext is
+// empty): every spectrum is searched and only this stage's PrSMs are
+// selected.
 std::string TopPIC_topmg_identify(
     std::map<std::string, std::string>& arguments,
     const std::string& raw_prsm_ext) {
@@ -501,13 +502,13 @@ std::string TopPIC_topmg_identify(
     std::set<int> search_spec_ids;
     int spectrum_num = msalign_util::getSpNum(sp_file_name);
     if (raw_prsm_ext.empty()) {
-      // --topmg-only: no earlier stage has searched, every spectrum is
-      // searched here
+      // --topmg topmg-only: no earlier stage has searched, every spectrum
+      // is searched here
       for (int spec_id = 0; spec_id < spectrum_num; spec_id++) {
         search_spec_ids.insert(spec_id);
       }
       std::cout << "TopMG's identification - " << search_spec_ids.size()
-                << " spectra to search, the only search (--topmg-only)."
+                << " spectra to search, the only search (--topmg topmg-only)."
                 << std::endl;
     } else {
       std::set<int> identified_spec_ids;
@@ -612,7 +613,7 @@ std::string TopPIC_topmg_identify(
     int var_ptm_in_gap =
         std::min(std::stoi(arguments["varPtmNumInGap"]), max_mod_num);
     // whole proteins only is the proteoform type COMPLETE alone, which is one
-    // of the two values the argument check allows with --topmg-identify
+    // of the two values the argument check allows with --topmg
     bool whole_protein_only = (arguments["allowProtType"] == "COMPLETE");
     GraphAlignMngPtr ga_mng_ptr = std::make_shared<GraphAlignMng>(
         prsm_para_ptr, var_mod_file_name, shift_num, max_mod_num, gap,
@@ -674,7 +675,7 @@ std::string TopPIC_topmg_identify(
     // PrSM of every spectrum is chosen between the two searches
     std::cout << "Merging TopMG and TopPIC PrSMs - started." << std::endl;
     {
-      // with --topmg-only there is no stage before this one
+      // with --topmg topmg-only there is no stage before this one
       std::vector<std::string> all_exts = {"toppic_topmg_evalue"};
       if (!raw_prsm_ext.empty()) {
         all_exts.push_back(raw_prsm_ext);
@@ -893,12 +894,12 @@ int TopPIC_postprocess(std::map<std::string, std::string>& arguments,
     std::string base_name = file_util::basename(sp_file_name);
     // the E-value model of the cluster protein correction below. The PrSMs it
     // scores carry the proteoform of their cluster's best PrSM: one of
-    // toppic's own, or with --topmg-identify one of the graph alignment's,
+    // toppic's own, or with --topmg one of the graph alignment's,
     // which carries up to TopMG's own number of unexpected shifts. The
     // generating function needs a table layer for every shift, so it takes
     // the larger of the two numbers.
     int shift_num = std::stoi(arguments["shiftNumber"]);
-    if (arguments["topmgIdentify"] == "true" &&
+    if (arguments["topmgMode"] != "disabled" &&
         arguments["topmgShiftNumber"] != "") {
       shift_num = std::max(shift_num, std::stoi(arguments["topmgShiftNumber"]));
     }
@@ -907,7 +908,7 @@ int TopPIC_postprocess(std::map<std::string, std::string>& arguments,
     // alignment's E-values come from MCMC (--topmg-use-mcmc): a corrected
     // PrSM gets a generating-function E-value, which is not comparable with
     // the MCMC one of the PrSM it would be counted with.
-    bool remove_topmg_others = arguments["topmgIdentify"] == "true" &&
+    bool remove_topmg_others = arguments["topmgMode"] != "disabled" &&
                                arguments["topmgUseMcmc"] == "true";
 
     // raw_prsm_ext is the file the last stage that produced a PrSM set
@@ -1232,9 +1233,9 @@ int TopPIC_report(std::map<std::string, std::string>& arguments) {
 
 int TopPICProgress(std::map<std::string, std::string>& arguments) {
   std::string raw_prsm_ext;
-  if (arguments["topmgOnly"] == "true") {
-    // --topmg-only: TopMG's identification is the only database search, and
-    // toppic's own identification stages (TopPIC_identify and
+  if (arguments["topmgMode"] == "topmg-only") {
+    // --topmg topmg-only: TopMG's identification is the only database
+    // search, and toppic's own identification stages (TopPIC_identify and
     // TopPIC_multi_ptm_search) are skipped
     if (!TopPIC_init(arguments)) {
       return 1;
@@ -1261,7 +1262,7 @@ int TopPICProgress(std::map<std::string, std::string>& arguments) {
     if (std::stoi(arguments["shiftNumber"]) >= 2) {
       raw_prsm_ext = TopPIC_multi_ptm_search(arguments, raw_prsm_ext);
     }
-    if (arguments["topmgIdentify"] == "true") {
+    if (arguments["topmgMode"] == "pipeline") {
       raw_prsm_ext = TopPIC_topmg_identify(arguments, raw_prsm_ext);
     }
   }
