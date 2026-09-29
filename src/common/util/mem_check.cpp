@@ -60,7 +60,10 @@ const std::map<std::string, double> memory_per_thread_list{
     // workers empty-handed at any moment, which is what the shared 1.0 gb
     // estimate was calibrated against): budgeting the true residency keeps
     // the stage's peak memory inside the machine (toppic_test experiment 66
-    // measured 14.0 gb peak at 12 threads on a 14 gb machine without this)
+    // measured 14.0 gb peak at 12 threads on a 14 gb machine without this).
+    // The variable PTM filter reads the same four files per block and
+    // budgets with this entry too (experiment 77: 13.8 gb peak and swapping
+    // at 13 threads on the same machine with the 1.0 gb entry)
     {"zero_shift_filter", 1.25},
     // diag filter memory requirement per thread: about 0.4 gb
     {"diag_filter", 0.5}};
@@ -77,7 +80,7 @@ const std::map<std::string, double> memory_per_thread_list{
 // drivers; the names are the stage banners the drivers print.
 const std::map<std::string, std::string> filter_stage_mem_entry_list{
     {"Zero unexpected shift filtering", "zero_shift_filter"},
-    {"Variable PTM filtering", "zero_one_shift_filter"},
+    {"Variable PTM filtering", "zero_shift_filter"},
     {"One unexpected shift filtering", "zero_one_shift_filter"},
     {"Multiple unexpected shifts filtering", "diag_filter"},
     {"ASF-One PTM filtering", "zero_one_shift_filter"},
