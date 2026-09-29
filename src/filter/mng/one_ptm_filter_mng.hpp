@@ -80,9 +80,9 @@ class OnePtmFilterMng {
 
   // The spectra the variable-PTM variants are filtered for (var_num_ > 0),
   // by spectrum id. A topmg run filters every spectrum and leaves
-  // search_all_ true; toppic's --topmg-identify filters only the spectra its
-  // graph alignment searches, the ones its earlier stages have not
-  // identified.
+  // search_all_ true; toppic's --topmg filters only the spectra its graph
+  // alignment searches: with pipeline the ones its earlier stages have not
+  // identified, with topmg-only all of them.
   bool search_all_ = true;
 
   std::set<int> search_spec_ids_;
