@@ -36,6 +36,12 @@ SeedEnvPtr relaxProcessSeedEnvPtr(const SeedEnvPtr& seed_ptr,
                                   const EcscoreParaPtr& para_ptr,
                                   double sn_ratio);
 
+// the seed at half the charge that findEnvColl tests when the even/odd peak
+// ratio suggests a doubled charge; version 1, 2 or 3 of the function (see
+// seed_env_util.cpp), nullptr when no such seed can be built
+SeedEnvPtr getHalfChargeEnv(const SeedEnvPtr& seed_ptr,
+                            double even_odd_log_ratio, int version);
+
 SeedEnvPtr testHalfChargeEnv(const SeedEnvPtr& seed_ptr,
                              const MsMapPtr& ms_map_ptr,
                              double even_odd_log_ratio,

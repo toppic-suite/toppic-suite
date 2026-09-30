@@ -85,6 +85,7 @@ bool Argument::parse(int argc, char* argv[]) {
   std::string ms1_rank_peak_distance = "";
   std::string ms2_rank_peak_distance = "";
   std::string mass_group_boundary = "";
+  std::string half_charge_env_version = "";
 
   // Define and parse the program options
   try {
@@ -176,6 +177,11 @@ bool Argument::parse(int argc, char* argv[]) {
         "mass-group-boundary", po::value<std::string>(&mass_group_boundary),
         "The mass above which envelope validation requires three matched and "
         "three consecutive isotopic peaks instead of two (default 4250).")(
+        "half-charge-env-version",
+        po::value<std::string>(&half_charge_env_version),
+        "<1|2|3>. The version of getHalfChargeEnv that builds the half-charge "
+        "seed when the feature detection suspects a doubled charge (default "
+        "1).")(
         "max-miss-peak-num", po::value<std::string>(&max_miss_peak_num),
         "<a non-negative integer>. Maximum number of missing peaks allowed in "
         "a matched envelope. The default value is 1.")(
@@ -364,6 +370,17 @@ bool Argument::parse(int argc, char* argv[]) {
         return false;
       }
       topfd_para_ptr_->setMassGroupBoundary(mass);
+    }
+
+    if (vm.count("half-charge-env-version")) {
+      int version = 0;
+      if (!toInt(half_charge_env_version, version) || version < 1 ||
+          version > 3) {
+        LOG_ERROR("Half charge envelope version "
+                  << half_charge_env_version << " should be 1, 2 or 3.");
+        return false;
+      }
+      topfd_para_ptr_->setHalfChargeEnvVersion(version);
     }
 
     if (vm.count("max-miss-peak-num")) {
