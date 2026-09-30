@@ -143,21 +143,28 @@ double cosineDistance(const Peaks& a, const Peaks& b) {
 }
 
 // linkage + fcluster(criterion='distance') + cluster_index_gen on the
-// members of one group, mapped back to their spectrum indices (sorted)
-template <typename DistFunc>
+// members of one group, mapped back to their spectrum indices (sorted).
+// Pairs for which cannot_link is true get the distance n * n (n the group
+// size) instead of dist_func's: a merge of two clusters A and B with such a
+// pair then has an average distance of at least n * n / (|A| |B|) >= 4, so
+// with average linkage and a cutoff below 4 no flat cluster holds the pair.
+template <typename DistFunc, typename CannotLink>
 void clusterGroup(const std::vector<int>& members, lib_cluster::Linkage method,
-                  double cutoff, DistFunc dist_func,
+                  double cutoff, DistFunc dist_func, CannotLink cannot_link,
                   std::vector<std::vector<int>>& clusters) {
   int n = static_cast<int>(members.size());
   if (n <= 1) {
     clusters.push_back(members);
     return;
   }
+  const double apart = static_cast<double>(n) * n;
   std::vector<double> dist;
   dist.reserve(static_cast<size_t>(n) * (n - 1) / 2);
   for (int i = 0; i < n; i++) {
     for (int j = i + 1; j < n; j++) {
-      dist.push_back(dist_func(members[i], members[j]));
+      dist.push_back(cannot_link(members[i], members[j])
+                         ? apart
+                         : dist_func(members[i], members[j]));
     }
   }
   std::vector<std::array<double, 4>> z =
@@ -406,7 +413,8 @@ void filterPpir(LibData& data, double cutoff) {
   data.spectra = std::move(kept);
 }
 
-LibLibrary build(const LibData& data, LibRepMethod method) {
+LibLibrary build(const LibData& data, LibRepMethod method,
+                 bool python_compatible) {
   LibLibrary lib;
   lib.input_spectrum_num = static_cast<int>(data.spectra.size());
 
@@ -444,11 +452,27 @@ LibLibrary build(const LibData& data, LibRepMethod method) {
         [&specs](int a, int b) {
           return std::fabs(specs[a]->precursor_mass - specs[b]->precursor_mass);
         },
-        prec_clusters);
+        [](int, int) { return false; }, prec_clusters);
   }
   lib.precursor_cluster_num = static_cast<int>(prec_clusters.size());
 
-  // clustering_index_50peaks: average linkage on the cosine distances
+  // clustering_index_50peaks: average linkage on the cosine distances.
+  // Unlike the Python script, two spectra identified as different
+  // proteoforms (different proteoform ids) are never put in one cluster;
+  // unidentified spectra may join any cluster.
+  int form_id_col = columnIndex(data.id_columns, "proteoform_id");
+  std::vector<LibValue> form_ids(spec_num);
+  for (int s = 0; s < spec_num; s++) {
+    if (form_id_col >= 0 && !specs[s]->id_values.empty()) {
+      form_ids[s] = specs[s]->id_values[form_id_col];
+    }
+  }
+  auto different_forms = [&form_ids, python_compatible](int a, int b) {
+    return !python_compatible &&
+           !std::holds_alternative<std::monostate>(form_ids[a]) &&
+           !std::holds_alternative<std::monostate>(form_ids[b]) &&
+           form_ids[a] != form_ids[b];
+  };
   std::vector<std::vector<int>> clusters;
   for (const std::vector<int>& pc : prec_clusters) {
     clusterGroup(
@@ -456,7 +480,7 @@ LibLibrary build(const LibData& data, LibRepMethod method) {
         [&log_peaks](int a, int b) {
           return cosineDistance(log_peaks[a], log_peaks[b]);
         },
-        clusters);
+        different_forms, clusters);
   }
   int cluster_num = static_cast<int>(clusters.size());
   for (const std::vector<int>& members : clusters) {
@@ -527,7 +551,6 @@ LibLibrary build(const LibData& data, LibRepMethod method) {
   // lib_ptm: the identification of each cluster's lowest-E-value member
   lib.ptm_columns = ptmColumns(data);
   int form_col = columnIndex(data.id_columns, "proteoform");
-  int form_id_col = columnIndex(data.id_columns, "proteoform_id");
   std::vector<int> ptm_member(cluster_num);
   std::map<std::pair<int, LibValue>, std::vector<int>> by_form;
   for (int k = 0; k < cluster_num; k++) {

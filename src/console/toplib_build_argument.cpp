@@ -36,6 +36,7 @@ std::map<std::string, std::string> ToplibBuildArgument::initArguments() {
   arguments["ppirCutoff"] = "0";
   arguments["outputFileName"] = "TopLib/lib_spectra_ms2.db";
   arguments["clusterFileName"] = "";
+  arguments["pythonCompatible"] = "false";
   return arguments;
 }
 
@@ -56,6 +57,10 @@ void ToplibBuildArgument::outputArguments(
          << arguments["ppirCutoff"] << std::endl;
   output << std::setw(gap) << std::left << "Output file:" << "\t"
          << arguments["outputFileName"] << std::endl;
+  if (arguments["pythonCompatible"] == "true") {
+    output << std::setw(gap) << std::left << "Python compatible:" << "\t"
+           << "true" << std::endl;
+  }
   output << std::setw(gap) << std::left << "Version:" << "\t"
          << Version::getVersion() << std::endl;
   output << "******************** Parameters ********************" << std::endl;
@@ -92,9 +97,11 @@ bool ToplibBuildArgument::parse(int argc, char* argv[]) {
         "TopLib/lib_spectra_ms2.db.");
     po::options_description desc("Options");
     desc.add(display_desc);
-    // hidden: the cluster of every spectrum, for testing
+    // hidden: the cluster of every spectrum, for testing; the Python
+    // script's behaviour (spectra of different proteoforms may share a
+    // cluster, TopLib's PrSM table column names only), for comparing with it
     desc.add_options()("cluster-file", po::value<std::string>(&cluster_file),
-                       "")("input-file",
+                       "")("python-compatible", "")("input-file",
                            po::value<std::vector<std::string>>()->multitoken(),
                            "The msalign file and the PrSM file.");
     po::positional_options_description positional_options;
@@ -144,6 +151,9 @@ bool ToplibBuildArgument::parse(int argc, char* argv[]) {
     }
     if (vm.count("cluster-file")) {
       arguments_["clusterFileName"] = cluster_file;
+    }
+    if (vm.count("python-compatible")) {
+      arguments_["pythonCompatible"] = "true";
     }
   } catch (std::exception& e) {
     std::cerr << "Unhandled Exception in parsing command line" << e.what()

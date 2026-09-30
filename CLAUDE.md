@@ -765,10 +765,33 @@ number).
 toplib_build is a C++ port of TopLib's `src/ms_library_building.py`
 (`~/claude/toplib`, commit 7577b09): it clusters identified MS/MS spectra
 and writes target and decoy representatives into the SQLite table
-`target_decoy_spectra_representatives`. The port reproduces the Python
-script's library value for value, and the test that shows it (toppic_test
-experiment 81, report 0081, data/480_lib) compares every cell. Facts to
-keep straight:
+`target_decoy_spectra_representatives`. With the hidden
+`--python-compatible` the port reproduces the Python script's library value
+for value, and the tests that show it (toppic_test experiments 81 and 82,
+reports 0081 and 0082: data/480_lib and 480_F3_02's TopPIC 1.9 and 2.0
+output) compare every cell. By default it departs from the script in two
+ways (experiment 82):
+
+- **Spectra of different proteoforms are never clustered together.** In
+  the spectral clustering a pair of spectra with different proteoform ids
+  gets the distance n * n (n the precursor cluster's size) instead of the
+  cosine distance (`clusterGroup`'s `cannot_link`): every average linkage
+  merge containing such a pair then averages at least 4, above the 0.7
+  cutoff, so no flat cluster holds it, while unidentified spectra can still
+  join any cluster. The script's clusters joined different proteoforms (46
+  of 47 multi-member clusters on data/480_lib, 34 of them different
+  proteins), and as each representative keeps one identification, 50
+  proteoforms got none. Do not replace this by a stricter cosine cutoff:
+  that changes the clustering of every spectrum, not only of the mixed
+  ones, and still does not guarantee the separation.
+- **The PrSM table's optional columns are also found under TopPIC 1.9's and
+  2.0's names** (`idColumnMap`: TopLib's name, TopPIC 1.7's, first; then
+  e.g. `Unexpected modifications`, `# Masses`, `# Matched masses` /
+  `# Matched exp fragments`). The script looks for 1.7's names only, so
+  from 1.9 and 2.0 tables it copied none of the eight renamed columns.
+
+`--python-compatible` turns both off (it is what the comparisons with the
+Python script use). Facts to keep straight:
 
 - **The Python choices are kept on purpose**, including odd ones: the
   top-50 peaks, precursor clusters by charge then complete linkage within
@@ -805,9 +828,8 @@ keep straight:
   parameter block is skipped, which TopLib does with a separate script), or
   a library msalign file (v1.2.1 keys, identifications in the headers;
   `lib_msalign_reader::readLibraryMsalign` maps them onto the table's
-  columns). The optional table columns keep TopLib's names (1.x spellings
-  such as `unexpected modifications`); TopPIC 2.0's `Unexpected
-  modifications` etc. are therefore not copied, as in the Python script.
+  columns). The optional table columns are read under TopLib's names or
+  TopPIC 1.9's and 2.0's (see above).
 - The hidden option `--cluster-file <file>` writes every spectrum's cluster
   (for comparing the clustering with the Python pipeline's, which it does
   not write).

@@ -32,9 +32,14 @@ namespace lib_msalign_reader {
 // without masses or with a zero precursor mass are skipped, masses above the
 // precursor mass are dropped, and the table rows are joined by spectrum id.
 // The table's header is its first line with a Spectrum ID column (TopLib
-// wants it on the first line; TopPIC writes its parameters above it).
+// wants it on the first line; TopPIC writes its parameters above it). The
+// optional columns are found under TopLib's names (TopPIC 1.7's table) or
+// under the names TopPIC 1.9 and 2.0 gave them (e.g. "Unexpected
+// modifications" for "unexpected modifications"); python_compatible looks
+// for TopLib's names only, as the Python script does.
 LibData readMsalignAndPrsms(const std::string& msalign_file_name,
-                            const std::string& prsm_file_name);
+                            const std::string& prsm_file_name,
+                            bool python_compatible = false);
 
 // A library msalign file (v1.2.1: the identification in the spectrum
 // headers, e.g. PROTEIN_ACCESSION, PROTEOFORM, E_VALUE; MS2_ID, MS2_SCAN,

@@ -109,39 +109,50 @@ bool isNumber(const std::string& s) {
 }
 
 // The identification columns in the order of TopLib's library table, with
-// the PrSM table column each comes from.
-const std::vector<std::pair<std::string, std::string>>& idColumnMap() {
-  static const std::vector<std::pair<std::string, std::string>> m = {
-      {"proteoform_id", "Proteoform ID"},
-      {"protein_accession", "Protein accession"},
-      {"protein_description", "Protein description"},
-      {"first_residue", "First residue"},
-      {"last_residue", "Last residue"},
-      {"protein_sequence", "Database protein sequence"},
-      {"proteoform", "Proteoform"},
-      {"e_value", "E-value"},
-      {"spectrum_level_q_value", "Spectrum-level Q-value"},
-      {"proteoform_level_q_value", "Proteoform-level Q-value"},
-      {"num_unexpected_modifications", "#unexpected modifications"},
-      {"unexpected_modifications", "unexpected modifications"},
-      {"fixed_ptms", "Fixed PTMs"},
-      {"adjusted_precursor_mass", "Adjusted precursor mass"},
-      {"prsm_id", "Prsm ID"},
-      {"fragmentation", "Fragmentation"},
-      {"num_original_peaks", "#peaks"},
-      {"proteoform_intensity", "Proteoform intensity"},
-      {"feature_intensity", "Feature intensity"},
-      {"feature_score", "Feature score"},
-      {"feature_apex_time", "Feature apex time"},
-      {"num_protein_hits", "#Protein hits"},
-      {"proteoform_mass", "Proteoform mass"},
-      {"protein_n_terminal_form", "Protein N-terminal form"},
-      {"num_variable_ptms", "#variable PTMs"},
-      {"variable_ptms", "variable PTMs"},
-      {"num_matched_peaks", "#matched peaks"},
-      {"num_matched_fragment_ions", "#matched fragment ions"},
-      {"special_amion_acids", "Special amino acids"},
-      {"miscore", "MIScore"}};
+// the PrSM table columns each can come from: TopLib's name first (TopPIC
+// 1.7's table), then the names TopPIC 1.9 and 2.0 gave the same column.
+struct IdColumnSource {
+  std::string name;
+  std::vector<std::string> headers;
+};
+
+const std::vector<IdColumnSource>& idColumnMap() {
+  static const std::vector<IdColumnSource> m = {
+      {"proteoform_id", {"Proteoform ID"}},
+      {"protein_accession", {"Protein accession"}},
+      {"protein_description", {"Protein description"}},
+      {"first_residue", {"First residue"}},
+      {"last_residue", {"Last residue"}},
+      {"protein_sequence", {"Database protein sequence"}},
+      {"proteoform", {"Proteoform"}},
+      {"e_value", {"E-value"}},
+      {"spectrum_level_q_value", {"Spectrum-level Q-value"}},
+      {"proteoform_level_q_value", {"Proteoform-level Q-value"}},
+      {"num_unexpected_modifications",
+       {"#unexpected modifications", "# Unexpected modifications"}},
+      {"unexpected_modifications",
+       {"unexpected modifications", "Unexpected modifications"}},
+      {"fixed_ptms", {"Fixed PTMs"}},
+      {"adjusted_precursor_mass", {"Adjusted precursor mass"}},
+      {"prsm_id", {"Prsm ID"}},
+      {"fragmentation", {"Fragmentation"}},
+      {"num_original_peaks", {"#peaks", "# Masses"}},
+      {"proteoform_intensity", {"Proteoform intensity"}},
+      {"feature_intensity", {"Feature intensity"}},
+      {"feature_score", {"Feature score"}},
+      {"feature_apex_time", {"Feature apex time"}},
+      {"num_protein_hits", {"#Protein hits", "# Protein hits"}},
+      {"proteoform_mass", {"Proteoform mass"}},
+      {"protein_n_terminal_form", {"Protein N-terminal form"}},
+      {"num_variable_ptms", {"#variable PTMs", "# Variable PTMs"}},
+      {"variable_ptms", {"variable PTMs", "Variable PTMs"}},
+      {"num_matched_peaks",
+       {"#matched peaks", "# Matched masses", "# Matched exp fragments"}},
+      {"num_matched_fragment_ions",
+       {"#matched fragment ions", "# Matched fragments",
+        "# Matched theo fragments"}},
+      {"special_amion_acids", {"Special amino acids"}},
+      {"miscore", {"MIScore"}}};
   return m;
 }
 
@@ -280,7 +291,8 @@ std::vector<double> intensityList(const std::string& v) {
 
 // ------------------------------------------------------------ TopFD + table
 LibData readMsalignAndPrsms(const std::string& msalign_file_name,
-                            const std::string& prsm_file_name) {
+                            const std::string& prsm_file_name,
+                            bool python_compatible) {
   LibData data;
   // read_msalign: every field is the first header line containing its key
   for (const std::vector<std::string>& block :
@@ -386,16 +398,26 @@ LibData readMsalignAndPrsms(const std::string& msalign_file_name,
   std::vector<int> src_col;
   const auto& cmap = idColumnMap();
   for (size_t i = 0; i < cmap.size(); i++) {
-    if (pos.count(cmap[i].second) == 0) {
+    // the first of the column's names in the table (TopLib's name only in
+    // the Python-compatible mode)
+    size_t name_num = python_compatible ? 1 : cmap[i].headers.size();
+    int col = -1;
+    for (size_t k = 0; k < name_num && col < 0; k++) {
+      auto it = pos.find(cmap[i].headers[k]);
+      if (it != pos.end()) {
+        col = it->second;
+      }
+    }
+    if (col < 0) {
       if (static_cast<int>(i) < kRequiredIdColumnNum) {
         LOG_ERROR("The PrSM file " << prsm_file_name << " has no "
-                                   << cmap[i].second << " column.");
+                                   << cmap[i].headers[0] << " column.");
         exit(EXIT_FAILURE);
       }
       continue;
     }
-    data.id_columns.push_back({cmap[i].first, LibColType::kReal});
-    src_col.push_back(pos[cmap[i].second]);
+    data.id_columns.push_back({cmap[i].name, LibColType::kReal});
+    src_col.push_back(col);
   }
   std::multimap<long long, size_t> by_id;
   for (size_t s = 0; s < data.spectra.size(); s++) {

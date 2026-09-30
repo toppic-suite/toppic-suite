@@ -4,7 +4,10 @@ toplib_build builds a top-down spectral library: it clusters identified
 MS/MS spectra, makes one representative spectrum per cluster, gives it the
 cluster's best identification and a decoy spectrum, and writes the targets
 and decoys into a SQLite database. It is a C++ port of the library building
-of TopLib (`src/ms_library_building.py`) and writes the same table.
+of TopLib (`src/ms_library_building.py`) and writes the same table, with two
+differences: spectra identified as different proteoforms are never put in
+one cluster (step 2 in section 2), and the PrSM table's columns are also
+found under the names TopPIC 1.9 and 2.0 give them (section 1).
 
 ```sh
 toplib_build [options] <msalign file> [<PrSM file>]
@@ -38,10 +41,21 @@ Either of two inputs:
    `Feature intensity`, `Feature score`, `Feature apex time`,
    `#Protein hits`, `Proteoform mass`, `Protein N-terminal form`,
    `#variable PTMs`, `variable PTMs`, `#matched peaks`,
-   `#matched fragment ions`, `Special amino acids` and `MIScore`. The names
-   are TopLib's and must match exactly: the columns TopPIC 2.0 names
-   `# Unexpected modifications`, `Unexpected modifications`,
-   `# Protein hits`, `# Variable PTMs` and `Variable PTMs` are not copied.
+   `#matched fragment ions`, `Special amino acids` and `MIScore`. These are
+   TopLib's names, those of TopPIC 1.7's table; TopPIC 1.9 and 2.0 renamed
+   eight of them, and those names are accepted as well:
+
+   | TopLib (TopPIC 1.7) | TopPIC 1.9 | TopPIC 2.0 |
+   |---|---|---|
+   | `#unexpected modifications` | `# Unexpected modifications` | `# Unexpected modifications` |
+   | `unexpected modifications` | `Unexpected modifications` | `Unexpected modifications` |
+   | `#peaks` | `# Masses` | `# Masses` |
+   | `#Protein hits` | `# Protein hits` | `# Protein hits` |
+   | `#variable PTMs` | `# Variable PTMs` | `# Variable PTMs` |
+   | `variable PTMs` | `Variable PTMs` | `Variable PTMs` |
+   | `#matched peaks` | `# Matched masses` | `# Matched exp fragments` |
+   | `#matched fragment ions` | `# Matched fragments` | `# Matched theo fragments` |
+
    Spectra without a row in the table are unidentified.
 2. **A library msalign file** (one argument): an msalign file whose spectra
    carry their identification in the header (`PROTEIN_ACCESSION`,
@@ -71,7 +85,12 @@ and masses above the precursor mass are left out.
    (average linkage, cosine distance at most 0.7). The cosine distance uses
    the 50 most intense masses of each spectrum with log2 intensities
    scaled to unit length; two masses of equal charge match when they differ
-   by at most 10 ppm, or by 1.00235 Da within 10 ppm.
+   by at most 10 ppm, or by 1.00235 Da within 10 ppm. Two spectra
+   identified as different proteoforms (different proteoform ids) are never
+   put in one cluster, however similar their spectra; unidentified spectra
+   can join any cluster. (TopLib's script lets them share a cluster, whose
+   representative then keeps only one of their identifications, so the
+   other proteoforms can be left without a representative.)
 3. **Makes one representative per cluster.** `average` (the default)
    merges the members' spectra (all masses): masses of equal charge within
    10 ppm are combined into their intensity-weighted mean mass with the

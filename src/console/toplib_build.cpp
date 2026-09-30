@@ -40,13 +40,15 @@ int main(int argc, char* argv[]) {
   auto start = std::chrono::steady_clock::now();
 
   std::cout << "Reading spectra - started." << std::endl;
+  bool python_compatible = arguments["pythonCompatible"] == "true";
   toplib::LibData data;
   if (arguments["prsmFileName"].empty()) {
     data = toplib::lib_msalign_reader::readLibraryMsalign(
         arguments["msalignFileName"]);
   } else {
     data = toplib::lib_msalign_reader::readMsalignAndPrsms(
-        arguments["msalignFileName"], arguments["prsmFileName"]);
+        arguments["msalignFileName"], arguments["prsmFileName"],
+        python_compatible);
   }
   int identified = 0;
   for (const toplib::LibSpectrum& sp : data.spectra) {
@@ -68,7 +70,8 @@ int main(int argc, char* argv[]) {
   toplib::LibRepMethod method = arguments["representative"] == "single"
                                     ? toplib::LibRepMethod::kSingle
                                     : toplib::LibRepMethod::kAverage;
-  toplib::LibLibrary lib = toplib::lib_builder::build(data, method);
+  toplib::LibLibrary lib =
+      toplib::lib_builder::build(data, method, python_compatible);
   int written = 0;
   for (const toplib::LibRep& rep : lib.reps) {
     written += rep.identified ? 1 : 0;
