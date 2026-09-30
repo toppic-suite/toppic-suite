@@ -47,6 +47,15 @@ double pythonSum(const std::vector<double>& a);
 // products in 32 lanes of fused multiply-adds, then 16, then one by one.
 double numpyNorm(const std::vector<double>& a);
 
+// np.log2(v) / np.linalg.norm(np.log2(v)), with the C library's log2
+// (numpy's differs from it by one ulp for a few values)
+std::vector<double> log2Normalize(const std::vector<double>& v);
+
+// Python's repr of a float, which is how pandas' to_csv writes float64
+// values: the shortest round-trip digits, positional from 1e-4 up to
+// 1e16, else in exponent form (1e-05, 1.5e+16)
+std::string pythonRepr(double v);
+
 // A number of a table cell as pandas' read_csv parses it (the C parser's
 // precise_xstrtod: up to 17 significant digits accumulated in a double, then
 // scaled by an exact power of ten, which is not always correctly rounded;

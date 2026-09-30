@@ -259,7 +259,7 @@ copied or symlinked to run from `bin/`), then the compiled-in shared dir
 custom prefix both work:
 
 - `install(TARGETS ${TOPPIC_EXECUTABLES} ...)` puts the seven CLI tools and
-  the six `*_gui` counterparts (toplib_build has none) in `<prefix>/bin`. **When you add a new executable
+  the six `*_gui` counterparts (toplib_build and toplib_search have none) in `<prefix>/bin`. **When you add a new executable
   target, append it to the `TOPPIC_EXECUTABLES` list** (end of the file) so it
   is installed and gets the rpath below — nothing else is needed.
 - On Linux the vendored `ext/onnx/libonnxruntime.so.1.23.2` and its SONAME symlink (which every
@@ -317,7 +317,7 @@ docs are hand-written and nothing checks them against the build.
 One manual per command-line tool, linked from README.md's "Manuals" section:
 `topfd_manual.md`, `topdia_manual.md`, `topindex_manual.md`,
 `toppic_manual.md`, `topmg_manual.md`, `topdiff_manual.md`,
-`toplib_build_manual.md`. Each follows the
+`toplib_build_manual.md`, `toplib_search_manual.md`. Each follows the
 same layout: overview and usage line, input (including the companion files a
 tool needs, e.g. TopPIC's `_ms2.feature` and `.sqlite`), the pipeline steps
 as the console prints them, the output files with their columns, option
@@ -845,6 +845,61 @@ Python script use). Facts to keep straight:
   (for comparing the clustering with the Python pipeline's, which it does
   not write).
 
+## toplib_search (`src/toplib/lib_search*`, `console/toplib_search`)
+
+toplib_search is a C++ port of TopLib's `src/ms_library_query.py` (the
+same commit): it searches the spectra of a TopFD msalign file against the
+library table and writes `toplib_output/query_res.tsv`. It reproduces the
+script's table byte for byte (toppic_test experiment 83, report 0083:
+480_F3_02 against five libraries of data/480_lib and 480_F3_02, the
+parameter variants and a stress query); there is no compatibility switch
+because nothing in the search was changed. Facts to keep straight:
+
+- **The script's choices are kept on purpose**: the library rows with a
+  proteoform, targets and decoys alike; only the query's first precursor;
+  the ppm test in ppm of the *library* mass with the 1.00235 Da isotope
+  shift (Da mode has no shift); the cosine loop of
+  `peak_50_cosine_mass_ppm` with the library spectrum first and its early
+  return; the *first* candidate of the smallest distance (`np.argmin`,
+  a NaN distance first) kept when Python's `min()` is at most 1; the
+  cutoffs as `np.arange(0.1, 1.0, 0.001)` computes them (start + i *
+  (the second value - start), not i * 0.001); the cutoff whose FDR is
+  *closest* to 1% (it may be above 1%); the similarity filter of 0.3
+  afterwards. The decoys share their target's precursor mass and rarely
+  win (40 of 3,036 best matches on 480_F3_02), so the chosen distance
+  cutoff is about 0.98 and the 0.3 similarity filter, not the FDR,
+  decides which matches are written (none of the 40 decoys reaches it).
+- **pandas' output**: the library columns keep the dtype `read_sql_query`
+  gives them over the whole table (integers only -> int64; any REAL value,
+  or an integer column with a NULL -> float64, written `924.0`; text or
+  all NULL -> object), floats are written as Python's repr
+  (`lib_numeric::pythonRepr`, `std::to_chars` shortest digits laid out as
+  CPython's `format_float_short`), NULL as an empty cell, text quoted as
+  `csv.QUOTE_MINIMAL` quotes.
+- **Deliberate differences**, none of which changes a result on a single
+  TopFD file: the library path is used as given (the script prepends
+  `./TopLib/`); `-T` and `-c` are case-insensitive and checked (the
+  script's `-T da` takes the 2.2 default but tests in ppm); tolerances
+  must be nonnegative numbers; spectra of a repeated `SPECTRUM_ID` (a
+  combined msalign file) are searched and reported one by one, where the
+  script merges their masses and then fails ("All arrays must be of the
+  same length").
+- **Not reproduced**, as in toplib_build: numpy's `log2` (SVML) differs
+  from glibc's by an ulp for a few values, which moves a distance by an
+  ulp (1 query of 4,257 on 480_F3_02); pandas' descending `sort_values`
+  and `np.argsort` are not stable, so a tie of intensities across the
+  50-peak cut or two equal masses may be ordered differently (stable sorts
+  here; none in 480_F3_02). The norm is `lib_numeric::numpyNorm` (OpenBLAS
+  SkylakeX `ddot`), and `-ffp-contract=off` keeps the loops unfused as
+  numba's are.
+- The library search needs no index: candidates come from the library
+  sorted by precursor mass with a window that covers the exact test, then
+  in library order; a search of 4,257 spectra takes about 0.5 s.
+- The hidden option `--match-file <file>` writes every query's match
+  before the FDR step (`spectrum_id`, `file_name`, `lib_index`,
+  `representative_id`, `flag`, `calculated_cosine_dist`), the table the
+  script computes in `ms_query` and does not store.
+
 ## Source layout
 
 `src` is the include root, so headers are included by their path from `src`
@@ -1005,8 +1060,9 @@ above it, never the reverse:
   here rather than in `prsm` because it recomputes E-values.
 - `src/merge` — the topdiff feature-merge backend (`feature_prsm`,
   `feature_sample_merge`), used by `console/topdiff_process`.
-- `src/toplib` — toplib_build's spectral library building (see the
-  toplib_build section); it depends only on `common` and `sql`.
+- `src/toplib` — toplib_build's spectral library building and
+  toplib_search's library search (see their sections); it depends only on
+  `common` and `sql`.
 
 These are all library layers. The **executable** layers are separate (they are
 NOT in `COMMON_SRCS`; each is its own `add_executable` that links
@@ -1014,7 +1070,7 @@ NOT in `COMMON_SRCS`; each is its own `add_executable` that links
 
 - `src/console` — the command-line tools. Each is a `main()` (`topfd.cpp`,
   `topdia.cpp`, `topindex.cpp`, `toppic.cpp`, `topmg.cpp`, `topdiff.cpp`,
-  `toplib_build.cpp`) plus
+  `toplib_build.cpp`, `toplib_search.cpp`) plus
   its `<tool>_argument.cpp` parser (`boost::program_options`) plus, for the four
   multi-step tools, its `<tool>_process.cpp` orchestrator. topfd/topdia have no
   `*_process` here — they drive the `topfd_process`/`topdia_process`

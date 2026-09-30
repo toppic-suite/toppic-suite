@@ -403,6 +403,9 @@ toppic_console_exe(topdiff
 toppic_console_exe(toplib_build
   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/toplib_build.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/toplib_build_argument.cpp)
+toppic_console_exe(toplib_search
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/console/toplib_search.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/console/toplib_search_argument.cpp)
 
 # ---------------------------------------------------------------------------
 # GUI executables (Qt6)
@@ -467,7 +470,7 @@ toppic_gui_exe(topdia_gui   topdia   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/top
 # extra is installed there.
 # ---------------------------------------------------------------------------
 set(TOPPIC_EXECUTABLES
-  topfd topdia topindex toppic topmg topdiff toplib_build
+  topfd topdia topindex toppic topmg topdiff toplib_build toplib_search
   topfd_gui topdia_gui topindex_gui toppic_gui topmg_gui topdiff_gui)
 
 install(TARGETS ${TOPPIC_EXECUTABLES}

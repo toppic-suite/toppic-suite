@@ -289,10 +289,8 @@ std::vector<double> intensityList(const std::string& v) {
 
 }  // namespace
 
-// ------------------------------------------------------------ TopFD + table
-LibData readMsalignAndPrsms(const std::string& msalign_file_name,
-                            const std::string& prsm_file_name,
-                            bool python_compatible) {
+// ------------------------------------------------------------ TopFD msalign
+LibData readMsalign(const std::string& msalign_file_name) {
   LibData data;
   // read_msalign: every field is the first header line containing its key
   for (const std::vector<std::string>& block :
@@ -369,6 +367,14 @@ LibData readMsalignAndPrsms(const std::string& msalign_file_name,
     noteOptional(data, sp);
     data.spectra.push_back(std::move(sp));
   }
+  return data;
+}
+
+// ------------------------------------------------------------ TopFD + table
+LibData readMsalignAndPrsms(const std::string& msalign_file_name,
+                            const std::string& prsm_file_name,
+                            bool python_compatible) {
+  LibData data = readMsalign(msalign_file_name);
 
   // the PrSM table (tab-separated): the header is the first line with a
   // Spectrum ID column; the lines before it (TopPIC's parameter block,
