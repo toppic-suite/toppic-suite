@@ -258,8 +258,8 @@ copied or symlinked to run from `bin/`), then the compiled-in shared dir
 `CMAKE_INSTALL_PREFIX` (default `/usr/local`), so `DESTDIR` staging and a
 custom prefix both work:
 
-- `install(TARGETS ${TOPPIC_EXECUTABLES} ...)` puts the six CLI tools and their
-  six `*_gui` counterparts in `<prefix>/bin`. **When you add a new executable
+- `install(TARGETS ${TOPPIC_EXECUTABLES} ...)` puts the seven CLI tools and
+  the six `*_gui` counterparts (toplib_build has none) in `<prefix>/bin`. **When you add a new executable
   target, append it to the `TOPPIC_EXECUTABLES` list** (end of the file) so it
   is installed and gets the rpath below — nothing else is needed.
 - On Linux the vendored `ext/onnx/libonnxruntime.so.1.23.2` and its SONAME symlink (which every
@@ -316,7 +316,8 @@ docs are hand-written and nothing checks them against the build.
 
 One manual per command-line tool, linked from README.md's "Manuals" section:
 `topfd_manual.md`, `topdia_manual.md`, `topindex_manual.md`,
-`toppic_manual.md`, `topmg_manual.md`, `topdiff_manual.md`. Each follows the
+`toppic_manual.md`, `topmg_manual.md`, `topdiff_manual.md`,
+`toplib_build_manual.md`. Each follows the
 same layout: overview and usage line, input (including the companion files a
 tool needs, e.g. TopPIC's `_ms2.feature` and `.sqlite`), the pipeline steps
 as the console prints them, the output files with their columns, option
@@ -762,6 +763,88 @@ through the hidden `--frag-extend-min-mass <Da>` (key `fragExtendMinMass`,
 default `"5000"`, the `SpPara` default; validated as a non-negative
 number).
 
+## toplib_build (`src/toplib`, `console/toplib_build`)
+
+toplib_build is a C++ port of TopLib's `src/ms_library_building.py`
+(`~/claude/toplib`, commit 7577b09): it clusters identified MS/MS spectra
+and writes target and decoy representatives into the SQLite table
+`target_decoy_spectra_representatives`. With the hidden
+`--python-compatible` the port reproduces the Python script's library value
+for value, and the tests that show it (toppic_test experiments 81 and 82,
+reports 0081 and 0082: data/480_lib and 480_F3_02's TopPIC 1.9 and 2.0
+output) compare every cell. By default it departs from the script in two
+ways (experiment 82):
+
+- **Spectra of different proteoforms are never clustered together.** A
+  proteoform is the pair (proteoform id, protein accession): TopPIC 1.9
+  gave PrSMs of different proteins sharing a precursor feature one
+  proteoform id (43 of 1,818 ids on 480_F3_02; 2.0's cluster protein
+  correction removed that), so the id alone is not enough. In the spectral
+  clustering a pair of identified spectra of different proteoforms gets
+  the distance n * n (n the precursor cluster's size) instead of the
+  cosine distance (`clusterGroup`'s `cannot_link`): every average linkage
+  merge containing such a pair then averages at least 4, above the 0.7
+  cutoff, so no flat cluster holds it, while unidentified spectra can still
+  join any cluster. The script's clusters joined different proteoforms (46
+  of 47 multi-member clusters on data/480_lib, 34 of them different
+  proteins), and as each representative keeps one identification, 50
+  proteoforms got none. The step that keeps one cluster's identification
+  per proteoform and precursor charge uses the same pair (the script uses
+  the id alone, which on 1.9 tables dropped one protein's identification
+  when two proteins shared an id). Do not replace this by a stricter cosine
+  cutoff:
+  that changes the clustering of every spectrum, not only of the mixed
+  ones, and still does not guarantee the separation.
+- **The PrSM table's optional columns are also found under TopPIC 1.9's and
+  2.0's names** (`idColumnMap`: TopLib's name, TopPIC 1.7's, first; then
+  e.g. `Unexpected modifications`, `# Masses`, `# Matched masses` /
+  `# Matched exp fragments`). The script looks for 1.7's names only, so
+  from 1.9 and 2.0 tables it copied none of the eight renamed columns.
+
+`--python-compatible` turns both off (it is what the comparisons with the
+Python script use). Facts to keep straight:
+
+- **The Python choices are kept on purpose**, including odd ones: the
+  top-50 peaks, precursor clusters by charge then complete linkage within
+  2.2 Da, the 10 ppm cosine distance with the 1.00235 Da shift and its
+  early return when the sum passes 1, average linkage at 0.7, the
+  `weighted_mass_sum_inte_cal` merge (a peak of the first spectrum takes
+  every matching peak of the second; a second-spectrum peak may be merged
+  into several), the precursor representative from the truncated integer
+  mass differences, the lowest-E-value identification and the removal of
+  all but the best cluster per (precursor charge, proteoform id), the decoy
+  loops (redraw while negative, then while above the precursor mass, the
+  second loop not rechecking the first), and pandas' column types. Each
+  function's comment names the Python function it ports; keep that.
+- **Exact arithmetic of the Python libraries** (`lib_numeric`,
+  `lib_cluster`): SciPy's `nn_chain` linkage (with its tie rule, the stable
+  sort by distance and `label`), `fcluster(criterion='distance')`'s
+  traversal order (the cluster ids), numpy's pairwise sum, CPython's
+  `sum()` (Neumaier, Python >= 3.12) for the PPIR, CPython's Mersenne
+  Twister with `random.seed(int)` and `random.sample` (the decoys), pandas'
+  `precise_xstrtod` for the PrSM table's numbers (not always correctly
+  rounded: 395 of the data set's 5,360 E-values differ from `strtod` by an
+  ulp), and `np.linalg.norm` as OpenBLAS's AVX-512 (SkylakeX) `ddot`
+  computes it, with `std::fma`. The `src/toplib` sources are compiled with
+  `-ffp-contract=off` (CMakeLists.txt) so that nothing else is fused.
+- **Not reproduced:** numpy's `log2` (Intel SVML on AVX-512) differs from
+  glibc's by an ulp for about 0.006% of values, so a few normalized
+  intensities differ by an ulp; numpy's default sort is not stable and the
+  port uses stable sorts, so equal values (two peaks of one mass with
+  different charges, equal E-values) may come out in another order. The
+  norm matches numpy only where numpy's OpenBLAS picks the SkylakeX kernel.
+  Everything else was bit-identical in experiment 81.
+- **Inputs:** a TopFD msalign file plus a PrSM table (the script's input;
+  the header is the first line with a `Spectrum ID` column, so TopPIC's
+  parameter block is skipped, which TopLib does with a separate script), or
+  a library msalign file (v1.2.1 keys, identifications in the headers;
+  `lib_msalign_reader::readLibraryMsalign` maps them onto the table's
+  columns). The optional table columns are read under TopLib's names or
+  TopPIC 1.9's and 2.0's (see above).
+- The hidden option `--cluster-file <file>` writes every spectrum's cluster
+  (for comparing the clustering with the Python pipeline's, which it does
+  not write).
+
 ## Source layout
 
 `src` is the include root, so headers are included by their path from `src`
@@ -922,13 +1005,16 @@ above it, never the reverse:
   here rather than in `prsm` because it recomputes E-values.
 - `src/merge` — the topdiff feature-merge backend (`feature_prsm`,
   `feature_sample_merge`), used by `console/topdiff_process`.
+- `src/toplib` — toplib_build's spectral library building (see the
+  toplib_build section); it depends only on `common` and `sql`.
 
 These are all library layers. The **executable** layers are separate (they are
 NOT in `COMMON_SRCS`; each is its own `add_executable` that links
 `toppic_common`):
 
 - `src/console` — the command-line tools. Each is a `main()` (`topfd.cpp`,
-  `topdia.cpp`, `topindex.cpp`, `toppic.cpp`, `topmg.cpp`, `topdiff.cpp`) plus
+  `topdia.cpp`, `topindex.cpp`, `toppic.cpp`, `topmg.cpp`, `topdiff.cpp`,
+  `toplib_build.cpp`) plus
   its `<tool>_argument.cpp` parser (`boost::program_options`) plus, for the four
   multi-step tools, its `<tool>_process.cpp` orchestrator. topfd/topdia have no
   `*_process` here — they drive the `topfd_process`/`topdia_process`
