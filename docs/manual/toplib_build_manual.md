@@ -86,9 +86,10 @@ and masses above the precursor mass are left out.
    the 50 most intense masses of each spectrum with log2 intensities
    scaled to unit length; two masses of equal charge match when they differ
    by at most 10 ppm, or by 1.00235 Da within 10 ppm. Two spectra
-   identified as different proteoforms (different proteoform ids) are never
-   put in one cluster, however similar their spectra; unidentified spectra
-   can join any cluster. (TopLib's script lets them share a cluster, whose
+   identified as different proteoforms (a different proteoform id or
+   protein accession) are never put in one cluster, however similar their
+   spectra; unidentified spectra can join any cluster. (TopPIC 1.9 could
+   give PrSMs of different proteins one proteoform id; 2.0 does not.) (TopLib's script lets them share a cluster, whose
    representative then keeps only one of their identifications, so the
    other proteoforms can be left without a representative.)
 3. **Makes one representative per cluster.** `average` (the default)
@@ -101,8 +102,9 @@ and masses above the precursor mass are left out.
    member with the most masses when no member is identified). The
    representative keeps its 50 most intense masses, sorted by mass.
 4. **Identifies each representative** with the member of lowest E-value.
-   Of the clusters that share a proteoform id and a precursor charge, only
-   the one with the lowest E-value keeps its identification; representatives
+   Of the clusters that share a proteoform (id and accession) and a
+   precursor charge, only the one with the lowest E-value keeps its
+   identification; representatives
    without an identification are not written.
 5. **Makes a decoy** of each representative: every mass is shifted by the
    mass difference of two randomly chosen amino acid residues (redrawn

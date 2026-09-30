@@ -772,16 +772,24 @@ reports 0081 and 0082: data/480_lib and 480_F3_02's TopPIC 1.9 and 2.0
 output) compare every cell. By default it departs from the script in two
 ways (experiment 82):
 
-- **Spectra of different proteoforms are never clustered together.** In
-  the spectral clustering a pair of spectra with different proteoform ids
-  gets the distance n * n (n the precursor cluster's size) instead of the
+- **Spectra of different proteoforms are never clustered together.** A
+  proteoform is the pair (proteoform id, protein accession): TopPIC 1.9
+  gave PrSMs of different proteins sharing a precursor feature one
+  proteoform id (43 of 1,818 ids on 480_F3_02; 2.0's cluster protein
+  correction removed that), so the id alone is not enough. In the spectral
+  clustering a pair of identified spectra of different proteoforms gets
+  the distance n * n (n the precursor cluster's size) instead of the
   cosine distance (`clusterGroup`'s `cannot_link`): every average linkage
   merge containing such a pair then averages at least 4, above the 0.7
   cutoff, so no flat cluster holds it, while unidentified spectra can still
   join any cluster. The script's clusters joined different proteoforms (46
   of 47 multi-member clusters on data/480_lib, 34 of them different
   proteins), and as each representative keeps one identification, 50
-  proteoforms got none. Do not replace this by a stricter cosine cutoff:
+  proteoforms got none. The step that keeps one cluster's identification
+  per proteoform and precursor charge uses the same pair (the script uses
+  the id alone, which on 1.9 tables dropped one protein's identification
+  when two proteins shared an id). Do not replace this by a stricter cosine
+  cutoff:
   that changes the clustering of every spectrum, not only of the mixed
   ones, and still does not guarantee the separation.
 - **The PrSM table's optional columns are also found under TopPIC 1.9's and

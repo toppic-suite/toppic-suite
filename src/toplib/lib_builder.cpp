@@ -24,6 +24,7 @@
 #include <numeric>
 #include <optional>
 #include <string>
+#include <tuple>
 #include <utility>
 #include <variant>
 #include <vector>
@@ -458,20 +459,28 @@ LibLibrary build(const LibData& data, LibRepMethod method,
 
   // clustering_index_50peaks: average linkage on the cosine distances.
   // Unlike the Python script, two spectra identified as different
-  // proteoforms (different proteoform ids) are never put in one cluster;
-  // unidentified spectra may join any cluster.
+  // proteoforms are never put in one cluster; unidentified spectra may join
+  // any cluster. A proteoform is its proteoform id and protein accession:
+  // TopPIC 1.9 gave PrSMs of different proteins one proteoform id when they
+  // shared a precursor feature (2.0 corrects them to one protein).
   int form_id_col = columnIndex(data.id_columns, "proteoform_id");
-  std::vector<LibValue> form_ids(spec_num);
+  int acc_col = columnIndex(data.id_columns, "protein_accession");
+  std::vector<std::pair<LibValue, LibValue>> forms(spec_num);
   for (int s = 0; s < spec_num; s++) {
-    if (form_id_col >= 0 && !specs[s]->id_values.empty()) {
-      form_ids[s] = specs[s]->id_values[form_id_col];
+    if (!specs[s]->id_values.empty()) {
+      if (form_id_col >= 0) {
+        forms[s].first = specs[s]->id_values[form_id_col];
+      }
+      if (acc_col >= 0) {
+        forms[s].second = specs[s]->id_values[acc_col];
+      }
     }
   }
-  auto different_forms = [&form_ids, python_compatible](int a, int b) {
+  auto different_forms = [&forms, python_compatible](int a, int b) {
     return !python_compatible &&
-           !std::holds_alternative<std::monostate>(form_ids[a]) &&
-           !std::holds_alternative<std::monostate>(form_ids[b]) &&
-           form_ids[a] != form_ids[b];
+           !std::holds_alternative<std::monostate>(forms[a].first) &&
+           !std::holds_alternative<std::monostate>(forms[b].first) &&
+           forms[a] != forms[b];
   };
   std::vector<std::vector<int>> clusters;
   for (const std::vector<int>& pc : prec_clusters) {
@@ -552,7 +561,7 @@ LibLibrary build(const LibData& data, LibRepMethod method,
   lib.ptm_columns = ptmColumns(data);
   int form_col = columnIndex(data.id_columns, "proteoform");
   std::vector<int> ptm_member(cluster_num);
-  std::map<std::pair<int, LibValue>, std::vector<int>> by_form;
+  std::map<std::tuple<int, LibValue, LibValue>, std::vector<int>> by_form;
   for (int k = 0; k < cluster_num; k++) {
     int best = minEValueMember(clusters[k], e_values);
     if (best < 0) {
@@ -573,11 +582,16 @@ LibLibrary build(const LibData& data, LibRepMethod method,
         std::holds_alternative<std::monostate>(sp.id_values[form_id_col])) {
       continue;
     }
-    by_form[{sp.precursor_charge, sp.id_values[form_id_col]}].push_back(k);
+    // the Python script groups by proteoform id alone
+    LibValue acc;
+    if (!python_compatible && acc_col >= 0) {
+      acc = sp.id_values[acc_col];
+    }
+    by_form[{sp.precursor_charge, sp.id_values[form_id_col], acc}].push_back(k);
   }
   // remove inconsistent identifications: of the clusters with the same
-  // proteoform and precursor charge only the one with the lowest E-value
-  // keeps it
+  // proteoform (id and accession) and precursor charge only the one with
+  // the lowest E-value keeps it
   for (const auto& group : by_form) {
     const std::vector<int>& ks = group.second;
     if (ks.size() <= 1) {
