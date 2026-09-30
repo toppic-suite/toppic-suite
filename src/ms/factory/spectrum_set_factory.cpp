@@ -65,8 +65,11 @@ SpectrumSetPtr geneSpectrumSetPtr(const DeconvMsPtrVec& deconv_ms_ptr_vec,
   double n_term_label_mass = sp_para_ptr->getNTermLabelMass();
 
   if (valid) {
+    // prec_mono_mass is the observed precursor mass; the extended spectra
+    // take the label-free one, and the PRM spectra subtract the label
+    // themselves (prm_ms_factory)
     extend_ms_three_ptr_vec = extend_ms_factory::geneMsThreePtrVec(
-        deconv_ms_ptr_vec, sp_para_ptr, prec_mono_mass);
+        deconv_ms_ptr_vec, sp_para_ptr, prec_mono_mass - n_term_label_mass);
     prm_ms_two_ptr_vec = prm_ms_factory::geneMsTwoPtrVec(
         deconv_ms_ptr_vec, sp_para_ptr, prec_mono_mass, n_term_label_mass);
     srm_ms_two_ptr_vec = prm_ms_factory::geneSuffixMsTwoPtrVec(

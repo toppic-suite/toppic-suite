@@ -57,7 +57,10 @@ IntPairVec getExtendIntMassErrorList(const ExtendMsPtrVec& ext_ms_ptr_vec,
     ExtendMsPtr ext_ms_ptr = ext_ms_ptr_vec[i];
     double shift = 0;
     if (pref) {
-      shift = ext_ms_ptr->getMsHeaderPtr()->getActivationPtr()->getN_BYShift();
+      // the prefix residue masses of the N-terminal fragments, whose masses
+      // carry the N-terminal label of a labeled run (toppic -N)
+      shift = ext_ms_ptr->getMsHeaderPtr()->getActivationPtr()->getN_BYShift() +
+              ext_ms_ptr->getMsHeaderPtr()->getNTermLabelMass();
     } else {
       shift = ext_ms_ptr->getMsHeaderPtr()->getActivationPtr()->getC_BYShift() +
               mass_constant::getWaterMass();

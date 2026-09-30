@@ -126,6 +126,9 @@ confidence of the assigned position.
 The `Proteoform mass` column is the mass of the annotated proteoform,
 including all named modifications and the mass shifts, and
 `Adjusted precursor mass` is the precursor mass it was matched to.
+Neither the string nor the two masses include an N-terminal label (the
+`N-terminal label mass` column, 0 without a label): `Precursor mass` is
+about `Adjusted precursor mass` plus the label.
 
 ## 5. Examples
 

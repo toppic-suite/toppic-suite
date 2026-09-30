@@ -52,7 +52,8 @@ std::function<void()> geneTask(const SpectrumSetPtr& spectrum_set_ptr,
     SimplePrsmPtrVec match_prsm_ptrs;
     for (size_t i = 0; i < ori_simple_prsm_ptrs.size(); i++) {
       // check if the simple_prsm has the same precursor +/- 1 Dalton shift
-      if (std::abs(spectrum_set_ptr->getPrecMonoMass() -
+      // (the filtering result holds the label-free precursor mass, -N)
+      if (std::abs(spectrum_set_ptr->getLabelFreePrecMonoMass() -
                    ori_simple_prsm_ptrs[i]->getPrecMass()) < std::pow(10, -4)) {
         match_prsm_ptrs.push_back(ori_simple_prsm_ptrs[i]);
       }

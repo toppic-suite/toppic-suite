@@ -118,8 +118,10 @@ int process(const PrsmParaPtr& prsm_para_ptr, const TdgfMngPtr& tdgf_mng_ptr,
       MsHeaderPtr header_ptr = deconv_ms_ptr_vec[0]->getMsHeaderPtr();
       auto it = corrections.find(header_ptr->getSpecId());
       if (it != corrections.end() && header_ptr->containsPrec()) {
-        double prec_mono_mass = header_ptr->getFirstPrecMonoMass() -
-                                sp_para_ptr->getNTermLabelMass();
+        // the observed precursor mass: the spectrum set subtracts the
+        // N-terminal label (toppic -N) itself, for its PRM and extended
+        // spectra
+        double prec_mono_mass = header_ptr->getFirstPrecMonoMass();
         SpectrumSetPtr spec_set_ptr = spectrum_set_factory::geneSpectrumSetPtr(
             deconv_ms_ptr_vec, sp_para_ptr, prec_mono_mass);
         if (spec_set_ptr->isValid()) {

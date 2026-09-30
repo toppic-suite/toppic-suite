@@ -45,8 +45,9 @@ PrsmPtrVec ZeroPtmSearchProcessor::zeroPtmSearchOneSpec(
     // When +/-1 Dalton error is allowed, if the adjusted precursor of the
     // spectrum set does not match the adjusted precursor mass in the
     // filtering result, the spectrum proteoform match is ignored.
-    double shift =
-        spec_set_ptr->getPrecMonoMass() - simple_prsm_ptr_vec[i]->getPrecMass();
+    // The filtering result holds the label-free precursor mass (toppic -N).
+    double shift = spec_set_ptr->getLabelFreePrecMonoMass() -
+                   simple_prsm_ptr_vec[i]->getPrecMass();
     if (std::lround(shift) != 0) {
       continue;
     }

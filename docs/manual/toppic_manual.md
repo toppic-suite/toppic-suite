@@ -166,6 +166,7 @@ columns are:
 | `Data file name` | The spectrum file. |
 | `Prsm ID`, `Spectrum ID`, `Fragmentation`, `Scan(s)`, `Retention time` | The PrSM and its spectrum (several values when spectra are combined, see `--num-combined-spectra`); retention time in minutes. |
 | `# Masses`, `Charge`, `Precursor mass`, `Adjusted precursor mass` | Number of deconvoluted masses, precursor charge, precursor mass, and the precursor mass adjusted to the proteoform. |
+| `N-terminal label mass` | The mass of the N-terminal label (for example TMT) that the search assumed on every proteoform, 0 without a label. The adjusted precursor mass, the proteoform and its mass leave the label out; the precursor mass includes it. |
 | `Proteoform ID`, `Proteoform intensity` | The proteoform cluster and its abundance. |
 | `Feature ID`, `Feature intensity`, `Feature score`, `Feature apex time` | The TopFD proteoform feature of the spectrum: id, abundance, ECScore and apex retention time (minutes). |
 | `# Protein hits`, `Protein accession`, `Protein description` | Number of proteins containing the proteoform, and the reported protein. |

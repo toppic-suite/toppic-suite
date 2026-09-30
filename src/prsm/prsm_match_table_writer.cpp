@@ -43,7 +43,8 @@ void PrsmMatchTableWriter::writeHeader(std::ofstream& file) {
        << delim << "Fragmentation" << delim << "Scan(s)" << delim
        << "Retention time" << delim << "# Masses" << delim << "Charge" << delim
        << "Precursor mass" << delim << "Adjusted precursor mass" << delim
-       << "Proteoform ID" << delim << "Proteoform intensity" << delim
+       << "N-terminal label mass" << delim << "Proteoform ID" << delim
+       << "Proteoform intensity" << delim
        << "Feature ID" << delim << "Feature intensity" << delim
        << "Feature score" << delim << "Feature apex time" << delim
        << "# Protein hits" << delim << "Protein accession" << delim
@@ -164,6 +165,7 @@ void PrsmMatchTableWriter::writePrsmStandardFormat(
            << deconv_ms_ptr_vec[0]->getMsHeaderPtr()->getFirstPrecCharge()
            << delim << prsm_ptr->getOriPrecMass() << delim
            << prsm_ptr->getAdjustedPrecMass() << delim
+           << prsm_ptr->getNTermLabelMass() << delim
            << prsm_ptr->getProteoformPtr()->getProteoClusterId() << delim
            << prsm_ptr->getProteoformPtr()->getProteoInte() << delim;
 
@@ -241,7 +243,7 @@ void PrsmMatchTableWriter::writePrsmStandardFormat(
 
       line_str << prsm_ptr->getFileName() << delim << prsm_ptr->getPrsmId()
                << delim << delim << delim << delim << delim << delim << delim
-               << delim << delim << delim << delim;
+               << delim << delim << delim << delim << delim;
 
       // feature
       line_str << delim << delim << delim << delim << delim;

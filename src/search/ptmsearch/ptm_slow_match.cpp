@@ -30,7 +30,8 @@ PtmSlowMatch::PtmSlowMatch(const ProteoformPtr& proteo_ptr,
   deconv_ms_ptr_vec_ = spectrum_set_ptr->getDeconvMsPtrVec();
   ms_six_ptr_vec_ = spectrum_set_ptr->getMsSixPtrVec();
   ms_three_ptr_vec_ = spectrum_set_ptr->getMsThreePtrVec();
-  prec_mono_mass_ = spectrum_set_ptr->getPrecMonoMass();
+  // the label-free precursor mass (toppic -N), the mass of the PRM spectra
+  prec_mono_mass_ = spectrum_set_ptr->getLabelFreePrecMonoMass();
   align_type_ptr_ = align_type_ptr;
   mng_ptr_ = mng_ptr;
   init();

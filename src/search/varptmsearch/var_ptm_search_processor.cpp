@@ -88,7 +88,8 @@ std::function<void()> geneTask(const SpectrumSetPtr& spec_set_ptr,
         mng_ptr->prsm_para_ptr_->getProtModPtrVec();
     ProteoformPtrVec proteoform_ptr_vec;
     for (size_t i = 0; i < simple_prsm_ptr_vec.size(); i++) {
-      if (std::abs(spec_set_ptr->getPrecMonoMass() -
+      // the filtering result holds the label-free precursor mass (-N)
+      if (std::abs(spec_set_ptr->getLabelFreePrecMonoMass() -
                    simple_prsm_ptr_vec[i]->getPrecMass()) > std::pow(10, -4)) {
         // When precursor error is allowed, if the adjusted precursor of the
         // spectrum set does not match the adjusted precursor mass in the

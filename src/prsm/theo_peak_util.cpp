@@ -72,18 +72,20 @@ TheoPeakPtrVec geneTheoPeak(const BpSpecPtr& bp_spec_ptr,
 
 TheoPeakPtrVec geneProteoformTheoPeak(const ProteoformPtr& proteoform_ptr,
                                       const ActivationPtr& activation_ptr,
-                                      double min_mass) {
+                                      double min_mass,
+                                      double n_term_label_mass) {
   BpSpecPtr bp_ptr = proteoform_ptr->getBpSpecPtr();
 
   TheoPeakPtrVec all_peaks;
   SeqSegmentPtrVec segments = proteoform_ptr->getSeqSegmentPtrVec();
   for (size_t i = 0; i < segments.size(); i++) {
     NeutralLossPtr neutral_loss_ptr = NeutralLossBase::getNeutralLossPtr_NONE();
+    // the N-terminal ions carry the label, the C-terminal ones do not
+    double n_term_shift = segments[i]->getNTermShift() + n_term_label_mass;
     double max_mass = proteoform_ptr->getResSeqPtr()->getSeqMass() +
-                      segments[i]->getNTermShift() +
-                      segments[i]->getCTermShift() - min_mass;
+                      n_term_shift + segments[i]->getCTermShift() - min_mass;
     TheoPeakPtrVec peaks = geneTheoPeak(
-        bp_ptr, activation_ptr, neutral_loss_ptr, segments[i]->getNTermShift(),
+        bp_ptr, activation_ptr, neutral_loss_ptr, n_term_shift,
         segments[i]->getCTermShift(), segments[i]->getLeftBpPos(),
         segments[i]->getRightBpPos(), min_mass, max_mass);
     all_peaks.insert(all_peaks.end(), peaks.begin(), peaks.end());

@@ -286,9 +286,15 @@ TheoPeakPtrVec getUnmatchedTheoPeaks(const PrsmPtr& prsm_ptr,
                                      const ActivationPtr& activation_ptr,
                                      double min_mass) {
   ProteoformPtr form_ptr = prsm_ptr->getProteoformPtr();
-  TheoPeakPtrVec theo_peaks =
-      theo_peak_util::geneProteoformTheoPeak(form_ptr, activation_ptr,
-                                             min_mass);
+  // the N-terminal label (toppic -N) of the refined spectra, which the
+  // N-terminal ions carry
+  const ExtendMsPtrVec& refine_ms_ptr_vec = prsm_ptr->getRefineMsPtrVec();
+  double n_term_label_mass =
+      refine_ms_ptr_vec.empty()
+          ? 0
+          : refine_ms_ptr_vec[0]->getMsHeaderPtr()->getNTermLabelMass();
+  TheoPeakPtrVec theo_peaks = theo_peak_util::geneProteoformTheoPeak(
+      form_ptr, activation_ptr, min_mass, n_term_label_mass);
   PeakIonPairPtrVec pairs = peak_ion_pair_util::genePeakIonPairs(
       form_ptr, prsm_ptr->getRefineMsPtrVec(), min_mass);
   std::set<std::pair<bool, int>> matched;

@@ -28,7 +28,8 @@ VarPtmSlowMatch::VarPtmSlowMatch(const ProteoformPtr& proteo_ptr,
   proteo_ptr_ = proteo_ptr;
   deconv_ms_ptr_vec_ = spectrum_set_ptr->getDeconvMsPtrVec();
   ms_six_ptr_vec_ = spectrum_set_ptr->getMsSixPtrVec();
-  prec_mono_mass_ = spectrum_set_ptr->getPrecMonoMass();
+  // the label-free precursor mass (toppic -N), the mass of the PRM spectra
+  prec_mono_mass_ = spectrum_set_ptr->getLabelFreePrecMonoMass();
   // LOG_ERROR("prec mass " << prec_mono_mass_ << " protein mass " <<
   // proteo_ptr->getMonoNeutralMass());
   mng_ptr_ = mng_ptr;

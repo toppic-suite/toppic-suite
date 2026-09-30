@@ -74,6 +74,11 @@ class Prsm {
 
   double getAdjustedPrecMass() { return adjusted_prec_mass_; }
 
+  // the N-terminal label mass of the search (-N, e.g. TMT; 0 without a
+  // label): the adjusted precursor mass and the proteoform exclude it, the
+  // original precursor mass includes it
+  double getNTermLabelMass() { return n_term_label_mass_; }
+
   ProteoformPtr getProteoformPtr() { return proteoform_ptr_; }
 
   ExpectedValuePtr getExpectedValuePtr() { return expected_value_ptr_; }
@@ -224,6 +229,8 @@ class Prsm {
   double ori_prec_mass_;
   /* adjusted precursor mass */
   double adjusted_prec_mass_;
+
+  double n_term_label_mass_ = 0;
 
   /* protein sequence */
   ProteoformPtr proteoform_ptr_;

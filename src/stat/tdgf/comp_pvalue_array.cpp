@@ -93,6 +93,10 @@ void CompPValueArray::compMultiExpectedValues(const PrmMsPtrVec& ms_six_ptr_vec,
 
   double tolerance =
       ms_six_ptr_vec[0]->getMsHeaderPtr()->getFirstPrecErrorTolerance(ppo);
+  // the original precursor mass of a PrSM includes the N-terminal label
+  // (toppic -N), its adjusted precursor mass does not
+  double n_term_label_mass =
+      mng_ptr_->prsm_para_ptr_->getSpParaPtr()->getNTermLabelMass();
   for (size_t i = 0; i < prsm_ptrs.size(); i++) {
     double prec_mass =
         ms_six_ptr_vec[0]->getMsHeaderPtr()->getFirstPrecMonoMassMinusWater();
@@ -107,10 +111,10 @@ void CompPValueArray::compMultiExpectedValues(const PrmMsPtrVec& ms_six_ptr_vec,
       // We need to adjust the prec mass for candidate number computation
       // if there was 1 Da difference between original prec mass and adjusted
       // prec mass.
-      if (std::abs(prsm_ptrs[i]->getOriPrecMass() -
-                   prsm_ptrs[i]->getAdjustedPrecMass()) > tolerance) {
-        if (prsm_ptrs[i]->getOriPrecMass() <
-            prsm_ptrs[i]->getAdjustedPrecMass()) {
+      double ori_prec_mass = prsm_ptrs[i]->getOriPrecMass() - n_term_label_mass;
+      if (std::abs(ori_prec_mass - prsm_ptrs[i]->getAdjustedPrecMass()) >
+          tolerance) {
+        if (ori_prec_mass < prsm_ptrs[i]->getAdjustedPrecMass()) {
           search_mass = prec_mass + mass_constant::getIsotopeMass();
         } else {
           search_mass = prec_mass - mass_constant::getIsotopeMass();
@@ -156,7 +160,9 @@ void CompPValueArray::compSingleExpectedValue(const DeconvMsPtrVec& ms_ptr_vec,
                                               const PrsmPtr& prsm_ptr,
                                               double ppo,
                                               double n_term_label_mass) {
-  double refine_prec_mass = prsm_ptr->getAdjustedPrecMass();
+  // the adjusted precursor mass of a PrSM is label-free (toppic -N); the PRM
+  // spectra are built from the observed one and subtract the label
+  double refine_prec_mass = prsm_ptr->getAdjustedPrecMass() + n_term_label_mass;
   DeconvMsPtrVec refine_ms_ptr_vec =
       deconv_ms_util::getRefineMsPtrVec(ms_ptr_vec, refine_prec_mass);
 

@@ -29,10 +29,17 @@ namespace extend_ms_factory {
 
 namespace {
 
+// prec_mass is the label-free precursor mass: with an N-terminal label
+// (toppic -N) the observed precursor mass minus the label. The header gets
+// that mass and the label; the peaks are the observed fragment masses, so
+// the N-terminal ones carry the label, and they are kept up to the observed
+// precursor mass.
 ExtendMsPtr geneMsThreePtr(const DeconvMsPtr& deconv_ms_ptr,
                            const SpParaPtr& sp_para_ptr, double prec_mass) {
   MsHeaderPtr ori_header_ptr = deconv_ms_ptr->getMsHeaderPtr();
   MsHeaderPtr header_ptr = MsHeader::geneMsHeaderPtr(ori_header_ptr, prec_mass);
+  double n_term_label_mass = sp_para_ptr->getNTermLabelMass();
+  header_ptr->setNTermLabelMass(n_term_label_mass);
   ExtendPeakPtrVec list;
   double frag_extend_min_mass = sp_para_ptr->getFragExtendMinMass();
   const std::vector<double>& ext_offsets = sp_para_ptr->getFragExtOffsets();
@@ -56,7 +63,9 @@ ExtendMsPtr geneMsThreePtr(const DeconvMsPtr& deconv_ms_ptr,
   // filter extend_peak
   ExtendPeakPtrVec list_filtered;
   double min_mass = sp_para_ptr->getMinMass();
-  double prec_mono_mass = header_ptr->getFirstPrecMonoMass();
+  // the observed precursor mass
+  double prec_mono_mass =
+      header_ptr->getFirstPrecMonoMass() + n_term_label_mass;
   for (size_t i = 0; i < list.size(); i++) {
     double mass = list[i]->getPosition();
     if (mass >= min_mass && mass <= prec_mono_mass - min_mass) {

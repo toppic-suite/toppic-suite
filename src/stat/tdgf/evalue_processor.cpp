@@ -170,8 +170,9 @@ void EValueProcessor::process(bool is_separate) {
     cnt += group_spec_num;
     MsHeaderPtr header_ptr = deconv_ms_ptr_vec[0]->getMsHeaderPtr();
     if (header_ptr->containsPrec()) {
-      double prec_mono_mass =
-          header_ptr->getFirstPrecMonoMass() - sp_para_ptr->getNTermLabelMass();
+      // the observed precursor mass: the spectrum set subtracts the N-terminal
+      // label (toppic -N) itself, for its PRM and extended spectra
+      double prec_mono_mass = header_ptr->getFirstPrecMonoMass();
       SpectrumSetPtr spec_set_ptr = spectrum_set_factory::geneSpectrumSetPtr(
           deconv_ms_ptr_vec, sp_para_ptr, prec_mono_mass);
       if (spec_set_ptr->isValid()) {
