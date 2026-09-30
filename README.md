@@ -29,6 +29,7 @@ The command-line tools are documented in `docs/manual/`:
 - [TopMG](docs/manual/topmg_manual.md) — identification of highly modified proteoforms with mass graphs
 - [TopDiff](docs/manual/topdiff_manual.md) — differential abundance of proteoforms across samples
 - [toplib_build](docs/manual/toplib_build_manual.md) — a spectral library of identified MS/MS spectra (the C++ port of TopLib's library building)
+- [toplib_search](docs/manual/toplib_search_manual.md) — identification of MS/MS spectra by searching a spectral library (the C++ port of TopLib's library search)
 - [Proteoform annotation](docs/manual/proteoform.md) — how to read the annotated proteoform strings in TopPIC and TopMG results
 
 The GUI tools (`topfd_gui`, `topdia_gui`, `topindex_gui`, `toppic_gui`,
