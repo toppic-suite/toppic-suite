@@ -104,19 +104,6 @@ Peaks topPeaksByMass(const Peaks& p) {
   return sortByMass(select(p, idx));
 }
 
-// np.log2(inte) / np.linalg.norm(np.log2(inte))
-std::vector<double> logNorm(const std::vector<double>& inte) {
-  std::vector<double> v(inte.size());
-  for (size_t i = 0; i < inte.size(); i++) {
-    v[i] = std::log2(inte[i]);
-  }
-  double norm = lib_numeric::numpyNorm(v);
-  for (double& x : v) {
-    x = x / norm;
-  }
-  return v;
-}
-
 // distance_calculation.peak_50_cosine_mass_ppm (err = 0, ppm = 10): one
 // minus the summed intensity products of the peak pairs of equal charge
 // whose masses differ by at most the tolerance or by one isotope shift
@@ -437,7 +424,8 @@ LibLibrary build(const LibData& data, LibRepMethod method,
   std::vector<Peaks> log_peaks(spec_num);
   for (int s = 0; s < spec_num; s++) {
     log_peaks[s] = sortByMass(top_peaks[s]);
-    log_peaks[s].intensities = logNorm(log_peaks[s].intensities);
+    log_peaks[s].intensities =
+        lib_numeric::log2Normalize(log_peaks[s].intensities);
   }
 
   // clustering_precursor_mass_index: by charge (increasing), then complete
@@ -554,7 +542,7 @@ LibLibrary build(const LibData& data, LibRepMethod method,
     rep.masses = std::move(peaks.masses);
     rep.intensities = std::move(peaks.intensities);
     rep.charges = std::move(peaks.charges);
-    rep.norm_intensities = logNorm(rep.intensities);
+    rep.norm_intensities = lib_numeric::log2Normalize(rep.intensities);
   }
 
   // lib_ptm: the identification of each cluster's lowest-E-value member

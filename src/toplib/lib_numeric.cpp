@@ -16,7 +16,9 @@
 
 #include "toplib/lib_numeric.hpp"
 
+#include <charconv>
 #include <cmath>
+#include <cstdio>
 #include <limits>
 
 namespace toppic {
@@ -123,6 +125,66 @@ double numpyNorm(const std::vector<double>& x) {
     dot = std::fma(x[i], x[i], dot);
   }
   return std::sqrt(dot);
+}
+
+std::vector<double> log2Normalize(const std::vector<double>& v) {
+  std::vector<double> r(v.size());
+  for (size_t i = 0; i < v.size(); i++) {
+    r[i] = std::log2(v[i]);
+  }
+  double norm = numpyNorm(r);
+  for (double& x : r) {
+    x = x / norm;
+  }
+  return r;
+}
+
+// Python's float_repr_style 'short' (format_float_short, mode 'r'):
+// std::to_chars gives the same shortest, nearest digits as dtoa's mode 0
+std::string pythonRepr(double v) {
+  if (std::isnan(v)) {
+    return "nan";
+  }
+  if (std::isinf(v)) {
+    return v > 0 ? "inf" : "-inf";
+  }
+  char buf[64];
+  auto res = std::to_chars(buf, buf + sizeof(buf), v,
+                           std::chars_format::scientific);
+  std::string sci(buf, res.ptr);
+  std::string sign;
+  if (!sci.empty() && sci[0] == '-') {
+    sign = "-";
+    sci.erase(0, 1);
+  }
+  size_t e = sci.find('e');
+  std::string digits;
+  for (size_t i = 0; i < e; i++) {
+    if (sci[i] != '.') {
+      digits += sci[i];
+    }
+  }
+  // the decimal point after decpt digits, as dtoa reports it
+  int decpt = std::stoi(sci.substr(e + 1)) + 1;
+  int n = static_cast<int>(digits.size());
+  std::string out;
+  if (decpt <= -4 || decpt > 16) {
+    out = digits.substr(0, 1);
+    if (n > 1) {
+      out += "." + digits.substr(1);
+    }
+    int exp = decpt - 1;
+    char eb[16];
+    std::snprintf(eb, sizeof(eb), "e%+.02d", exp);
+    out += eb;
+  } else if (decpt <= 0) {
+    out = "0." + std::string(-decpt, '0') + digits;
+  } else if (decpt < n) {
+    out = digits.substr(0, decpt) + "." + digits.substr(decpt);
+  } else {
+    out = digits + std::string(decpt - n, '0') + ".0";
+  }
+  return sign + out;
 }
 
 namespace {

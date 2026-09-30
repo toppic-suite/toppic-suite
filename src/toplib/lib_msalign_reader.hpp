@@ -26,6 +26,12 @@ namespace toplib {
 
 namespace lib_msalign_reader {
 
+// The spectra of a TopFD msalign file as msalign_file.read_msalign reads
+// them: header fields are found by substring, spectra without masses or
+// with a zero precursor mass are skipped, masses above the precursor mass
+// are dropped. No identifications.
+LibData readMsalign(const std::string& msalign_file_name);
+
 // A TopFD msalign file and a filtered TopPIC PrSM table, as TopLib's
 // ms_library_building.py reads them (msalign_file.read_msalign and
 // get_spectra_by_file): header fields are found by substring, spectra
