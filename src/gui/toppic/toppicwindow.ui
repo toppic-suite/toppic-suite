@@ -1145,7 +1145,7 @@ level:</string>
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>290</y>
+        <y>285</y>
         <width>851</width>
         <height>91</height>
        </rect>
@@ -1273,7 +1273,7 @@ level:</string>
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>184</y>
+        <y>216</y>
         <width>341</width>
         <height>30</height>
        </rect>
@@ -1298,7 +1298,7 @@ level:</string>
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>216</y>
+        <y>248</y>
         <width>451</width>
         <height>30</height>
        </rect>
@@ -1424,7 +1424,7 @@ level:</string>
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>250</y>
+        <y>184</y>
         <width>341</width>
         <height>33</height>
        </rect>
