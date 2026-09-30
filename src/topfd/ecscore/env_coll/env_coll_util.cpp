@@ -16,8 +16,16 @@
 #include "topfd/ecscore/env_coll/env_coll_util.hpp"
 
 #include <algorithm>
+#include <cmath>
+#include <cstdlib>
+#include <fstream>
+#include <iomanip>
 #include <limits>
+#include <mutex>
 #include <numeric>
+#include <sstream>
+#include <string>
+#include <vector>
 
 #include "common/base/mass_constant.hpp"
 #include "common/util/logger.hpp"
@@ -93,6 +101,110 @@ EnvCollPtr getEnvCollPtr(const MsMapPtr& matrix_ptr, const SeedEnvPtr& seed_ptr,
   return env_coll_ptr;
 }
 
+namespace {
+
+// Experiment instrumentation (issue #390, experiment 86 of toppic_test): with
+// the environment variable TOPFD_HALF_CHARGE_LOG=<file>, findEnvColl writes
+// one row per half-charge test: the seed and, for each version of
+// getHalfChargeEnv, its candidate and whether the candidate passes the checks
+// that follow in findEnvColl. It only reads the peak matrix; the run goes on
+// with the selected version.
+std::mutex half_charge_log_mutex;
+
+std::ofstream* halfChargeLog() {
+  static std::ofstream* log = []() -> std::ofstream* {
+    const char* name = std::getenv("TOPFD_HALF_CHARGE_LOG");
+    if (name == nullptr) {
+      return nullptr;
+    }
+    auto* out = new std::ofstream(name);
+    *out << "call\tspec_id\tmono_mass\tcharge\tseed_inte\tpeak_num"
+         << "\trefer_idx\tleft_removed\tratio\tused_version";
+    for (int v = 1; v <= 3; v++) {
+      std::string p = "\tv" + std::to_string(v) + "_";
+      *out << p << "charge" << p << "mono_mass" << p << "offset" << p
+           << "preproc" << p << "preproc_peaks" << p << "env_set" << p
+           << "valid";
+    }
+    *out << "\tmz_list\ttheo_inte\taggr_inte\n";
+    return out;
+  }();
+  return log;
+}
+
+std::string joinList(const std::vector<double>& list) {
+  std::ostringstream out;
+  out << std::setprecision(8);
+  for (size_t i = 0; i < list.size(); i++) {
+    if (i > 0) out << ',';
+    out << list[i];
+  }
+  return out.str();
+}
+
+void logHalfChargeTest(const MsMapPtr& matrix_ptr, const SeedEnvPtr& seed_ptr,
+                       double even_odd_peak_ratio,
+                       const std::vector<double>& aggr_inte_list,
+                       const EcscoreParaPtr& para_ptr, double sn_ratio,
+                       double split_ratio) {
+  std::ofstream* out = halfChargeLog();
+  if (out == nullptr) {
+    return;
+  }
+  std::vector<double> mz_list = seed_ptr->getMzList();
+  int charge = seed_ptr->getCharge();
+  // the old peak spacing, and the number of peaks preprocessSeedEnvPtr
+  // removed before the seed's first peak
+  double spacing = mass_constant::getIsotopeMass() / charge;
+  long left_removed = std::lround((mz_list[0] - seed_ptr->getMonoMz()) / spacing);
+  int min_match_peak_num = para_ptr->getMinMatchPeakNumInTopThree();
+  int min_scan_num = para_ptr->min_scan_num_;
+  std::ostringstream row;
+  row << std::setprecision(10);
+  row << '\t' << seed_ptr->getSpecId() << '\t' << seed_ptr->getMonoNeutralMass()
+      << '\t' << charge << '\t' << seed_ptr->getSeedInte() << '\t'
+      << seed_ptr->getPeakNum() << '\t' << seed_ptr->getReferIdx() << '\t'
+      << left_removed << '\t' << even_odd_peak_ratio << '\t'
+      << para_ptr->half_charge_env_version_;
+  for (int v = 1; v <= 3; v++) {
+    SeedEnvPtr cand_ptr =
+        seed_env_util::getHalfChargeEnv(seed_ptr, even_odd_peak_ratio, v);
+    if (cand_ptr == nullptr) {
+      row << "\tNA\tNA\tNA\t0\t0\t0\t0";
+      continue;
+    }
+    // the candidate's monoisotopic m/z on the old peak grid, in old
+    // spacings from the seed's first peak
+    double offset = (cand_ptr->getMonoMz() - mz_list[0]) / spacing;
+    SeedEnvPtr pp_ptr = seed_env_util::preprocessSeedEnvPtr(
+        cand_ptr, matrix_ptr, para_ptr, sn_ratio);
+    int pp_peaks = 0;
+    int found = 0;
+    int valid = 0;
+    if (pp_ptr != nullptr) {
+      pp_peaks = pp_ptr->getPeakNum();
+      EnvSetPtr es_ptr =
+          env_set_util::searchEnvSet(matrix_ptr, pp_ptr, para_ptr, sn_ratio);
+      if (es_ptr != nullptr) {
+        found = 1;
+        es_ptr->refineXicBoundary(split_ratio);
+        valid = es_ptr->containValidEnvs(min_scan_num, min_match_peak_num);
+      }
+    }
+    row << '\t' << cand_ptr->getCharge() << '\t'
+        << cand_ptr->getMonoNeutralMass() << '\t' << offset << '\t'
+        << (pp_ptr != nullptr ? 1 : 0) << '\t' << pp_peaks << '\t' << found
+        << '\t' << valid;
+  }
+  row << '\t' << joinList(mz_list) << '\t' << joinList(seed_ptr->getInteList())
+      << '\t' << joinList(aggr_inte_list) << '\n';
+  static long call = 0;
+  std::lock_guard<std::mutex> lock(half_charge_log_mutex);
+  *out << call++ << row.str() << std::flush;
+}
+
+}  // namespace
+
 EnvCollPtr findEnvColl(const MsMapPtr& matrix_ptr, const SeedEnvPtr& seed_ptr,
                        const EcscoreParaPtr& para_ptr, double sn_ratio,
                        double split_ratio) {
@@ -112,6 +224,9 @@ EnvCollPtr findEnvColl(const MsMapPtr& matrix_ptr, const SeedEnvPtr& seed_ptr,
       component_score::getAggOddEvenPeakRatio(env_set_ptr);
   SeedEnvPtr new_seed_ptr = seed_ptr;
   if (std::abs(even_odd_peak_ratio) > para_ptr->even_odd_ratio_cutoff_) {
+    logHalfChargeTest(matrix_ptr, seed_ptr, even_odd_peak_ratio,
+                      env_set_ptr->compAggrEnvInteList(), para_ptr, sn_ratio,
+                      split_ratio);
     new_seed_ptr = seed_env_util::testHalfChargeEnv(
         seed_ptr, matrix_ptr, even_odd_peak_ratio, para_ptr, sn_ratio);
     if (new_seed_ptr == nullptr) {
