@@ -68,6 +68,10 @@ ToppicWindow::ToppicWindow(QWidget* parent)
   QRegularExpressionValidator* validator3 =
       new QRegularExpressionValidator(rx3, this);
   ui->minModEdit->setValidator(validator3);
+  // the N-terminal label mass (-N): a non-negative number with up to six
+  // decimals, e.g. 229.162932 for TMT
+  QRegularExpression rx4("^\\d{1,6}(\\.\\d{0,6})?$");
+  ui->nTermLabelEdit->setValidator(new QRegularExpressionValidator(rx4, this));
 
   QFont font;
   QFont outputFont;
@@ -133,6 +137,8 @@ void ToppicWindow::on_defaultButton_clicked() {
   ui->approxSpectraCheckBox->setChecked(false);
   ui->minModEdit->setText(QString::fromStdString(arguments_["minShiftMass"]));
   ui->maxModEdit->setText(QString::fromStdString(arguments_["maxShiftMass"]));
+  ui->nTermLabelEdit->setText(
+      QString::fromStdString(arguments_["nTermLabelMass"]));
   ui->cutoffSpectralValueEdit->setText(
       QString::fromStdString(arguments_["cutoffSpectralValue"]));
   ui->cutoffProteoformValueEdit->setText(
@@ -373,6 +379,8 @@ std::map<std::string, std::string> ToppicWindow::getArguments() {
 
   arguments_["minShiftMass"] = ui->minModEdit->text().toStdString();
   arguments_["maxShiftMass"] = ui->maxModEdit->text().toStdString();
+  arguments_["nTermLabelMass"] =
+      ui->nTermLabelEdit->text().trimmed().toStdString();
 
   if (ui->approxSpectraCheckBox->isChecked()) {
     arguments_["useApproxSpectra"] = "true";
@@ -491,6 +499,7 @@ void ToppicWindow::lockDialog() {
   ui->formErrorToleranceEdit->setEnabled(false);
   ui->maxModEdit->setEnabled(false);
   ui->minModEdit->setEnabled(false);
+  ui->nTermLabelEdit->setEnabled(false);
   ui->cutoffSpectralValueEdit->setEnabled(false);
   ui->cutoffProteoformValueEdit->setEnabled(false);
   ui->cutoffProteinValueEdit->setEnabled(false);
@@ -541,6 +550,7 @@ void ToppicWindow::unlockDialog() {
   ui->formErrorToleranceEdit->setEnabled(true);
   ui->maxModEdit->setEnabled(true);
   ui->minModEdit->setEnabled(true);
+  ui->nTermLabelEdit->setEnabled(true);
   ui->cutoffSpectralValueEdit->setEnabled(true);
   ui->cutoffProteoformValueEdit->setEnabled(true);
   ui->cutoffProteinValueEdit->setEnabled(true);
@@ -646,6 +656,12 @@ bool ToppicWindow::checkError() {
                          tr("Minimum mass shift is empty!"), QMessageBox::Yes);
     return true;
   }
+  if (ui->nTermLabelEdit->text().isEmpty()) {
+    QMessageBox::warning(this, tr("Warning"),
+                         tr("N-terminal label mass is empty!"),
+                         QMessageBox::Yes);
+    return true;
+  }
   if (ui->cutoffSpectralValueEdit->text().isEmpty()) {
     QMessageBox::warning(this, tr("Warning"),
                          tr("Spectrum-level cutoff value is empty!"),
@@ -744,6 +760,7 @@ void ToppicWindow::showArguments() {
        "\nnumOfTopPrsms:" + arguments_["numOfTopPrsms"] +
        "\nminShiftMass:" + arguments_["minShiftMass"] +
        "\nmaxShiftMass:" + arguments_["maxShiftMass"] +
+       "\nnTermLabelMass:" + arguments_["nTermLabelMass"] +
        "\nkeepTempFiles:" + arguments_["keepTempFiles"] +
        "\nlocalThreshold:" + arguments_["localThreshold"] +
        "\ngroupSpectrumNumber:" + arguments_["groupSpectrumNumber"] +

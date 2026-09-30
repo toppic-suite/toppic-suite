@@ -1420,6 +1420,44 @@ level:</string>
        </layout>
       </widget>
      </widget>
+     <widget class="QWidget" name="horizontalLayoutWidget_nTermLabel">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>350</y>
+        <width>341</width>
+        <height>33</height>
+       </rect>
+      </property>
+      <layout class="QHBoxLayout" name="horizontalLayout_nTermLabel">
+       <item>
+        <widget class="QLabel" name="label_nTermLabel">
+         <property name="toolTip">
+          <string>Mass of a label on the N-terminus of every proteoform, for example 229.162932 for TMT; 0 for none</string>
+         </property>
+         <property name="text">
+          <string>N-terminal label mass (Da):</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="nTermLabelEdit">
+         <property name="maximumSize">
+          <size>
+           <width>110</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="toolTip">
+          <string>Mass of a label on the N-terminus of every proteoform, for example 229.162932 for TMT; 0 for none</string>
+         </property>
+         <property name="text">
+          <string>0</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
     </widget>
    </widget>
    <zorder>tabWidget</zorder>
