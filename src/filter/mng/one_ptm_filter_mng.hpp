@@ -78,6 +78,12 @@ class OnePtmFilterMng {
 
   int var_num_ = 0;
 
+  // A candidate is a protein and a sequence range, so a protein can take
+  // several of the candidate numbers above with different ranges (issue
+  // #348); false keeps each protein's best range and its best shifts, as
+  // before.
+  bool range_candidates_ = true;
+
   // The spectra the variable-PTM variants are filtered for (var_num_ > 0),
   // by spectrum id. A topmg run filters every spectrum and leaves
   // search_all_ true; toppic's --topmg filters only the spectra its graph

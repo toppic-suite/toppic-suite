@@ -76,6 +76,9 @@ class VarPtmFilter {
   MassMatchPtr term_index_ptr_;
   MassMatchPtr rev_term_index_ptr_;
 
+  // the sequence ranges of the index rows
+  mass_match_util::IndexRowRanges row_ranges_;
+
   SimplePrsmPtrVec comp_match_ptrs_;
   SimplePrsmPtrVec pref_match_ptrs_;
   SimplePrsmPtrVec suff_match_ptrs_;

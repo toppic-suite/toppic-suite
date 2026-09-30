@@ -130,13 +130,18 @@ std::function<void()> geneTask(const SpectrumSetPtr& spec_set_ptr,
           start_pos = proteo_with_prot_mod_ptr->getStartPos();
           LOG_DEBUG("Start pos with N terminal mod: " << start_pos);
         }
-      } else {
+      } else if (!simple_prsm_ptr->hasSeqRange()) {
         double n_term_trunc = -n_term_shift;
         start_pos = findMatchedPos(db_proteo_ptr, n_term_trunc);
       }
       int end_pos = db_proteo_ptr->getEndPos();
-      if (type_ptr == ProteoformType::PREFIX ||
-          type_ptr == ProteoformType::INTERNAL) {
+      if (simple_prsm_ptr->hasSeqRange()) {
+        // the range of the filtering result (issue #348), which the shifts
+        // give as well
+        start_pos = simple_prsm_ptr->getSeqStartPos();
+        end_pos = simple_prsm_ptr->getSeqEndPos();
+      } else if (type_ptr == ProteoformType::PREFIX ||
+                 type_ptr == ProteoformType::INTERNAL) {
         double proteo_minus_water_mass = db_proteo_ptr->getMinusWaterMass();
         double n_term_trunc = proteo_minus_water_mass + c_term_shift;
         // the reported position is the position of matched breakpoint

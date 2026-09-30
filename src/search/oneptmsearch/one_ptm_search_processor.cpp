@@ -64,12 +64,16 @@ PrsmPtrVec OnePtmSearchProcessor::onePtmSearchOneSpec(
       ProteoformPtrVec mod_form_ptr_vec =
           proteoform_factory::geneProtModProteoform(proteo_ptr,
                                                     prot_mod_ptr_vec);
-      proteoform_ptr_vec.insert(proteoform_ptr_vec.end(),
-                                mod_form_ptr_vec.begin(),
-                                mod_form_ptr_vec.end());
-      expand_simple_prsm_vec.insert(expand_simple_prsm_vec.end(),
-                                    mod_form_ptr_vec.size(),
-                                    simple_prsm_ptr_vec[i]);
+      // with the range of the filtering result, the forms that start where
+      // the range starts (issue #348)
+      bool has_range = simple_prsm_ptr_vec[i]->hasSeqRange();
+      int start_pos = simple_prsm_ptr_vec[i]->getSeqStartPos();
+      for (size_t j = 0; j < mod_form_ptr_vec.size(); j++) {
+        if (!has_range || mod_form_ptr_vec[j]->getStartPos() == start_pos) {
+          proteoform_ptr_vec.push_back(mod_form_ptr_vec[j]);
+          expand_simple_prsm_vec.push_back(simple_prsm_ptr_vec[i]);
+        }
+      }
     } else {
       proteoform_ptr_vec.push_back(proteo_ptr);
       expand_simple_prsm_vec.push_back(simple_prsm_ptr_vec[i]);

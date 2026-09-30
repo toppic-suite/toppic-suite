@@ -123,6 +123,13 @@ VarPtmFilter::VarPtmFilter(const ProteoformPtrVec& proteo_ptrs,
         proteo_ptrs, n_term_acet_2d, mng_ptr->max_proteoform_mass_,
         mng_ptr->filter_scale_);
   }
+  std::vector<int> proteo_lens;
+  for (size_t i = 0; i < proteo_ptrs.size(); i++) {
+    proteo_lens.push_back(proteo_ptrs[i]->getResSeqPtr()->getLen());
+  }
+  row_ranges_.init(proteo_lens, term_index_ptr_, diag_index_ptr_,
+                   rev_term_index_ptr_, rev_diag_index_ptr_,
+                   mng_ptr->prsm_para_ptr_->getProtModPtrVec());
 }
 
 std::vector<std::pair<int, int>> getShiftedMassErrors(
@@ -216,11 +223,35 @@ void VarPtmFilter::computeBestMatch(const FilterSpecPtr& spec_ptr) {
   double prec_error_tole =
       spec_ptr->getHeaderPtr()->getFirstPrecErrorTolerance(tole_ptr->getPpo());
 
-  ProtCandidatePtrVec comp_prots = mass_match_util::findVarPtmTopProteins(
-      term_scores_, rev_term_scores_,
-      term_rows_2d_, rev_term_rows_2d_, term_index_ptr_, rev_term_index_ptr_,
-      prec_minus_water_mass, prec_error_tole, mng_ptr_->shift_list_,
-      mng_ptr_->comp_threshold_, mng_ptr_->comp_num_);
+  // The candidates of a proteoform type (issue #348): with
+  // range_candidates_, the best ranges, a protein once for each of its
+  // ranges; otherwise the best proteins, each with the range of its best
+  // pair.
+  auto findCands = [&](const std::vector<short>& scores,
+                       const std::vector<short>& rev_scores,
+                       const mass_match_util::PrecMatchRows& rows_2d,
+                       const mass_match_util::PrecMatchRows& rev_rows_2d,
+                       const MassMatchPtr& index_ptr,
+                       const MassMatchPtr& rev_index_ptr, bool term_start,
+                       bool term_end, int threshold, int top_num) {
+    mass_match_util::RangeRows range_rows =
+        row_ranges_.getRangeRows(term_start, term_end, false, false);
+    if (mng_ptr_->range_candidates_) {
+      return mass_match_util::findVarPtmTopRanges(
+          scores, rev_scores, rows_2d, rev_rows_2d, index_ptr, rev_index_ptr,
+          range_rows, prec_minus_water_mass, prec_error_tole,
+          mng_ptr_->shift_list_, threshold, top_num);
+    }
+    return mass_match_util::findVarPtmTopProteins(
+        scores, rev_scores, rows_2d, rev_rows_2d, index_ptr, rev_index_ptr,
+        prec_minus_water_mass, prec_error_tole, mng_ptr_->shift_list_,
+        threshold, top_num, &range_rows);
+  };
+
+  ProtCandidatePtrVec comp_prots =
+      findCands(term_scores_, rev_term_scores_, term_rows_2d_,
+                rev_term_rows_2d_, term_index_ptr_, rev_term_index_ptr_, true,
+                true, mng_ptr_->comp_threshold_, mng_ptr_->comp_num_);
   comp_match_ptrs_.clear();
   for (size_t i = 0; i < comp_prots.size(); i++) {
     int id = comp_prots[i]->getProteinId();
@@ -229,11 +260,11 @@ void VarPtmFilter::computeBestMatch(const FilterSpecPtr& spec_ptr) {
         comp_prots[i]));
   }
 
-  ProtCandidatePtrVec pref_prots = mass_match_util::findVarPtmTopProteins(
-      term_scores_, rev_diag_scores_,
-      term_rows_2d_, rev_diag_rows_2d_, term_index_ptr_, rev_diag_index_ptr_,
-      prec_minus_water_mass, prec_error_tole, mng_ptr_->shift_list_,
-      mng_ptr_->pref_suff_threshold_, mng_ptr_->pref_suff_num_);
+  ProtCandidatePtrVec pref_prots =
+      findCands(term_scores_, rev_diag_scores_, term_rows_2d_,
+                rev_diag_rows_2d_, term_index_ptr_, rev_diag_index_ptr_, true,
+                false, mng_ptr_->pref_suff_threshold_,
+                mng_ptr_->pref_suff_num_);
   pref_match_ptrs_.clear();
   for (size_t i = 0; i < pref_prots.size(); i++) {
     int id = pref_prots[i]->getProteinId();
@@ -242,11 +273,11 @@ void VarPtmFilter::computeBestMatch(const FilterSpecPtr& spec_ptr) {
         pref_prots[i]));
   }
 
-  ProtCandidatePtrVec suff_prots = mass_match_util::findVarPtmTopProteins(
-      diag_scores_, rev_term_scores_,
-      diag_rows_2d_, rev_term_rows_2d_, diag_index_ptr_, rev_term_index_ptr_,
-      prec_minus_water_mass, prec_error_tole, mng_ptr_->shift_list_,
-      mng_ptr_->pref_suff_threshold_, mng_ptr_->pref_suff_num_);
+  ProtCandidatePtrVec suff_prots =
+      findCands(diag_scores_, rev_term_scores_, diag_rows_2d_,
+                rev_term_rows_2d_, diag_index_ptr_, rev_term_index_ptr_, false,
+                true, mng_ptr_->pref_suff_threshold_,
+                mng_ptr_->pref_suff_num_);
   suff_match_ptrs_.clear();
   for (size_t i = 0; i < suff_prots.size(); i++) {
     int id = suff_prots[i]->getProteinId();
@@ -255,11 +286,11 @@ void VarPtmFilter::computeBestMatch(const FilterSpecPtr& spec_ptr) {
         suff_prots[i]));
   }
 
-  ProtCandidatePtrVec internal_prots = mass_match_util::findVarPtmTopProteins(
-      diag_scores_, rev_diag_scores_,
-      diag_rows_2d_, rev_diag_rows_2d_, diag_index_ptr_, rev_diag_index_ptr_,
-      prec_minus_water_mass, prec_error_tole, mng_ptr_->shift_list_,
-      mng_ptr_->internal_threshold_, mng_ptr_->internal_num_);
+  ProtCandidatePtrVec internal_prots =
+      findCands(diag_scores_, rev_diag_scores_, diag_rows_2d_,
+                rev_diag_rows_2d_, diag_index_ptr_, rev_diag_index_ptr_, false,
+                false, mng_ptr_->internal_threshold_,
+                mng_ptr_->internal_num_);
   internal_match_ptrs_.clear();
   for (size_t i = 0; i < internal_prots.size(); i++) {
     int id = internal_prots[i]->getProteinId();

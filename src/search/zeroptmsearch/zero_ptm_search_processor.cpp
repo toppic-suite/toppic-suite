@@ -17,6 +17,8 @@
 
 #include <algorithm>
 #include <cmath>
+#include <utility>
+#include <vector>
 
 #include "common/thread/ordered_task_runner.hpp"
 #include "common/thread/simple_thread_pool.hpp"
@@ -41,6 +43,9 @@ PrsmPtrVec ZeroPtmSearchProcessor::zeroPtmSearchOneSpec(
   ProtModPtrVec prot_mod_ptr_vec = mng_ptr->prsm_para_ptr_->getProtModPtrVec();
   ExtendMsPtrVec ms_three_vec = spec_set_ptr->getMsThreePtrVec();
   ProteoformPtrVec proteoform_ptr_vec;
+  // the range of each proteoform in its residues, -1 when the filter gives
+  // none (issue #348)
+  std::vector<std::pair<int, int>> ranges;
   for (size_t i = 0; i < simple_prsm_ptr_vec.size(); i++) {
     // When +/-1 Dalton error is allowed, if the adjusted precursor of the
     // spectrum set does not match the adjusted precursor mass in the
@@ -55,23 +60,40 @@ PrsmPtrVec ZeroPtmSearchProcessor::zeroPtmSearchOneSpec(
     std::string seq_desc = simple_prsm_ptr_vec[i]->getSeqDesc();
     ProteoformPtr proteo_ptr = proteoform_factory::readFastaToProteoformPtr(
         reader_ptr, seq_name, seq_desc, fix_mod_list);
+    // the range of the filtering result, in the database protein
+    bool has_range = simple_prsm_ptr_vec[i]->hasSeqRange();
+    int start_pos = simple_prsm_ptr_vec[i]->getSeqStartPos();
+    int end_pos = simple_prsm_ptr_vec[i]->getSeqEndPos();
     if (type_ptr == ProteoformType::COMPLETE ||
         type_ptr == ProteoformType::PREFIX) {
       ProteoformPtrVec mod_form_ptr_vec =
           proteoform_factory::geneProtModProteoform(proteo_ptr,
                                                     prot_mod_ptr_vec);
-      proteoform_ptr_vec.insert(proteoform_ptr_vec.end(),
-                                mod_form_ptr_vec.begin(),
-                                mod_form_ptr_vec.end());
+      for (size_t j = 0; j < mod_form_ptr_vec.size(); j++) {
+        int form_start = mod_form_ptr_vec[j]->getStartPos();
+        if (!has_range) {
+          proteoform_ptr_vec.push_back(mod_form_ptr_vec[j]);
+          ranges.emplace_back(-1, -1);
+        } else if (form_start == start_pos) {
+          // the forms that start where the range starts
+          proteoform_ptr_vec.push_back(mod_form_ptr_vec[j]);
+          ranges.emplace_back(0, end_pos - form_start);
+        }
+      }
     } else {
       proteoform_ptr_vec.push_back(proteo_ptr);
+      if (has_range) {
+        ranges.emplace_back(start_pos, end_pos);
+      } else {
+        ranges.emplace_back(-1, -1);
+      }
     }
   }
   double ppo =
       mng_ptr->prsm_para_ptr_->getSpParaPtr()->getPrecTolerancePtr()->getPpo();
-  ZpFastMatchPtrVec fast_matches =
-      zero_ptm_fast_search::filter(type_ptr, ms_three_vec, proteoform_ptr_vec,
-                                   mng_ptr->zero_ptm_filter_result_num_, ppo);
+  ZpFastMatchPtrVec fast_matches = zero_ptm_fast_search::filterRanges(
+      type_ptr, ms_three_vec, proteoform_ptr_vec, ranges,
+      mng_ptr->zero_ptm_filter_result_num_, ppo);
   DeconvMsPtrVec deconv_ms_vec = spec_set_ptr->getDeconvMsPtrVec();
   SpParaPtr sp_para_ptr = mng_ptr_->prsm_para_ptr_->getSpParaPtr();
 

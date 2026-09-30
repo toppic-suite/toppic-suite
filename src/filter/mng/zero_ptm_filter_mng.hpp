@@ -44,6 +44,10 @@ class ZeroPtmFilterMng {
   unsigned int pref_suff_num_ = 5;
   unsigned int inte_num_ = 10;
   int filter_scale_ = 100;
+  // A candidate is a protein and a sequence range, so a protein can take
+  // several of the candidate numbers above with different ranges (issue
+  // #348); false keeps the best range of each protein only.
+  bool range_candidates_ = true;
 
   int thread_num_ = 1;
 

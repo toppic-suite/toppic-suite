@@ -20,6 +20,7 @@
 
 #include "filter/massmatch/filter_spec.hpp"
 #include "filter/massmatch/mass_match.hpp"
+#include "filter/massmatch/mass_match_util.hpp"
 #include "filter/mng/one_ptm_filter_mng.hpp"
 #include "ms/spec/prm_ms.hpp"
 #include "prsm/simple_prsm.hpp"
@@ -59,6 +60,8 @@ class OnePtmFilter {
   // indexes, computed once for the block
   std::vector<char> term_nonincr_shifts_;
   std::vector<char> diag_nonincr_shifts_;
+  // the sequence ranges of the index rows
+  mass_match_util::IndexRowRanges row_ranges_;
 
   // Score arrays of the four indexes and their per-proteoform maxima. They
   // are reused by the spectra of the database block, not reallocated for each

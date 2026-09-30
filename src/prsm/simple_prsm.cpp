@@ -48,6 +48,8 @@ SimplePrsm::SimplePrsm(const MsHeaderPtr& header_ptr, int spectrum_num,
   seq_desc_ = proteo_ptr->getSeqDesc();
   prot_mass_ = proteo_ptr->getResSeqPtr()->getSeqMass();
   score_ = cand_ptr->getScore();
+  seq_start_pos_ = cand_ptr->getStartPos();
+  seq_end_pos_ = cand_ptr->getEndPos();
   n_term_shifts_ = cand_ptr->getNTermShifts();
   c_term_shifts_ = cand_ptr->getCTermShifts();
 }
@@ -75,6 +77,11 @@ SimplePrsm::SimplePrsm(XmlDOMElement element) {
       xml_dom_util::getDoubleChildValue(element, "spectrum_number", 0);
   seq_name_ = xml_dom_util::getChildValue(element, "sequence_name", 0);
   seq_desc_ = xml_dom_util::getChildValue(element, "sequence_desc", 0);
+  // files written before the range was added have no range
+  if (xml_dom_util::getChildCount(element, "seq_start_pos") > 0) {
+    seq_start_pos_ = xml_dom_util::getIntChildValue(element, "seq_start_pos", 0);
+    seq_end_pos_ = xml_dom_util::getIntChildValue(element, "seq_end_pos", 0);
+  }
   prot_mass_ = xml_dom_util::getDoubleChildValue(element, "proteoform_mass", 0);
   score_ = xml_dom_util::getDoubleChildValue(element, "score", 0);
   // n term shifts
@@ -115,6 +122,10 @@ XmlDOMElement SimplePrsm::toXml(XmlDOMDocument* xml_doc, XmlDOMElement parent) {
   xml_doc->addElement(element, "spectrum_number", str.c_str());
   xml_doc->addElement(element, "sequence_name", seq_name_.c_str());
   xml_doc->addElement(element, "sequence_desc", seq_desc_.c_str());
+  str = std::to_string(seq_start_pos_);
+  xml_doc->addElement(element, "seq_start_pos", str.c_str());
+  str = std::to_string(seq_end_pos_);
+  xml_doc->addElement(element, "seq_end_pos", str.c_str());
   str = str_util::toString(prot_mass_);
   xml_doc->addElement(element, "proteoform_mass", str.c_str());
   str = str_util::toString(score_);
@@ -151,6 +162,10 @@ std::vector<std::string> SimplePrsm::toStrVec() {
                     "</spectrum_number>");
   str_vec.push_back("<sequence_name>" + getSeqName() + "</sequence_name>");
   str_vec.push_back("<sequence_desc>" + getSeqDesc() + "</sequence_desc>");
+  str_vec.push_back("<seq_start_pos>" + std::to_string(seq_start_pos_) +
+                    "</seq_start_pos>");
+  str_vec.push_back("<seq_end_pos>" + std::to_string(seq_end_pos_) +
+                    "</seq_end_pos>");
   str_vec.push_back("<proteoform_mass>" +
                     str_util::toString(getProteoformMass()) +
                     "</proteoform_mass>");
@@ -211,6 +226,20 @@ bool SimplePrsm::cmpSeqIncScoreDec(const SimplePrsmPtr a,
   } else {
     return a->getScore() > b->getScore();
   }
+}
+
+bool SimplePrsm::cmpSeqRangeIncScoreDec(const SimplePrsmPtr& a,
+                                        const SimplePrsmPtr& b) {
+  if (a->getSeqName() != b->getSeqName()) {
+    return a->getSeqName() < b->getSeqName();
+  }
+  if (a->getSeqStartPos() != b->getSeqStartPos()) {
+    return a->getSeqStartPos() < b->getSeqStartPos();
+  }
+  if (a->getSeqEndPos() != b->getSeqEndPos()) {
+    return a->getSeqEndPos() < b->getSeqEndPos();
+  }
+  return a->getScore() > b->getScore();
 }
 
 /*

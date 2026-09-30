@@ -16,6 +16,9 @@
 #ifndef TOPPIC_SEARCH_ZEROPTMSEARCH_ZERO_PTM_FAST_SEARCH_HPP_
 #define TOPPIC_SEARCH_ZEROPTMSEARCH_ZERO_PTM_FAST_SEARCH_HPP_
 
+#include <utility>
+#include <vector>
+
 #include "ms/spec/extend_ms.hpp"
 #include "search/zeroptmsearch/zero_ptm_fast_match.hpp"
 #include "seq/proteoform.hpp"
@@ -28,6 +31,16 @@ ZpFastMatchPtrVec filter(const ProteoformTypePtr& align_type_ptr,
                          const ExtendMsPtrVec& ms_ptr_ptr,
                          const ProteoformPtrVec& proteo_ptrs, int report_num,
                          double ppo);
+
+// The same, with the sequence range of each proteoform given (issue #348):
+// ranges[i] is the first and the last residue of the range, 0-based in the
+// residues of proteo_ptrs[i]. Only that range is tested against the
+// precursor mass and scored; a range of -1 is searched for as filter does.
+ZpFastMatchPtrVec filterRanges(const ProteoformTypePtr& align_type_ptr,
+                               const ExtendMsPtrVec& ms_ptr_vec,
+                               const ProteoformPtrVec& proteo_ptrs,
+                               const std::vector<std::pair<int, int>>& ranges,
+                               int report_num, double ppo);
 
 }
 

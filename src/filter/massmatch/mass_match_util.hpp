@@ -19,6 +19,7 @@
 #include <cstdint>
 #include <vector>
 
+#include "common/base/prot_mod.hpp"
 #include "filter/massmatch/mass_match.hpp"
 #include "seq/prot_candidate.hpp"
 
@@ -46,6 +47,63 @@ void warnIndexLimits(const std::string& file_name,
 void warnOldIndexLayout(const std::string& index_dir,
                         const std::string& suffix);
 
+// The sequence ranges of the index rows (issue #348). A pair of a row of an
+// N-terminal side index and a row of a C-terminal side index is a range of
+// the protein, [start, end], 0-based positions of its first and last
+// residue.
+//
+// The first residue of each row of an N-terminal side index: a row of the
+// N-terminal form index (is_term_index) starts at the truncation length of
+// its protein modification, found by its shift (0 for NONE and
+// M_ACETYLATION, 1 for NME and NME_ACETYLATION); the n-th row of a
+// proteoform in the diagonal index removes its first n residues and starts
+// at n.
+std::vector<int> compRowStartPositions(const MassMatchPtr& index_ptr,
+                                       bool is_term_index,
+                                       const ProtModPtrVec& prot_mod_ptrs);
+
+// The last residue of each row of a C-terminal side index: the one row of a
+// proteoform in the reverse term index (is_term_index) ends at the last
+// residue, length - 1; the n-th row in the reverse diagonal index removes
+// the last n residues and ends at length - 1 - n.
+std::vector<int> compRowEndPositions(const MassMatchPtr& index_ptr,
+                                     bool is_term_index,
+                                     const std::vector<int>& proteo_lens);
+
+// The ranges of the rows of a filter's two indexes for one proteoform type,
+// and the ranges the type allows: with proper_start the range may not start
+// at the first residue (a zero-shift SUFFIX or INTERNAL proteoform), with
+// proper_end it may not end at the last one (PREFIX, INTERNAL).
+struct RangeRows {
+  const std::vector<int>* row_starts_ = nullptr;
+  const std::vector<int>* rev_row_ends_ = nullptr;
+  const std::vector<int>* proteo_lens_ = nullptr;
+  bool proper_start_ = false;
+  bool proper_end_ = false;
+};
+
+// The row ranges of a filter's four indexes: the N-terminal form index, the
+// diagonal index, the reverse term index and the reverse diagonal index,
+// with the lengths of the proteins, computed once per database block.
+struct IndexRowRanges {
+  std::vector<int> proteo_lens_;
+  std::vector<int> term_starts_;
+  std::vector<int> diag_starts_;
+  std::vector<int> rev_term_ends_;
+  std::vector<int> rev_diag_ends_;
+
+  void init(const std::vector<int>& proteo_lens, const MassMatchPtr& term_ptr,
+            const MassMatchPtr& diag_ptr, const MassMatchPtr& rev_term_ptr,
+            const MassMatchPtr& rev_diag_ptr,
+            const ProtModPtrVec& prot_mod_ptrs);
+
+  // The rows of a proteoform type: the N-terminal form index (term_start)
+  // or the diagonal index, the reverse term index (term_end) or the reverse
+  // diagonal index.
+  RangeRows getRangeRows(bool term_start, bool term_end, bool proper_start,
+                         bool proper_end) const;
+};
+
 ProtCandidatePtrVec findZeroShiftTopProteins(std::vector<short>& scores,
                                              std::vector<short>& rev_scores,
                                              const MassMatchPtr& index_ptr,
@@ -59,14 +117,6 @@ ProtCandidatePtrVec findZeroShiftTopProteins(std::vector<short>& scores,
 void compProteoMaxScores(const std::vector<short>& scores,
                          const MassMatchPtr& index_ptr,
                          std::vector<int>& max_scores);
-
-// Zero-shift candidates: the proteoforms whose best N-terminal row score
-// plus best C-terminal row score reaches the threshold (no truncation shift
-// is recorded). The maxima come from compProteoMaxScores, so the four
-// proteoform types share four scans of the score arrays.
-ProtCandidatePtrVec simpleFindZeroShiftTopProteins(
-    const std::vector<int>& max_scores, const std::vector<int>& rev_max_scores,
-    int threshold, int top_num);
 
 // One-shift candidates: the proteoforms with the best total score of an
 // N-terminal row and a C-terminal row whose masses leave a shift in
@@ -82,12 +132,33 @@ std::vector<char> compNonincreasingShifts(const MassMatchPtr& index_ptr);
 // nonincr_shifts, when given, is compNonincreasingShifts of index_ptr: the
 // truncation window of a proteoform whose shifts do not increase is then
 // moved only for the rows that are scanned, which gives the same window.
+// range_rows, when given, sets each candidate's range to that of its best
+// pair.
 ProtCandidatePtrVec findOneShiftTopProteins(
     std::vector<short>& scores, std::vector<short>& rev_scores,
     const std::vector<int>& max_scores, const std::vector<int>& rev_max_scores,
     const MassMatchPtr& index_ptr, const MassMatchPtr& rev_index_ptr,
     double prec_minus_water_mass, double prec_error_tole, double min_shift,
     double max_shift, int term_shift_num, int threshold, int top_num,
+    const std::vector<char>* nonincr_shifts = nullptr,
+    const RangeRows* range_rows = nullptr);
+
+// Candidates as sequence ranges (issue #348): a candidate is a protein and a
+// range, so a protein can be reported once for each of its ranges, and the
+// pairs of rows that give the same range (two N-terminal forms with the same
+// start) give one candidate, the better. The best top_num candidates are
+// reported, by score descending, then protein id, start and end ascending.
+//
+// One-shift: the pairs whose range mass is in the shift window; a
+// candidate's shift lists hold the N- and the C-terminal shift of its own
+// pair.
+ProtCandidatePtrVec findOneShiftTopRanges(
+    std::vector<short>& scores, std::vector<short>& rev_scores,
+    const std::vector<int>& max_scores, const std::vector<int>& rev_max_scores,
+    const MassMatchPtr& index_ptr, const MassMatchPtr& rev_index_ptr,
+    const RangeRows& range_rows, double prec_minus_water_mass,
+    double prec_error_tole, double min_shift, double max_shift,
+    int term_shift_num, int threshold, int top_num,
     const std::vector<char>* nonincr_shifts = nullptr);
 
 ProtCandidatePtrVec findVarPtmTopProteins(
@@ -117,14 +188,41 @@ void compPrecMatchRows(const MassMatchPtr& index_ptr,
                        PrecMatchRows& prec_match_rows);
 
 // The same candidates from those row lists, which the four proteoform types
-// of a spectrum share.
+// of a spectrum share. range_rows, when given, sets each candidate's range to
+// that of its best pair.
 ProtCandidatePtrVec findVarPtmTopProteins(
     const std::vector<short>& scores, const std::vector<short>& rev_scores,
     const PrecMatchRows& prec_match_rows,
     const PrecMatchRows& rev_prec_match_rows,
     const MassMatchPtr& index_ptr, const MassMatchPtr& rev_index_ptr,
     double prec_minus_water_mass, double prec_error_tole,
-    std::vector<double>& ptm_shifts, int threshold, int top_num);
+    std::vector<double>& ptm_shifts, int threshold, int top_num,
+    const RangeRows* range_rows = nullptr);
+
+// Variable-PTM candidates as sequence ranges (see findOneShiftTopRanges):
+// the pairs whose range mass plus one of the PTM shifts is within the
+// precursor error tolerance.
+ProtCandidatePtrVec findVarPtmTopRanges(
+    const std::vector<short>& scores, const std::vector<short>& rev_scores,
+    const PrecMatchRows& prec_match_rows,
+    const PrecMatchRows& rev_prec_match_rows,
+    const MassMatchPtr& index_ptr, const MassMatchPtr& rev_index_ptr,
+    const RangeRows& range_rows, double prec_minus_water_mass,
+    double prec_error_tole, std::vector<double>& ptm_shifts, int threshold,
+    int top_num);
+
+// Zero-shift candidates as sequence ranges (see findOneShiftTopRanges): the
+// pairs of rows that both received the precursor bonus, whose range mass is
+// within the precursor error tolerance and whose range the proteoform type
+// allows. With one_per_protein, each protein keeps its best pair, the first
+// in the order of the rows, as findZeroShiftTopProteins does.
+ProtCandidatePtrVec findZeroShiftTopRanges(
+    const std::vector<short>& scores, const std::vector<short>& rev_scores,
+    const PrecMatchRows& prec_match_rows,
+    const PrecMatchRows& rev_prec_match_rows,
+    const MassMatchPtr& index_ptr, const MassMatchPtr& rev_index_ptr,
+    const RangeRows& range_rows, double prec_minus_water_mass,
+    double prec_error_tole, int threshold, int top_num, bool one_per_protein);
 
 ProtCandidatePtrVec findDiagTopProteins(
     const std::vector<short>& scores, const std::vector<int>& proteo_row_begins,

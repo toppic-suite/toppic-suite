@@ -51,6 +51,10 @@ class VarPtmFilterMng {
   unsigned int comp_num_ = 5;
   unsigned int pref_suff_num_ = 20;
   unsigned int internal_num_ = 30;
+  // A candidate is a protein and a sequence range, so a protein can take
+  // several of the candidate numbers above with different ranges (issue
+  // #348); false keeps the best range of each protein only.
+  bool range_candidates_ = true;
   int filter_scale_ = 100;
 
   int comp_threshold_ = MassMatch::getPrecursorMatchScore() * 2;

@@ -18,6 +18,7 @@
 
 #include "filter/massmatch/filter_spec.hpp"
 #include "filter/massmatch/mass_match.hpp"
+#include "filter/massmatch/mass_match_util.hpp"
 #include "filter/mng/zero_ptm_filter_mng.hpp"
 #include "ms/spec/extend_ms.hpp"
 #include "prsm/simple_prsm.hpp"
@@ -54,6 +55,20 @@ class ZeroPtmFilter {
   MassMatchPtr rev_diag_index_ptr_;
   MassMatchPtr term_index_ptr_;
   MassMatchPtr rev_term_index_ptr_;
+
+  // the sequence ranges of the index rows
+  mass_match_util::IndexRowRanges row_ranges_;
+
+  // the rows of each index that received the precursor bonus, by proteoform,
+  // reused by the spectra of the block
+  std::vector<int> term_prec_rows_;
+  std::vector<int> diag_prec_rows_;
+  std::vector<int> rev_term_prec_rows_;
+  std::vector<int> rev_diag_prec_rows_;
+  mass_match_util::PrecMatchRows term_rows_2d_;
+  mass_match_util::PrecMatchRows diag_rows_2d_;
+  mass_match_util::PrecMatchRows rev_term_rows_2d_;
+  mass_match_util::PrecMatchRows rev_diag_rows_2d_;
 
   SimplePrsmPtrVec comp_match_ptrs_;
   SimplePrsmPtrVec pref_match_ptrs_;

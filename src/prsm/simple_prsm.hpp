@@ -68,6 +68,20 @@ class SimplePrsm {
 
   double getProteoformMass() { return prot_mass_; }
 
+  // The sequence range of the candidate: its first and last residue, 0-based
+  // positions in the database protein, -1 when the filter gives no range
+  // (issue #348).
+  int getSeqStartPos() { return seq_start_pos_; }
+
+  int getSeqEndPos() { return seq_end_pos_; }
+
+  bool hasSeqRange() { return seq_start_pos_ >= 0 && seq_end_pos_ >= 0; }
+
+  void setSeqRange(int start_pos, int end_pos) {
+    seq_start_pos_ = start_pos;
+    seq_end_pos_ = end_pos;
+  }
+
   std::vector<double>& getNTermShifts() { return n_term_shifts_; }
 
   std::vector<double>& getCTermShifts() { return c_term_shifts_; }
@@ -92,6 +106,11 @@ class SimplePrsm {
 
   static bool cmpSeqIncScoreDec(const SimplePrsmPtr a, const SimplePrsmPtr b);
 
+  // The protein, then the range, then the score descending: the candidates
+  // that are the same simple PrSM of a spectrum are next to each other.
+  static bool cmpSeqRangeIncScoreDec(const SimplePrsmPtr& a,
+                                     const SimplePrsmPtr& b);
+
   // static bool cmpSpecIncScoreDecSeqInc(const SimplePrsmPtr a, const
   // SimplePrsmPtr b);
 
@@ -108,6 +127,8 @@ class SimplePrsm {
   std::string seq_name_;
   std::string seq_desc_;
   double prot_mass_;
+  int seq_start_pos_ = -1;
+  int seq_end_pos_ = -1;
 
   double score_;
 
