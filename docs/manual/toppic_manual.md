@@ -166,7 +166,7 @@ columns are:
 | `Data file name` | The spectrum file. |
 | `Prsm ID`, `Spectrum ID`, `Fragmentation`, `Scan(s)`, `Retention time` | The PrSM and its spectrum (several values when spectra are combined, see `--num-combined-spectra`); retention time in minutes. |
 | `# Masses`, `Charge`, `Precursor mass`, `Adjusted precursor mass` | Number of deconvoluted masses, precursor charge, precursor mass, and the precursor mass adjusted to the proteoform. |
-| `N-terminal label mass` | The mass of the N-terminal label (for example TMT) that the search assumed on every proteoform, 0 without a label. The adjusted precursor mass, the proteoform and its mass leave the label out; the precursor mass includes it. |
+| `N-terminal label mass` | The mass of the N-terminal label (`-N`, for example TMT) that the search assumed on every proteoform, 0 without a label. The adjusted precursor mass, the proteoform and its mass leave the label out; the precursor mass includes it. |
 | `Proteoform ID`, `Proteoform intensity` | The proteoform cluster and its abundance. |
 | `Feature ID`, `Feature intensity`, `Feature score`, `Feature apex time` | The TopFD proteoform feature of the spectrum: id, abundance, ECScore and apex retention time (minutes). |
 | `# Protein hits`, `Protein accession`, `Protein description` | Number of proteins containing the proteoform, and the reported protein. |
@@ -185,6 +185,7 @@ Database and modifications:
 |---|---|---|
 | `-f`, `--fixed-mod <C57\|C58\|file>` | none | Fixed modifications: `C57` carbamidomethylation of cysteine, `C58` carboxymethylation of cysteine, or a modification file (section 5). |
 | `-n`, `--n-terminal-form <list>` | NONE,NME,NME_ACETYLATION,M_ACETYLATION | Allowed protein N-terminal forms, comma-separated: no modification, methionine excision, acetylation after methionine excision, acetylation of the initial methionine. |
+| `-N`, `--n-terminal-label <number>` | 0 | Mass (Da) of a label on the N-terminus of every proteoform, for example 229.162932 for TMT. The label is added to the N-terminal fragment ions and removed from the precursor mass; the reported proteoforms and adjusted precursor masses are label-free, and the `N-terminal label mass` column gives the label (section 3). Every N-terminus is labeled, acetylated ones included. In `toppic_gui`: "N-terminal label mass (Da)" on the Advanced Parameters tab. |
 | `-R`, `--proteoform-type <list>` | COMPLETE,PREFIX,SUFFIX,INTERNAL | Allowed proteoform types, comma-separated: the complete protein, its N-terminal part, its C-terminal part, or an internal part. |
 | `-d`, `--decoy` | off | Search a shuffled decoy database as well, to estimate false discovery rates. Required for the `FDR` cutoff types. |
 

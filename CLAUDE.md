@@ -342,8 +342,11 @@ writers, and nothing checks them against the code, so:
 - TopDIA's `-p`/`-P` options set `TopfdPara::seed_env_inte_corr_tole_cutoff_`
   (copied into `EcscorePara` by `env_coll_detect::processMs1/processMs2`)
   before each feature-detection stage; both default to 0.5, the value the
-  detector had hard-coded, so default runs are unchanged. TopPIC's hidden
-  `-N`/`--n-terminal-label` works (its handler used to test the wrong key). (TopDiff resolves result
+  detector had hard-coded, so default runs are unchanged. TopPIC's
+  `-N`/`--n-terminal-label` works (its handler used to test the wrong key); it
+  is a visible option and a toppic_gui field ("N-terminal label mass (Da)",
+  Advanced Parameters tab, `nTermLabelEdit`; `gui/util/command.cpp` emits
+  `-N` only for a non-zero value). (TopDiff resolves result
   files itself: `<base>_post_ms2_<tool>_proteoform.xml` first, then
   `<base>_ms2_...`, for either `_ms2.msalign` or `_post_ms2.msalign` input —
   `merge/feature_sample_merge.cpp`; keep the manual's section 1 in step.)

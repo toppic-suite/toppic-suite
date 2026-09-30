@@ -387,6 +387,13 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
         "M_ACETYLATION for N-terminal methionine acetylation. When multiple "
         "forms are allowed, they are separated by commas. Default value: "
         "NONE,NME,NME_ACETYLATION,M_ACETYLATION.")(
+        "n-terminal-label,N", po::value<std::string>(&n_term_label_mass),
+        "<a non-negative number>. Mass of a label on the N-terminus of every "
+        "proteoform, for example 229.162932 for TMT. The label is added to "
+        "the N-terminal fragment ions and removed from the precursor mass; "
+        "the reported proteoforms and adjusted precursor masses are "
+        "label-free, and the result tables give the label in the column "
+        "N-terminal label mass. Default value: 0 Dalton.")(
         "proteoform-type,R", po::value<std::string>(&allow_prot_type),
         "<a list of allowed types of proteoforms>. Four types of proteoforms "
         "can be selected: COMPLETE, PREFIX, SUFFIX, and INTERNAL. COMPLETE "
@@ -1047,7 +1054,7 @@ bool ToppicArgument::validateArguments() {
     if (mass < 0.0) {
       LOG_ERROR("N-terminal label mass "
                 << n_term_label_mass
-                << " error! The value should be positive.");
+                << " error! The value should not be negative.");
       return false;
     }
   } catch (const std::exception& ex) {

@@ -17,6 +17,7 @@
 
 #include <iostream>
 #include <sstream>
+#include <string>
 
 #include "common/util/logger.hpp"
 
@@ -167,6 +168,7 @@ std::map<std::string, std::string> toppic_para{
     {"activation", "-a "},
     {"fixedMod", "-f "},
     {"allowProtMod", "-n "},
+    {"nTermLabelMass", "-N "},
     {"allowProtType", "-R "},
     {"searchType", "-d "},
     {"threadNumber", "-u "},
@@ -216,6 +218,9 @@ std::string geneToppicCommand(std::map<std::string, std::string> arguments_,
         continue;
       } else if (it->first == "combinedOutputName" && it->second == "") {
         continue;
+      } else if (it->first == "nTermLabelMass" &&
+                 (it->second == "" || std::stod(it->second) == 0.0)) {
+        continue;  // no N-terminal label: leave out -N
       } else if (it->first == "useFeatureFile") {
         if (it->second == "false") {
           command = command + toppic_para[it->first];
