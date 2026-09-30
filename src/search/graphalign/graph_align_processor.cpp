@@ -172,15 +172,21 @@ void GraphAlignProcessor::process() {
   // to its own output file, and the merge below reads the PrSMs of a
   // spectrum file by file; the PrSMs are therefore kept per candidate and
   // written to the same files in the same order once every candidate is
-  // aligned, which leaves the merged file as it was. A thread's turn could
-  // not get past a candidate whose spectrum it never met, so such a
-  // candidate stops its file here too.
+  // aligned, which leaves the merged file as it was. A candidate whose
+  // spectrum is never read is skipped (the filter keeps a spectrum when one
+  // of its +/-1 Da precursor variants is valid, the alignment reads the
+  // unshifted precursor); it used to stop every later candidate of its
+  // file, as a thread's turn could not get past it, so that the candidates
+  // lost depended on the number of threads.
   //
   // The files are still thread_num_ of them, but the thread pool may be
   // smaller: every thread holds an alignment's DP table and consistent
   // pairs, and mem_check lowers the number of threads to the memory
   // available (toppic_test experiment 77). The output does not depend on
-  // the pool's size, only on the number of files.
+  // the pool's size, nor on the number of files: the merge orders the
+  // PrSMs of a spectrum completely
+  // (PrsmStr::cmpNormMatchTheoFragDecPtmNumInc) before it keeps the first of
+  // each protein (experiment 78).
   int thread_num = mng_ptr_->thread_num_;
   int layer_num = (mng_ptr_->n_unknown_shift_ + 1) *
                   (mng_ptr_->max_known_mods_ + 1);
@@ -214,7 +220,6 @@ void GraphAlignProcessor::process() {
         var_mod_ptr_vec));
   }
   std::vector<std::vector<std::string>> results(cands.size());
-  std::vector<bool> file_stopped(thread_num, false);
 
   SimpleThreadPoolPtr pool_ptr =
       std::make_shared<SimpleThreadPool>(pool_thread_num);
@@ -225,6 +230,7 @@ void GraphAlignProcessor::process() {
   SpecGraphReader spec_reader(sp_file_name, group_spec_num,
                               mng_ptr_->convert_ratio_, sp_para_ptr);
   size_t next_cand = 0;
+  size_t unread_cand_num = 0;
   int cnt = 0;
   DeconvMsPtrVec deconv_ms_ptr_vec = ms_reader_ptr->getNextMsPtrVec();
   while (deconv_ms_ptr_vec.size() > 0) {
@@ -237,7 +243,7 @@ void GraphAlignProcessor::process() {
         int spec_id = spec_set_ptr->getSpectrumId();
         while (next_cand < cands.size() &&
                cands[next_cand]->getSpectrumId() < spec_id) {
-          file_stopped[next_cand % thread_num] = true;
+          unread_cand_num++;
           next_cand++;
         }
         size_t end_cand = next_cand;
@@ -258,9 +264,6 @@ void GraphAlignProcessor::process() {
                 mng_ptr_->getIntTolerance());
           }
           for (size_t c = next_cand; c < end_cand; c++) {
-            if (file_stopped[c % thread_num]) {
-              continue;
-            }
             // a short queue, so that only a few spectra are held
             while (pool_ptr->getQueueSize() >=
                    static_cast<size_t>(2 * pool_thread_num)) {
@@ -293,6 +296,12 @@ void GraphAlignProcessor::process() {
   std::cout << std::flush << "Mass graph alignment - processing "
             << spectrum_num << " of " << spectrum_num << " spectra."
             << std::endl;
+  unread_cand_num += cands.size() - next_cand;
+  if (unread_cand_num > 0) {
+    std::cout << "Graph alignment - " << unread_cand_num
+              << " candidates skipped: their spectra were not read."
+              << std::endl;
+  }
 
   for (size_t c = 0; c < results.size(); c++) {
     for (size_t k = 0; k < results[c].size(); k++) {
