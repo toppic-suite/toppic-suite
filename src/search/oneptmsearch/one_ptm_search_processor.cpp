@@ -61,19 +61,21 @@ PrsmPtrVec OnePtmSearchProcessor::onePtmSearchOneSpec(
         reader_ptr, seq_name, seq_desc, fix_mod_list);
     if (type_ptr == ProteoformType::COMPLETE ||
         type_ptr == ProteoformType::PREFIX) {
+      // Every N-terminal form is aligned, not only the ones that start where
+      // the candidate's range starts: the unexpected shift can take up an
+      // N-terminal form other than the one of the filter's best pair, and
+      // aligning only the forms of its start gave fewer matched fragments on
+      // 230 spectra of the 480 data set for 3 s of the stage's 19 s
+      // (toppic_test experiment 86).
       ProteoformPtrVec mod_form_ptr_vec =
           proteoform_factory::geneProtModProteoform(proteo_ptr,
                                                     prot_mod_ptr_vec);
-      // with the range of the filtering result, the forms that start where
-      // the range starts (issue #348)
-      bool has_range = simple_prsm_ptr_vec[i]->hasSeqRange();
-      int start_pos = simple_prsm_ptr_vec[i]->getSeqStartPos();
-      for (size_t j = 0; j < mod_form_ptr_vec.size(); j++) {
-        if (!has_range || mod_form_ptr_vec[j]->getStartPos() == start_pos) {
-          proteoform_ptr_vec.push_back(mod_form_ptr_vec[j]);
-          expand_simple_prsm_vec.push_back(simple_prsm_ptr_vec[i]);
-        }
-      }
+      proteoform_ptr_vec.insert(proteoform_ptr_vec.end(),
+                                mod_form_ptr_vec.begin(),
+                                mod_form_ptr_vec.end());
+      expand_simple_prsm_vec.insert(expand_simple_prsm_vec.end(),
+                                    mod_form_ptr_vec.size(),
+                                    simple_prsm_ptr_vec[i]);
     } else {
       proteoform_ptr_vec.push_back(proteo_ptr);
       expand_simple_prsm_vec.push_back(simple_prsm_ptr_vec[i]);

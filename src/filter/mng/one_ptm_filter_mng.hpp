@@ -78,11 +78,15 @@ class OnePtmFilterMng {
 
   int var_num_ = 0;
 
-  // A candidate is a protein and a sequence range, so a protein can take
-  // several of the candidate numbers above with different ranges (issue
-  // #348); false keeps each protein's best range and its best shifts, as
-  // before.
-  bool range_candidates_ = true;
+  // true: a candidate is a protein and a sequence range, so a protein can
+  // take several of the candidate numbers above with different ranges (issue
+  // #348); false (the default): each protein keeps its best range and the
+  // shifts of its best pairs. Here the pairs of the shift window give a
+  // protein many ranges that share one strong side, which took 29% to 55% of
+  // the slots on the 480 data set and made the one-shift search worse on
+  // five times as many spectra as it made it better (toppic_test experiment
+  // 86).
+  bool range_candidates_ = false;
 
   // The spectra the variable-PTM variants are filtered for (var_num_ > 0),
   // by spectrum id. A topmg run filters every spectrum and leaves
