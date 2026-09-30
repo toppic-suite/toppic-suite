@@ -260,11 +260,25 @@ void addTruncShiftsWithRestriction(
         }
       }
     }
+    // A row takes part in several of the best pairs - a C-terminal truncation
+    // once for each N-terminal form, for example - and its shift is reported
+    // once, in the order of its first pair (issue #436). The search drops a
+    // repeated shift itself, so the result is the same.
     std::vector<double> n_shifts;
     std::vector<double> c_shifts;
     for (size_t j = 0; j < best.size(); j++) {
-      n_shifts.push_back(trunc_shifts[best[j].n_idx_]);
-      c_shifts.push_back(rev_trunc_shifts[best[j].c_idx_]);
+      bool new_n = true;
+      bool new_c = true;
+      for (size_t p = 0; p < j; p++) {
+        new_n = new_n && best[p].n_idx_ != best[j].n_idx_;
+        new_c = new_c && best[p].c_idx_ != best[j].c_idx_;
+      }
+      if (new_n) {
+        n_shifts.push_back(trunc_shifts[best[j].n_idx_]);
+      }
+      if (new_c) {
+        c_shifts.push_back(rev_trunc_shifts[best[j].c_idx_]);
+      }
     }
     prot_ptr->setNTermShifts(n_shifts);
     prot_ptr->setCTermShifts(c_shifts);
