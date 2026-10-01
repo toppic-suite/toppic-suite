@@ -182,8 +182,6 @@ void processMs1Windowed(const TopfdParaPtr& topfd_para_ptr) {
       topfd_para_ptr->getMaxCharge(), topfd_para_ptr->getMs1MinScanNum());
   score_para_ptr->seed_env_inte_corr_tole_cutoff_ =
       topfd_para_ptr->getSeedEnvInteCorrToleCutoff();
-  score_para_ptr->half_charge_env_version_ =
-      topfd_para_ptr->getHalfChargeEnvVersion();
   // read deconvoluted MS1 peaks
   std::string output_base_name = topfd_para_ptr->getOutputBaseName();
   std::string ms1_file_name = output_base_name + "_ms1.msalign";
@@ -543,8 +541,6 @@ void processMs1(const TopfdParaPtr& topfd_para_ptr) {
       topfd_para_ptr->getMaxCharge(), topfd_para_ptr->getMs1MinScanNum());
   score_para_ptr->seed_env_inte_corr_tole_cutoff_ =
       topfd_para_ptr->getSeedEnvInteCorrToleCutoff();
-  score_para_ptr->half_charge_env_version_ =
-      topfd_para_ptr->getHalfChargeEnvVersion();
   // read deconvoluted MS1 peaks
   std::string output_base_name = topfd_para_ptr->getOutputBaseName();
   std::string ms1_file_name = output_base_name + "_ms1.msalign";
@@ -839,8 +835,6 @@ void processMs2(const TopfdParaPtr& topfd_para_ptr) {
       topfd_para_ptr->getMaxCharge(), topfd_para_ptr->getMs2MinScanNum());
   score_para_ptr->seed_env_inte_corr_tole_cutoff_ =
       topfd_para_ptr->getSeedEnvInteCorrToleCutoff();
-  score_para_ptr->half_charge_env_version_ =
-      topfd_para_ptr->getHalfChargeEnvVersion();
 
   // read deconvoluted MS2 peaks
   std::string output_base_name = topfd_para_ptr->getOutputBaseName();

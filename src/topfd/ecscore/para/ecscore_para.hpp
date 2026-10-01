@@ -55,9 +55,6 @@ class EcscorePara {
   double match_feature_ppm_tolerance_ = 0.000010;
   double match_feature_time_overlap_tole_ = 0.8;
   double even_odd_ratio_cutoff_ = 0.4;
-  // the version of seed_env_util::getHalfChargeEnv used when the even/odd
-  // peak ratio exceeds even_odd_ratio_cutoff_ (1, 2 or 3)
-  int half_charge_env_version_ = 1;
 };
 
 using EcscoreParaPtr = std::shared_ptr<EcscorePara>;

@@ -17,7 +17,6 @@
 
 #include <cmath>
 
-#include "common/base/mass_constant.hpp"
 #include "common/util/logger.hpp"
 #include "topfd/ecscore/env/ms_map_env_util.hpp"
 
@@ -161,71 +160,17 @@ SeedEnvPtr relaxProcessSeedEnvPtr(const SeedEnvPtr& seed_ptr,
   return result_seed_env_ptr;
 }
 
-SeedEnvPtr getHalfChargeEnvV1(const SeedEnvPtr& seed_ptr,
-                              double even_odd_peak_ratio) {
-  double mass = seed_ptr->getMonoNeutralMass();
-  int charge = seed_ptr->getCharge();
-  double mz = peak_util::compMz(mass, charge);
-  std::vector<double> distribution = seed_ptr->getMzList();
-  if (even_odd_peak_ratio < 0) {
-    mz = mz + (distribution[1] - distribution[0]);
-  }
-  int new_charge = int(charge / 2);
-  if (new_charge == 0) {
-    new_charge = new_charge + 1;
-  }
-  double mono_mass = peak_util::compPeakNeutralMass(mz, new_charge);
-
-  int sp_id = seed_ptr->getSpecId();
-  int peak_id = -1;
-  double inte = seed_ptr->getSeedInte() / 2;
-
-  DeconvPeakPtr peak_ptr =
-      std::make_shared<DeconvPeak>(sp_id, peak_id, mono_mass, inte, new_charge);
-  SeedEnvPtr new_seed_ptr = std::make_shared<SeedEnv>(peak_ptr);
-
-  return new_seed_ptr;
-}
-
-SeedEnvPtr getHalfChargeEnvV2(const SeedEnvPtr& seed_ptr,
-                              double even_odd_log_ratio) {
-  double old_charge = seed_ptr->getCharge();
-  if (old_charge < 2) {
-    return nullptr;
-  }
-  int new_charge = int(old_charge / 2);
-  double ref_mz = seed_ptr->getReferMz();
-  double ref_mass = peak_util::compPeakNeutralMass(ref_mz, new_charge);
-  double mono_mass = EnvBase::convertRefMassToMonoMass(ref_mass);
-  int refer_idx = seed_ptr->getReferIdx();
-  // if refer_idx is even and env_odd_log_ratio < 0
-  // or refer_idx is odd  and env_odd_log_ratio > 0
-  // then increase mass by about 1 Dalton
-  if (((refer_idx) % 2 == 0 && even_odd_log_ratio < 0) ||
-      ((refer_idx) % 2 == 1 && even_odd_log_ratio > 0)) {
-    mono_mass += mass_constant::getIsotopeMass();
-  }
-  int sp_id = seed_ptr->getSpecId();
-  int peak_id = -1;
-  double inte = seed_ptr->getSeedInte() / 2;
-  DeconvPeakPtr peak_ptr =
-      std::make_shared<DeconvPeak>(sp_id, peak_id, mono_mass, inte, new_charge);
-  SeedEnvPtr new_seed_ptr = std::make_shared<SeedEnv>(peak_ptr);
-  return new_seed_ptr;
-}
-
-// V3: V1 with the stronger peak set counted from the monoisotopic peak. The
-// even/odd ratio compares the peaks at the even and odd indexes of the seed's
-// peak list, counted from its first peak, which is not necessarily the
-// monoisotopic one: preprocessSeedEnvPtr removes the weak peaks at the start
-// of the envelope (all of them before the tallest for large masses). V1 reads
-// the ratio as if the first peak were the monoisotopic one, so when an odd
-// number of peaks was removed it builds the half-charge envelope on the
-// weaker set. At half the charge the peaks are two old peak spacings apart;
-// the new envelope starts at the monoisotopic m/z, or one old spacing above
-// it when the stronger set is the other one.
-SeedEnvPtr getHalfChargeEnvV3(const SeedEnvPtr& seed_ptr,
-                              double even_odd_log_ratio) {
+// The seed at half the charge that findEnvColl tests when the even/odd peak
+// ratio suggests a doubled charge. The ratio compares the peaks at the even
+// and odd indexes of the seed's peak list, counted from its first peak, which
+// is not necessarily the monoisotopic one: preprocessSeedEnvPtr removes the
+// weak peaks at the start of the envelope (all of them before the tallest for
+// large masses). At half the charge the peaks are two old peak spacings apart,
+// so the new envelope lies on the even or on the odd peaks. It starts at the
+// monoisotopic m/z, or one old spacing above it when the stronger set,
+// counted from the monoisotopic peak, is the odd one (issue #390).
+SeedEnvPtr getHalfChargeEnv(const SeedEnvPtr& seed_ptr,
+                            double even_odd_log_ratio) {
   double mass = seed_ptr->getMonoNeutralMass();
   int charge = seed_ptr->getCharge();
   double mz = peak_util::compMz(mass, charge);
@@ -255,22 +200,11 @@ SeedEnvPtr getHalfChargeEnvV3(const SeedEnvPtr& seed_ptr,
   return new_seed_ptr;
 }
 
-SeedEnvPtr getHalfChargeEnv(const SeedEnvPtr& seed_ptr,
-                            double even_odd_log_ratio, int version) {
-  if (version == 2) {
-    return getHalfChargeEnvV2(seed_ptr, even_odd_log_ratio);
-  } else if (version == 3) {
-    return getHalfChargeEnvV3(seed_ptr, even_odd_log_ratio);
-  }
-  return getHalfChargeEnvV1(seed_ptr, even_odd_log_ratio);
-}
-
 SeedEnvPtr testHalfChargeEnv(const SeedEnvPtr& seed_ptr,
                              const MsMapPtr& ms_map_ptr,
                              double even_odd_log_ratio,
                              const EcscoreParaPtr& para_ptr, double sn_ratio) {
-  SeedEnvPtr half_charge_seed = getHalfChargeEnv(
-      seed_ptr, even_odd_log_ratio, para_ptr->half_charge_env_version_);
+  SeedEnvPtr half_charge_seed = getHalfChargeEnv(seed_ptr, even_odd_log_ratio);
   if (half_charge_seed == nullptr) {
     return nullptr;
   }
