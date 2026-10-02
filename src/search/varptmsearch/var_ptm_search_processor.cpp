@@ -56,6 +56,22 @@ ProtModPtr findMatchedProtModPtr(const ProteoformPtr& db_proteo_ptr,
   exit(EXIT_FAILURE);
 }
 
+// Prsm::cmpMatchTheoFragDecMatchExpFragDecProtInc, then a PrSM with a
+// truncation N-terminal modification first: a candidate is searched as it is
+// and with each truncation N-terminal modification, and when a first
+// residue's modification can be placed on the N-terminus or on the side chain
+// with the same scores (an acetylation of K1), the N-terminal one is reported
+bool cmpScoreDecProtIncTruncNTermFirst(const PrsmPtr& a, const PrsmPtr& b) {
+  if (Prsm::cmpMatchTheoFragDecMatchExpFragDecProtInc(a, b)) {
+    return true;
+  }
+  if (Prsm::cmpMatchTheoFragDecMatchExpFragDecProtInc(b, a)) {
+    return false;
+  }
+  return a->getProteoformPtr()->hasTruncNTermMod() &&
+         !b->getProteoformPtr()->hasTruncNTermMod();
+}
+
 int findMatchedPos(const ProteoformPtr& proteo_ptr, double n_term_trunc) {
   std::vector<double> prms = proteo_ptr->getBpSpecPtr()->getPrmMasses();
   for (size_t i = 0; i < prms.size(); i++) {
@@ -202,8 +218,7 @@ std::function<void()> geneTask(const SpectrumSetPtr& spec_set_ptr,
         }
       }
     }
-    std::sort(prsms.begin(), prsms.end(),
-              Prsm::cmpMatchTheoFragDecMatchExpFragDecProtInc);
+    std::sort(prsms.begin(), prsms.end(), cmpScoreDecProtIncTruncNTermFirst);
     PrsmPtrVec selected_prsms =
         prsm_util::getTopPrsms(prsms, mng_ptr->n_report_);
 

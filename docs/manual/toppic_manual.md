@@ -289,7 +289,9 @@ Gln->pyro-Glu,-17.026549,Q,N-term,28
 
 With `Acetyl,42.010565,K,any,1` and `Acetyl,42.010565,*,N-term,1` in one
 file, a proteoform starting with K can be acetylated on its N-terminus, on
-the side chain of K, or both (`[Acetyl]-(K)[Acetyl]...`). In the tables a
+the side chain of K, or both (`[Acetyl]-(K)[Acetyl]...`). One acetylation
+of the first K gives the same fragment masses on the N-terminus and on the
+side chain; TopPIC then reports the N-terminal one. In the tables a
 truncation N-terminal modification is the prefix `[Name]-` of the
 `Proteoform` string and `Name:[N-term]`, first, in `Variable PTMs`; `#
 Variable PTMs` counts it (see [Proteoform annotation](proteoform.md)).

@@ -795,7 +795,10 @@ from the side-chain PTMs of that residue. Facts to keep straight:
   the candidate for each listed mass, 0 as it is, otherwise the variants of
   the N-term mods of that mass, with at most `-S` - 1 side-chain PTMs
   (`VarPtmAlign::max_ptm_num_`). So residue 1 can carry an N-terminal and a
-  side-chain PTM.
+  side-chain PTM. When a variant and the candidate as it is score the same
+  (one acetylation of K1, on the N-terminus or the side chain), the
+  processor's sort (`cmpScoreDecProtIncTruncNTermFirst`) reports the
+  N-terminal one; the user chose this over comparing E-values.
 - **E-value.** (T + 1)^k x (T_N + 1) for a PrSM with k side-chain PTMs and
   a truncation N-terminal modification, T_N = the number of N-term masses
   (`TdgfMng::n_term_var_ptm_type_num_`, argument `nTermVarPtmTypeNum`); the
