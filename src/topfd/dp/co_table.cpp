@@ -15,6 +15,8 @@
 
 #include "topfd/dp/co_table.hpp"
 
+#include <algorithm>
+
 namespace toppic {
 
 int CoTable::cntTableSize(MatchEnvPtr2D& win_envs, int win, int pnt) {
@@ -49,8 +51,42 @@ bool CoTable::checkCoexist(const MatchEnvPtr& env_a, const MatchEnvPtr& env_b,
   return true;
 }
 
+// Count the peaks shared by env_a and env_b: the matched peaks of env_a whose
+// spectrum peak is also a matched peak of env_b.
+int CoTable::cntSharedPeakNum(const MatchEnvPtr& env_a,
+                              const MatchEnvPtr& env_b) {
+  int cnt_share = 0;
+  ExpEnvPtr real_env_a = env_a->getExpEnvPtr();
+  ExpEnvPtr real_env_b = env_b->getExpEnvPtr();
+  for (int i = 0; i < real_env_a->getPeakNum(); i++) {
+    if (!real_env_a->isExist(i)) {
+      continue;
+    }
+    int a_idx = real_env_a->getPeakIdx(i);
+    for (int j = 0; j < real_env_b->getPeakNum(); j++) {
+      if (real_env_b->getPeakIdx(j) == a_idx) {
+        cnt_share++;
+        break;
+      }
+    }
+  }
+  return cnt_share;
+}
+
+// Two envelopes do not coexist when the ratio between their number of shared
+// peaks and the smaller of their numbers of matched peaks is larger than
+// max_peak_sharing_ratio; otherwise each shared peak is checked.
 bool CoTable::checkCoexist(const MatchEnvPtr& env_a, const MatchEnvPtr& env_b,
-                           double tolerance) {
+                           double tolerance, double max_peak_sharing_ratio) {
+  int min_peak_num = std::min(env_a->getExpEnvPtr()->getMatchPeakNum(),
+                              env_b->getExpEnvPtr()->getMatchPeakNum());
+  if (min_peak_num > 0) {
+    double ratio =
+        static_cast<double>(cntSharedPeakNum(env_a, env_b)) / min_peak_num;
+    if (ratio > max_peak_sharing_ratio) {
+      return false;
+    }
+  }
   int cnt_share = 0;
   int cnt_coexist = 0;
   ExpEnvPtr real_env_a = env_a->getExpEnvPtr();
@@ -76,7 +112,7 @@ bool CoTable::checkCoexist(const MatchEnvPtr& env_a, const MatchEnvPtr& env_b,
 
 void CoTable::compTableEntry(MatchEnvPtrVec& env_list, MatchEnvPtr2D& win_envs,
                              std::vector<bool>& rows, int id, int win,
-                             double tolerance) {
+                             double tolerance, double max_peak_sharing_ratio) {
   if (win < 0) {
     return;
   }
@@ -85,14 +121,14 @@ void CoTable::compTableEntry(MatchEnvPtrVec& env_list, MatchEnvPtr2D& win_envs,
     if (prev_id >= id) {
       return;
     }
-    rows[id - prev_id - 1] =
-        checkCoexist(env_list[prev_id], env_list[id], tolerance);
+    rows[id - prev_id - 1] = checkCoexist(env_list[prev_id], env_list[id],
+                                          tolerance, max_peak_sharing_ratio);
   }
 }
 
 // initialize coexist table
 std::vector<std::vector<bool>> CoTable::initCoexistTable(
-    MatchEnvPtr2D& win_envs, double tolerance) {
+    MatchEnvPtr2D& win_envs, double tolerance, double max_peak_sharing_ratio) {
   MatchEnvPtrVec env_list;
   for (size_t i = 0; i < win_envs.size(); i++) {
     for (size_t j = 0; j < win_envs[i].size(); j++) {
@@ -108,9 +144,12 @@ std::vector<std::vector<bool>> CoTable::initCoexistTable(
       int id = win_envs[i][j]->getId();
       int size = cntTableSize(win_envs, i, j);
       co_table[id].resize(size);
-      compTableEntry(env_list, win_envs, co_table[id], id, i - 2, tolerance);
-      compTableEntry(env_list, win_envs, co_table[id], id, i - 1, tolerance);
-      compTableEntry(env_list, win_envs, co_table[id], id, i, tolerance);
+      compTableEntry(env_list, win_envs, co_table[id], id, i - 2, tolerance,
+                     max_peak_sharing_ratio);
+      compTableEntry(env_list, win_envs, co_table[id], id, i - 1, tolerance,
+                     max_peak_sharing_ratio);
+      compTableEntry(env_list, win_envs, co_table[id], id, i, tolerance,
+                     max_peak_sharing_ratio);
     }
   }
   return co_table;
