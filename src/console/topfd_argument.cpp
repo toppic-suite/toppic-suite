@@ -85,6 +85,7 @@ bool Argument::parse(int argc, char* argv[]) {
   std::string ms1_rank_peak_distance = "";
   std::string ms2_rank_peak_distance = "";
   std::string mass_group_boundary = "";
+  std::string max_peak_sharing_ratio = "";
 
   // Define and parse the program options
   try {
@@ -176,6 +177,12 @@ bool Argument::parse(int argc, char* argv[]) {
         "mass-group-boundary", po::value<std::string>(&mass_group_boundary),
         "The mass above which envelope validation requires three matched and "
         "three consecutive isotopic peaks instead of two (default 4250).")(
+        "max-peak-sharing-ratio",
+        po::value<std::string>(&max_peak_sharing_ratio),
+        "<a number in [0, 1]>. Two envelopes do not coexist in the dynamic "
+        "programming when the ratio between their number of shared peaks and "
+        "the smaller of their numbers of matched peaks is larger than this "
+        "value (default 1.0, no limit).")(
         "max-miss-peak-num", po::value<std::string>(&max_miss_peak_num),
         "<a non-negative integer>. Maximum number of missing peaks allowed in "
         "a matched envelope. The default value is 1.")(
@@ -364,6 +371,16 @@ bool Argument::parse(int argc, char* argv[]) {
         return false;
       }
       topfd_para_ptr_->setMassGroupBoundary(mass);
+    }
+
+    if (vm.count("max-peak-sharing-ratio")) {
+      double ratio = 0;
+      if (!toDouble(max_peak_sharing_ratio, ratio) || ratio < 0 || ratio > 1) {
+        LOG_ERROR("Max peak sharing ratio " << max_peak_sharing_ratio
+                  << " should be a number in [0, 1].");
+        return false;
+      }
+      topfd_para_ptr_->setMaxPeakSharingRatio(ratio);
     }
 
     if (vm.count("max-miss-peak-num")) {

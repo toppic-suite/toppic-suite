@@ -340,6 +340,8 @@ DeconvSingleSp::DeconvSingleSp(const TopfdParaPtr& topfd_para_ptr,
       (ms_level == 2) ? topfd_para_ptr->getMsTwoRankPeakDistance()
                       : topfd_para_ptr->getMsOneRankPeakDistance();
   dp_para_ptr_ = std::make_shared<DpPara>(topfd_para_ptr->getMzError());
+  dp_para_ptr_->max_peak_sharing_ratio_ =
+      topfd_para_ptr->getMaxPeakSharingRatio();
   ms_level_ = ms_level;
   double sn_ratio;
   if (ms_level == 1) {
@@ -431,8 +433,9 @@ MatchEnvPtrVec DeconvSingleSp::deconv() {
   // prepare table for dp
   if (dp_para_ptr_->check_double_increase_) {
     LOG_DEBUG("Generating coexisting table...");
-    dp_para_ptr_->coexist_table_ =
-        CoTable::initCoexistTable(win_envs, dp_para_ptr_->mz_tolerance_);
+    dp_para_ptr_->coexist_table_ = CoTable::initCoexistTable(
+        win_envs, dp_para_ptr_->mz_tolerance_,
+        dp_para_ptr_->max_peak_sharing_ratio_);
   }
   // dp
   LOG_DEBUG("Generating Graph and DP...");

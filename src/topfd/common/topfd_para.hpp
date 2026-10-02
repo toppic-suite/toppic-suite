@@ -53,6 +53,7 @@ class TopfdPara {
   int getMaxCharge() const { return max_charge_; }
 
   double getMassGroupBoundary() const { return mass_group_boundary_; }
+  double getMaxPeakSharingRatio() const { return max_peak_sharing_ratio_; }
   double getMaxMass() const { return max_mass_; }
   double getMzError() const { return mz_error_; }
   int getMaxMissPeakNum() const { return max_miss_peak_num_; }
@@ -112,6 +113,9 @@ class TopfdPara {
 
   void setMassGroupBoundary(double mass) {
     mass_group_boundary_ = mass;
+  }
+  void setMaxPeakSharingRatio(double ratio) {
+    max_peak_sharing_ratio_ = ratio;
   }
   void setMaxMass(double mass) { max_mass_ = mass; }
   void setMzError(double error) { mz_error_ = error; }
@@ -197,6 +201,9 @@ class TopfdPara {
   // keep in step with EnvPara::DEFAULT_MASS_GROUP_BOUNDARY; this header
   // deliberately has no project includes, so the value is repeated
   double mass_group_boundary_ = 4250;
+  // hidden option --max-peak-sharing-ratio: DpPara::max_peak_sharing_ratio_,
+  // above which two envelopes sharing peaks do not coexist in the DP
+  double max_peak_sharing_ratio_ = 1.0;
   double max_mass_ = 50000;
   // precursor window is used only when the mzML file does not
   // contain the precursor window information

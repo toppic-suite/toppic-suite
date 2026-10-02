@@ -30,6 +30,7 @@ class DpPara {
   DpPara(const DpParaPtr& dp_para_ptr) {
     check_double_increase_ = dp_para_ptr->check_double_increase_;
     coexist_table_ = dp_para_ptr->coexist_table_;
+    max_peak_sharing_ratio_ = dp_para_ptr->max_peak_sharing_ratio_;
     max_env_num_per_peak_ = dp_para_ptr->max_env_num_per_peak_;
     dp_env_num_ = dp_para_ptr->dp_env_num_;
     max_env_num_per_vertex_ = dp_para_ptr->max_env_num_per_vertex_;
@@ -50,6 +51,10 @@ class DpPara {
   // Check double increasing when two envelopes overlap
   bool check_double_increase_ = true;
   std::vector<std::vector<bool>> coexist_table_;
+  // Two envelopes do not coexist when the ratio between their number of
+  // shared peaks and the smaller of their numbers of matched peaks is larger
+  // than this value; 1.0 is never exceeded and keeps every pair
+  double max_peak_sharing_ratio_ = 1.0;
 
   // maximum number of envelopes sharing one peak
   int max_env_num_per_peak_ = 2;

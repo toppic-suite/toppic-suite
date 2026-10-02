@@ -29,15 +29,18 @@ class CoTable {
   static bool checkCoexist(const MatchEnvPtr& env_a, const MatchEnvPtr& env_b,
                            int pos_a, int pos_b, double tolerance);
 
+  static int cntSharedPeakNum(const MatchEnvPtr& env_a,
+                              const MatchEnvPtr& env_b);
+
   static bool checkCoexist(const MatchEnvPtr& env_a, const MatchEnvPtr& env_b,
-                           double tolerance);
+                           double tolerance, double max_peak_sharing_ratio);
 
   static void compTableEntry(MatchEnvPtrVec& env_list, MatchEnvPtr2D& win_envs,
                              std::vector<bool>& rows, int id, int win,
-                             double tolerance);
+                             double tolerance, double max_peak_sharing_ratio);
 
   static std::vector<std::vector<bool>> initCoexistTable(
-      MatchEnvPtr2D& win_envs, double tolerance);
+      MatchEnvPtr2D& win_envs, double tolerance, double max_peak_sharing_ratio);
 };
 
 }  // namespace toppic
