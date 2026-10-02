@@ -53,15 +53,21 @@ class SimplePrsmMemMerge {
   // spec_num: the number of spectra of the file, so that the per-spectrum
   // lists are allocated once and never grow while the block threads add to
   // them (a resize would invalidate the references the other threads hold).
+  // group_num: the number of candidate groups (the variable PTM filter's
+  // rounds), each kept with its own top_nums; the written list of a spectrum
+  // is the first group's best, then each later group's best whose protein
+  // and range are not written already. One group is the merge above.
   SimplePrsmMemMerge(const std::string& sp_file_name,
                      const std::string& output_file_ext,
-                     const std::vector<int>& top_nums, int spec_num);
+                     const std::vector<int>& top_nums, int spec_num,
+                     int group_num = 1);
 
   // type_idx: 0 complete, 1 prefix, 2 suffix, 3 internal
   // block_idx and call_idx give the position the records had in the block
   // files the merge read: block file order, then write order inside a block.
+  // group: the candidate group, 0 to group_num - 1
   void add(int type_idx, int block_idx, int call_idx,
-           const SimplePrsmPtrVec& prsm_ptrs);
+           const SimplePrsmPtrVec& prsm_ptrs, int group = 0);
 
   void write();
 
@@ -80,7 +86,9 @@ class SimplePrsmMemMerge {
   // the order the candidates of a spectrum are trimmed and written in
   static bool cmpEntry(const Entry& a, const Entry& b);
 
-  // results_[type][spectrum id]
+  int group_num_ = 1;
+
+  // results_[group * type number + type][spectrum id]
   std::vector<std::vector<std::vector<Entry>>> results_;
   std::vector<std::unique_ptr<std::mutex>> mutexes_;
 };

@@ -122,51 +122,6 @@ std::vector<char> compNTermRowMask(const MassMatchPtr& index_ptr,
   return mask;
 }
 
-// The candidates of one proteoform type from two rounds merged: a protein
-// (by_range: a protein and a range) once, with its higher score, the first
-// round's on a tie, and the best top_num in the order the finders report
-// them: score descending, then protein id, start and end ascending.
-ProtCandidatePtrVec mergeCands(const ProtCandidatePtrVec& first,
-                               const ProtCandidatePtrVec& second,
-                               size_t top_num, bool by_range) {
-  ProtCandidatePtrVec all = first;
-  for (size_t i = 0; i < second.size(); i++) {
-    const ProtCandidatePtr& cand = second[i];
-    bool found = false;
-    for (size_t j = 0; j < all.size(); j++) {
-      if (all[j]->getProteinId() == cand->getProteinId() &&
-          (!by_range || (all[j]->getStartPos() == cand->getStartPos() &&
-                         all[j]->getEndPos() == cand->getEndPos()))) {
-        found = true;
-        if (cand->getScore() > all[j]->getScore()) {
-          all[j] = cand;
-        }
-        break;
-      }
-    }
-    if (!found) {
-      all.push_back(cand);
-    }
-  }
-  std::stable_sort(all.begin(), all.end(),
-                   [](const ProtCandidatePtr& a, const ProtCandidatePtr& b) {
-                     if (a->getScore() != b->getScore()) {
-                       return a->getScore() > b->getScore();
-                     }
-                     if (a->getProteinId() != b->getProteinId()) {
-                       return a->getProteinId() < b->getProteinId();
-                     }
-                     if (a->getStartPos() != b->getStartPos()) {
-                       return a->getStartPos() < b->getStartPos();
-                     }
-                     return a->getEndPos() < b->getEndPos();
-                   });
-  if (all.size() > top_num) {
-    all.resize(top_num);
-  }
-  return all;
-}
-
 }  // namespace
 
 VarPtmFilter::VarPtmFilter(const ProteoformPtrVec& proteo_ptrs,
@@ -402,16 +357,31 @@ void VarPtmFilter::computeBestMatch(const FilterSpecPtr& spec_ptr) {
   std::array<ProtCandidatePtrVec, 4> cands =
       findTypeCands(spec_ptr, mng_ptr_->shift_list_, nullptr, nullptr);
 
+  int group_spec_num = spec_ptr->getGroupSpecNum();
+  auto geneMatchPtrs = [&](const ProtCandidatePtrVec& prots,
+                           SimplePrsmPtrVec* match_ptrs) {
+    match_ptrs->clear();
+    for (size_t i = 0; i < prots.size(); i++) {
+      int id = prots[i]->getProteinId();
+      match_ptrs->push_back(std::make_shared<SimplePrsm>(
+          spec_ptr->getHeaderPtr(), group_spec_num, proteo_ptrs_[id],
+          prots[i]));
+    }
+  };
+  geneMatchPtrs(cands[0], &comp_match_ptrs_);
+  geneMatchPtrs(cands[1], &pref_match_ptrs_);
+  geneMatchPtrs(cands[2], &suff_match_ptrs_);
+  geneMatchPtrs(cands[3], &internal_match_ptrs_);
+
   // One more round for each proteoform N-terminal PTM mass m: the spectrum
   // with m taken off its N-terminal masses and its precursor mass, so that
   // the N-terminal rows match the fragments of a proteoform whose first
   // residue carries the PTM; the other variable PTMs are those of up to
   // var_ptm_num - 1, no other PTM included. Only the rows whose first
-  // residue can carry the PTM start a pair.
+  // residue can carry the PTM start a pair. The candidates hold the
+  // spectrum's own header (its precursor mass).
   const FilterSpecPtrVec& n_term_specs = spec_ptr->getNTermModSpecs();
-  const std::vector<size_t> top_nums = {
-      mng_ptr_->comp_num_, mng_ptr_->pref_suff_num_, mng_ptr_->pref_suff_num_,
-      mng_ptr_->internal_num_};
+  n_term_match_ptrs_.resize(n_term_specs.size());
   for (size_t k = 0; k < n_term_specs.size(); k++) {
     const FilterSpecPtr& n_term_spec_ptr = n_term_specs[k];
     scoreIndexes(n_term_spec_ptr,
@@ -421,23 +391,8 @@ void VarPtmFilter::computeBestMatch(const FilterSpecPtr& spec_ptr) {
     std::array<ProtCandidatePtrVec, 4> round_cands = findTypeCands(
         n_term_spec_ptr, mng_ptr_->n_term_other_shift_list_,
         &n_term_term_masks_[k], &n_term_diag_masks_[k]);
-    for (size_t t = 0; t < cands.size(); t++) {
-      cands[t] = mergeCands(cands[t], round_cands[t], top_nums[t],
-                            mng_ptr_->range_candidates_);
-    }
-  }
-
-  int group_spec_num = spec_ptr->getGroupSpecNum();
-  std::array<SimplePrsmPtrVec*, 4> match_ptrs = {
-      &comp_match_ptrs_, &pref_match_ptrs_, &suff_match_ptrs_,
-      &internal_match_ptrs_};
-  for (size_t t = 0; t < cands.size(); t++) {
-    match_ptrs[t]->clear();
-    for (size_t i = 0; i < cands[t].size(); i++) {
-      int id = cands[t][i]->getProteinId();
-      match_ptrs[t]->push_back(std::make_shared<SimplePrsm>(
-          spec_ptr->getHeaderPtr(), group_spec_num, proteo_ptrs_[id],
-          cands[t][i]));
+    for (size_t t = 0; t < round_cands.size(); t++) {
+      geneMatchPtrs(round_cands[t], &n_term_match_ptrs_[k][t]);
     }
   }
 }

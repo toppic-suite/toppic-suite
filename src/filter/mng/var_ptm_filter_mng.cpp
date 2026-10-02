@@ -62,7 +62,8 @@ VarPtmFilterMng::VarPtmFilterMng(const PrsmParaPtr& prsm_para_ptr,
   for (size_t i = 0; i < n_term_mod_ptrs.size(); i++) {
     double shift = n_term_mod_ptrs[i]->getShift();
     size_t pos = 0;
-    while (pos < n_term_shift_list_.size() && n_term_shift_list_[pos] != shift) {
+    while (pos < n_term_shift_list_.size() &&
+           n_term_shift_list_[pos] != shift) {
       pos++;
     }
     if (pos == n_term_shift_list_.size()) {

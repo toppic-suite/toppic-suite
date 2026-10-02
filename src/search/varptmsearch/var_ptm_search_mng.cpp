@@ -66,7 +66,8 @@ VarPtmSearchMng::VarPtmSearchMng(const PrsmParaPtr& prsm_para_ptr, int n_report,
   for (size_t i = 0; i < n_term_mod_ptrs.size(); i++) {
     double shift = n_term_mod_ptrs[i]->getShift();
     size_t pos = 0;
-    while (pos < single_shift_list_.size() && single_shift_list_[pos] != shift) {
+    while (pos < single_shift_list_.size() &&
+           single_shift_list_[pos] != shift) {
       pos++;
     }
     if (pos == single_shift_list_.size()) {

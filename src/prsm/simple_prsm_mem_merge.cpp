@@ -18,6 +18,8 @@
 #include <algorithm>
 #include <functional>
 #include <sstream>
+#include <string>
+#include <vector>
 
 #include "common/base/proteoform_type.hpp"
 #include "common/util/file_util.hpp"
@@ -85,11 +87,12 @@ bool SimplePrsmMemMerge::cmpEntry(const Entry& a, const Entry& b) {
 SimplePrsmMemMerge::SimplePrsmMemMerge(const std::string& sp_file_name,
                                        const std::string& output_file_ext,
                                        const std::vector<int>& top_nums,
-                                       int spec_num)
+                                       int spec_num, int group_num)
     : sp_file_name_(sp_file_name),
       output_file_ext_(output_file_ext),
-      top_nums_(top_nums) {
-  results_.resize(top_nums.size());
+      top_nums_(top_nums),
+      group_num_(group_num) {
+  results_.resize(top_nums.size() * group_num);
   for (size_t i = 0; i < results_.size(); i++) {
     results_[i].resize(spec_num);
   }
@@ -99,14 +102,15 @@ SimplePrsmMemMerge::SimplePrsmMemMerge(const std::string& sp_file_name,
 }
 
 void SimplePrsmMemMerge::add(int type_idx, int block_idx, int call_idx,
-                             const SimplePrsmPtrVec& prsm_ptrs) {
+                             const SimplePrsmPtrVec& prsm_ptrs, int group) {
   if (prsm_ptrs.size() == 0) {
     return;
   }
   int spec_id = prsm_ptrs[0]->getSpectrumId();
   size_t top_num = static_cast<size_t>(top_nums_[type_idx]);
   std::lock_guard<std::mutex> lock(*mutexes_[spec_id % mutex_num]);
-  std::vector<std::vector<Entry>>& type_results = results_[type_idx];
+  std::vector<std::vector<Entry>>& type_results =
+      results_[group * top_nums_.size() + type_idx];
   if (static_cast<size_t>(spec_id) >= type_results.size()) {
     return;
   }
@@ -136,21 +140,39 @@ void SimplePrsmMemMerge::write() {
       ProteoformType::PREFIX->getName().c_str(),
       ProteoformType::SUFFIX->getName().c_str(),
       ProteoformType::INTERNAL->getName().c_str()};
-  for (size_t type_idx = 0; type_idx < results_.size(); type_idx++) {
+  for (size_t type_idx = 0; type_idx < top_nums_.size(); type_idx++) {
     SimplePrsmXmlWriter writer(base_name + "." + output_file_ext_ + "_" +
                                type_names[type_idx]);
     size_t top_num = static_cast<size_t>(top_nums_[type_idx]);
-    std::vector<std::vector<Entry>>& type_results = results_[type_idx];
-    for (size_t spec_id = 0; spec_id < type_results.size(); spec_id++) {
-      std::vector<Entry>& results = type_results[spec_id];
-      if (results.size() == 0) {
-        continue;
+    size_t spec_num = results_[type_idx].size();
+    for (size_t spec_id = 0; spec_id < spec_num; spec_id++) {
+      // the best top_num of each group, the first group's first; a later
+      // group's candidate whose protein and range are written already is
+      // left out
+      std::vector<std::string> written;
+      for (int group = 0; group < group_num_; group++) {
+        std::vector<Entry>& results =
+            results_[group * top_nums_.size() + type_idx][spec_id];
+        if (results.size() == 0) {
+          continue;
+        }
+        std::sort(results.begin(), results.end(), cmpEntry);
+        for (size_t i = 0; i < results.size() && i < top_num; i++) {
+          const SimplePrsmPtr& prsm_ptr = results[i].prsm_ptr_;
+          if (group_num_ > 1) {
+            std::string key = prsm_ptr->getSeqName() + " " +
+                              std::to_string(prsm_ptr->getSeqStartPos()) +
+                              " " + std::to_string(prsm_ptr->getSeqEndPos());
+            if (std::find(written.begin(), written.end(), key) !=
+                written.end()) {
+              continue;
+            }
+            written.push_back(key);
+          }
+          writer.write(toPrsmStr(prsm_ptr));
+        }
+        std::vector<Entry>().swap(results);
       }
-      std::sort(results.begin(), results.end(), cmpEntry);
-      for (size_t i = 0; i < results.size() && i < top_num; i++) {
-        writer.write(toPrsmStr(results[i].prsm_ptr_));
-      }
-      std::vector<Entry>().swap(results);
     }
     writer.close();
   }
