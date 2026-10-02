@@ -16,6 +16,7 @@
 #include "filter/diag/diag_filter_processor.hpp"
 
 #include <algorithm>
+#include <cstdlib>
 #include <iomanip>
 #include <iostream>
 #include <sstream>
@@ -23,6 +24,7 @@
 #include "common/base/mod_util.hpp"
 #include "common/thread/simple_thread_pool.hpp"
 #include "common/util/file_util.hpp"
+#include "common/util/logger.hpp"
 #include "common/util/str_util.hpp"
 #include "common/xml/xml_dom_document.hpp"
 #include "common/xml/xml_dom_util.hpp"
@@ -208,14 +210,16 @@ void DiagFilterProcessor::addResults(int spec_id,
   for (size_t i = 0; i < match_ptrs.size(); i++) {
     str_ptrs.push_back(toPrsmStr(match_ptrs[i]));
   }
+  auto it = spec_pos_.find(spec_id);
+  if (it == spec_pos_.end()) {
+    LOG_ERROR("Spectrum id " << spec_id << " is not in the spectrum file!");
+    exit(EXIT_FAILURE);
+  }
+  int spec_pos = it->second;
   size_t top_num = mng_ptr_->filter_result_num_;
   std::lock_guard<std::mutex> lock(
-      spec_mutexes_[spec_id % spec_mutexes_.size()]);
-  if (static_cast<size_t>(spec_id) >= spec_results_.size()) {
-    std::lock_guard<std::mutex> resize_lock(resize_mutex_);
-    spec_results_.resize(spec_id + 1);
-  }
-  SimplePrsmStrPtrVec& results = spec_results_[spec_id];
+      spec_mutexes_[spec_pos % spec_mutexes_.size()]);
+  SimplePrsmStrPtrVec& results = spec_results_[spec_pos];
   results.insert(results.end(), str_ptrs.begin(), str_ptrs.end());
   if (results.size() > 2 * top_num) {
     std::sort(results.begin(), results.end(),
@@ -270,8 +274,8 @@ void DiagFilterProcessor::readSpectra() {
 void DiagFilterProcessor::writeResults(const std::string& output_file_name) {
   SimplePrsmXmlWriter writer(output_file_name);
   size_t top_num = mng_ptr_->filter_result_num_;
-  for (size_t spec_id = 0; spec_id < spec_results_.size(); spec_id++) {
-    SimplePrsmStrPtrVec& results = spec_results_[spec_id];
+  for (size_t spec_pos = 0; spec_pos < spec_results_.size(); spec_pos++) {
+    SimplePrsmStrPtrVec& results = spec_results_[spec_pos];
     std::sort(results.begin(), results.end(),
               SimplePrsmStr::cmpScoreDecSeqInc);
     for (size_t i = 0; i < results.size() && i < top_num; i++) {
@@ -296,7 +300,12 @@ void DiagFilterProcessor::process() {
   int spec_num =
       msalign_util::getSpNum(mng_ptr_->prsm_para_ptr_->getSpectrumFileName());
   mng_ptr_->n_spec_block_ = spec_num * db_block_ptr_vec.size();
-  spec_results_.resize(spec_num);
+  std::vector<int> spec_ids =
+      msalign_util::readSpIds(mng_ptr_->prsm_para_ptr_->getSpectrumFileName());
+  for (size_t i = 0; i < spec_ids.size(); i++) {
+    spec_pos_.emplace(spec_ids[i], static_cast<int>(i));
+  }
+  spec_results_.resize(spec_ids.size());
   std::vector<std::mutex> mutexes(64);
   spec_mutexes_.swap(mutexes);
   if (mng_ptr_->var_num_ == 0) {

@@ -227,8 +227,9 @@ void process(const OnePtmFilterMngPtr& mng_ptr) {
                                static_cast<int>(mng_ptr->pref_suff_num_),
                                static_cast<int>(mng_ptr->pref_suff_num_),
                                static_cast<int>(mng_ptr->inte_num_)};
-  SimplePrsmMemMerge combiner(prsm_para_ptr->getSpectrumFileName(),
-                              mng_ptr->output_file_ext_, top_nums, spec_num);
+  SimplePrsmMemMerge combiner(
+      prsm_para_ptr->getSpectrumFileName(), mng_ptr->output_file_ext_,
+      top_nums, msalign_util::readSpIds(prsm_para_ptr->getSpectrumFileName()));
   int block_num = db_block_ptr_vec.size();
   mng_ptr->cnts_.resize(block_num, 0);
   // the spectra, or their variable-modification variants, are read and
