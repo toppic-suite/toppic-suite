@@ -26,21 +26,13 @@ namespace toppic {
 
 class VarPtmAlign {
  public:
-  // n_term_free: the proteoform's N-terminus is not blocked by an acetylated
-  // protein N-terminal form, so its first residue can carry a proteoform
-  // N-terminal PTM; not one of the masses of form_n_term_masses, which a
-  // protein N-terminal form at the proteoform's start already gives
   VarPtmAlign(const std::vector<double>& ms_masses,
               const std::vector<double>& seq_masses,
               const ResSeqPtr& sub_res_seq_ptr,
               const DiagonalPtrVec& diagonal_ptrs,
-              const VarPtmSearchMngPtr& mng_ptr, bool n_term_free,
-              const std::vector<double>& form_n_term_masses);
+              const VarPtmSearchMngPtr& mng_ptr, int max_ptm_num);
 
   void initMatchTable();
-  // whether a protein N-terminal form at the proteoform's start gives a
-  // modification of this mass
-  bool isFormNTermMass(double mass) const;
 
   void initAllowShiftTable();
 
@@ -88,19 +80,16 @@ class VarPtmAlign {
 
   int best_d_;
   int best_ptm_num_;
+
+  // the largest number of variable PTMs of a result: the manager's
+  // var_ptm_num_, less one for a proteoform with a truncation N-terminal
+  // modification
+  int max_ptm_num_;
   int best_score_;
 
   DiagHeaderPtrVec backtrack_diag_header_ptrs_;
 
   ModPtrVec backtrack_mod_ptrs_;
-
-  // for each PTM of backtrack_mod_ptrs_, whether it is a proteoform
-  // N-terminal PTM (on the first residue)
-  std::vector<bool> backtrack_n_term_mods_;
-
-  bool n_term_free_ = true;
-
-  std::vector<double> form_n_term_masses_;
 };
 
 using VarPtmAlignPtr = std::shared_ptr<VarPtmAlign>;

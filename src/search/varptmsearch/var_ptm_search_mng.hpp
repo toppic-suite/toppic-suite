@@ -53,12 +53,12 @@ class VarPtmSearchMng {
 
   ResiduePtrVec2D res_ptr_vec_2d_;
 
-  // For each single shift, the proteoform N-terminal variable PTMs of its
-  // mass (Position N-term) and their residues; empty for a shift without
-  // them. A shift with only such PTMs has empty lists above.
-  ModPtrVec2D n_term_mod_ptr_vec_2d_;
-
-  ResiduePtrVec2D n_term_res_ptr_vec_2d_;
+  // Variable PTMs of the proteoform N-terminus (Position N-term). They are
+  // not shifts of the alignment: the search adds one to a candidate as its
+  // truncation N-terminal modification
+  // (proteoform_factory::geneTruncNTermModProteoform) when the filter found
+  // the candidate with its mass.
+  ModPtrVec n_term_mod_ptr_vec_;
 
   // shift list for single and multiple (up to var_ptm_num) variable PTMs
   std::vector<double> shift_list_;

@@ -40,11 +40,13 @@ class VarPtmFilter {
                                      const PrmMsPtrVec& srm_ms_ptr_vec,
                                      const VarPtmFilterMngPtr& mng_ptr);
 
-  // The candidates of a spectrum set. With proteoform N-terminal PTMs, the
-  // spectrum is scored once more for each N-terminal mass (the spectra of
-  // spec_ptr->getNTermModSpecs()), and each of these rounds has candidates of
-  // its own (getNTermMatchPtrs), so that the many weak pairs a round with
-  // the precursor mass less the PTM mass finds do not displace the
+  // The candidates of a spectrum set. With truncation N-terminal
+  // modifications (variable PTMs of the proteoform N-terminus), the
+  // spectrum is scored once more for each of their masses (the spectra of
+  // spec_ptr->getNTermModSpecs()), and each of these rounds has candidates
+  // of its own (getNTermMatchPtrs, carrying the round's mass in
+  // SimplePrsm::getTruncNTermModShifts), so that the many weak pairs a round
+  // with the precursor mass less the PTM mass finds do not displace the
   // candidates of the first round.
   void computeBestMatch(const FilterSpecPtr& spec_ptr);
 
@@ -95,26 +97,29 @@ class VarPtmFilter {
   // the sequence ranges of the index rows
   mass_match_util::IndexRowRanges row_ranges_;
 
-  // For each proteoform N-terminal PTM mass of the manager, the rows of the
-  // N-terminal form index and of the diagonal index whose first residue can
-  // carry the PTM: 1 if the residue at the row's start is one of the PTM's
-  // residues and the row's N-terminal form is not acetylated.
-  std::vector<std::vector<char>> n_term_term_masks_;
+  // For each truncation N-terminal modification mass of the manager, the
+  // rows of the diagonal index whose first residue can carry the PTM: 1 if
+  // the row starts at the third residue of the protein or later and the
+  // amino acid there is one of the PTM's.
   std::vector<std::vector<char>> n_term_diag_masks_;
 
-  // Score the spectrum against the four indexes, with the precursor bonus
-  // for the precursor masses of prec_minus_water_mass_errors.
+  // Score the spectrum against the four indexes (without score_term, all
+  // but the N-terminal form index), with the precursor bonus for the
+  // precursor masses of prec_minus_water_mass_errors.
   void scoreIndexes(const FilterSpecPtr& spec_ptr,
                     const std::vector<std::pair<int, int>>&
-                        prec_minus_water_mass_errors);
+                        prec_minus_water_mass_errors,
+                    bool score_term);
 
   // The candidates of the four proteoform types (complete, prefix, suffix,
   // internal) from the scores of scoreIndexes: the pairs whose range mass
-  // plus one of ptm_shifts is the precursor mass of spec_ptr, the
-  // N-terminal rows restricted to term_mask and diag_mask when given.
+  // plus one of ptm_shifts is the precursor mass of spec_ptr. With
+  // diag_mask (a truncation N-terminal modification round), only the
+  // suffix and internal candidates, whose diagonal index rows are
+  // restricted to diag_mask.
   std::array<ProtCandidatePtrVec, 4> findTypeCands(
       const FilterSpecPtr& spec_ptr, std::vector<double>& ptm_shifts,
-      const std::vector<char>* term_mask, const std::vector<char>* diag_mask);
+      const std::vector<char>* diag_mask);
 
   SimplePrsmPtrVec comp_match_ptrs_;
   SimplePrsmPtrVec pref_match_ptrs_;

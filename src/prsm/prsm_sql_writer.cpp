@@ -217,8 +217,8 @@ void PrsmSqlWriter::writePrsm(sqlite3_stmt* stmt, const PrsmPtr& prsm_ptr) {
   bindText(stmt, idx++, form_ptr->getAlterStr(AlterType::FIXED));
   sqlite3_bind_int(stmt, idx++, form_ptr->getAlterNum(AlterType::UNEXPECTED));
   bindText(stmt, idx++, form_ptr->getAlterStr(AlterType::UNEXPECTED));
-  sqlite3_bind_int(stmt, idx++, form_ptr->getAlterNum(AlterType::VARIABLE));
-  bindText(stmt, idx++, form_ptr->getAlterStr(AlterType::VARIABLE));
+  sqlite3_bind_int(stmt, idx++, form_ptr->getVarPtmNum());
+  bindText(stmt, idx++, form_ptr->getVarPtmStr());
   bindText(stmt, idx++, form_ptr->getMIScore());
   sqlite3_bind_int(stmt, idx++,
                    static_cast<int>(prsm_ptr->getMatchExpFragNum()));
@@ -243,6 +243,22 @@ void PrsmSqlWriter::writeMassShifts(sqlite3_stmt* stmt,
     sqlite3_bind_double(stmt, 5, shifts[i]->getMassShift());
     bindText(stmt, 6, shifts[i]->getTypePtr()->getName());
     bindText(stmt, 7, shifts[i]->getAnnoStr());
+    sql_util::stepAndReset(sql_db_, stmt);
+  }
+  // the truncation N-terminal modification is no mass shift: it is the
+  // residue sequence's N-terminal modification, in the mass of the first
+  // residue; it gets the next index
+  ProteoformPtr form_ptr = prsm_ptr->getProteoformPtr();
+  if (form_ptr->hasTruncNTermMod()) {
+    const ModPtr& mod_ptr = form_ptr->getTruncNTermModPtr();
+    sqlite3_bind_int(stmt, 1, prsm_ptr->getPrsmId());
+    sqlite3_bind_int(stmt, 2, static_cast<int>(shifts.size()));
+    sqlite3_bind_int(stmt, 3, 0);
+    sqlite3_bind_int(stmt, 4, 1);
+    sqlite3_bind_double(stmt, 5, mod_ptr->getShift());
+    bindText(stmt, 6, "N-terminal variable");
+    bindText(stmt, 7,
+             mod_ptr->getModResiduePtr()->getPtmPtr()->getAbbrName());
     sql_util::stepAndReset(sql_db_, stmt);
   }
 }

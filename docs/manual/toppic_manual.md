@@ -268,19 +268,31 @@ Oxidation,15.994915,M,any,35
 `Residues` lists the one-letter codes of the residues that can carry the
 modification, or `*` for any residue; `Position` is `any`, `N-term` or
 `C-term` (`*` and `any` cannot be combined); `UnimodID` is the Unimod
-accession, or `-1` when unknown. Lines starting with `#` are comments. Each
-name may be used on one line only.
+accession, or `-1` when unknown. Lines starting with `#` are comments. A
+name that is not one of the built-in PTMs of `res/base_data/ptm_base.xml`
+(such as `Acetyl`, `Phospho`, `Oxidation`) may be used on one line only.
 
 In the variable PTM file (`-b`), `N-term` is the N-terminus of the
-proteoform: the modification can only be on its first residue, whatever the
-proteoform's start in the protein, and only when the proteoform's N-terminus
-is not acetylated by its protein N-terminal form (`-n`). At most one such
-modification is on a proteoform, and it counts toward `-S`. Examples:
+proteoform, the alpha-amine of its first residue: a truncation N-terminal
+modification. It is searched only on a proteoform without a protein
+N-terminal form (`-n`) that starts at the third residue of the protein or
+later (the first two are those of the protein N-terminal forms), and only
+when the proteoform's first residue is one of the line's residues. The
+first residue's side chain can still carry an `any` modification. At most
+one such modification is on a proteoform, and it counts toward `-S`.
+Examples:
 
 ```text
 Acetyl,42.010565,*,N-term,1
 Gln->pyro-Glu,-17.026549,Q,N-term,28
 ```
+
+With `Acetyl,42.010565,K,any,1` and `Acetyl,42.010565,*,N-term,1` in one
+file, a proteoform starting with K can be acetylated on its N-terminus, on
+the side chain of K, or both (`[Acetyl]-(K)[Acetyl]...`). In the tables a
+truncation N-terminal modification is the prefix `[Name]-` of the
+`Proteoform` string and `Name:[N-term]`, first, in `Variable PTMs`; `#
+Variable PTMs` counts it (see [Proteoform annotation](proteoform.md)).
 
 The protein N-terminal forms themselves are set with `-n`. The variable PTM
 stage does not use `C-term` modifications.

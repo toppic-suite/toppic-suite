@@ -16,8 +16,6 @@
 #ifndef TOPPIC_COMMON_BASE_PROT_MOD_UTIL_HPP_
 #define TOPPIC_COMMON_BASE_PROT_MOD_UTIL_HPP_
 
-#include <vector>
-
 #include "common/base/prot_mod.hpp"
 #include "common/base/residue.hpp"
 
@@ -29,16 +27,6 @@ bool allowMod(const ProtModPtr& prot_mod_ptr, const ResiduePtrVec& residues);
 
 bool containMod(const ProtModPtrVec& prot_mod_ptr_vec,
                 const ProtModPtr& prot_mod_ptr);
-
-// The masses of the modifications that the protein N-terminal forms of
-// prot_mod_ptr_vec put on the first residue of a proteoform starting at
-// residue start of the protein with residues: the forms that start there,
-// modify their first residue (acetylation) and apply to the protein. A
-// proteoform N-terminal variable PTM of such a mass at such a start is
-// that form.
-std::vector<double> getFormNTermModMasses(const ProtModPtrVec& prot_mod_ptr_vec,
-                                          const ResiduePtrVec& residues,
-                                          int start);
 
 }  // namespace prot_mod_util
 

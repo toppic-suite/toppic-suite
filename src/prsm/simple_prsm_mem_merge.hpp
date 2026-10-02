@@ -56,7 +56,9 @@ class SimplePrsmMemMerge {
   // group_num: the number of candidate groups (the variable PTM filter's
   // rounds), each kept with its own top_nums; the written list of a spectrum
   // is the first group's best, then each later group's best whose protein
-  // and range are not written already. One group is the merge above.
+  // and range are not listed already (a listed one takes the later
+  // candidate's truncation N-terminal modification shifts). One group is
+  // the merge above.
   SimplePrsmMemMerge(const std::string& sp_file_name,
                      const std::string& output_file_ext,
                      const std::vector<int>& top_nums, int spec_num,

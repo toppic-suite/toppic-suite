@@ -147,9 +147,11 @@ void SimplePrsmMemMerge::write() {
     size_t spec_num = results_[type_idx].size();
     for (size_t spec_id = 0; spec_id < spec_num; spec_id++) {
       // the best top_num of each group, the first group's first; a later
-      // group's candidate whose protein and range are written already is
-      // left out
-      std::vector<std::string> written;
+      // group's candidate whose protein and range are listed already is not
+      // listed again, its truncation N-terminal modification shifts are
+      // added to the listed one's
+      std::vector<std::string> keys;
+      SimplePrsmPtrVec selected;
       for (int group = 0; group < group_num_; group++) {
         std::vector<Entry>& results =
             results_[group * top_nums_.size() + type_idx][spec_id];
@@ -163,15 +165,24 @@ void SimplePrsmMemMerge::write() {
             std::string key = prsm_ptr->getSeqName() + " " +
                               std::to_string(prsm_ptr->getSeqStartPos()) +
                               " " + std::to_string(prsm_ptr->getSeqEndPos());
-            if (std::find(written.begin(), written.end(), key) !=
-                written.end()) {
+            auto it = std::find(keys.begin(), keys.end(), key);
+            if (it != keys.end()) {
+              const SimplePrsmPtr& listed_ptr = selected[it - keys.begin()];
+              const std::vector<double>& shifts =
+                  prsm_ptr->getTruncNTermModShifts();
+              for (size_t j = 0; j < shifts.size(); j++) {
+                listed_ptr->addTruncNTermModShift(shifts[j]);
+              }
               continue;
             }
-            written.push_back(key);
+            keys.push_back(key);
           }
-          writer.write(toPrsmStr(prsm_ptr));
+          selected.push_back(prsm_ptr);
         }
         std::vector<Entry>().swap(results);
+      }
+      for (size_t i = 0; i < selected.size(); i++) {
+        writer.write(toPrsmStr(selected[i]));
       }
     }
     writer.close();

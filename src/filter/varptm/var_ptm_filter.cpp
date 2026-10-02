@@ -24,7 +24,7 @@
 #include <utility>
 #include <vector>
 
-#include "common/base/prot_mod_util.hpp"
+#include "common/base/amino_acid.hpp"
 #include "common/util/file_util.hpp"
 #include "common/util/logger.hpp"
 #include "filter/massmatch/mass_match_factory.hpp"
@@ -64,58 +64,30 @@ std::vector<std::pair<int, int>> getShiftedMassErrors(
   return result;
 }
 
-// The rows of an N-terminal side index whose first residue can carry a
-// proteoform N-terminal PTM of mass n_term_mass with the residues res_ptrs:
-// the residue at the row's start is one of them; in the N-terminal form
-// index, the row's form is not an acetylated one (its N-terminus is
-// blocked); and no protein N-terminal form at the row's start gives a
-// modification of that mass (acetylation after NME is NME_ACETYLATION, which
-// the first round finds).
+// The rows of the diagonal index whose first residue can carry a truncation
+// N-terminal modification (a variable PTM of the proteoform N-terminus) with
+// the residues res_ptrs: the row starts at the third residue of the protein
+// or later (the first two are those of the protein N-terminal forms, which
+// the N-terminal form index has), and the amino acid there is one of theirs
+// (Proteoform::setTruncNTermModPtr).
 std::vector<char> compNTermRowMask(const MassMatchPtr& index_ptr,
                                    const std::vector<int>& row_starts,
-                                   bool is_term_index,
                                    const ProteoformPtrVec& proteo_ptrs,
-                                   const ProtModPtrVec& prot_mod_ptrs,
-                                   double n_term_mass,
                                    const ResiduePtrVec& res_ptrs) {
   const std::vector<int>& row_proteo_ids = index_ptr->getRowProteoIds();
-  const std::vector<double>& trunc_shifts = index_ptr->getTruncShifts();
   std::vector<char> mask(row_proteo_ids.size(), 0);
   for (size_t r = 0; r < mask.size(); r++) {
-    if (is_term_index) {
-      bool acetylated = false;
-      for (size_t m = 0; m < prot_mod_ptrs.size(); m++) {
-        if (std::abs(prot_mod_ptrs[m]->getProtShift() - trunc_shifts[r]) <
-            0.0001) {
-          acetylated = prot_mod_ptrs[m]->isAcetylation();
-          break;
-        }
-      }
-      if (acetylated) {
-        continue;
-      }
-    }
-    const ResSeqPtr& seq_ptr =
-        proteo_ptrs[row_proteo_ids[r]]->getResSeqPtr();
+    const ResSeqPtr& seq_ptr = proteo_ptrs[row_proteo_ids[r]]->getResSeqPtr();
     int start = row_starts[r];
-    if (start < 0 || start >= seq_ptr->getLen()) {
+    if (start < 2 || start >= seq_ptr->getLen()) {
       continue;
     }
-    const ResiduePtr& res_ptr = seq_ptr->getResiduePtr(start);
+    const AminoAcidPtr& acid_ptr =
+        seq_ptr->getResiduePtr(start)->getAminoAcidPtr();
     for (size_t i = 0; i < res_ptrs.size(); i++) {
-      if (res_ptr->isSame(res_ptrs[i])) {
+      if (res_ptrs[i]->getAminoAcidPtr() == acid_ptr) {
         mask[r] = 1;
         break;
-      }
-    }
-    if (mask[r]) {
-      std::vector<double> form_masses = prot_mod_util::getFormNTermModMasses(
-          prot_mod_ptrs, seq_ptr->getResidues(), start);
-      for (size_t i = 0; i < form_masses.size(); i++) {
-        if (std::abs(form_masses[i] - n_term_mass) < 0.001) {
-          mask[r] = 0;
-          break;
-        }
       }
     }
   }
@@ -218,14 +190,9 @@ VarPtmFilter::VarPtmFilter(const ProteoformPtrVec& proteo_ptrs,
                    rev_term_index_ptr_, rev_diag_index_ptr_,
                    mng_ptr->prsm_para_ptr_->getProtModPtrVec());
   for (size_t k = 0; k < mng_ptr->n_term_shift_list_.size(); k++) {
-    n_term_term_masks_.push_back(compNTermRowMask(
-        term_index_ptr_, row_ranges_.term_starts_, true, proteo_ptrs,
-        mng_ptr->prsm_para_ptr_->getProtModPtrVec(),
-        mng_ptr->n_term_shift_list_[k], mng_ptr->n_term_res_ptr_vec_2d_[k]));
-    n_term_diag_masks_.push_back(compNTermRowMask(
-        diag_index_ptr_, row_ranges_.diag_starts_, false, proteo_ptrs,
-        mng_ptr->prsm_para_ptr_->getProtModPtrVec(),
-        mng_ptr->n_term_shift_list_[k], mng_ptr->n_term_res_ptr_vec_2d_[k]));
+    n_term_diag_masks_.push_back(
+        compNTermRowMask(diag_index_ptr_, row_ranges_.diag_starts_,
+                         proteo_ptrs, mng_ptr->n_term_res_ptr_vec_2d_[k]));
   }
 }
 
@@ -251,17 +218,20 @@ FilterSpecPtr VarPtmFilter::geneFilterSpec(
 
 void VarPtmFilter::scoreIndexes(
     const FilterSpecPtr& spec_ptr,
-    const std::vector<std::pair<int, int>>& prec_minus_water_mass_errors) {
+    const std::vector<std::pair<int, int>>& prec_minus_water_mass_errors,
+    bool score_term) {
   const std::vector<std::pair<int, int>>& pref_mass_errors =
       spec_ptr->getPrefMassErrors();
   const std::vector<std::pair<int, int>>& suff_mass_errors =
       spec_ptr->getSuffMassErrors();
 
-  term_scores_.assign(term_index_ptr_->getRowNum(), 0);
-  term_prec_rows_.clear();
-  term_index_ptr_->compMatchScores(pref_mass_errors,
-                                   prec_minus_water_mass_errors, term_scores_,
-                                   term_prec_rows_);
+  if (score_term) {
+    term_scores_.assign(term_index_ptr_->getRowNum(), 0);
+    term_prec_rows_.clear();
+    term_index_ptr_->compMatchScores(pref_mass_errors,
+                                     prec_minus_water_mass_errors,
+                                     term_scores_, term_prec_rows_);
+  }
 
   diag_scores_.assign(diag_index_ptr_->getRowNum(), 0);
   diag_prec_rows_.clear();
@@ -283,8 +253,10 @@ void VarPtmFilter::scoreIndexes(
 
   // the bonus rows of each proteoform, collected once and shared by the four
   // proteoform types
-  mass_match_util::compPrecMatchRows(term_index_ptr_, term_prec_rows_,
-                                     term_rows_2d_);
+  if (score_term) {
+    mass_match_util::compPrecMatchRows(term_index_ptr_, term_prec_rows_,
+                                       term_rows_2d_);
+  }
   mass_match_util::compPrecMatchRows(diag_index_ptr_, diag_prec_rows_,
                                      diag_rows_2d_);
   mass_match_util::compPrecMatchRows(rev_term_index_ptr_, rev_term_prec_rows_,
@@ -295,7 +267,7 @@ void VarPtmFilter::scoreIndexes(
 
 std::array<ProtCandidatePtrVec, 4> VarPtmFilter::findTypeCands(
     const FilterSpecPtr& spec_ptr, std::vector<double>& ptm_shifts,
-    const std::vector<char>* term_mask, const std::vector<char>* diag_mask) {
+    const std::vector<char>* diag_mask) {
   PeakTolerancePtr tole_ptr =
       mng_ptr_->prsm_para_ptr_->getSpParaPtr()->getPrecTolerancePtr();
   double prec_minus_water_mass =
@@ -316,8 +288,7 @@ std::array<ProtCandidatePtrVec, 4> VarPtmFilter::findTypeCands(
                        bool term_end, int threshold, int top_num) {
     mass_match_util::RangeRows range_rows =
         row_ranges_.getRangeRows(term_start, term_end, false, false);
-    const std::vector<char>* start_row_mask =
-        term_start ? term_mask : diag_mask;
+    const std::vector<char>* start_row_mask = term_start ? nullptr : diag_mask;
     if (mng_ptr_->range_candidates_) {
       return mass_match_util::findVarPtmTopRanges(
           scores, rev_scores, rows_2d, rev_rows_2d, index_ptr, rev_index_ptr,
@@ -331,14 +302,20 @@ std::array<ProtCandidatePtrVec, 4> VarPtmFilter::findTypeCands(
   };
 
   std::array<ProtCandidatePtrVec, 4> cands;
-  cands[0] = findCands(term_scores_, rev_term_scores_, term_rows_2d_,
-                       rev_term_rows_2d_, term_index_ptr_, rev_term_index_ptr_,
-                       true, true, mng_ptr_->comp_threshold_,
-                       mng_ptr_->comp_num_);
-  cands[1] = findCands(term_scores_, rev_diag_scores_, term_rows_2d_,
-                       rev_diag_rows_2d_, term_index_ptr_, rev_diag_index_ptr_,
-                       true, false, mng_ptr_->pref_suff_threshold_,
-                       mng_ptr_->pref_suff_num_);
+  // a truncation N-terminal modification is on a proteoform without a
+  // protein N-terminal form, so its round has no complete and prefix
+  // candidates
+  if (diag_mask == nullptr) {
+    cands[0] = findCands(term_scores_, rev_term_scores_, term_rows_2d_,
+                         rev_term_rows_2d_, term_index_ptr_,
+                         rev_term_index_ptr_, true, true,
+                         mng_ptr_->comp_threshold_, mng_ptr_->comp_num_);
+    cands[1] = findCands(term_scores_, rev_diag_scores_, term_rows_2d_,
+                         rev_diag_rows_2d_, term_index_ptr_,
+                         rev_diag_index_ptr_, true, false,
+                         mng_ptr_->pref_suff_threshold_,
+                         mng_ptr_->pref_suff_num_);
+  }
   cands[2] = findCands(diag_scores_, rev_term_scores_, diag_rows_2d_,
                        rev_term_rows_2d_, diag_index_ptr_, rev_term_index_ptr_,
                        false, true, mng_ptr_->pref_suff_threshold_,
@@ -353,9 +330,10 @@ std::array<ProtCandidatePtrVec, 4> VarPtmFilter::findTypeCands(
 void VarPtmFilter::computeBestMatch(const FilterSpecPtr& spec_ptr) {
   scoreIndexes(spec_ptr,
                getShiftedMassErrors(spec_ptr->getPrecMinusWaterMassError(),
-                                    mng_ptr_->int_shift_list_, false));
+                                    mng_ptr_->int_shift_list_, false),
+               true);
   std::array<ProtCandidatePtrVec, 4> cands =
-      findTypeCands(spec_ptr, mng_ptr_->shift_list_, nullptr, nullptr);
+      findTypeCands(spec_ptr, mng_ptr_->shift_list_, nullptr);
 
   int group_spec_num = spec_ptr->getGroupSpecNum();
   auto geneMatchPtrs = [&](const ProtCandidatePtrVec& prots,
@@ -373,13 +351,15 @@ void VarPtmFilter::computeBestMatch(const FilterSpecPtr& spec_ptr) {
   geneMatchPtrs(cands[2], &suff_match_ptrs_);
   geneMatchPtrs(cands[3], &internal_match_ptrs_);
 
-  // One more round for each proteoform N-terminal PTM mass m: the spectrum
-  // with m taken off its N-terminal masses and its precursor mass, so that
-  // the N-terminal rows match the fragments of a proteoform whose first
-  // residue carries the PTM; the other variable PTMs are those of up to
-  // var_ptm_num - 1, no other PTM included. Only the rows whose first
-  // residue can carry the PTM start a pair. The candidates hold the
-  // spectrum's own header (its precursor mass).
+  // One more round for each truncation N-terminal modification mass m (the
+  // variable PTMs of the proteoform N-terminus): the spectrum with m taken
+  // off its N-terminal masses and its precursor mass, so that the N-terminal
+  // rows match the fragments of a proteoform whose N-terminus carries the
+  // PTM; the other variable PTMs are those of up to var_ptm_num - 1, no
+  // other PTM included. Only the diagonal index rows whose first residue
+  // can carry the PTM start a pair (suffix and internal candidates). The
+  // candidates hold the spectrum's own header (its precursor mass) and m,
+  // the shift the search adds to them.
   const FilterSpecPtrVec& n_term_specs = spec_ptr->getNTermModSpecs();
   n_term_match_ptrs_.resize(n_term_specs.size());
   for (size_t k = 0; k < n_term_specs.size(); k++) {
@@ -387,12 +367,17 @@ void VarPtmFilter::computeBestMatch(const FilterSpecPtr& spec_ptr) {
     scoreIndexes(n_term_spec_ptr,
                  getShiftedMassErrors(
                      n_term_spec_ptr->getPrecMinusWaterMassError(),
-                     mng_ptr_->n_term_other_int_shift_list_, true));
-    std::array<ProtCandidatePtrVec, 4> round_cands = findTypeCands(
-        n_term_spec_ptr, mng_ptr_->n_term_other_shift_list_,
-        &n_term_term_masks_[k], &n_term_diag_masks_[k]);
+                     mng_ptr_->n_term_other_int_shift_list_, true),
+                 false);
+    std::array<ProtCandidatePtrVec, 4> round_cands =
+        findTypeCands(n_term_spec_ptr, mng_ptr_->n_term_other_shift_list_,
+                      &n_term_diag_masks_[k]);
+    std::vector<double> trunc_shifts(1, mng_ptr_->n_term_shift_list_[k]);
     for (size_t t = 0; t < round_cands.size(); t++) {
       geneMatchPtrs(round_cands[t], &n_term_match_ptrs_[k][t]);
+      for (size_t i = 0; i < n_term_match_ptrs_[k][t].size(); i++) {
+        n_term_match_ptrs_[k][t][i]->setTruncNTermModShifts(trunc_shifts);
+      }
     }
   }
 }

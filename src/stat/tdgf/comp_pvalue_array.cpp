@@ -19,7 +19,6 @@
 
 #include "common/base/proteoform_type.hpp"
 #include "common/base/mass_constant.hpp"
-#include "common/base/mod_type.hpp"
 #include "common/util/logger.hpp"
 #include "ms/factory/prm_ms_factory.hpp"
 #include "ms/spec/deconv_ms_util.hpp"
@@ -105,9 +104,13 @@ void CompPValueArray::compMultiExpectedValues(const PrmMsPtrVec& ms_six_ptr_vec,
     int unexpect_shift_num = proteo_ptr->getAlterNum(AlterType::UNEXPECTED);
     ProteoformTypePtr type_ptr = proteo_ptr->getProteoformType();
 
-    int var_ptm_num = proteo_ptr->getVarPtmNum();
+    // the variable PTMs of the mass shifts, and the truncation N-terminal
+    // modification, counted with its own type number
+    int var_ptm_num = proteo_ptr->getAlterNum(AlterType::VARIABLE);
+    int n_term_var_ptm_num = proteo_ptr->hasTruncNTermMod() ? 1 : 0;
     double search_mass = prec_mass;
-    if (unexpect_shift_num == 0 && var_ptm_num == 0) {
+    if (unexpect_shift_num == 0 && var_ptm_num == 0 &&
+        n_term_var_ptm_num == 0) {
       // in ZERO PTM searching, +/-1 Da was allowed.
       // We need to adjust the prec mass for candidate number computation
       // if there was 1 Da difference between original prec mass and adjusted
@@ -122,9 +125,12 @@ void CompPValueArray::compMultiExpectedValues(const PrmMsPtrVec& ms_six_ptr_vec,
         }
       }
     }
-    // when variable PTMs are allowed, use residue seq mass as precursor mass
-    if (unexpect_shift_num == 0 && var_ptm_num > 0) {
-      search_mass = proteo_ptr->getResSeqPtr()->getResMassSum();
+    // when variable PTMs are allowed, use residue seq mass as precursor mass,
+    // without the truncation N-terminal modification (the residue sequence
+    // has it as its N-terminal modification)
+    if (unexpect_shift_num == 0 && var_ptm_num + n_term_var_ptm_num > 0) {
+      search_mass = proteo_ptr->getResSeqPtr()->getResMassSum() -
+                    proteo_ptr->getTruncNTermModPtr()->getShift();
     }
     LOG_DEBUG("prec_ mass " << prec_mass << " search mass " << search_mass);
     double cand_num = test_num_ptr_->compCandNum(type_ptr, unexpect_shift_num,
@@ -135,23 +141,10 @@ void CompPValueArray::compMultiExpectedValues(const PrmMsPtrVec& ms_six_ptr_vec,
       cand_num = 1.0;
     }
 
-    // multiple a factor for variable PTMs: the PTMs of the proteoform
-    // N-terminus (modification type N_TERM) are counted with their own type
-    // number
-    int n_term_var_ptm_num = 0;
-    MassShiftPtrVec var_shift_ptrs =
-        proteo_ptr->getMassShiftPtrVec(AlterType::VARIABLE);
-    for (size_t s = 0; s < var_shift_ptrs.size(); s++) {
-      const AlterPtrVec& alter_ptrs = var_shift_ptrs[s]->getAlterPtrVec();
-      for (size_t a = 0; a < alter_ptrs.size(); a++) {
-        if (alter_ptrs[a]->getModPtr()->getModTypePtr() == ModType::N_TERM) {
-          n_term_var_ptm_num++;
-        }
-      }
-    }
+    // multiple a factor for variable PTMs: the truncation N-terminal
+    // modification is counted with its own type number
     double var_ptm_factor =
-        pow(mng_ptr_->var_ptm_type_num_ + 1,
-            var_ptm_num - n_term_var_ptm_num) *
+        pow(mng_ptr_->var_ptm_type_num_ + 1, var_ptm_num) *
         pow(mng_ptr_->n_term_var_ptm_type_num_ + 1, n_term_var_ptm_num);
     LOG_DEBUG("candidate number "
               << cand_num << " var_ptm_type_num " << mng_ptr_->var_ptm_type_num_
