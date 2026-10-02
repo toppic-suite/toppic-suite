@@ -60,16 +60,23 @@ class SimplePrsmMemMerge {
   // the number of spectra dropped every candidate of a larger id without a
   // word (issue #598). The lists are written in file order, the order in
   // which the searches read the spectra and the filter file side by side.
+  // group_num: the number of candidate groups (the variable PTM filter's
+  // rounds), each kept with its own top_nums; the written list of a spectrum
+  // is the first group's best, then each later group's best whose protein
+  // and range are not listed already (a listed one takes the later
+  // candidate's truncation N-terminal modification shifts). One group is
+  // the merge above.
   SimplePrsmMemMerge(const std::string& sp_file_name,
                      const std::string& output_file_ext,
                      const std::vector<int>& top_nums,
-                     const std::vector<int>& spec_ids);
+                     const std::vector<int>& spec_ids, int group_num = 1);
 
   // type_idx: 0 complete, 1 prefix, 2 suffix, 3 internal
   // block_idx and call_idx give the position the records had in the block
   // files the merge read: block file order, then write order inside a block.
+  // group: the candidate group, 0 to group_num - 1
   void add(int type_idx, int block_idx, int call_idx,
-           const SimplePrsmPtrVec& prsm_ptrs);
+           const SimplePrsmPtrVec& prsm_ptrs, int group = 0);
 
   void write();
 
@@ -91,7 +98,9 @@ class SimplePrsmMemMerge {
   // spectrum id -> position of the spectrum in the file; read only once the
   // block threads run
   std::unordered_map<int, int> spec_pos_;
-  // results_[type][position of the spectrum in the file]
+  int group_num_ = 1;
+  // results_[group * type number + type][position of the spectrum in the
+  // file]
   std::vector<std::vector<std::vector<Entry>>> results_;
   std::vector<std::unique_ptr<std::mutex>> mutexes_;
 };

@@ -20,6 +20,7 @@
 #include <string>
 #include <vector>
 
+#include "common/base/mod.hpp"
 #include "common/base/prot_mod.hpp"
 #include "common/base/proteoform_type.hpp"
 #include "common/base/ptm.hpp"
@@ -57,6 +58,22 @@ class Proteoform {
 
   ProtModPtr getProtModPtr() const { return prot_mod_ptr_; }
 
+  // The variable PTM of the proteoform N-terminus (the alpha-amine of its
+  // first residue), for a truncated proteoform; ModBase::getNTermNoneModPtr()
+  // without one.
+  const ModPtr& getTruncNTermModPtr() const { return trunc_n_term_mod_ptr_; }
+
+  bool hasTruncNTermMod() const;
+
+  // Sets the truncation N-terminal modification, which also becomes the N-
+  // terminal modification of the residue sequence (its mass is in the
+  // sequence mass and the prefix masses). Only a proteoform without a
+  // protein N-terminal form (NONE) that starts at the third residue of the
+  // protein or later can have one, and only on its first residue's amino
+  // acid; otherwise nothing is changed and false is returned. The N-terminal
+  // none modification removes it.
+  bool setTruncNTermModPtr(const ModPtr& mod_ptr);
+
   ResSeqPtr getResSeqPtr() const { return residue_seq_ptr_; }
 
   BpSpecPtr getBpSpecPtr() const { return bp_spec_ptr_; }
@@ -69,6 +86,8 @@ class Proteoform {
 
   int getAlterNum(const AlterTypePtr& type_ptr);
 
+  // the number of variable PTMs: the variable mass shifts' and the
+  // truncation N-terminal modification
   int getVarPtmNum();
 
   const MassShiftPtrVec& getMassShiftPtrVec() const { return mass_shift_list_; }
@@ -110,6 +129,11 @@ class Proteoform {
 
   std::string getAlterStr(const AlterTypePtr& type_ptr);
 
+  // the variable PTMs as name:[position] (the Variable PTMs column): the
+  // truncation N-terminal modification first, as name:[N-term], then the
+  // variable mass shifts
+  std::string getVarPtmStr();
+
   void appendXml(XmlDOMDocument* xml_doc, XmlDOMElement parent);
 
   void parseXml(XmlDOMElement element, const ProteoformPtr& db_proteoform);
@@ -132,6 +156,10 @@ class Proteoform {
   FastaSeqPtr fasta_seq_ptr_;
 
   ProtModPtr prot_mod_ptr_;
+
+  // the variable PTM of the N-terminus of a truncated proteoform (see
+  // setTruncNTermModPtr); ModBase::getNTermNoneModPtr() without one
+  ModPtr trunc_n_term_mod_ptr_;
 
   // start and end positions are relative to the
   // database sequence

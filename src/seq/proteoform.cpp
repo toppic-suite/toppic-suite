@@ -25,13 +25,16 @@
 
 #include "common/base/mass_constant.hpp"
 #include "common/base/mod_base.hpp"
+#include "common/base/mod_type.hpp"
 #include "common/base/prot_mod_base.hpp"
 #include "common/base/ptm_base.hpp"
+#include "common/util/logger.hpp"
 #include "common/util/str_util.hpp"
 #include "common/xml/xml_dom_document.hpp"
 #include "common/xml/xml_dom_util.hpp"
 #include "seq/alter_type.hpp"
 #include "seq/proteoform_factory.hpp"
+#include "seq/residue_seq.hpp"
 
 namespace toppic {
 
@@ -41,6 +44,7 @@ Proteoform::Proteoform(const FastaSeqPtr& fasta_seq_ptr,
                        const MassShiftPtrVec& mass_shift_ptr_vec)
     : fasta_seq_ptr_(fasta_seq_ptr),
       prot_mod_ptr_(prot_mod_ptr),
+      trunc_n_term_mod_ptr_(ModBase::getNTermNoneModPtr()),
       start_pos_(start_pos),
       end_pos_(end_pos),
       residue_seq_ptr_(res_seq_ptr),
@@ -103,6 +107,21 @@ void Proteoform::parseXml(XmlDOMElement element,
 
   bp_spec_ptr_ = std::make_shared<BpSpec>(residue_seq_ptr_);
 
+  // Get the truncation N-terminal modification (files written before it was
+  // added have none)
+  trunc_n_term_mod_ptr_ = ModBase::getNTermNoneModPtr();
+  if (xml_dom_util::getChildCount(element, "trunc_n_term_mod") > 0) {
+    XmlDOMElement trunc_element =
+        xml_dom_util::getChildElement(element, "trunc_n_term_mod", 0);
+    std::string mod_element_name = Mod::getXmlElementName();
+    XmlDOMElement mod_element = xml_dom_util::getChildElement(
+        trunc_element, mod_element_name.c_str(), 0);
+    if (!setTruncNTermModPtr(ModBase::getModPtrFromXml(mod_element))) {
+      LOG_ERROR("The truncation N-terminal modification of a proteoform of "
+                << fasta_seq_ptr_->getName() << " cannot be added!");
+    }
+  }
+
   // Parse mass shifts
   std::string shift_name = MassShift::getXmlElementName();
   std::string shift_list_name = shift_name + "_list";
@@ -128,6 +147,36 @@ double Proteoform::getMass() {
     }
   }
   return mass;
+}
+
+bool Proteoform::hasTruncNTermMod() const {
+  return !ModBase::isNTermNoneModPtr(trunc_n_term_mod_ptr_);
+}
+
+bool Proteoform::setTruncNTermModPtr(const ModPtr& mod_ptr) {
+  if (ModBase::isNTermNoneModPtr(mod_ptr)) {
+    if (hasTruncNTermMod()) {
+      trunc_n_term_mod_ptr_ = mod_ptr;
+      residue_seq_ptr_ = std::make_shared<ResidueSeq>(
+          residue_seq_ptr_->getResidues(), mod_ptr);
+      bp_spec_ptr_ = std::make_shared<BpSpec>(residue_seq_ptr_);
+    }
+    return true;
+  }
+  // the first two residues of a protein are those of its N-terminal forms
+  if (prot_mod_ptr_ != ProtModBase::getProtModPtr_NONE() || start_pos_ < 2 ||
+      residue_seq_ptr_->getLen() == 0 ||
+      mod_ptr->getModTypePtr() != ModType::N_TERM ||
+      mod_ptr->getOriResiduePtr()->getAminoAcidPtr() !=
+          residue_seq_ptr_->getResiduePtr(0)->getAminoAcidPtr()) {
+    return false;
+  }
+  trunc_n_term_mod_ptr_ = mod_ptr;
+  // a new residue sequence, as the old one may be shared
+  residue_seq_ptr_ =
+      std::make_shared<ResidueSeq>(residue_seq_ptr_->getResidues(), mod_ptr);
+  bp_spec_ptr_ = std::make_shared<BpSpec>(residue_seq_ptr_);
+  return true;
 }
 
 double Proteoform::getMinusWaterMass() {
@@ -192,7 +241,9 @@ int Proteoform::getAlterNum(const AlterTypePtr& type_ptr) {
   return n;
 }
 
-int Proteoform::getVarPtmNum() { return getAlterNum(AlterType::VARIABLE); }
+int Proteoform::getVarPtmNum() {
+  return getAlterNum(AlterType::VARIABLE) + (hasTruncNTermMod() ? 1 : 0);
+}
 
 MassShiftPtrVec Proteoform::getMassShiftPtrVec(const AlterTypePtr& type_ptr) {
   MassShiftPtrVec shift_ptr_vec;
@@ -291,6 +342,17 @@ std::string Proteoform::getAlterStr(const AlterTypePtr& type_ptr) {
   return result;
 }
 
+std::string Proteoform::getVarPtmStr() {
+  std::string result = getAlterStr(AlterType::VARIABLE);
+  if (hasTruncNTermMod()) {
+    std::string n_term_str =
+        trunc_n_term_mod_ptr_->getModResiduePtr()->getPtmPtr()->getAbbrName() +
+        ":[N-term]";
+    result = result == "" ? n_term_str : n_term_str + ";" + result;
+  }
+  return result;
+}
+
 std::string Proteoform::getProteoformMatchSeq() {
   std::string mid_string = residue_seq_ptr_->toAcidString();
   std::sort(mass_shift_list_.begin(), mass_shift_list_.end(),
@@ -322,6 +384,14 @@ std::string Proteoform::getProteoformMatchSeq() {
   }
   // last break;
   result = result + right_strings[mid_string.length()];
+
+  // the truncation N-terminal modification, before everything on the first
+  // residue: [Acetyl]-(K)[Acetyl]... has both an N-terminal and a side chain
+  // acetylation on K
+  if (hasTruncNTermMod()) {
+    PtmPtr ptm_ptr = trunc_n_term_mod_ptr_->getModResiduePtr()->getPtmPtr();
+    result = "[" + ptm_ptr->getAbbrName() + "]-" + result;
+  }
 
   return result;
 }
@@ -362,7 +432,7 @@ void Proteoform::appendXml(XmlDOMDocument* xml_doc, XmlDOMElement parent) {
   str = std::to_string(prot_cluster_id_);
   xml_doc->addElement(element, "prot_cluster_id", str.c_str());
   // The following three elements are used in prsm_str
-  str = std::to_string(getAlterNum(AlterType::VARIABLE));
+  str = std::to_string(getVarPtmNum());
   xml_doc->addElement(element, "variable_ptm_num", str.c_str());
   str = std::to_string(getAlterNum(AlterType::UNEXPECTED));
   xml_doc->addElement(element, "unexpected_ptm_num", str.c_str());
@@ -370,6 +440,13 @@ void Proteoform::appendXml(XmlDOMDocument* xml_doc, XmlDOMElement parent) {
   xml_doc->addElement(element, "proteo_match_seq", str.c_str());
   str = residue_seq_ptr_->toAcidString();
   xml_doc->addElement(element, "proteo_db_seq", str.c_str());
+  // written only when there is one, so that the files of proteoforms
+  // without one stay the same
+  if (hasTruncNTermMod()) {
+    XmlDOMElement trunc_element =
+        xml_doc->addElement(element, "trunc_n_term_mod");
+    trunc_n_term_mod_ptr_->appendToXml(xml_doc, trunc_element);
+  }
 
   element_name = MassShift::getXmlElementName() + "_list";
   XmlDOMElement cl = xml_doc->addElement(element, element_name.c_str());

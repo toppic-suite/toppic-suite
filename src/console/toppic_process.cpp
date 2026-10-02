@@ -263,6 +263,8 @@ std::string TopPIC_identify(std::map<std::string, std::string>& arguments) {
 
     // var_ptm_type number is used for E-value computation
     int var_ptm_type_num = 0;
+    // and the number of proteoform N-terminal variable PTM masses
+    int n_term_var_ptm_type_num = 0;
 
     // index file name
     IndexFileNamePtr file_name_ptr = std::make_shared<IndexFileName>();
@@ -333,6 +335,7 @@ std::string TopPIC_identify(std::map<std::string, std::string>& arguments) {
           prsm_para_ptr, index_file_para, var_ptm_file_name, var_ptm_num,
           var_filter_thread_num, use_approx_spec, "toppic_var_filter");
       var_ptm_type_num = var_filter_mng_ptr->getSingleShiftNum();
+      n_term_var_ptm_type_num = var_filter_mng_ptr->getNTermShiftNum();
       var_ptm_filter_processor::process(var_filter_mng_ptr);
       std::cout << "Variable PTM filtering - finished." << std::endl;
 
@@ -385,6 +388,7 @@ std::string TopPIC_identify(std::map<std::string, std::string>& arguments) {
     // of these stages, on the spectra they left unidentified
     // (TopPIC_multi_ptm_search); it needs the variable-PTM type count
     arguments["varPtmTypeNum"] = std::to_string(var_ptm_type_num);
+    arguments["nTermVarPtmTypeNum"] = std::to_string(n_term_var_ptm_type_num);
 
     std::cout << "Merging PrSMs - started." << std::endl;
     int prsm_top_num = std::numeric_limits<int>::max();
@@ -402,6 +406,7 @@ std::string TopPIC_identify(std::map<std::string, std::string>& arguments) {
         prsm_para_ptr, shift_num,
         std::max(std::abs(max_shift_mass), std::abs(min_shift_mass)),
         var_ptm_type_num, thread_num, "toppic_combined", "toppic_evalue");
+    tdgf_mng_ptr->n_term_var_ptm_type_num_ = n_term_var_ptm_type_num;
     EValueProcessorPtr processor =
         std::make_shared<EValueProcessor>(tdgf_mng_ptr);
     processor->init();
@@ -968,6 +973,10 @@ int TopPIC_postprocess(std::map<std::string, std::string>& arguments,
           prsm_para_ptr, shift_num,
           std::max(std::abs(max_shift_mass), std::abs(min_shift_mass)),
           var_ptm_type_num, std::stoi(arguments["threadNumber"]), "", "");
+      tdgf_mng_ptr->n_term_var_ptm_type_num_ =
+          arguments["nTermVarPtmTypeNum"] == ""
+              ? 0
+              : std::stoi(arguments["nTermVarPtmTypeNum"]);
       int removed_num = 0;
       int corrected_num = cluster_prot_corrector::process(
           prsm_para_ptr, tdgf_mng_ptr, cur_suffix, "toppic_cluster_prot",

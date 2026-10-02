@@ -1197,7 +1197,7 @@ ProtCandidatePtrVec findVarPtmTopProteins(
     const MassMatchPtr& index_ptr, const MassMatchPtr& rev_index_ptr,
     double prec_minus_water_mass, double prec_error_tole,
     std::vector<double>& ptm_shifts, int threshold, int top_num,
-    const RangeRows* range_rows) {
+    const RangeRows* range_rows, const std::vector<char>* start_row_mask) {
   double min_mass = prec_minus_water_mass - prec_error_tole;
   double max_mass = prec_minus_water_mass + prec_error_tole;
   const std::vector<double>& proteo_minus_water_masses =
@@ -1256,6 +1256,9 @@ ProtCandidatePtrVec findVarPtmTopProteins(
     int best_n_row = -1;
     int best_c_row = -1;
     for (size_t j = 0; j < row_num; j++) {
+      if (start_row_mask != nullptr && !(*start_row_mask)[prec_match_rows[j]]) {
+        continue;
+      }
       int score_j = scores[prec_match_rows[j]];
       if (score_j + max_rev_score <= best_score) {
         continue;
@@ -1346,7 +1349,7 @@ ProtCandidatePtrVec findVarPtmTopRanges(
     const MassMatchPtr& index_ptr, const MassMatchPtr& rev_index_ptr,
     const RangeRows& range_rows, double prec_minus_water_mass,
     double prec_error_tole, std::vector<double>& ptm_shifts, int threshold,
-    int top_num) {
+    int top_num, const std::vector<char>* start_row_mask) {
   double min_mass = prec_minus_water_mass - prec_error_tole;
   double max_mass = prec_minus_water_mass + prec_error_tole;
   const std::vector<double>& proteo_minus_water_masses =
@@ -1401,6 +1404,9 @@ ProtCandidatePtrVec findVarPtmTopRanges(
     int id = static_cast<int>(i);
     for (size_t j = 0; j < row_num; j++) {
       int row = prec_match_rows[j];
+      if (start_row_mask != nullptr && !(*start_row_mask)[row]) {
+        continue;
+      }
       int score_j = scores[row];
       if (score_j + max_rev_score < best.cutoff(threshold)) {
         continue;

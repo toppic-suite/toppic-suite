@@ -76,13 +76,17 @@ as a mass when it did not:
 | Fixed modification | TopPIC/TopMG `-f` (`C57`, `C58` or a modification file) | `(C)[Carbamidomethylation]` on every modified residue | `Fixed PTMs` |
 | Protein N-terminal form | `-n` (`NME`, `NME_ACETYLATION`, `M_ACETYLATION`) | Acetylation as the prefix `[Acetyl]-`; methionine excision is not annotated, the proteoform simply starts at residue 2 | `Protein N-terminal form` |
 | Variable modification | TopPIC `-b`, TopMG `-i` (a modification file) | `(S)[Phospho]` on the modified residue | `# Variable PTMs`, `Variable PTMs` |
+| Truncation N-terminal modification | TopPIC `-b`, Position `N-term` (a variable PTM of the proteoform N-terminus, on a proteoform starting at residue 3 of the protein or later without a protein N-terminal form) | The prefix `[Gln->pyro-Glu]-QAEV...`, before any annotation of the first residue: `[Acetyl]-(K)[Acetyl]...` has an N-terminal and a side-chain acetylation on K | `# Variable PTMs`, `Variable PTMs` (`Acetyl:[N-term]`, first) |
 | Unexpected mass shift | TopPIC `-s`, `-m`, `-M`; TopMG `-s` | `(...)[+79.9663]`, a signed mass over a residue range | `# Unexpected modifications`, `Unexpected modifications` |
 | Characterized unexpected shift | TopPIC `-B` (a common modification file) with PTM characterization | The shift is replaced by the matching modification name, `(S)[Phospho]`, over the residues the characterization allows | `Variable PTMs`, `MIScore` |
 
 The `Fixed PTMs`, `Unexpected modifications` and `Variable PTMs` columns
 list the same annotations as `name:[position]` or `name:[first-last]`
 (1-based positions in the proteoform), separated by `;`; for unexpected
-shifts the "name" is the mass, for example `-0.0467:[7-33]`.
+shifts the "name" is the mass, for example `-0.0467:[7-33]`. A truncation
+N-terminal modification is on the N-terminus rather than on a residue, so
+its position is `N-term`: `Acetyl:[N-term];Acetyl:[1]` for
+`[Acetyl]-(K)[Acetyl]...`.
 
 **Where the names and masses come from.** The name in brackets is the
 modification's abbreviation, and its mass is what TopPIC/TopMG add to the

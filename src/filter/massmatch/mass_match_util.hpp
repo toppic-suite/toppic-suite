@@ -189,7 +189,9 @@ void compPrecMatchRows(const MassMatchPtr& index_ptr,
 
 // The same candidates from those row lists, which the four proteoform types
 // of a spectrum share. range_rows, when given, sets each candidate's range to
-// that of its best pair.
+// that of its best pair. start_row_mask, when given, has one entry per row of
+// the first index, and only the rows whose entry is nonzero start a pair (the
+// rows whose first residue can carry a proteoform N-terminal PTM).
 ProtCandidatePtrVec findVarPtmTopProteins(
     const std::vector<short>& scores, const std::vector<short>& rev_scores,
     const PrecMatchRows& prec_match_rows,
@@ -197,11 +199,12 @@ ProtCandidatePtrVec findVarPtmTopProteins(
     const MassMatchPtr& index_ptr, const MassMatchPtr& rev_index_ptr,
     double prec_minus_water_mass, double prec_error_tole,
     std::vector<double>& ptm_shifts, int threshold, int top_num,
-    const RangeRows* range_rows = nullptr);
+    const RangeRows* range_rows = nullptr,
+    const std::vector<char>* start_row_mask = nullptr);
 
 // Variable-PTM candidates as sequence ranges (see findOneShiftTopRanges):
 // the pairs whose range mass plus one of the PTM shifts is within the
-// precursor error tolerance.
+// precursor error tolerance. start_row_mask as in findVarPtmTopProteins.
 ProtCandidatePtrVec findVarPtmTopRanges(
     const std::vector<short>& scores, const std::vector<short>& rev_scores,
     const PrecMatchRows& prec_match_rows,
@@ -209,7 +212,7 @@ ProtCandidatePtrVec findVarPtmTopRanges(
     const MassMatchPtr& index_ptr, const MassMatchPtr& rev_index_ptr,
     const RangeRows& range_rows, double prec_minus_water_mass,
     double prec_error_tole, std::vector<double>& ptm_shifts, int threshold,
-    int top_num);
+    int top_num, const std::vector<char>* start_row_mask = nullptr);
 
 // Zero-shift candidates as sequence ranges (see findOneShiftTopRanges): the
 // pairs of rows that both received the precursor bonus, whose range mass is

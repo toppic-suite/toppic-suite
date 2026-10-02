@@ -15,12 +15,26 @@
 
 #include "prsm/simple_prsm.hpp"
 
+#include <algorithm>
+#include <string>
+#include <vector>
+
 #include "common/util/logger.hpp"
 #include "common/util/str_util.hpp"
 #include "common/xml/xml_dom_document.hpp"
 #include "common/xml/xml_dom_util.hpp"
 
 namespace toppic {
+
+namespace {
+
+// the truncation N-terminal modification shifts of a candidate without one,
+// which the files leave out
+bool isDefaultTruncShifts(const std::vector<double>& shifts) {
+  return shifts.size() == 1 && shifts[0] == 0;
+}
+
+}  // namespace
 
 SimplePrsm::SimplePrsm(const MsHeaderPtr& header_ptr, int spectrum_num,
                        const ProteoformPtr& proteo_ptr, int score)
@@ -105,6 +119,28 @@ SimplePrsm::SimplePrsm(XmlDOMElement element) {
         xml_dom_util::getDoubleChildValue(c_shift_list_element, "shift", i);
     c_term_shifts_.push_back(shift);
   }
+  // truncation N-terminal modification shifts, written only when they are
+  // not {0}
+  if (xml_dom_util::getChildCount(element, "trunc_n_term_mod_shift_list") >
+      0) {
+    XmlDOMElement trunc_list_element = xml_dom_util::getChildElement(
+        element, "trunc_n_term_mod_shift_list", 0);
+    int trunc_shift_num =
+        xml_dom_util::getChildCount(trunc_list_element, "shift");
+    trunc_n_term_mod_shifts_.clear();
+    for (int i = 0; i < trunc_shift_num; i++) {
+      trunc_n_term_mod_shifts_.push_back(
+          xml_dom_util::getDoubleChildValue(trunc_list_element, "shift", i));
+    }
+  }
+}
+
+void SimplePrsm::addTruncNTermModShift(double shift) {
+  if (std::find(trunc_n_term_mod_shifts_.begin(),
+                trunc_n_term_mod_shifts_.end(),
+                shift) == trunc_n_term_mod_shifts_.end()) {
+    trunc_n_term_mod_shifts_.push_back(shift);
+  }
 }
 
 XmlDOMElement SimplePrsm::toXml(XmlDOMDocument* xml_doc, XmlDOMElement parent) {
@@ -143,6 +179,15 @@ XmlDOMElement SimplePrsm::toXml(XmlDOMDocument* xml_doc, XmlDOMElement parent) {
   for (size_t i = 0; i < c_term_shifts_.size(); i++) {
     str = str_util::toString(c_term_shifts_[i]);
     xml_doc->addElement(c_shift_list, "shift", str.c_str());
+  }
+
+  if (!isDefaultTruncShifts(trunc_n_term_mod_shifts_)) {
+    XmlDOMElement trunc_shift_list =
+        xml_doc->addElement(element, "trunc_n_term_mod_shift_list");
+    for (size_t i = 0; i < trunc_n_term_mod_shifts_.size(); i++) {
+      str = str_util::toString(trunc_n_term_mod_shifts_[i]);
+      xml_doc->addElement(trunc_shift_list, "shift", str.c_str());
+    }
   }
   return element;
 }
@@ -191,6 +236,16 @@ std::vector<std::string> SimplePrsm::toStrVec() {
                         "</shift>");
     }
     str_vec.push_back("</c_term_shift_list>");
+  }
+
+  if (!isDefaultTruncShifts(trunc_n_term_mod_shifts_)) {
+    str_vec.push_back("<trunc_n_term_mod_shift_list>");
+    for (size_t i = 0; i < trunc_n_term_mod_shifts_.size(); i++) {
+      str_vec.push_back("<shift>" +
+                        str_util::toString(trunc_n_term_mod_shifts_[i]) +
+                        "</shift>");
+    }
+    str_vec.push_back("</trunc_n_term_mod_shift_list>");
   }
 
   str_vec.push_back("</simple_prsm>");

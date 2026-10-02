@@ -763,6 +763,47 @@ through the hidden `--frag-extend-min-mass <Da>` (key `fragExtendMinMass`,
 default `"5000"`, the `SpPara` default; validated as a non-negative
 number).
 
+## Truncation N-terminal modifications (`-b`, Position `N-term`)
+
+A variable PTM file line with Position `N-term` is a variable PTM of the
+proteoform N-terminus (the alpha-amine of its first residue), kept apart
+from the side-chain PTMs of that residue. Facts to keep straight:
+
+- **Representation.** `Proteoform::trunc_n_term_mod_ptr_` (default
+  `ModBase::getNTermNoneModPtr()`) records it, and its mass is the residue
+  sequence's `n_mod_ptr_` (sequence mass, `BpSpec` prefix masses), as for an
+  acetylated protein N-terminal form; it is no mass shift.
+  `setTruncNTermModPtr` accepts it only on a proteoform with the NONE
+  protein N-terminal form starting at protein residue 3 or later (0-based
+  start >= 2; residues 1-2 are the protein N-terminal forms') whose first
+  amino acid is the mod's. `proteoform_factory::geneTruncNTermModProteoform`
+  makes the variant, `geneSubProteoform` keeps it when the first residue
+  stays, the PrSM XML has `<trunc_n_term_mod>` only when set.
+- **Output.** `[Name]-` prefix of the proteoform string, outside any
+  annotation of residue 1; `Name:[N-term]` first in `Variable PTMs`
+  (`getVarPtmStr`); `getVarPtmNum` (`# Variable PTMs`, XML
+  `variable_ptm_num`, FDR groups) counts it; one `prsm_mass_shift` row of
+  type `N-terminal variable`.
+- **Filter.** One more round per N-term mass m (spectrum built as for an
+  N-terminal label of m), only on diagonal-index rows of a fitting start
+  (suffix and internal types; the N-terminal form index is not scored), up
+  to `-S` - 1 other PTMs, each round its own `SimplePrsmMemMerge` group. A
+  candidate carries the masses to try in `SimplePrsm::trunc_n_term_mod_
+  shifts_` (`{0}` = none, not written to the file then); a candidate of
+  several rounds is listed once with the union.
+- **Search.** The alignment knows no N-term shift: the processor searches
+  the candidate for each listed mass, 0 as it is, otherwise the variants of
+  the N-term mods of that mass, with at most `-S` - 1 side-chain PTMs
+  (`VarPtmAlign::max_ptm_num_`). So residue 1 can carry an N-terminal and a
+  side-chain PTM. When a variant and the candidate as it is score the same
+  (one acetylation of K1, on the N-terminus or the side chain), the
+  processor's sort (`cmpScoreDecProtIncTruncNTermFirst`) reports the
+  N-terminal one; the user chose this over comparing E-values.
+- **E-value.** (T + 1)^k x (T_N + 1) for a PrSM with k side-chain PTMs and
+  a truncation N-terminal modification, T_N = the number of N-term masses
+  (`TdgfMng::n_term_var_ptm_type_num_`, argument `nTermVarPtmTypeNum`); the
+  candidate count uses the sequence mass without the N-terminal mod.
+
 ## toplib_build (`src/toplib`, `console/toplib_build`)
 
 toplib_build is a C++ port of TopLib's `src/ms_library_building.py`

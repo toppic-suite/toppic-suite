@@ -30,7 +30,7 @@ class VarPtmAlign {
               const std::vector<double>& seq_masses,
               const ResSeqPtr& sub_res_seq_ptr,
               const DiagonalPtrVec& diagonal_ptrs,
-              const VarPtmSearchMngPtr& mng_ptr);
+              const VarPtmSearchMngPtr& mng_ptr, int max_ptm_num);
 
   void initMatchTable();
 
@@ -80,6 +80,11 @@ class VarPtmAlign {
 
   int best_d_;
   int best_ptm_num_;
+
+  // the largest number of variable PTMs of a result: the manager's
+  // var_ptm_num_, less one for a proteoform with a truncation N-terminal
+  // modification
+  int max_ptm_num_;
   int best_score_;
 
   DiagHeaderPtrVec backtrack_diag_header_ptrs_;

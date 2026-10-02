@@ -94,7 +94,7 @@ std::vector<std::vector<std::string>> readModTxtForTsv(
 
 ModPtrVec2D readModTxt(const std::string& file_name) {
   LOG_DEBUG("mod txt file " << file_name);
-  std::vector<ModPtrVec> mod_ptr_vec2d(3);
+  std::vector<ModPtrVec> mod_ptr_vec2d(4);
   std::ifstream infile(file_name.c_str());
   if (!infile.is_open()) {
     LOG_ERROR("Variable PTM file " << file_name << " cannot be opened!");
@@ -145,10 +145,15 @@ ModPtrVec2D readModTxt(const std::string& file_name) {
             std::make_shared<Residue>(a, PtmBase::getEmptyPtmPtr()));
         ResiduePtr mod_residue_ptr =
             ResidueBase::getBaseResiduePtr(std::make_shared<Residue>(a, p));
+        // a proteoform N-terminal modification has the N_TERM type, which
+        // tells it from a side chain one of the same mass and residue
+        ModTypePtr mod_type_ptr =
+            l[3] == "N-term" ? ModType::N_TERM : ModType::SIDE_CHAIN;
         ModPtr m = ModBase::getBaseModPtr(std::make_shared<Mod>(
-            ori_residue_ptr, mod_residue_ptr, ModType::SIDE_CHAIN));
+            ori_residue_ptr, mod_residue_ptr, mod_type_ptr));
         if (l[3] == "N-term") {
           mod_ptr_vec2d[0].push_back(m);
+          mod_ptr_vec2d[3].push_back(m);
         } else if (l[3] == "C-term") {
           mod_ptr_vec2d[1].push_back(m);
         } else if (l[3] == "any") {
@@ -174,6 +179,12 @@ ModPtrVec readAnywhereModTxt(const std::string& file_name) {
   ModPtrVec2D mod_vec_2d = readModTxt(file_name);
   // the vector at index 2 is the anywhere modifications
   return mod_vec_2d[2];
+}
+
+ModPtrVec readNTermModTxt(const std::string& file_name) {
+  ModPtrVec2D mod_vec_2d = readModTxt(file_name);
+  // the vector at index 3 is the N-terminal only modifications
+  return mod_vec_2d[3];
 }
 
 std::vector<double> readModTxtToShiftList(const std::string& file_name) {

@@ -117,8 +117,12 @@ void VarPtmSlowMatch::init() {
     return;
   }
   LOG_DEBUG("Seq mass " << sub_res_seq_ptr->getSeqMass());
-  var_ptm_align_ptr_ = std::make_shared<VarPtmAlign>(
-      ms_masses, seq_masses, sub_res_seq_ptr, diagonal_ptrs, mng_ptr_);
+  // a truncation N-terminal modification is one of the variable PTMs
+  int max_ptm_num =
+      mng_ptr_->var_ptm_num_ - (proteo_ptr_->hasTruncNTermMod() ? 1 : 0);
+  var_ptm_align_ptr_ =
+      std::make_shared<VarPtmAlign>(ms_masses, seq_masses, sub_res_seq_ptr,
+                                    diagonal_ptrs, mng_ptr_, max_ptm_num);
   success_init_ = true;
 }
 

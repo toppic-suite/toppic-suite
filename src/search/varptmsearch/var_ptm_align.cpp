@@ -30,12 +30,13 @@ VarPtmAlign::VarPtmAlign(const std::vector<double>& ms_masses,
                          const std::vector<double>& seq_masses,
                          const ResSeqPtr& sub_res_seq_ptr,
                          const DiagonalPtrVec& diagonal_ptrs,
-                         const VarPtmSearchMngPtr& mng_ptr)
+                         const VarPtmSearchMngPtr& mng_ptr, int max_ptm_num)
     : ms_masses_(ms_masses),
       seq_masses_(seq_masses),
       sub_res_seq_ptr_(sub_res_seq_ptr),
       diagonal_ptrs_(diagonal_ptrs),
-      mng_ptr_(mng_ptr) {
+      mng_ptr_(mng_ptr),
+      max_ptm_num_(max_ptm_num) {
   initMatchTable();
   initAllowShiftTable();
   initScoreTable();
@@ -143,7 +144,7 @@ void VarPtmAlign::backtrack() {
   best_score_ = -1;
   best_d_ = 0;
   best_ptm_num_ = 0;
-  size_t var_ptm_num = mng_ptr_->var_ptm_num_;
+  int var_ptm_num = std::min(max_ptm_num_, mng_ptr_->var_ptm_num_);
   int pos = seq_masses_.size() - 1;
   for (size_t i = 0; i < diagonal_ptrs_.size(); i++) {
     LOG_DEBUG("diag " << i << " shift "
@@ -152,7 +153,7 @@ void VarPtmAlign::backtrack() {
                       << diagonal_ptrs_[i]->getHeader()->isProtCTermMatch());
     // check if the diagonal is matched to the C-terminus
     if (diagonal_ptrs_[i]->getHeader()->isProtCTermMatch()) {
-      for (size_t j = 0; j <= var_ptm_num; j++) {
+      for (int j = 0; j <= var_ptm_num; j++) {
         int score = scores_3d_[i][pos][j];
         if (score > best_score_) {
           best_score_ = score;

@@ -82,6 +82,21 @@ class SimplePrsm {
     seq_end_pos_ = end_pos;
   }
 
+  // The masses of the truncation N-terminal modifications (variable PTMs of
+  // the proteoform N-terminus) that the variable PTM search tries on the
+  // candidate, 0 for none: {0} unless the filter found the candidate in a
+  // round for such a mass (VarPtmFilter).
+  const std::vector<double>& getTruncNTermModShifts() {
+    return trunc_n_term_mod_shifts_;
+  }
+
+  void setTruncNTermModShifts(const std::vector<double>& shifts) {
+    trunc_n_term_mod_shifts_ = shifts;
+  }
+
+  // adds a shift that is not in the list
+  void addTruncNTermModShift(double shift);
+
   std::vector<double>& getNTermShifts() { return n_term_shifts_; }
 
   std::vector<double>& getCTermShifts() { return c_term_shifts_; }
@@ -134,6 +149,7 @@ class SimplePrsm {
 
   std::vector<double> n_term_shifts_;
   std::vector<double> c_term_shifts_;
+  std::vector<double> trunc_n_term_mod_shifts_ = {0};
 };
 
 } /* namespace toppic */

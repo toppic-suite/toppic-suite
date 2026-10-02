@@ -58,6 +58,7 @@ VarPtmSearchMng::VarPtmSearchMng(const PrsmParaPtr& prsm_para_ptr, int n_report,
       res_ptr_vec_2d_[pos].push_back(mod_ptr_list[i]->getOriResiduePtr());
     }
   }
+  n_term_mod_ptr_vec_ = mod_util::readNTermModTxt(var_ptm_file_name);
   // get round single shifts
   // round single shift list
   for (size_t i = 0; i < single_shift_list_.size(); i++) {
