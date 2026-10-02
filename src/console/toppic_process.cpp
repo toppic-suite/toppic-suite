@@ -332,7 +332,7 @@ std::string TopPIC_identify(std::map<std::string, std::string>& arguments) {
       VarPtmFilterMngPtr var_filter_mng_ptr = std::make_shared<VarPtmFilterMng>(
           prsm_para_ptr, index_file_para, var_ptm_file_name, var_ptm_num,
           var_filter_thread_num, use_approx_spec, "toppic_var_filter");
-      var_ptm_type_num = var_filter_mng_ptr->getSingleShiftNum();
+      var_ptm_type_num = var_filter_mng_ptr->getVarPtmTypeNum();
       var_ptm_filter_processor::process(var_filter_mng_ptr);
       std::cout << "Variable PTM filtering - finished." << std::endl;
 

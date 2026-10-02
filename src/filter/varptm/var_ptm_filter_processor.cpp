@@ -37,6 +37,36 @@ namespace toppic {
 
 namespace var_ptm_filter_processor {
 
+// The filter's form of a spectrum set, and, with proteoform N-terminal PTMs,
+// one more for each N-terminal mass m: the spectrum set with m added to its
+// N-terminal label, which prm_ms_factory takes off the N-terminal masses and
+// the precursor mass (as for toppic's -N), while the C-terminal masses stay.
+inline FilterSpecPtr geneFilterSpec(const DeconvMsPtrVec& deconv_ms_ptr_vec,
+                                    const SpParaPtr& sp_para_ptr,
+                                    double prec_mono_mass,
+                                    double n_term_label_mass,
+                                    const std::vector<double>& mod_mass,
+                                    const VarPtmFilterMngPtr& mng_ptr) {
+  auto geneSpec = [&](double label_mass) {
+    PrmMsPtrVec prm_ms_ptr_vec = prm_ms_factory::geneMsTwoPtrVec(
+        deconv_ms_ptr_vec, sp_para_ptr, prec_mono_mass, label_mass, mod_mass);
+    PrmMsPtrVec srm_ms_ptr_vec = prm_ms_factory::geneSuffixMsTwoPtrVec(
+        deconv_ms_ptr_vec, sp_para_ptr, prec_mono_mass, label_mass, mod_mass);
+    return VarPtmFilter::geneFilterSpec(prm_ms_ptr_vec, srm_ms_ptr_vec,
+                                        mng_ptr);
+  };
+  FilterSpecPtr spec_ptr = geneSpec(n_term_label_mass);
+  if (!mng_ptr->n_term_shift_list_.empty()) {
+    FilterSpecPtrVec n_term_specs;
+    for (size_t i = 0; i < mng_ptr->n_term_shift_list_.size(); i++) {
+      n_term_specs.push_back(
+          geneSpec(n_term_label_mass + mng_ptr->n_term_shift_list_[i]));
+    }
+    spec_ptr->setNTermModSpecs(std::move(n_term_specs));
+  }
+  return spec_ptr;
+}
+
 // Reads the spectra per block and scores every variable-modification variant
 // of each set (topmg, use_approx_spec_).
 inline void filterBlockVariants(const ProteoformPtrVec& raw_forms,
@@ -82,14 +112,9 @@ inline void filterBlockVariants(const ProteoformPtrVec& raw_forms,
               for (size_t p = 0; p < mod_mass.size(); p++) {
                 std::fill(mod_mass.begin(), mod_mass.end(), 0.0);
                 mod_mass[p] += mod_mass_list[m];
-                PrmMsPtrVec prm_ms_ptr_vec = prm_ms_factory::geneMsTwoPtrVec(
+                filter_ptr->computeBestMatch(geneFilterSpec(
                     deconv_ms_ptr_vec, sp_para_ptr, prec_mono_mass,
-                    n_term_label_mass, mod_mass);
-                PrmMsPtrVec srm_ms_ptr_vec =
-                    prm_ms_factory::geneSuffixMsTwoPtrVec(
-                        deconv_ms_ptr_vec, sp_para_ptr, prec_mono_mass,
-                        n_term_label_mass, mod_mass);
-                filter_ptr->computeBestMatch(prm_ms_ptr_vec, srm_ms_ptr_vec);
+                    n_term_label_mass, mod_mass, mng_ptr));
                 if (prsm_para_ptr->allowCompleteProt()) {
                   combiner->add(0, block_idx, add_idx, filter_ptr->getCompMatchPtrs());
                 }
@@ -107,13 +132,9 @@ inline void filterBlockVariants(const ProteoformPtrVec& raw_forms,
               }
             }
           } else {
-            PrmMsPtrVec prm_ms_ptr_vec = prm_ms_factory::geneMsTwoPtrVec(
+            filter_ptr->computeBestMatch(geneFilterSpec(
                 deconv_ms_ptr_vec, sp_para_ptr, prec_mono_mass,
-                n_term_label_mass, mod_mass);
-            PrmMsPtrVec srm_ms_ptr_vec = prm_ms_factory::geneSuffixMsTwoPtrVec(
-                deconv_ms_ptr_vec, sp_para_ptr, prec_mono_mass,
-                n_term_label_mass, mod_mass);
-            filter_ptr->computeBestMatch(prm_ms_ptr_vec, srm_ms_ptr_vec);
+                n_term_label_mass, mod_mass, mng_ptr));
             if (prsm_para_ptr->allowCompleteProt()) {
               combiner->add(0, block_idx, add_idx, filter_ptr->getCompMatchPtrs());
             }
@@ -176,14 +197,9 @@ inline FilterSpecPtrVec readSpectra(const VarPtmFilterMngPtr& mng_ptr) {
           DeconvMsPtrVec set_ms_ptr_vec = spec_set_ptr->getDeconvMsPtrVec();
           double prec_mono_mass = spec_set_ptr->getPrecMonoMass();
           double n_term_label_mass = spec_set_ptr->getNTermLabelMass();
-          PrmMsPtrVec prm_ms_ptr_vec = prm_ms_factory::geneMsTwoPtrVec(
-              set_ms_ptr_vec, sp_para_ptr, prec_mono_mass, n_term_label_mass,
-              mod_mass);
-          PrmMsPtrVec srm_ms_ptr_vec = prm_ms_factory::geneSuffixMsTwoPtrVec(
-              set_ms_ptr_vec, sp_para_ptr, prec_mono_mass, n_term_label_mass,
-              mod_mass);
-          spectra.push_back(VarPtmFilter::geneFilterSpec(
-              prm_ms_ptr_vec, srm_ms_ptr_vec, mng_ptr));
+          spectra.push_back(geneFilterSpec(set_ms_ptr_vec, sp_para_ptr,
+                                           prec_mono_mass, n_term_label_mass,
+                                           mod_mass, mng_ptr));
         }
       }
     }

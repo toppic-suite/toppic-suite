@@ -56,6 +56,44 @@ VarPtmFilterMng::VarPtmFilterMng(const PrsmParaPtr& prsm_para_ptr,
     int int_shift = std::round(shift_list_[i] * filter_scale_);
     int_shift_list_.push_back(int_shift);
   }
+
+  // proteoform N-terminal variable PTMs, grouped by mass
+  ModPtrVec n_term_mod_ptrs = mod_util::readNTermModTxt(var_ptm_file_name);
+  for (size_t i = 0; i < n_term_mod_ptrs.size(); i++) {
+    double shift = n_term_mod_ptrs[i]->getShift();
+    size_t pos = 0;
+    while (pos < n_term_shift_list_.size() && n_term_shift_list_[pos] != shift) {
+      pos++;
+    }
+    if (pos == n_term_shift_list_.size()) {
+      n_term_shift_list_.push_back(shift);
+      n_term_res_ptr_vec_2d_.push_back(ResiduePtrVec());
+    }
+    n_term_res_ptr_vec_2d_[pos].push_back(
+        n_term_mod_ptrs[i]->getOriResiduePtr());
+  }
+  if (!n_term_shift_list_.empty()) {
+    std::vector<int> round_other_shift_list =
+        computeShifts(round_single_shift_list_, var_ptm_num_ - 1);
+    for (size_t i = 0; i < round_other_shift_list.size(); i++) {
+      double shift = round_other_shift_list[i] / round_scale_;
+      n_term_other_shift_list_.push_back(shift);
+      n_term_other_int_shift_list_.push_back(
+          std::round(shift * filter_scale_));
+    }
+  }
+  LOG_DEBUG("Number of N-terminal shifts: " << n_term_shift_list_.size());
+}
+
+int VarPtmFilterMng::getVarPtmTypeNum() {
+  int num = single_shift_list_.size();
+  for (size_t i = 0; i < n_term_shift_list_.size(); i++) {
+    if (std::find(single_shift_list_.begin(), single_shift_list_.end(),
+                  n_term_shift_list_[i]) == single_shift_list_.end()) {
+      num++;
+    }
+  }
+  return num;
 }
 
 std::vector<int> VarPtmFilterMng::computeShifts(

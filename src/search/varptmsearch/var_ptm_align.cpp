@@ -30,12 +30,13 @@ VarPtmAlign::VarPtmAlign(const std::vector<double>& ms_masses,
                          const std::vector<double>& seq_masses,
                          const ResSeqPtr& sub_res_seq_ptr,
                          const DiagonalPtrVec& diagonal_ptrs,
-                         const VarPtmSearchMngPtr& mng_ptr)
+                         const VarPtmSearchMngPtr& mng_ptr, bool n_term_free)
     : ms_masses_(ms_masses),
       seq_masses_(seq_masses),
       sub_res_seq_ptr_(sub_res_seq_ptr),
       diagonal_ptrs_(diagonal_ptrs),
-      mng_ptr_(mng_ptr) {
+      mng_ptr_(mng_ptr),
+      n_term_free_(n_term_free) {
   initMatchTable();
   initAllowShiftTable();
   initScoreTable();
@@ -67,6 +68,17 @@ void VarPtmAlign::initAllowShiftTable() {
           if (seq_res_ptr->isSame(mod_res_ptr)) {
             allow_shifts[j] = true;
             break;
+          }
+        }
+        // a proteoform N-terminal PTM: on the first residue only, and only
+        // if the N-terminus is free
+        if (!allow_shifts[j] && i == 1 && n_term_free_) {
+          for (size_t k = 0; k < mng_ptr_->n_term_res_ptr_vec_2d_[j].size();
+               k++) {
+            if (seq_res_ptr->isSame(mng_ptr_->n_term_res_ptr_vec_2d_[j][k])) {
+              allow_shifts[j] = true;
+              break;
+            }
           }
         }
       }
@@ -211,11 +223,25 @@ void VarPtmAlign::backtrack(int d, int ptm) {
           break;
         }
       }
+      // a proteoform N-terminal PTM, on the first residue
+      bool n_term_mod = false;
+      if (cur_mod_ptr == nullptr && res_pos == 0 && n_term_free_) {
+        const ModPtrVec& n_term_mod_ptrs =
+            mng_ptr_->n_term_mod_ptr_vec_2d_[shift_idx];
+        for (size_t k = 0; k < n_term_mod_ptrs.size(); k++) {
+          if (seq_res_ptr->isSame(n_term_mod_ptrs[k]->getOriResiduePtr())) {
+            cur_mod_ptr = n_term_mod_ptrs[k];
+            n_term_mod = true;
+            break;
+          }
+        }
+      }
       if (cur_mod_ptr == nullptr) {
         LOG_ERROR("No matched modification is found!");
         exit(EXIT_FAILURE);
       }
       backtrack_mod_ptrs_.push_back(cur_mod_ptr);
+      backtrack_n_term_mods_.push_back(n_term_mod);
 
       cur_end = pre_pos;
       cur_bgn = pre_pos;
@@ -232,6 +258,7 @@ void VarPtmAlign::backtrack(int d, int ptm) {
   std::reverse(list.begin(), list.end());
   backtrack_diag_header_ptrs_ = list;
   std::reverse(backtrack_mod_ptrs_.begin(), backtrack_mod_ptrs_.end());
+  std::reverse(backtrack_n_term_mods_.begin(), backtrack_n_term_mods_.end());
 }
 
 MassShiftPtrVec VarPtmAlign::geneShiftVec(
@@ -259,42 +286,73 @@ MassShiftPtrVec VarPtmAlign::geneShiftVec(
   // add AlterPtr to shifts
   int idx = 0;
   AlterPtrVec alter_ptr_vec;
+  // A proteoform N-terminal PTM is a mass shift of its own on the first
+  // residue; its mass is taken off the shift it falls in, which is removed
+  // when the PTM is all of it.
+  MassShiftPtr n_term_shift_ptr;
+  double n_term_mass = 0;
+  std::vector<bool> removed(shift_ptrs.size(), false);
   for (size_t i = 1; i < ori_header_ptrs.size(); i++) {
     DiagHeaderPtr cur_ptr = ori_header_ptrs[i];
     DiagHeaderPtr pre_ptr = ori_header_ptrs[i - 1];
     double shift = cur_ptr->getProtNTermShift() - pre_ptr->getProtNTermShift();
-    int left_bp_pos = shift_ptrs[idx]->getLeftBpPos();
-    int right_bp_pos = shift_ptrs[idx]->getRightBpPos();
     ModPtr mod_ptr = backtrack_mod_ptrs_[i - 1];
-    ResiduePtr mod_res_ptr = mod_ptr->getOriResiduePtr();
-    // find modifiable residues
-    while (left_bp_pos < right_bp_pos) {
-      ResiduePtr seq_res_ptr = sub_res_seq_ptr_->getResiduePtr(left_bp_pos);
-      if (seq_res_ptr->isSame(mod_res_ptr)) {
-        break;
+    if (backtrack_n_term_mods_[i - 1]) {
+      AlterPtr a = std::make_shared<Alter>(0, 1, AlterType::VARIABLE, shift,
+                                           mod_ptr);
+      n_term_shift_ptr = std::make_shared<MassShift>(a);
+      n_term_mass = shift;
+    } else {
+      int left_bp_pos = shift_ptrs[idx]->getLeftBpPos();
+      int right_bp_pos = shift_ptrs[idx]->getRightBpPos();
+      ResiduePtr mod_res_ptr = mod_ptr->getOriResiduePtr();
+      // find modifiable residues
+      while (left_bp_pos < right_bp_pos) {
+        ResiduePtr seq_res_ptr = sub_res_seq_ptr_->getResiduePtr(left_bp_pos);
+        if (seq_res_ptr->isSame(mod_res_ptr)) {
+          break;
+        }
+        left_bp_pos++;
       }
-      left_bp_pos++;
-    }
-    while (right_bp_pos > left_bp_pos) {
-      ResiduePtr seq_res_ptr =
-          sub_res_seq_ptr_->getResiduePtr(right_bp_pos - 1);
-      if (seq_res_ptr->isSame(mod_res_ptr)) {
-        break;
+      while (right_bp_pos > left_bp_pos) {
+        ResiduePtr seq_res_ptr =
+            sub_res_seq_ptr_->getResiduePtr(right_bp_pos - 1);
+        if (seq_res_ptr->isSame(mod_res_ptr)) {
+          break;
+        }
+        right_bp_pos--;
       }
-      right_bp_pos--;
-    }
 
-    AlterPtr a = std::make_shared<Alter>(left_bp_pos, right_bp_pos,
-                                         AlterType::VARIABLE, shift, mod_ptr);
-    alter_ptr_vec.push_back(a);
+      AlterPtr a = std::make_shared<Alter>(left_bp_pos, right_bp_pos,
+                                           AlterType::VARIABLE, shift, mod_ptr);
+      alter_ptr_vec.push_back(a);
+    }
 
     if (refined_header_ptrs[i] != nullptr) {
+      if (n_term_mass != 0) {
+        shift_ptrs[idx]->setMassShift(shift_ptrs[idx]->getMassShift() -
+                                      n_term_mass);
+        n_term_mass = 0;
+        if (alter_ptr_vec.empty()) {
+          removed[idx] = true;
+        }
+      }
       shift_ptrs[idx]->setAlterPtrVec(alter_ptr_vec);
       alter_ptr_vec.clear();
       idx++;
     }
   }
-  return shift_ptrs;
+  if (n_term_shift_ptr == nullptr) {
+    return shift_ptrs;
+  }
+  MassShiftPtrVec result_ptrs;
+  result_ptrs.push_back(n_term_shift_ptr);
+  for (size_t i = 0; i < shift_ptrs.size(); i++) {
+    if (!removed[i]) {
+      result_ptrs.push_back(shift_ptrs[i]);
+    }
+  }
+  return result_ptrs;
 }
 
 PrsmPtr VarPtmAlign::geneResult(const ProteoformPtr& sub_proteo_ptr,

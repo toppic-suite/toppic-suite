@@ -16,6 +16,11 @@
 #ifndef TOPPIC_FILTER_VARPTM_VAR_PTM_FILTER_HPP_
 #define TOPPIC_FILTER_VARPTM_VAR_PTM_FILTER_HPP_
 
+#include <array>
+#include <memory>
+#include <string>
+#include <vector>
+
 #include "filter/massmatch/filter_spec.hpp"
 #include "filter/massmatch/mass_match.hpp"
 #include "filter/massmatch/mass_match_util.hpp"
@@ -35,10 +40,11 @@ class VarPtmFilter {
                                      const PrmMsPtrVec& srm_ms_ptr_vec,
                                      const VarPtmFilterMngPtr& mng_ptr);
 
+  // The candidates of a spectrum set. With proteoform N-terminal PTMs, the
+  // spectrum is scored once more for each N-terminal mass (the spectra of
+  // spec_ptr->getNTermModSpecs()), and the candidates of the rounds are
+  // merged.
   void computeBestMatch(const FilterSpecPtr& spec_ptr);
-
-  void computeBestMatch(const PrmMsPtrVec& prm_ms_ptr_vec,
-                        const PrmMsPtrVec& srm_ms_ptr_vec);
 
   SimplePrsmPtrVec getCompMatchPtrs() { return comp_match_ptrs_; }
   SimplePrsmPtrVec getPrefMatchPtrs() { return pref_match_ptrs_; }
@@ -78,6 +84,27 @@ class VarPtmFilter {
 
   // the sequence ranges of the index rows
   mass_match_util::IndexRowRanges row_ranges_;
+
+  // For each proteoform N-terminal PTM mass of the manager, the rows of the
+  // N-terminal form index and of the diagonal index whose first residue can
+  // carry the PTM: 1 if the residue at the row's start is one of the PTM's
+  // residues and the row's N-terminal form is not acetylated.
+  std::vector<std::vector<char>> n_term_term_masks_;
+  std::vector<std::vector<char>> n_term_diag_masks_;
+
+  // Score the spectrum against the four indexes, with the precursor bonus
+  // for the precursor masses of prec_minus_water_mass_errors.
+  void scoreIndexes(const FilterSpecPtr& spec_ptr,
+                    const std::vector<std::pair<int, int>>&
+                        prec_minus_water_mass_errors);
+
+  // The candidates of the four proteoform types (complete, prefix, suffix,
+  // internal) from the scores of scoreIndexes: the pairs whose range mass
+  // plus one of ptm_shifts is the precursor mass of spec_ptr, the
+  // N-terminal rows restricted to term_mask and diag_mask when given.
+  std::array<ProtCandidatePtrVec, 4> findTypeCands(
+      const FilterSpecPtr& spec_ptr, std::vector<double>& ptm_shifts,
+      const std::vector<char>* term_mask, const std::vector<char>* diag_mask);
 
   SimplePrsmPtrVec comp_match_ptrs_;
   SimplePrsmPtrVec pref_match_ptrs_;

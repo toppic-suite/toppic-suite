@@ -28,9 +28,17 @@ ModPtrVec readModXml(const std::string& file_name);
 std::vector<std::vector<std::string>> readModTxtForTsv(
     const std::string& file_name);
 
+// The modifications of a modification file in four lists: [0] those that
+// can occur at the N-terminus of a proteoform (Position N-term or any), [1]
+// at its C-terminus (C-term or any), [2] anywhere (any) and [3] only at its
+// N-terminus (N-term).
 ModPtrVec2D readModTxt(const std::string& file_name);
 
 ModPtrVec readAnywhereModTxt(const std::string& file_name);
+
+// The modifications that can occur only at the N-terminus of a proteoform,
+// on its first residue (Position N-term): list [3] of readModTxt.
+ModPtrVec readNTermModTxt(const std::string& file_name);
 
 std::vector<double> readModTxtToShiftList(const std::string& file_name);
 

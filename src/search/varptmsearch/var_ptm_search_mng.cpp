@@ -15,6 +15,7 @@
 
 #include "search/varptmsearch/var_ptm_search_mng.hpp"
 
+#include <algorithm>
 #include <cmath>
 
 #include "common/base/mod_util.hpp"
@@ -58,6 +59,27 @@ VarPtmSearchMng::VarPtmSearchMng(const PrsmParaPtr& prsm_para_ptr, int n_report,
       res_ptr_vec_2d_[pos].push_back(mod_ptr_list[i]->getOriResiduePtr());
     }
   }
+  // proteoform N-terminal variable PTMs, added to the single shifts
+  ModPtrVec n_term_mod_ptrs = mod_util::readNTermModTxt(var_ptm_file_name);
+  n_term_mod_ptr_vec_2d_.resize(single_shift_list_.size());
+  n_term_res_ptr_vec_2d_.resize(single_shift_list_.size());
+  for (size_t i = 0; i < n_term_mod_ptrs.size(); i++) {
+    double shift = n_term_mod_ptrs[i]->getShift();
+    size_t pos = 0;
+    while (pos < single_shift_list_.size() && single_shift_list_[pos] != shift) {
+      pos++;
+    }
+    if (pos == single_shift_list_.size()) {
+      single_shift_list_.push_back(shift);
+      mod_ptr_vec_2d_.push_back(ModPtrVec());
+      res_ptr_vec_2d_.push_back(ResiduePtrVec());
+      n_term_mod_ptr_vec_2d_.push_back(ModPtrVec());
+      n_term_res_ptr_vec_2d_.push_back(ResiduePtrVec());
+    }
+    n_term_mod_ptr_vec_2d_[pos].push_back(n_term_mod_ptrs[i]);
+    n_term_res_ptr_vec_2d_[pos].push_back(
+        n_term_mod_ptrs[i]->getOriResiduePtr());
+  }
   // get round single shifts
   // round single shift list
   for (size_t i = 0; i < single_shift_list_.size(); i++) {
@@ -70,42 +92,64 @@ VarPtmSearchMng::VarPtmSearchMng(const PrsmParaPtr& prsm_para_ptr, int n_report,
 
 void VarPtmSearchMng::computeShifts() {
   round_shift_list_.push_back(0);
+  // the smallest number of PTMs that give each shift
+  std::vector<int> ptm_nums(1, 0);
   // empty previous indexes for shift 0
   std::vector<int> empty_idxes;
   diag_prev_idxes_.push_back(empty_idxes);
   std::vector<int> empty_shift_idxes;
   diag_prev_shift_idxes_.push_back(empty_shift_idxes);
-
-  for (int i = 0; i < var_ptm_num_; i++) {
-    size_t cur_list_len = round_shift_list_.size();
-    for (size_t j = 0; j < cur_list_len; j++) {
-      for (size_t k = 0; k < round_single_shift_list_.size(); k++) {
-        int new_shift = round_shift_list_[j] + round_single_shift_list_[k];
-        LOG_DEBUG("new shift " << new_shift);
-        int pos = -1;
-        for (size_t p = 0; p < round_shift_list_.size(); p++) {
-          if (round_shift_list_[p] == new_shift) {
-            pos = p;
-            break;
-          }
-        }
-        // if the new shift is not in the list
-        if (pos == -1) {
-          round_shift_list_.push_back(new_shift);
-          std::vector<int> cur_idxes;
-          cur_idxes.push_back(j);
-          diag_prev_idxes_.push_back(cur_idxes);
-          std::vector<int> shift_idxes;
-          shift_idxes.push_back(k);
-          diag_prev_shift_idxes_.push_back(shift_idxes);
-        } else {
-          diag_prev_idxes_[pos].push_back(j);
-          diag_prev_shift_idxes_[pos].push_back(k);
-        }
+  // add single shift k to shift j
+  auto addShift = [&](size_t j, size_t k) {
+    int new_shift = round_shift_list_[j] + round_single_shift_list_[k];
+    LOG_DEBUG("new shift " << new_shift);
+    int pos = -1;
+    for (size_t p = 0; p < round_shift_list_.size(); p++) {
+      if (round_shift_list_[p] == new_shift) {
+        pos = p;
+        break;
+      }
+    }
+    // if the new shift is not in the list
+    if (pos == -1) {
+      round_shift_list_.push_back(new_shift);
+      ptm_nums.push_back(ptm_nums[j] + 1);
+      std::vector<int> cur_idxes;
+      cur_idxes.push_back(j);
+      diag_prev_idxes_.push_back(cur_idxes);
+      std::vector<int> shift_idxes;
+      shift_idxes.push_back(k);
+      diag_prev_shift_idxes_.push_back(shift_idxes);
+    } else {
+      ptm_nums[pos] = std::min(ptm_nums[pos], ptm_nums[j] + 1);
+      diag_prev_idxes_[pos].push_back(j);
+      diag_prev_shift_idxes_[pos].push_back(k);
+    }
+  };
+  // A proteoform N-terminal PTM is on the first residue, so it is the first
+  // shift of a combination, and a combination has one at most.
+  if (var_ptm_num_ >= 1) {
+    for (size_t k = 0; k < round_single_shift_list_.size(); k++) {
+      if (!n_term_res_ptr_vec_2d_[k].empty()) {
+        addShift(0, k);
       }
     }
   }
-
+  for (int i = 0; i < var_ptm_num_; i++) {
+    size_t cur_list_len = round_shift_list_.size();
+    for (size_t j = 0; j < cur_list_len; j++) {
+      if (ptm_nums[j] >= var_ptm_num_) {
+        continue;
+      }
+      for (size_t k = 0; k < round_single_shift_list_.size(); k++) {
+        // a shift of proteoform N-terminal PTMs only
+        if (res_ptr_vec_2d_[k].empty()) {
+          continue;
+        }
+        addShift(j, k);
+      }
+    }
+  }
   // get double shifts
   LOG_DEBUG("Number of shifts:" << round_shift_list_.size());
   for (size_t i = 0; i < round_shift_list_.size(); i++) {

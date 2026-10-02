@@ -268,7 +268,22 @@ Oxidation,15.994915,M,any,35
 `Residues` lists the one-letter codes of the residues that can carry the
 modification, or `*` for any residue; `Position` is `any`, `N-term` or
 `C-term` (`*` and `any` cannot be combined); `UnimodID` is the Unimod
-accession, or `-1` when unknown. Lines starting with `#` are comments.
+accession, or `-1` when unknown. Lines starting with `#` are comments. Each
+name may be used on one line only.
+
+In the variable PTM file (`-b`), `N-term` is the N-terminus of the
+proteoform: the modification can only be on its first residue, whatever the
+proteoform's start in the protein, and only when the proteoform's N-terminus
+is not acetylated by its protein N-terminal form (`-n`). At most one such
+modification is on a proteoform, and it counts toward `-S`. Examples:
+
+```text
+Acetyl,42.010565,*,N-term,1
+Gln->pyro-Glu,-17.026549,Q,N-term,28
+```
+
+The protein N-terminal forms themselves are set with `-n`. The variable PTM
+stage does not use `C-term` modifications.
 
 ## 6. Examples
 

@@ -75,7 +75,7 @@ as a mass when it did not:
 |---|---|---|---|
 | Fixed modification | TopPIC/TopMG `-f` (`C57`, `C58` or a modification file) | `(C)[Carbamidomethylation]` on every modified residue | `Fixed PTMs` |
 | Protein N-terminal form | `-n` (`NME`, `NME_ACETYLATION`, `M_ACETYLATION`) | Acetylation as the prefix `[Acetyl]-`; methionine excision is not annotated, the proteoform simply starts at residue 2 | `Protein N-terminal form` |
-| Variable modification | TopPIC `-b`, TopMG `-i` (a modification file) | `(S)[Phospho]` on the modified residue | `# Variable PTMs`, `Variable PTMs` |
+| Variable modification | TopPIC `-b`, TopMG `-i` (a modification file) | `(S)[Phospho]` on the modified residue; a proteoform N-terminal one (TopPIC `-b`, Position `N-term`) on the first residue, `(Q)[Gln->pyro-Glu]...`, `Gln->pyro-Glu:[1]` in `Variable PTMs` | `# Variable PTMs`, `Variable PTMs` |
 | Unexpected mass shift | TopPIC `-s`, `-m`, `-M`; TopMG `-s` | `(...)[+79.9663]`, a signed mass over a residue range | `# Unexpected modifications`, `Unexpected modifications` |
 | Characterized unexpected shift | TopPIC `-B` (a common modification file) with PTM characterization | The shift is replaced by the matching modification name, `(S)[Phospho]`, over the residues the characterization allows | `Variable PTMs`, `MIScore` |
 

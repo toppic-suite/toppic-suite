@@ -19,6 +19,8 @@
 #include "ms/factory/prm_ms_util.hpp"
 #include "search/diag/diag_header_util.hpp"
 #include "search/diag/diag_pair_util.hpp"
+#include "seq/alter_type.hpp"
+#include "seq/mass_shift.hpp"
 
 namespace toppic {
 
@@ -117,8 +119,19 @@ void VarPtmSlowMatch::init() {
     return;
   }
   LOG_DEBUG("Seq mass " << sub_res_seq_ptr->getSeqMass());
+  // the N-terminus is blocked when an acetylated protein N-terminal form
+  // modifies the first residue
+  bool n_term_free = true;
+  MassShiftPtrVec prot_shift_ptrs =
+      proteo_ptr_->getMassShiftPtrVec(AlterType::PROTEIN_VARIABLE);
+  for (size_t i = 0; i < prot_shift_ptrs.size(); i++) {
+    if (prot_shift_ptrs[i]->getLeftBpPos() == 0) {
+      n_term_free = false;
+    }
+  }
   var_ptm_align_ptr_ = std::make_shared<VarPtmAlign>(
-      ms_masses, seq_masses, sub_res_seq_ptr, diagonal_ptrs, mng_ptr_);
+      ms_masses, seq_masses, sub_res_seq_ptr, diagonal_ptrs, mng_ptr_,
+      n_term_free);
   success_init_ = true;
 }
 

@@ -26,11 +26,14 @@ namespace toppic {
 
 class VarPtmAlign {
  public:
+  // n_term_free: the proteoform's N-terminus is not blocked by an acetylated
+  // protein N-terminal form, so its first residue can carry a proteoform
+  // N-terminal PTM
   VarPtmAlign(const std::vector<double>& ms_masses,
               const std::vector<double>& seq_masses,
               const ResSeqPtr& sub_res_seq_ptr,
               const DiagonalPtrVec& diagonal_ptrs,
-              const VarPtmSearchMngPtr& mng_ptr);
+              const VarPtmSearchMngPtr& mng_ptr, bool n_term_free);
 
   void initMatchTable();
 
@@ -85,6 +88,12 @@ class VarPtmAlign {
   DiagHeaderPtrVec backtrack_diag_header_ptrs_;
 
   ModPtrVec backtrack_mod_ptrs_;
+
+  // for each PTM of backtrack_mod_ptrs_, whether it is a proteoform
+  // N-terminal PTM (on the first residue)
+  std::vector<bool> backtrack_n_term_mods_;
+
+  bool n_term_free_ = true;
 };
 
 using VarPtmAlignPtr = std::shared_ptr<VarPtmAlign>;
