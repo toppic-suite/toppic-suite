@@ -16,11 +16,13 @@
 #include "prsm/simple_prsm_mem_merge.hpp"
 
 #include <algorithm>
+#include <cstdlib>
 #include <functional>
 #include <sstream>
 
 #include "common/base/proteoform_type.hpp"
 #include "common/util/file_util.hpp"
+#include "common/util/logger.hpp"
 #include "common/util/str_util.hpp"
 #include "common/xml/xml_dom_document.hpp"
 #include "common/xml/xml_dom_util.hpp"
@@ -85,13 +87,16 @@ bool SimplePrsmMemMerge::cmpEntry(const Entry& a, const Entry& b) {
 SimplePrsmMemMerge::SimplePrsmMemMerge(const std::string& sp_file_name,
                                        const std::string& output_file_ext,
                                        const std::vector<int>& top_nums,
-                                       int spec_num)
+                                       const std::vector<int>& spec_ids)
     : sp_file_name_(sp_file_name),
       output_file_ext_(output_file_ext),
       top_nums_(top_nums) {
+  for (size_t i = 0; i < spec_ids.size(); i++) {
+    spec_pos_.emplace(spec_ids[i], static_cast<int>(i));
+  }
   results_.resize(top_nums.size());
   for (size_t i = 0; i < results_.size(); i++) {
-    results_[i].resize(spec_num);
+    results_[i].resize(spec_ids.size());
   }
   for (int i = 0; i < mutex_num; i++) {
     mutexes_.push_back(std::unique_ptr<std::mutex>(new std::mutex()));
@@ -104,13 +109,16 @@ void SimplePrsmMemMerge::add(int type_idx, int block_idx, int call_idx,
     return;
   }
   int spec_id = prsm_ptrs[0]->getSpectrumId();
-  size_t top_num = static_cast<size_t>(top_nums_[type_idx]);
-  std::lock_guard<std::mutex> lock(*mutexes_[spec_id % mutex_num]);
-  std::vector<std::vector<Entry>>& type_results = results_[type_idx];
-  if (static_cast<size_t>(spec_id) >= type_results.size()) {
-    return;
+  auto it = spec_pos_.find(spec_id);
+  if (it == spec_pos_.end()) {
+    LOG_ERROR("Spectrum id " << spec_id << " is not in the spectrum file "
+                             << sp_file_name_ << "!");
+    exit(EXIT_FAILURE);
   }
-  std::vector<Entry>& results = type_results[spec_id];
+  int spec_pos = it->second;
+  size_t top_num = static_cast<size_t>(top_nums_[type_idx]);
+  std::lock_guard<std::mutex> lock(*mutexes_[spec_pos % mutex_num]);
+  std::vector<Entry>& results = results_[type_idx][spec_pos];
   for (size_t i = 0; i < prsm_ptrs.size(); i++) {
     Entry entry;
     entry.prsm_ptr_ = prsm_ptrs[i];
@@ -141,8 +149,8 @@ void SimplePrsmMemMerge::write() {
                                type_names[type_idx]);
     size_t top_num = static_cast<size_t>(top_nums_[type_idx]);
     std::vector<std::vector<Entry>>& type_results = results_[type_idx];
-    for (size_t spec_id = 0; spec_id < type_results.size(); spec_id++) {
-      std::vector<Entry>& results = type_results[spec_id];
+    for (size_t spec_pos = 0; spec_pos < type_results.size(); spec_pos++) {
+      std::vector<Entry>& results = type_results[spec_pos];
       if (results.size() == 0) {
         continue;
       }

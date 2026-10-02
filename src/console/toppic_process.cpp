@@ -500,13 +500,13 @@ std::string TopPIC_topmg_identify(
     // from every spectrum of the file and not from the PrSMs.
     std::string base_name = file_util::basename(sp_file_name);
     std::set<int> search_spec_ids;
-    int spectrum_num = msalign_util::getSpNum(sp_file_name);
+    // the ids of the file, which need not be 0 .. spectrum number - 1
+    // (issue #598)
+    std::vector<int> spec_ids = msalign_util::readSpIds(sp_file_name);
     if (raw_prsm_ext.empty()) {
       // --topmg topmg-only: no earlier stage has searched, every spectrum
       // is searched here
-      for (int spec_id = 0; spec_id < spectrum_num; spec_id++) {
-        search_spec_ids.insert(spec_id);
-      }
+      search_spec_ids.insert(spec_ids.begin(), spec_ids.end());
       std::cout << "TopMG's identification - " << search_spec_ids.size()
                 << " spectra to search, the only search (--topmg topmg-only)."
                 << std::endl;
@@ -546,9 +546,9 @@ std::string TopPIC_topmg_identify(
           }
         }
       }
-      for (int spec_id = 0; spec_id < spectrum_num; spec_id++) {
-        if (identified_spec_ids.count(spec_id) == 0) {
-          search_spec_ids.insert(spec_id);
+      for (size_t i = 0; i < spec_ids.size(); i++) {
+        if (identified_spec_ids.count(spec_ids[i]) == 0) {
+          search_spec_ids.insert(spec_ids[i]);
         }
       }
       std::cout << "TopMG's identification - " << search_spec_ids.size()

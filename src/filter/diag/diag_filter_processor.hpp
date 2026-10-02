@@ -17,6 +17,7 @@
 #define TOPPIC_FILTER_DIAG_DIAG_FILTER_PROCESSOR_HPP_
 
 #include <mutex>
+#include <unordered_map>
 #include <vector>
 
 #include "filter/diag/diag_filter.hpp"
@@ -47,11 +48,16 @@ class DiagFilterProcessor {
 
   void readSpectra();
 
+  // spectrum id -> position of the spectrum in the file; read only once the
+  // block threads run
+  std::unordered_map<int, int> spec_pos_;
   // the best candidates of each spectrum over the blocks processed so far,
-  // as the text records that the combined output file receives
+  // as the text records that the combined output file receives, by the
+  // position of the spectrum in the file: one list per spectrum, allocated
+  // before the block threads start and never resized while they hold
+  // references to the lists (the ids need not start at 0, issue #598)
   std::vector<SimplePrsmStrPtrVec> spec_results_;
   std::vector<std::mutex> spec_mutexes_;
-  std::mutex resize_mutex_;
 
   void writeResults(const std::string& output_file_name);
 };
