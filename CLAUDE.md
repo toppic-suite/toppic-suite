@@ -943,6 +943,16 @@ above it, never the reverse:
   default, 0, keeps every mass; both drivers use the default); the number
   of masses in the tables is not stored in the PrSM but computed from the
   attached full spectra at output.
+  Spectrum ids (`SPECTRUM_ID`) need not start at 0 or be consecutive: a
+  subset of a file keeps the ids of its spectra, and `msalign_frac_merge`
+  adds `SpPara::getMaxSpecNumPerFile()` (10,000,000) per fraction. Code that
+  keeps one entry per spectrum indexes it by the spectrum's position in the
+  file (`msalign_util::readSpIds`, the ids in file order), never by its id
+  up to `getSpNum`: the filters' candidate lists (`SimplePrsmMemMerge`,
+  `DiagFilterProcessor`) once allocated one list per id below the spectrum
+  number and dropped the candidates of every larger id without a word, so
+  TopPIC found nothing in a file whose ids start above 0 (issue #598,
+  toppic_test experiment 100).
 - `src/topfd` — the TopFD deconvolution/feature-detection layer, built on `ms`:
   `common` (`topfd_para` config + the `topfd_process`/`topfd_single_process`
   orchestrators), `dp` (dynamic-programming envelope assignment), `envcnn` and
