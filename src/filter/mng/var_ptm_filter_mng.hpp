@@ -43,10 +43,9 @@ class VarPtmFilterMng {
 
   int getSingleShiftNum() { return single_shift_list_.size(); }
 
-  // the number of variable PTM types for the E-value computation: the
-  // distinct masses of the variable PTMs anywhere and at the proteoform
-  // N-terminus
-  int getVarPtmTypeNum();
+  // the number of proteoform N-terminal variable PTM masses, which the
+  // E-value computation counts apart from the PTMs anywhere
+  int getNTermShiftNum() { return n_term_shift_list_.size(); }
 
   PrsmParaPtr prsm_para_ptr_;
 

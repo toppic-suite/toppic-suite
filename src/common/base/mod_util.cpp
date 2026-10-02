@@ -145,8 +145,12 @@ ModPtrVec2D readModTxt(const std::string& file_name) {
             std::make_shared<Residue>(a, PtmBase::getEmptyPtmPtr()));
         ResiduePtr mod_residue_ptr =
             ResidueBase::getBaseResiduePtr(std::make_shared<Residue>(a, p));
+        // a proteoform N-terminal modification has the N_TERM type, which
+        // tells it from a side chain one of the same mass and residue
+        ModTypePtr mod_type_ptr =
+            l[3] == "N-term" ? ModType::N_TERM : ModType::SIDE_CHAIN;
         ModPtr m = ModBase::getBaseModPtr(std::make_shared<Mod>(
-            ori_residue_ptr, mod_residue_ptr, ModType::SIDE_CHAIN));
+            ori_residue_ptr, mod_residue_ptr, mod_type_ptr));
         if (l[3] == "N-term") {
           mod_ptr_vec2d[0].push_back(m);
           mod_ptr_vec2d[3].push_back(m);

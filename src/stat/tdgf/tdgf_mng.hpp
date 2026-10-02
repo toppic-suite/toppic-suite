@@ -40,6 +40,11 @@ class TdgfMng {
 
   int var_ptm_type_num_ = 0;
 
+  // the number of proteoform N-terminal variable PTM masses: a PrSM's
+  // N-terminal variable PTM multiplies its candidate number by this plus 1,
+  // each of its other variable PTMs by var_ptm_type_num_ plus 1
+  int n_term_var_ptm_type_num_ = 0;
+
   // Max ptm mass is used in the function for counting sequence numbers
   double max_ptm_mass_ = 1000000;
 

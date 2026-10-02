@@ -85,17 +85,6 @@ VarPtmFilterMng::VarPtmFilterMng(const PrsmParaPtr& prsm_para_ptr,
   LOG_DEBUG("Number of N-terminal shifts: " << n_term_shift_list_.size());
 }
 
-int VarPtmFilterMng::getVarPtmTypeNum() {
-  int num = single_shift_list_.size();
-  for (size_t i = 0; i < n_term_shift_list_.size(); i++) {
-    if (std::find(single_shift_list_.begin(), single_shift_list_.end(),
-                  n_term_shift_list_[i]) == single_shift_list_.end()) {
-      num++;
-    }
-  }
-  return num;
-}
-
 std::vector<int> VarPtmFilterMng::computeShifts(
     std::vector<int>& round_single_shift_list, int var_ptm_num) {
   std::vector<int> round_shift_list;

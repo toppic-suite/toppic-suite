@@ -19,6 +19,7 @@
 
 #include "common/base/proteoform_type.hpp"
 #include "common/base/mass_constant.hpp"
+#include "common/base/mod_type.hpp"
 #include "common/util/logger.hpp"
 #include "ms/factory/prm_ms_factory.hpp"
 #include "ms/spec/deconv_ms_util.hpp"
@@ -134,8 +135,24 @@ void CompPValueArray::compMultiExpectedValues(const PrmMsPtrVec& ms_six_ptr_vec,
       cand_num = 1.0;
     }
 
-    // multiple a factor for variable PTMs
-    double var_ptm_factor = pow(mng_ptr_->var_ptm_type_num_ + 1, var_ptm_num);
+    // multiple a factor for variable PTMs: the PTMs of the proteoform
+    // N-terminus (modification type N_TERM) are counted with their own type
+    // number
+    int n_term_var_ptm_num = 0;
+    MassShiftPtrVec var_shift_ptrs =
+        proteo_ptr->getMassShiftPtrVec(AlterType::VARIABLE);
+    for (size_t s = 0; s < var_shift_ptrs.size(); s++) {
+      const AlterPtrVec& alter_ptrs = var_shift_ptrs[s]->getAlterPtrVec();
+      for (size_t a = 0; a < alter_ptrs.size(); a++) {
+        if (alter_ptrs[a]->getModPtr()->getModTypePtr() == ModType::N_TERM) {
+          n_term_var_ptm_num++;
+        }
+      }
+    }
+    double var_ptm_factor =
+        pow(mng_ptr_->var_ptm_type_num_ + 1,
+            var_ptm_num - n_term_var_ptm_num) *
+        pow(mng_ptr_->n_term_var_ptm_type_num_ + 1, n_term_var_ptm_num);
     LOG_DEBUG("candidate number "
               << cand_num << " var_ptm_type_num " << mng_ptr_->var_ptm_type_num_
               << " var ptm num " << var_ptm_num << " factor "
