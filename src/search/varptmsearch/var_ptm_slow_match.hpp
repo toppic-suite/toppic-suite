@@ -32,9 +32,14 @@ namespace toppic {
 
 class VarPtmSlowMatch {
  public:
+  // form_n_term_masses: the masses of the N-terminal modifications that a
+  // protein N-terminal form already gives at the proteoform's start; a
+  // proteoform N-terminal PTM of such a mass is not searched, the form is
   VarPtmSlowMatch(const ProteoformPtr& proteo_ptr,
                   const SpectrumSetPtr& spectrum_set_ptr,
-                  const VarPtmSearchMngPtr& mng_ptr);
+                  const VarPtmSearchMngPtr& mng_ptr,
+                  const std::vector<double>& form_n_term_masses =
+                      std::vector<double>());
 
   ProteoformPtr getProteoform() { return proteo_ptr_; };
 
@@ -53,6 +58,8 @@ class VarPtmSlowMatch {
   PrmMsPtrVec ms_six_ptr_vec_;
   VarPtmAlignPtr var_ptm_align_ptr_;
   bool success_init_;
+
+  std::vector<double> form_n_term_masses_;
 
   DiagHeaderPtrVec geneVarPtmNTermShiftHeaders();
 };

@@ -87,6 +87,9 @@ std::function<void()> geneTask(const SpectrumSetPtr& spec_set_ptr,
     ProtModPtrVec prot_mod_ptr_vec =
         mng_ptr->prsm_para_ptr_->getProtModPtrVec();
     ProteoformPtrVec proteoform_ptr_vec;
+    // for each proteoform, the masses of the N-terminal modifications that a
+    // protein N-terminal form already gives at its start
+    std::vector<std::vector<double>> form_n_term_masses_vec;
     for (size_t i = 0; i < simple_prsm_ptr_vec.size(); i++) {
       // the filtering result holds the label-free precursor mass (-N)
       if (std::abs(spec_set_ptr->getLabelFreePrecMonoMass() -
@@ -164,11 +167,15 @@ std::function<void()> geneTask(const SpectrumSetPtr& spec_set_ptr,
                                 << (simple_prsm_ptr->getPrecMass() -
                                     sub_proteo_ptr->getMass()));
       proteoform_ptr_vec.push_back(sub_proteo_ptr);
+      form_n_term_masses_vec.push_back(prot_mod_util::getFormNTermModMasses(
+          prot_mod_ptr_vec, db_proteo_ptr->getResSeqPtr()->getResidues(),
+          start_pos));
     }
 
     PrsmPtrVec prsms;
     for (size_t i = 0; i < proteoform_ptr_vec.size(); i++) {
-      VarPtmSlowMatch slow_match(proteoform_ptr_vec[i], spec_set_ptr, mng_ptr);
+      VarPtmSlowMatch slow_match(proteoform_ptr_vec[i], spec_set_ptr, mng_ptr,
+                                 form_n_term_masses_vec[i]);
       if (slow_match.isSuccessInit()) {
         PrsmPtr tmp = slow_match.compute();
         LOG_DEBUG("Slow match computation finish!");

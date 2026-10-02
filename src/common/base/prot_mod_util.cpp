@@ -16,6 +16,7 @@
 #include "common/base/prot_mod_util.hpp"
 
 #include <string>
+#include <vector>
 
 #include "common/base/mod_base.hpp"
 #include "common/base/prot_mod_base.hpp"
@@ -70,6 +71,24 @@ bool allowMod(const ProtModPtr& prot_mod_ptr, const ResiduePtrVec& residues) {
     }
   }
   return true;
+}
+
+std::vector<double> getFormNTermModMasses(const ProtModPtrVec& prot_mod_ptr_vec,
+                                          const ResiduePtrVec& residues,
+                                          int start) {
+  std::vector<double> masses;
+  for (size_t i = 0; i < prot_mod_ptr_vec.size(); i++) {
+    const ProtModPtr& prot_mod_ptr = prot_mod_ptr_vec[i];
+    ModPtr mod_ptr = prot_mod_ptr->getModPtr();
+    if (ModBase::isNTermNoneModPtr(mod_ptr) ||
+        prot_mod_ptr->getTruncPtr()->getTruncLen() != start) {
+      continue;
+    }
+    if (allowMod(prot_mod_ptr, residues)) {
+      masses.push_back(mod_ptr->getShift());
+    }
+  }
+  return masses;
 }
 
 bool containMod(const ProtModPtrVec& prot_mod_ptr_vec,

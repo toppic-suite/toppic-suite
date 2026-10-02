@@ -24,6 +24,7 @@
 #include <utility>
 #include <vector>
 
+#include "common/base/prot_mod_util.hpp"
 #include "common/util/file_util.hpp"
 #include "common/util/logger.hpp"
 #include "filter/massmatch/mass_match_factory.hpp"
@@ -64,14 +65,18 @@ std::vector<std::pair<int, int>> getShiftedMassErrors(
 }
 
 // The rows of an N-terminal side index whose first residue can carry a
-// proteoform N-terminal PTM with the residues res_ptrs: the residue at the
-// row's start is one of them and, in the N-terminal form index, the row's
-// form is not an acetylated one (its N-terminus is blocked).
+// proteoform N-terminal PTM of mass n_term_mass with the residues res_ptrs:
+// the residue at the row's start is one of them; in the N-terminal form
+// index, the row's form is not an acetylated one (its N-terminus is
+// blocked); and no protein N-terminal form at the row's start gives a
+// modification of that mass (acetylation after NME is NME_ACETYLATION, which
+// the first round finds).
 std::vector<char> compNTermRowMask(const MassMatchPtr& index_ptr,
                                    const std::vector<int>& row_starts,
                                    bool is_term_index,
                                    const ProteoformPtrVec& proteo_ptrs,
                                    const ProtModPtrVec& prot_mod_ptrs,
+                                   double n_term_mass,
                                    const ResiduePtrVec& res_ptrs) {
   const std::vector<int>& row_proteo_ids = index_ptr->getRowProteoIds();
   const std::vector<double>& trunc_shifts = index_ptr->getTruncShifts();
@@ -101,6 +106,16 @@ std::vector<char> compNTermRowMask(const MassMatchPtr& index_ptr,
       if (res_ptr->isSame(res_ptrs[i])) {
         mask[r] = 1;
         break;
+      }
+    }
+    if (mask[r]) {
+      std::vector<double> form_masses = prot_mod_util::getFormNTermModMasses(
+          prot_mod_ptrs, seq_ptr->getResidues(), start);
+      for (size_t i = 0; i < form_masses.size(); i++) {
+        if (std::abs(form_masses[i] - n_term_mass) < 0.001) {
+          mask[r] = 0;
+          break;
+        }
       }
     }
   }
@@ -251,11 +266,11 @@ VarPtmFilter::VarPtmFilter(const ProteoformPtrVec& proteo_ptrs,
     n_term_term_masks_.push_back(compNTermRowMask(
         term_index_ptr_, row_ranges_.term_starts_, true, proteo_ptrs,
         mng_ptr->prsm_para_ptr_->getProtModPtrVec(),
-        mng_ptr->n_term_res_ptr_vec_2d_[k]));
+        mng_ptr->n_term_shift_list_[k], mng_ptr->n_term_res_ptr_vec_2d_[k]));
     n_term_diag_masks_.push_back(compNTermRowMask(
         diag_index_ptr_, row_ranges_.diag_starts_, false, proteo_ptrs,
         mng_ptr->prsm_para_ptr_->getProtModPtrVec(),
-        mng_ptr->n_term_res_ptr_vec_2d_[k]));
+        mng_ptr->n_term_shift_list_[k], mng_ptr->n_term_res_ptr_vec_2d_[k]));
   }
 }
 

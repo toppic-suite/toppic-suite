@@ -26,7 +26,9 @@ namespace toppic {
 
 VarPtmSlowMatch::VarPtmSlowMatch(const ProteoformPtr& proteo_ptr,
                                  const SpectrumSetPtr& spectrum_set_ptr,
-                                 const VarPtmSearchMngPtr& mng_ptr) {
+                                 const VarPtmSearchMngPtr& mng_ptr,
+                                 const std::vector<double>& form_n_term_masses)
+    : form_n_term_masses_(form_n_term_masses) {
   proteo_ptr_ = proteo_ptr;
   deconv_ms_ptr_vec_ = spectrum_set_ptr->getDeconvMsPtrVec();
   ms_six_ptr_vec_ = spectrum_set_ptr->getMsSixPtrVec();
@@ -131,7 +133,7 @@ void VarPtmSlowMatch::init() {
   }
   var_ptm_align_ptr_ = std::make_shared<VarPtmAlign>(
       ms_masses, seq_masses, sub_res_seq_ptr, diagonal_ptrs, mng_ptr_,
-      n_term_free);
+      n_term_free, form_n_term_masses_);
   success_init_ = true;
 }
 

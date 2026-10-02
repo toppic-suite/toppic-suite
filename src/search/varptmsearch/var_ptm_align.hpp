@@ -28,14 +28,19 @@ class VarPtmAlign {
  public:
   // n_term_free: the proteoform's N-terminus is not blocked by an acetylated
   // protein N-terminal form, so its first residue can carry a proteoform
-  // N-terminal PTM
+  // N-terminal PTM; not one of the masses of form_n_term_masses, which a
+  // protein N-terminal form at the proteoform's start already gives
   VarPtmAlign(const std::vector<double>& ms_masses,
               const std::vector<double>& seq_masses,
               const ResSeqPtr& sub_res_seq_ptr,
               const DiagonalPtrVec& diagonal_ptrs,
-              const VarPtmSearchMngPtr& mng_ptr, bool n_term_free);
+              const VarPtmSearchMngPtr& mng_ptr, bool n_term_free,
+              const std::vector<double>& form_n_term_masses);
 
   void initMatchTable();
+  // whether a protein N-terminal form at the proteoform's start gives a
+  // modification of this mass
+  bool isFormNTermMass(double mass) const;
 
   void initAllowShiftTable();
 
@@ -94,6 +99,8 @@ class VarPtmAlign {
   std::vector<bool> backtrack_n_term_mods_;
 
   bool n_term_free_ = true;
+
+  std::vector<double> form_n_term_masses_;
 };
 
 using VarPtmAlignPtr = std::shared_ptr<VarPtmAlign>;

@@ -16,6 +16,7 @@
 #include "search/varptmsearch/var_ptm_align.hpp"
 
 #include <algorithm>
+#include <cmath>
 #include <limits>
 
 #include "common/util/logger.hpp"
@@ -30,16 +31,27 @@ VarPtmAlign::VarPtmAlign(const std::vector<double>& ms_masses,
                          const std::vector<double>& seq_masses,
                          const ResSeqPtr& sub_res_seq_ptr,
                          const DiagonalPtrVec& diagonal_ptrs,
-                         const VarPtmSearchMngPtr& mng_ptr, bool n_term_free)
+                         const VarPtmSearchMngPtr& mng_ptr, bool n_term_free,
+                         const std::vector<double>& form_n_term_masses)
     : ms_masses_(ms_masses),
       seq_masses_(seq_masses),
       sub_res_seq_ptr_(sub_res_seq_ptr),
       diagonal_ptrs_(diagonal_ptrs),
       mng_ptr_(mng_ptr),
-      n_term_free_(n_term_free) {
+      n_term_free_(n_term_free),
+      form_n_term_masses_(form_n_term_masses) {
   initMatchTable();
   initAllowShiftTable();
   initScoreTable();
+}
+
+bool VarPtmAlign::isFormNTermMass(double mass) const {
+  for (size_t i = 0; i < form_n_term_masses_.size(); i++) {
+    if (std::abs(form_n_term_masses_[i] - mass) < 0.001) {
+      return true;
+    }
+  }
+  return false;
 }
 
 void VarPtmAlign::initMatchTable() {
@@ -70,9 +82,10 @@ void VarPtmAlign::initAllowShiftTable() {
             break;
           }
         }
-        // a proteoform N-terminal PTM: on the first residue only, and only
-        // if the N-terminus is free
-        if (!allow_shifts[j] && i == 1 && n_term_free_) {
+        // a proteoform N-terminal PTM: on the first residue only, only if
+        // the N-terminus is free and no protein N-terminal form gives it
+        if (!allow_shifts[j] && i == 1 && n_term_free_ &&
+            !isFormNTermMass(mng_ptr_->single_shift_list_[j])) {
           for (size_t k = 0; k < mng_ptr_->n_term_res_ptr_vec_2d_[j].size();
                k++) {
             if (seq_res_ptr->isSame(mng_ptr_->n_term_res_ptr_vec_2d_[j][k])) {
@@ -225,7 +238,8 @@ void VarPtmAlign::backtrack(int d, int ptm) {
       }
       // a proteoform N-terminal PTM, on the first residue
       bool n_term_mod = false;
-      if (cur_mod_ptr == nullptr && res_pos == 0 && n_term_free_) {
+      if (cur_mod_ptr == nullptr && res_pos == 0 && n_term_free_ &&
+          !isFormNTermMass(mng_ptr_->single_shift_list_[shift_idx])) {
         const ModPtrVec& n_term_mod_ptrs =
             mng_ptr_->n_term_mod_ptr_vec_2d_[shift_idx];
         for (size_t k = 0; k < n_term_mod_ptrs.size(); k++) {
