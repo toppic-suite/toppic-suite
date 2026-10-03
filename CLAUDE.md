@@ -551,9 +551,11 @@ rows) is written as `DeconvSingleSp`'s. Facts to keep straight:
     - no harmonic test and a single-charge cosine of 0.7 (most fragments
       appear at one charge);
     - the charge pre-check also accepts a neighbour peak at the averagine
-      distribution's own isotope spacing (`precheck` 2): a small
-      fragment's M+1 is about 1.0033 Da from its monoisotopic peak, which
-      at m/z 200 and charge 1 is outside 5 ppm of the averaged 1.00235.
+      distribution's own isotope spacing (`precheck` 2): the M+1 peak of
+      averagine is 1.00286 Da from the monoisotopic peak at every mass,
+      while 1.00235 fits the apex of envelopes above about 5 kDa
+      (toppic_test experiment 107); at m/z 200 and charge 1 the difference
+      is 2.5 ppm, half of the 5 ppm window.
 - **Research switches**: `TOPFD_GREEDY_MS2_PARA` ("name=value,...")
   overrides the defaults in `GreedyMs2Para`; `TOPFD_GREEDY_MS2_DEBUG_SCAN=
   <scan>` writes one scan's decisions to `greedy_ms2_scan<scan>.txt`.

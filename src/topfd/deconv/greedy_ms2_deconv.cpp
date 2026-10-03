@@ -561,8 +561,10 @@ bool GreedySearch::passes(const Fit& fit, double min_cos) const {
 // isotope spacing from the seed at the charge, on either side. The spacing
 // is the averaged 1.00235 Da or, with precheck 2, also the spacing of the
 // averagine distribution around its apex at the seed's mass: the M+1 peak
-// of a small fragment is about 1.0033 Da from its monoisotopic peak, 5.9
-// ppm from the averaged spacing at m/z 203 and charge 1.
+// of averagine is 1.00286 Da from its monoisotopic peak at every mass
+// (toppic_test experiment 107), 3 ppm from the averaged spacing at m/z 203
+// and charge 1, so that a few ppm of measurement error put it outside a
+// 5 ppm window (6 ppm in a 480_F3_02 spectrum).
 bool GreedySearch::hasNeighbourPeak(int seed, int charge, double ref_mass) {
   double mz = mzs_[seed];
   double tolerance = getTolerance(mz, charge);
