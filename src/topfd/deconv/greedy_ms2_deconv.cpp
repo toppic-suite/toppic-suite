@@ -33,7 +33,6 @@
 #include "ms/env/env_para.hpp"
 #include "ms/env/exp_env.hpp"
 #include "ms/env/match_env_filter.hpp"
-#include "ms/env/match_env_refine.hpp"
 #include "ms/env/match_env_util.hpp"
 #include "ms/spec/baseline_util.hpp"
 #include "topfd/envcnn/onnx_env_cnn.hpp"
@@ -69,7 +68,8 @@ struct GreedyMs2Para {
   // the score of an envelope: explained intensity minus the weighted
   // intensity predicted where there is no peak (0), or that times the
   // squared isotope cosine (1), or (2) as 1 with the theoretical intensity
-  // a matched peak falls short of also subtracted
+  // a matched peak falls short of also subtracted (2 found fewer fragments
+  // in experiment 106)
   int score_mode = 1;
   // monoisotopic offsets (isotopes) searched around the apex alignment
   int max_offset = 2;
@@ -105,15 +105,13 @@ struct GreedyMs2Para {
   double dup_window = 2;
   // with dup_window: only a mass an integer number of isotope spacings
   // (within dup_ppm ppm) from the earlier one is a duplicate (1), or any
-  // mass inside the window (0). Distinct fragments of one charge can lie
-  // closer than 2 Da (1,951.94 and 1,953.87 Da at charge 2, 627.33 and
-  // 628.28 Da at charge 1 in one 480_F3_02 spectrum); an isotope-shifted
-  // copy of a mass is k x 1.00235 Da away.
+  // mass inside the window (0). Distinct masses of one charge can lie
+  // closer than 2 Da (in one 480_F3_02 spectrum the b/y fragments 1,951.94
+  // Da at charge 2 and 627.33 Da at charge 1 lie 1.93 and 0.95 Da from more
+  // intense masses of the same charge); an isotope-shifted copy of a mass
+  // is k x 1.00235 Da away.
   int dup_iso = 1;
   double dup_ppm = 20;
-  // match_env_refine::mzRefine on the result, as DeconvSingleSp does (1),
-  // or the greedy fit as it is (0)
-  int refine = 0;
   // every charge competes with the best of its isotope offsets (1), or with
   // the apex alignment only, the offset being chosen after the charge (0,
   // greedy_ms1_deconv). Below about 5,000 Da the monoisotopic peak and its
@@ -149,14 +147,18 @@ struct GreedyMs2Para {
   // scores better there. The greedy order decides a mass before the
   // weaker species whose peaks lie in its envelope, which then lend
   // intensity to a wrong isotope offset (a 2,538.39 Da charge 4 fragment
-  // read as 2,537.39 Da through a charge 5 species' peak at its M-1).
+  // read as 2,537.39 Da through a charge 5 species' peak at its M-1). Off:
+  // it moved few masses, and with alt_ratio 0.9 and miss_weight 0.5 it gave
+  // no more identifications at 1% FDR (toppic_test experiment 106, run g4).
   int refit_rounds = 0;
   // a mass below alt_max_mass whose seed charge's envelope one isotope
   // lower or higher scores at least alt_ratio x the chosen one is also
   // reported at that mass (0 = never). TopPIC tolerates a +-1 isotope error
   // only above 5,000 Da (its fragment mass extension); below, about 11% of
   // the fragments found are one isotope off (toppic_test experiment 106).
-  // TopFD's former addMultiMass reported such alternatives too.
+  // TopFD's former addMultiMass reported such alternatives too. Off: 0.9
+  // recovered fragments but added masses, and gave no more identifications
+  // at 1% FDR (experiment 106, run g4).
   double alt_ratio = 0;
   double alt_max_mass = 5000;
 };
@@ -218,8 +220,6 @@ GreedyMs2Para readPara() {
       para.dup_iso = static_cast<int>(value);
     } else if (name == "dup_ppm") {
       para.dup_ppm = value;
-    } else if (name == "refine") {
-      para.refine = static_cast<int>(value);
     } else if (name == "offset_by_seed") {
       para.offset_by_seed = static_cast<int>(value);
     } else if (name == "alt_ratio") {
@@ -1088,9 +1088,6 @@ MatchEnvPtrVec deconv(const PeakPtrVec& peak_list,
   // as DeconvSingleSp::postprocess
   PeakPtrVec peaks = peak_list;
   match_env_util::assignIntensity(peaks, envs);
-  if (getPara().refine != 0) {
-    match_env_refine::mzRefine(envs, env_para_ptr->refine_core_ratio_);
-  }
   onnx_env_cnn::computeEnvScores(peak_list, envs);
   envs = match_env_filter::filterByEnvCnnScore(
       envs, std::max(getPara().min_envcnn,

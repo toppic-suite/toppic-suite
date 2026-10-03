@@ -509,8 +509,53 @@ written by the same `writeMsOne` as `deconvMsOne`'s. Facts to keep straight:
   (334-336 s against 285-333 s) and memory. Without the option the branch
   writes main's masses, precursors and features.
 - **Not done**: the precursor-window step of `deconvMsOne` (switch
-  `prec_win` runs it first; it did not change the identifications), the
-  MS/MS spectra, and FAIMS/`-T` specifics (the MS1 path is the same).
+  `prec_win` runs it first; it did not change the identifications) and
+  FAIMS/`-T` specifics (the MS1 path is the same). The MS/MS spectra have
+  their own greedy search (next section).
+
+## Greedy MS/MS deconvolution (`topfd/deconv/greedy_ms2_deconv`, `--ms2-greedy-deconv`)
+
+`greedy_ms2_deconv::deconv` is the alternative to `DeconvSingleSp` for
+MS/MS spectra selected by the hidden topfd option `--ms2-greedy-deconv`
+(`TopfdPara::isMs2GreedyDeconv`; `deconv_ms2_process::deconvMsTwo` and
+`topfd -T` call it; the parameter block then prints "MS/MS deconvolution:
+Greedy" instead of the DP's ranking window and harmonic check lines, and
+only then, so that default output files keep main's block). It started as a
+copy of the greedy MS1 search (previous section) and keeps its structure;
+the output (msalign lines, EnvCNN scores, the `-F`-relevant score, SQLite
+rows) is written as `DeconvSingleSp`'s. Facts to keep straight:
+
+- **Bounds**: fragment masses below the precursors' largest mass and
+  charges up to their largest charge (`deconvMsTwo`'s `max_mass` /
+  `max_charge`), the MS/MS signal-to-noise ratio for the seed threshold.
+- **What differs from the MS1 search** (each a `GreedyMs2Para` switch,
+  toppic_test experiment 106):
+    - every charge competes with the best of its isotope offsets
+      (`charge_offsets`): below about 5,000 Da the averagine apex and the
+      monoisotopic peak are of similar height, and the apex alignment of the
+      right charge was often one isotope off and lost to a wrong charge;
+    - the offset is chosen on the seed charge's envelope alone
+      (`offset_by_seed`), and a neighbouring charge joins the series only
+      when its own best offset agrees (`nb_consistent`); a neighbouring
+      charge was often the envelope of another mass one isotope away;
+    - the search matches peaks within 5 ppm (`ppm_tol`), not TopFD's 0.02
+      m/z: on 480_F3_02 the peaks of confident envelopes lie within 0.6 ppm
+      (median), and the wide window let high-charge envelopes collect the
+      peaks of other species; a peak only within 0.02 m/z (two envelopes'
+      peaks merged into one centroid) is neither matched nor counted as
+      missing (`near_no_pen`). The reported envelopes are matched with
+      TopFD's tolerance, as EnvCNN expects;
+    - the same-charge duplicate test only blocks masses an integer number
+      of isotope spacings from an earlier one (`dup_iso`): distinct
+      masses of one charge can lie closer than 2 Da;
+    - no harmonic test and a single-charge cosine of 0.7 (most fragments
+      appear at one charge).
+- **Research switches**: `TOPFD_GREEDY_MS2_PARA` ("name=value,...")
+  overrides the defaults in `GreedyMs2Para`; `TOPFD_GREEDY_MS2_DEBUG_SCAN=
+  <scan>` writes one scan's decisions to `greedy_ms2_scan<scan>.txt`.
+  Switches kept off by default are listed there with their experiment 106
+  results (`refit_rounds`, `alt_ratio`, `mono_by`, `score_mode` 2, ...).
+- **Results**: see toppic_test report 0106.
 
 ## Post mass matching (`prsm/prsm_post_mass_match`, toppic only)
 
