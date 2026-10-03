@@ -110,6 +110,12 @@ struct GreedyPara {
   // a mass found at one charge only is reported (and subtracted) only when
   // its envelope's isotope cosine reaches single_min_cos (0 = no test)
   double single_min_cos = 0;
+  // a seed whose mass lies within merge_window Da of a mass found before
+  // gives that mass's envelopes at the seed series' charges the earlier
+  // mass lacks, when they fit, and nothing otherwise (0 = no merge): the
+  // peaks of a charge state missing from a mass's series must not become a
+  // near-duplicate mass
+  double merge_window = 0;
   // envelopes with an EnvCNN score below min_envcnn are not reported (0 =
   // all reported)
   double min_envcnn = 0;
@@ -174,6 +180,8 @@ GreedyPara readPara() {
       para.mono_by = static_cast<int>(value);
     } else if (name == "single_min_cos") {
       para.single_min_cos = value;
+    } else if (name == "merge_window") {
+      para.merge_window = value;
     } else if (name == "min_envcnn") {
       para.min_envcnn = value;
     } else if (name == "envcnn") {
@@ -782,7 +790,40 @@ std::vector<FitVec> GreedySearch::run() {
       }
       *debug_os_ << " score " << best_score << "\n";
     }
-    if (best_series.size() == 1 && best_series[0].cos < para_.single_min_cos) {
+    int merge_into = -1;
+    if (para_.merge_window > 0) {
+      double best_diff = para_.merge_window;
+      for (std::size_t k = 0; k < result.size(); k++) {
+        double diff =
+            std::abs(result[k][0].mono_mass - best_series[0].mono_mass);
+        if (diff < best_diff) {
+          best_diff = diff;
+          merge_into = static_cast<int>(k);
+        }
+      }
+    }
+    if (merge_into >= 0) {
+      double mass = result[merge_into][0].mono_mass;
+      FitVec merged;
+      for (const Fit& fit : best_series) {
+        bool has_charge = false;
+        for (const Fit& f : result[merge_into]) {
+          has_charge = has_charge || f.charge == fit.charge;
+        }
+        if (has_charge) {
+          continue;
+        }
+        Fit refit = fitEnv(mass, fit.charge);
+        if (passes(refit, para_.nb_min_cos)) {
+          merged.push_back(std::move(refit));
+        }
+      }
+      if (merged.empty()) {
+        continue;
+      }
+      best_series = std::move(merged);
+    } else if (best_series.size() == 1 &&
+               best_series[0].cos < para_.single_min_cos) {
       continue;
     }
     // 3. subtract the envelopes of the mass at all its charges
@@ -803,7 +844,13 @@ std::vector<FitVec> GreedySearch::run() {
         }
       }
     }
-    result.push_back(std::move(best_series));
+    if (merge_into >= 0) {
+      for (Fit& fit : best_series) {
+        result[merge_into].push_back(std::move(fit));
+      }
+    } else {
+      result.push_back(std::move(best_series));
+    }
   }
   return result;
 }
