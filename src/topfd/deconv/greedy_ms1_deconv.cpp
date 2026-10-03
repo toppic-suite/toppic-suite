@@ -107,6 +107,11 @@ struct GreedyPara {
   // one of charge z / f matches the peaks on the grid and only unrelated
   // peaks between them (FLASHDeconv's and kDecon's harmonic checks)
   double harm_ratio = 0;
+  // a mass found at one charge only is reported (and subtracted) only when
+  // its envelope's isotope cosine reaches single_min_cos (0 = no test)
+  double single_min_cos = 0;
+  // research aid for timing: 0 skips the EnvCNN scores
+  int envcnn = 1;
   // main's precursor-window step first (1) or not (0)
   int prec_win = 0;
   // main's mzRefine (monoisotopic choice per envelope) on the result
@@ -164,6 +169,10 @@ GreedyPara readPara() {
       para.min_explained_frac = value;
     } else if (name == "mono_by") {
       para.mono_by = static_cast<int>(value);
+    } else if (name == "single_min_cos") {
+      para.single_min_cos = value;
+    } else if (name == "envcnn") {
+      para.envcnn = static_cast<int>(value);
     } else if (name == "harm_ratio") {
       para.harm_ratio = value;
     } else if (name == "precheck") {
@@ -768,6 +777,9 @@ std::vector<FitVec> GreedySearch::run() {
       }
       *debug_os_ << " score " << best_score << "\n";
     }
+    if (best_series.size() == 1 && best_series[0].cos < para_.single_min_cos) {
+      continue;
+    }
     // 3. subtract the envelopes of the mass at all its charges
     subtract(best_series);
     for (const Fit& fit : best_series) {
@@ -857,7 +869,9 @@ MatchEnvPtrVec deconv(const PeakPtrVec& peak_list,
   if (getPara().refine != 0) {
     match_env_refine::mzRefine(envs, env_para_ptr->refine_core_ratio_);
   }
-  onnx_env_cnn::computeEnvScores(peak_list, envs);
+  if (getPara().envcnn != 0) {
+    onnx_env_cnn::computeEnvScores(peak_list, envs);
+  }
   if (topfd_para_ptr->isSortUseMsDeconv()) {
     std::sort(envs.begin(), envs.end(), MatchEnv::cmpMsdeconvScoreDec);
   } else {
