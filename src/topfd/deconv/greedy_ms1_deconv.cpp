@@ -96,6 +96,17 @@ struct GreedyPara {
   double dyn_rise = 1.2;
   // isotopes beyond the fitted ones the boundary may reach
   int dyn_max_ext = 6;
+  // a charge z is tried for a seed only when a peak lies one isotope
+  // spacing (1.00235 / z) from it on either side (1; DeconTools' charge
+  // check) or always (0)
+  int precheck = 1;
+  // harmonic test of the seed charge z (0 = none): for f = 2, 3 dividing z,
+  // the observed / theoretical intensity ratio of the isotopes off the grid
+  // of every f-th isotope through the apex, over that of the isotopes on it,
+  // must be at least harm_ratio; an envelope of charge z that is really
+  // one of charge z / f matches the peaks on the grid and only unrelated
+  // peaks between them (FLASHDeconv's and kDecon's harmonic checks)
+  double harm_ratio = 0;
   // main's precursor-window step first (1) or not (0)
   int prec_win = 0;
   // main's mzRefine (monoisotopic choice per envelope) on the result
@@ -153,6 +164,10 @@ GreedyPara readPara() {
       para.min_explained_frac = value;
     } else if (name == "mono_by") {
       para.mono_by = static_cast<int>(value);
+    } else if (name == "harm_ratio") {
+      para.harm_ratio = value;
+    } else if (name == "precheck") {
+      para.precheck = static_cast<int>(value);
     } else if (name == "dyn_bound") {
       para.dyn_bound = static_cast<int>(value);
     } else if (name == "dyn_rise") {
@@ -251,6 +266,8 @@ class GreedySearch {
   int getAggregateOffset(const FitVec& series);
 
   std::vector<int> getTailPeaks(const Fit& fit);
+
+  bool isHarmonic(const Fit& fit);
 
   void subtract(const FitVec& series);
 };
@@ -528,6 +545,45 @@ int GreedySearch::getAggregateOffset(const FitVec& series) {
   return best_k;
 }
 
+// Whether the envelope of a fit looks like an envelope of charge z / f,
+// f = 2 or 3 (see GreedyPara::harm_ratio).
+bool GreedySearch::isHarmonic(const Fit& fit) {
+  if (para_.harm_ratio <= 0) {
+    return false;
+  }
+  const Distr& distr = getDistr(fit.mono_mass);
+  for (int f = 2; f <= 3; f++) {
+    if (fit.charge % f != 0) {
+      continue;
+    }
+    double on_obs = 0;
+    double on_theo = 0;
+    double off_obs = 0;
+    double off_theo = 0;
+    int off_num = 0;
+    for (int i = fit.first; i <= fit.last; i++) {
+      int idx = fit.peak_idxes[i];
+      double obs = idx >= 0 ? residuals_[idx] : 0;
+      if (((i - distr.apex) % f + f) % f == 0) {
+        on_obs += obs;
+        on_theo += distr.intes[i];
+      } else {
+        off_obs += obs;
+        off_theo += distr.intes[i];
+        off_num++;
+      }
+    }
+    if (off_num < 2 || on_obs <= 0 || off_theo <= 0) {
+      continue;
+    }
+    double ratio = (off_obs / off_theo) / (on_obs / on_theo);
+    if (ratio < para_.harm_ratio) {
+      return true;
+    }
+  }
+  return false;
+}
+
 void GreedySearch::subtract(const FitVec& series) {
   for (const Fit& fit : series) {
     const Distr& distr = getDistr(fit.mono_mass);
@@ -638,6 +694,15 @@ std::vector<FitVec> GreedySearch::run() {
       if (ref_mass >= max_mass_ || ref_mass < env_para_ptr_->min_mass_) {
         continue;
       }
+      if (para_.precheck != 0) {
+        double tolerance = env_para_ptr_->getMzTolerance(z);
+        int left = findPeak(mzs_[seed] - iso_mass / z, tolerance);
+        int right = findPeak(mzs_[seed] + iso_mass / z, tolerance);
+        if ((left < 0 || intes_[left] < min_inte_) &&
+            (right < 0 || intes_[right] < min_inte_)) {
+          continue;
+        }
+      }
       EnvPtr ref_env = EnvBase::getEnvByRefMass(ref_mass);
       if (ref_env == nullptr) {
         continue;
@@ -645,7 +710,7 @@ std::vector<FitVec> GreedySearch::run() {
       double mono_mass =
           ref_mass - (ref_env->getReferMz() - ref_env->getMonoMz());
       Fit fit = fitEnv(mono_mass, z);
-      if (!passes(fit, para_.min_cos)) {
+      if (!passes(fit, para_.min_cos) || isHarmonic(fit)) {
         continue;
       }
       if (para_.min_explained_frac > 0 &&
