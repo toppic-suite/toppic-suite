@@ -110,6 +110,9 @@ struct GreedyPara {
   // a mass found at one charge only is reported (and subtracted) only when
   // its envelope's isotope cosine reaches single_min_cos (0 = no test)
   double single_min_cos = 0;
+  // envelopes with an EnvCNN score below min_envcnn are not reported (0 =
+  // all reported)
+  double min_envcnn = 0;
   // research aid for timing: 0 skips the EnvCNN scores
   int envcnn = 1;
   // main's precursor-window step first (1) or not (0)
@@ -171,6 +174,8 @@ GreedyPara readPara() {
       para.mono_by = static_cast<int>(value);
     } else if (name == "single_min_cos") {
       para.single_min_cos = value;
+    } else if (name == "min_envcnn") {
+      para.min_envcnn = value;
     } else if (name == "envcnn") {
       para.envcnn = static_cast<int>(value);
     } else if (name == "harm_ratio") {
@@ -871,6 +876,15 @@ MatchEnvPtrVec deconv(const PeakPtrVec& peak_list,
   }
   if (getPara().envcnn != 0) {
     onnx_env_cnn::computeEnvScores(peak_list, envs);
+  }
+  if (getPara().min_envcnn > 0) {
+    MatchEnvPtrVec kept;
+    for (const MatchEnvPtr& env : envs) {
+      if (env->getEnvcnnScore() >= getPara().min_envcnn) {
+        kept.push_back(env);
+      }
+    }
+    envs = std::move(kept);
   }
   if (topfd_para_ptr->isSortUseMsDeconv()) {
     std::sort(envs.begin(), envs.end(), MatchEnv::cmpMsdeconvScoreDec);
