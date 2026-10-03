@@ -35,6 +35,7 @@
 #include "ms/spec/deconv_ms.hpp"
 #include "ms/spec/msalign_writer.hpp"
 #include "topfd/deconv/deconv_single_sp.hpp"
+#include "topfd/deconv/greedy_ms2_deconv.hpp"
 #include "topfd/envcnn/onnx_env_cnn.hpp"
 
 namespace toppic {
@@ -88,7 +89,11 @@ void processOneFile(const TopfdParaPtr& para_ptr,
     PeakPtrVec peak_list = readPeakFile(spec_file_name);
 
     MatchEnvPtrVec result_envs;
-    if (peak_list.size() > 0) {
+    if (peak_list.size() > 0 && para_ptr->isMs2GreedyDeconv()) {
+      // hidden option --ms2-greedy-deconv
+      result_envs = greedy_ms2_deconv::deconv(peak_list, para_ptr, max_mass,
+                                              static_cast<int>(max_charge));
+    } else if (peak_list.size() > 0) {
       DeconvSingleSpPtr deconv_ptr = std::make_shared<DeconvSingleSp>(
           para_ptr, peak_list, ms_level, max_mass, max_charge);
       result_envs = deconv_ptr->deconv();
