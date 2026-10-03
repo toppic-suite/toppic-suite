@@ -549,7 +549,11 @@ rows) is written as `DeconvSingleSp`'s. Facts to keep straight:
       of isotope spacings from an earlier one (`dup_iso`): distinct
       masses of one charge can lie closer than 2 Da;
     - no harmonic test and a single-charge cosine of 0.7 (most fragments
-      appear at one charge).
+      appear at one charge);
+    - the charge pre-check also accepts a neighbour peak at the averagine
+      distribution's own isotope spacing (`precheck` 2): a small
+      fragment's M+1 is about 1.0033 Da from its monoisotopic peak, which
+      at m/z 200 and charge 1 is outside 5 ppm of the averaged 1.00235.
 - **Research switches**: `TOPFD_GREEDY_MS2_PARA` ("name=value,...")
   overrides the defaults in `GreedyMs2Para`; `TOPFD_GREEDY_MS2_DEBUG_SCAN=
   <scan>` writes one scan's decisions to `greedy_ms2_scan<scan>.txt`.

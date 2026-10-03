@@ -87,8 +87,9 @@ struct GreedyMs2Para {
   double dyn_rise = 1.2;
   int dyn_max_ext = 6;
   // a charge z is tried for a seed only when a peak lies one isotope
-  // spacing (1.00235 / z) from it on either side (1) or always (0)
-  int precheck = 1;
+  // spacing (1.00235 / z) from it on either side (1), also at the averagine
+  // distribution's own spacing around its apex (2), or always (0)
+  int precheck = 2;
   // harmonic test of the seed charge z (0 = none), as in greedy_ms1_deconv;
   // off for MS/MS: with 0.4 it cost fragments in toppic_test experiment 106
   double harm_ratio = 0;
@@ -336,6 +337,8 @@ class GreedySearch {
 
   static bool hasPeak(const Fit& fit, int peak_idx);
 
+  bool hasNeighbourPeak(int seed, int charge, double ref_mass);
+
   bool isBestOffset(const Fit& fit);
 
   FitVec getSeries(double mono_mass, int charge, const Fit& seed_fit);
@@ -552,6 +555,39 @@ bool GreedySearch::passes(const Fit& fit, double min_cos) const {
     }
   }
   return true;
+}
+
+// The charge pre-check (GreedyMs2Para::precheck): whether a peak lies one
+// isotope spacing from the seed at the charge, on either side. The spacing
+// is the averaged 1.00235 Da or, with precheck 2, also the spacing of the
+// averagine distribution around its apex at the seed's mass: the M+1 peak
+// of a small fragment is about 1.0033 Da from its monoisotopic peak, 5.9
+// ppm from the averaged spacing at m/z 203 and charge 1.
+bool GreedySearch::hasNeighbourPeak(int seed, int charge, double ref_mass) {
+  double mz = mzs_[seed];
+  double tolerance = getTolerance(mz, charge);
+  std::vector<double> spacings = {mass_constant::getIsotopeMass()};
+  if (para_.precheck == 2) {
+    const Distr& distr = getDistr(ref_mass);
+    int n = static_cast<int>(distr.offsets.size());
+    if (distr.apex + 1 < n) {
+      spacings.push_back(distr.offsets[distr.apex + 1] -
+                         distr.offsets[distr.apex]);
+    }
+    if (distr.apex >= 1) {
+      spacings.push_back(distr.offsets[distr.apex] -
+                         distr.offsets[distr.apex - 1]);
+    }
+  }
+  for (double spacing : spacings) {
+    for (int dir = -1; dir <= 1; dir += 2) {
+      int idx = findPeak(mz + dir * spacing / charge, tolerance);
+      if (idx >= 0 && intes_[idx] >= min_inte_) {
+        return true;
+      }
+    }
+  }
+  return false;
 }
 
 // whether the peak is matched in the isotopes the fit uses
@@ -812,14 +848,8 @@ std::vector<FitVec> GreedySearch::run() {
       if (ref_mass >= max_mass_ || ref_mass < env_para_ptr_->min_mass_) {
         continue;
       }
-      if (para_.precheck != 0) {
-        double tolerance = getTolerance(mzs_[seed], z);
-        int left = findPeak(mzs_[seed] - iso_mass / z, tolerance);
-        int right = findPeak(mzs_[seed] + iso_mass / z, tolerance);
-        if ((left < 0 || intes_[left] < min_inte_) &&
-            (right < 0 || intes_[right] < min_inte_)) {
-          continue;
-        }
+      if (para_.precheck != 0 && !hasNeighbourPeak(seed, z, ref_mass)) {
+        continue;
       }
       EnvPtr ref_env = EnvBase::getEnvByRefMass(ref_mass);
       if (ref_env == nullptr) {
