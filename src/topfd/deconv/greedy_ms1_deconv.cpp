@@ -67,10 +67,26 @@ struct GreedyPara {
   int max_offset = 2;
   // times a peak may be the seed
   int max_seed_num = 2;
+  // whether a peak matched in an envelope found before (and kept, with the
+  // theoretical intensity deducted) may still be a seed (1) or not (0)
+  int seed_matched = 1;
+  // the seed envelope must explain at least this fraction of the residual
+  // intensity in its m/z window (0 = no test)
+  double min_explained_frac = 0;
+  // the monoisotopic mass: the offset whose series scores best (0), or the
+  // offset whose averagine distribution has the best cosine with the
+  // isotope intensities summed over the series' charges, with the observed
+  // intensity beyond the distribution counted (1; FLASHDeconv's
+  // getIsotopeCosineAndIsoOffset)
+  int mono_by = 0;
   // main's precursor-window step first (1) or not (0)
   int prec_win = 0;
   // main's mzRefine (monoisotopic choice per envelope) on the result
   int refine = 0;
+  // an envelope within dup_window Da of a mass already found at the same
+  // charge is not used (0 = no test): the residual of a subtracted envelope
+  // must not come back as an isotope-shifted copy of its mass
+  double dup_window = 3.5;
 };
 
 GreedyPara readPara() {
@@ -110,6 +126,14 @@ GreedyPara readPara() {
       para.prec_win = static_cast<int>(value);
     } else if (name == "refine") {
       para.refine = static_cast<int>(value);
+    } else if (name == "dup_window") {
+      para.dup_window = value;
+    } else if (name == "seed_matched") {
+      para.seed_matched = static_cast<int>(value);
+    } else if (name == "min_explained_frac") {
+      para.min_explained_frac = value;
+    } else if (name == "mono_by") {
+      para.mono_by = static_cast<int>(value);
     } else {
       LOG_WARN("Unknown TOPFD_GREEDY_PARA entry " << name);
     }
@@ -147,6 +171,9 @@ struct Fit {
   double explained = 0;
   double penalty = 0;
   bool apex_match = false;
+  // the residual intensity of all peaks in the m/z window of the isotopes
+  // used (half an isotope spacing beyond both ends)
+  double window_inte = 0;
   // the isotopes used: [first, last] of the distribution
   int first = 0;
   int last = -1;
@@ -178,6 +205,8 @@ class GreedySearch {
   std::vector<double> intes_;
   std::vector<double> residuals_;
   std::unordered_map<int, Distr> distr_cache_;
+  // the masses found so far, per charge
+  std::vector<std::vector<double>> found_masses_;
 
   const Distr& getDistr(double mono_mass);
 
@@ -190,6 +219,8 @@ class GreedySearch {
   FitVec getSeries(double mono_mass, int charge, const Fit& seed_fit);
 
   static double seriesScore(const FitVec& series);
+
+  int getAggregateOffset(const FitVec& series);
 
   void subtract(const FitVec& series);
 };
@@ -210,6 +241,7 @@ GreedySearch::GreedySearch(const PeakPtrVec& peak_list,
     intes_.push_back(peak->getIntensity());
   }
   residuals_ = intes_;
+  found_masses_.resize(max_charge_ + 1);
   // the noise level and the thresholds of DeconvData::initMinInte
   double noise_inte = baseline_util::getBaseLine(intes_);
   double sn_ratio = topfd_para_ptr->getMsOneSnRatio();
@@ -344,6 +376,15 @@ Fit GreedySearch::fitEnv(double mono_mass, int charge) {
     }
   }
   fit.apex_match = obs[distr.apex] > 0;
+  if (para_.min_explained_frac > 0) {
+    double half = 0.5 * mass_constant::getIsotopeMass() / charge;
+    double bgn = mono_mz + distr.offsets[fit.first] / charge - half;
+    double end = mono_mz + distr.offsets[fit.last] / charge + half;
+    for (auto it = std::lower_bound(mzs_.begin(), mzs_.end(), bgn);
+         it != mzs_.end() && *it <= end; ++it) {
+      fit.window_inte += residuals_[it - mzs_.begin()];
+    }
+  }
   fit.cos = (oo > 0 && tt > 0) ? to / std::sqrt(tt * oo) : 0;
   fit.valid = true;
   return fit;
@@ -354,10 +395,18 @@ bool GreedySearch::passes(const Fit& fit, double min_cos) const {
     return false;
   }
   int mass_group = env_para_ptr_->getMassGroup(fit.mono_mass);
-  if (mass_group < 0) {
+  if (mass_group < 0 ||
+      fit.match_num < env_para_ptr_->min_match_peak_num_[mass_group]) {
     return false;
   }
-  return fit.match_num >= env_para_ptr_->min_match_peak_num_[mass_group];
+  if (para_.dup_window > 0) {
+    for (double mass : found_masses_[fit.charge]) {
+      if (std::abs(mass - fit.mono_mass) < para_.dup_window) {
+        return false;
+      }
+    }
+  }
+  return true;
 }
 
 // The envelopes of one mass: the seed charge and the neighbouring charges
@@ -391,6 +440,64 @@ double GreedySearch::seriesScore(const FitVec& series) {
   return score;
 }
 
+// The isotope offset k in [-max_offset, max_offset] of the series' mass
+// whose averagine distribution, shifted by k isotopes, has the best cosine
+// with the residual intensities at the isotope positions summed over the
+// series' charges. The positions run max_offset isotopes beyond both ends of
+// the distribution, so intensity the shifted distribution does not explain
+// lowers its cosine.
+int GreedySearch::getAggregateOffset(const FitVec& series) {
+  double base_mass = series[0].mono_mass;
+  const Distr& distr = getDistr(base_mass);
+  int k_max = para_.max_offset;
+  int bgn = series[0].first - k_max;
+  int end = series[0].last + k_max;
+  for (const Fit& fit : series) {
+    bgn = std::min(bgn, fit.first - k_max);
+    end = std::max(end, fit.last + k_max);
+  }
+  double iso_mass = mass_constant::getIsotopeMass();
+  int n = static_cast<int>(distr.intes.size());
+  std::vector<double> aggr(end - bgn + 1, 0.0);
+  for (const Fit& fit : series) {
+    int z = fit.charge;
+    double mono_mz = base_mass / z + mass_constant::getProtonMass();
+    double tolerance = env_para_ptr_->getMzTolerance(z);
+    for (int j = bgn; j <= end; j++) {
+      double offset = (j >= 0 && j < n) ? distr.offsets[j] : j * iso_mass;
+      int idx = findPeak(mono_mz + offset / z, tolerance);
+      if (idx >= 0 && intes_[idx] >= min_inte_) {
+        aggr[j - bgn] += residuals_[idx];
+      }
+    }
+  }
+  double aa = 0;
+  for (double v : aggr) {
+    aa += v * v;
+  }
+  int best_k = 0;
+  double best_cos = -1;
+  for (int k = -k_max; k <= k_max; k++) {
+    double ab = 0;
+    double bb = 0;
+    for (int j = bgn; j <= end; j++) {
+      int i = j - k;
+      if (i < distr.first || i > distr.last) {
+        continue;
+      }
+      ab += aggr[j - bgn] * distr.intes[i];
+      bb += distr.intes[i] * distr.intes[i];
+    }
+    double cos = (aa > 0 && bb > 0) ? ab / std::sqrt(aa * bb) : 0;
+    // ties keep the apex alignment
+    if (cos > best_cos + 1e-9 || (k == 0 && cos >= best_cos - 1e-9)) {
+      best_cos = cos;
+      best_k = k;
+    }
+  }
+  return best_k;
+}
+
 void GreedySearch::subtract(const FitVec& series) {
   for (const Fit& fit : series) {
     const Distr& distr = getDistr(fit.mono_mass);
@@ -418,13 +525,15 @@ std::vector<FitVec> GreedySearch::run() {
     }
   }
   std::vector<int> seed_nums(residuals_.size(), 0);
+  std::vector<bool> matched(residuals_.size(), false);
   double proton = mass_constant::getProtonMass();
   double iso_mass = mass_constant::getIsotopeMass();
   while (!queue.empty()) {
     auto [inte, seed] = queue.top();
     queue.pop();
     if (residuals_[seed] < min_ref_inte_ ||
-        seed_nums[seed] >= para_.max_seed_num) {
+        seed_nums[seed] >= para_.max_seed_num ||
+        (para_.seed_matched == 0 && matched[seed])) {
       continue;
     }
     if (inte != residuals_[seed]) {
@@ -452,6 +561,10 @@ std::vector<FitVec> GreedySearch::run() {
       if (!passes(fit, para_.min_cos)) {
         continue;
       }
+      if (para_.min_explained_frac > 0 &&
+          fit.explained < para_.min_explained_frac * fit.window_inte) {
+        continue;
+      }
       FitVec series = getSeries(mono_mass, z, fit);
       double score = seriesScore(series);
       if (debug_os_ != nullptr) {
@@ -470,8 +583,9 @@ std::vector<FitVec> GreedySearch::run() {
     }
     // 2. the monoisotopic mass: the best series over the isotope offsets
     double base_mass = best_series[0].mono_mass;
+    int aggr_k = para_.mono_by == 1 ? getAggregateOffset(best_series) : 0;
     for (int k = -para_.max_offset; k <= para_.max_offset; k++) {
-      if (k == 0) {
+      if (k == 0 || (para_.mono_by == 1 && k != aggr_k)) {
         continue;
       }
       double mono_mass = base_mass + k * iso_mass;
@@ -488,7 +602,7 @@ std::vector<FitVec> GreedySearch::run() {
       }
       FitVec series = getSeries(mono_mass, best_charge, fit);
       double score = seriesScore(series);
-      if (score > best_score) {
+      if (score > best_score || para_.mono_by == 1) {
         best_score = score;
         best_series = std::move(series);
       }
@@ -504,6 +618,14 @@ std::vector<FitVec> GreedySearch::run() {
     }
     // 3. subtract the envelopes of the mass at all its charges
     subtract(best_series);
+    for (const Fit& fit : best_series) {
+      found_masses_[fit.charge].push_back(fit.mono_mass);
+      for (int i = fit.first; i <= fit.last; i++) {
+        if (fit.peak_idxes[i] >= 0) {
+          matched[fit.peak_idxes[i]] = true;
+        }
+      }
+    }
     for (const Fit& fit : best_series) {
       for (int i = fit.first; i <= fit.last; i++) {
         int idx = fit.peak_idxes[i];
