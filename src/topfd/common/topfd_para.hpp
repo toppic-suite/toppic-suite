@@ -79,6 +79,7 @@ class TopfdPara {
   bool isOutputDpEnvs() const { return output_dp_envs_; }
   bool isUseFlashDeconv() const { return use_flashdeconv_; }
   bool isMs1GreedyDeconv() const { return ms1_greedy_deconv_; }
+  bool isMs2GreedyDeconv() const { return ms2_greedy_deconv_; }
   int getThreadNum() const { return thread_num_; }
   double getMs1EcscoreCutoff() const { return ms1_ecscore_cutoff_; }
   double getMs2EcscoreCutoff() const { return ms2_ecscore_cutoff_; }
@@ -142,6 +143,7 @@ class TopfdPara {
   void setOutputDpEnvs(bool output) { output_dp_envs_ = output; }
   void setUseFlashDeconv(bool use) { use_flashdeconv_ = use; }
   void setMs1GreedyDeconv(bool greedy) { ms1_greedy_deconv_ = greedy; }
+  void setMs2GreedyDeconv(bool greedy) { ms2_greedy_deconv_ = greedy; }
   void setMaxMissPeakNum(int num) { max_miss_peak_num_ = num; }
   void setMsOneRankPeakDistance(double d) { ms1_rank_peak_distance_ = d; }
   void setMsTwoRankPeakDistance(double d) { ms2_rank_peak_distance_ = d; }
@@ -281,6 +283,10 @@ class TopfdPara {
   // greedy_ms1_deconv (deconv_ms1_process::deconvMsOneGreedy) instead of the
   // precursor-window step + DeconvSingleSp
   bool ms1_greedy_deconv_ = false;
+  // hidden option --ms2-greedy-deconv: deconvolute the MS/MS spectra with
+  // greedy_ms2_deconv (in deconv_ms2_process::deconvMsTwo) instead of
+  // DeconvSingleSp
+  bool ms2_greedy_deconv_ = false;
 
   //** information for each run **
   int frac_id_ = -1;

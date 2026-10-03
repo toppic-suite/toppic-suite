@@ -258,9 +258,13 @@ std::string TopfdPara::getTopfdParaStr(const std::string& prefix,
   kv("Fragment envelope EnvCNN score cutoff:")
       << ms2_env_cnn_score_cutoff_ << std::endl;
   // both steps belong to TopFD's own MS/MS deconvolution: the FLASHDeconv
-  // path (--ms2-flashdeconv) does not run them, and the ranking window has no
-  // meaning when the filtering-by-mz step is disabled
-  if (!use_flashdeconv_) {
+  // path (--ms2-flashdeconv) and the greedy search (--ms2-greedy-deconv) do
+  // not run them, and the ranking window has no meaning when the
+  // filtering-by-mz step is disabled. The greedy search's line is printed
+  // only when it runs, so that the default output files keep main's block.
+  if (ms2_greedy_deconv_ && !use_flashdeconv_) {
+    kv("MS/MS deconvolution:") << "Greedy" << std::endl;
+  } else if (!use_flashdeconv_) {
     if (run_filter_by_mz_) {
       kv("Fragment envelope ranking window:")
           << ms2_rank_peak_distance_ << " Dalton" << std::endl;

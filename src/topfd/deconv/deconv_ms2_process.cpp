@@ -18,6 +18,7 @@
 #include <algorithm>
 #include <atomic>
 #include <cstddef>
+#include <cstdlib>
 #include <memory>
 #include <string>
 #include <utility>
@@ -34,6 +35,7 @@
 #include "ms/spec/msalign_thread_merge.hpp"
 #include "ms/spec/msalign_writer.hpp"
 #include "topfd/deconv/deconv_single_sp.hpp"
+#include "topfd/deconv/greedy_ms2_deconv.hpp"
 
 namespace toppic {
 
@@ -124,7 +126,18 @@ void deconvMsTwo(const MzmlMsPtr& ms_ptr, SpecFeaturePtrVec sp_feat_ptr_vec,
   // 2. Deconv the whole spectrum with filtering
   PeakPtrVec peak_list = ms_ptr->getPeakPtrVec();
   MatchEnvPtrVec deconv_envs;
-  if (peak_list.size() > 0) {
+  if (peak_list.size() > 0 && topfd_para_ptr->isMs2GreedyDeconv()) {
+    // hidden option --ms2-greedy-deconv: the greedy search; research aid:
+    // the decisions of one scan (TOPFD_GREEDY_MS2_DEBUG_SCAN)
+    std::string debug_name;
+    const char* debug_scan = std::getenv("TOPFD_GREEDY_MS2_DEBUG_SCAN");
+    int scan = ms_ptr->getMsHeaderPtr()->getFirstScanNum();
+    if (debug_scan != nullptr && std::atoi(debug_scan) == scan) {
+      debug_name = "greedy_ms2_scan" + std::to_string(scan) + ".txt";
+    }
+    deconv_envs = greedy_ms2_deconv::deconv(peak_list, topfd_para_ptr,
+                                            max_mass, max_charge, debug_name);
+  } else if (peak_list.size() > 0) {
     int ms_level = 2;
     DeconvSingleSpPtr deconv_ptr = std::make_shared<DeconvSingleSp>(
         topfd_para_ptr, peak_list, ms_level, max_mass, max_charge);

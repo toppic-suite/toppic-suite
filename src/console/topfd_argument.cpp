@@ -203,6 +203,11 @@ bool Argument::parse(int argc, char* argv[]) {
         "charge state of the most intense peak with all the charge states of "
         "its mass and subtracts the mass's envelopes, instead of the dynamic "
         "programming (experimental).")(
+        "ms2-greedy-deconv",
+        "Deconvolute the MS/MS spectra with the greedy search, which decides "
+        "the charge state of the most intense peak with all the charge states "
+        "of its fragment mass and subtracts the mass's envelopes, instead of "
+        "the dynamic programming (experimental).")(
         "disable-ms2-harmonic-check",
         "Skip the harmonic check of MS/MS spectra, which replaces an envelope "
         "by a better scoring harmonic parent mass.")(
@@ -370,6 +375,10 @@ bool Argument::parse(int argc, char* argv[]) {
 
     if (vm.count("ms1-greedy-deconv")) {
       topfd_para_ptr_->setMs1GreedyDeconv(true);
+    }
+
+    if (vm.count("ms2-greedy-deconv")) {
+      topfd_para_ptr_->setMs2GreedyDeconv(true);
     }
 
     if (vm.count("mass-group-boundary")) {
