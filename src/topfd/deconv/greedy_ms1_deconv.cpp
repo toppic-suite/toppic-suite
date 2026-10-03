@@ -32,7 +32,6 @@
 #include "ms/env/env_base.hpp"
 #include "ms/env/env_para.hpp"
 #include "ms/env/exp_env.hpp"
-#include "ms/env/match_env_refine.hpp"
 #include "ms/env/match_env_util.hpp"
 #include "ms/spec/baseline_util.hpp"
 #include "topfd/envcnn/onnx_env_cnn.hpp"
@@ -43,8 +42,11 @@ namespace greedy_ms1_deconv {
 
 namespace {
 
-// The parameters of the search. The defaults can be changed for research
-// with the environment variable TOPFD_GREEDY_PARA, a comma-separated list of
+// The parameters of the search. The defaults are the setting that gave the
+// most identifications on 480_F3_02 in toppic_test experiment 104 (runs g3
+// and g6, with the filters of g5 and g6 that report fewer envelopes at the
+// same identifications). They can be changed for research with the
+// environment variable TOPFD_GREEDY_PARA, a comma-separated list of
 // name=value pairs (e.g. "min_cos=0.7,keep_ratio=2").
 struct GreedyPara {
   // isotope cosine an envelope of the seed charge needs
@@ -68,7 +70,7 @@ struct GreedyPara {
   // squared isotope cosine (1; the cos^2 weighting of FLASHDeconv's SNR), so
   // that a charge 2z envelope that matches the peaks of a charge z envelope
   // and unrelated peaks between them in a dense region loses to charge z
-  int score_mode = 0;
+  int score_mode = 1;
   // monoisotopic offsets (isotopes) searched around the apex alignment
   int max_offset = 2;
   // times a peak may be the seed
@@ -84,7 +86,7 @@ struct GreedyPara {
   // isotope intensities summed over the series' charges, with the observed
   // intensity beyond the distribution counted (1; FLASHDeconv's
   // getIsotopeCosineAndIsoOffset)
-  int mono_by = 0;
+  int mono_by = 1;
   // the envelope boundary of the subtraction found from the observed peaks
   // (1) or the isotopes fitted (0): from the apex outwards, the envelope goes
   // on while the next isotope has a peak whose residual intensity is at most
@@ -92,7 +94,7 @@ struct GreedyPara {
   // isotopes (below core_ratio) and the isotopes beyond the fitted ones are
   // removed whole, so that a tail wider than the averagine distribution
   // leaves no residual to seed an isotope-shifted copy of the mass
-  int dyn_bound = 0;
+  int dyn_bound = 1;
   double dyn_rise = 1.2;
   // isotopes beyond the fitted ones the boundary may reach
   int dyn_max_ext = 6;
@@ -106,10 +108,10 @@ struct GreedyPara {
   // must be at least harm_ratio; an envelope of charge z that is really
   // one of charge z / f matches the peaks on the grid and only unrelated
   // peaks between them (FLASHDeconv's and kDecon's harmonic checks)
-  double harm_ratio = 0;
+  double harm_ratio = 0.4;
   // a mass found at one charge only is reported (and subtracted) only when
   // its envelope's isotope cosine reaches single_min_cos (0 = no test)
-  double single_min_cos = 0;
+  double single_min_cos = 0.8;
   // a seed whose mass lies within merge_window Da of a mass found before
   // gives that mass's envelopes at the seed series' charges the earlier
   // mass lacks, when they fit, and nothing otherwise (0 = no merge): the
@@ -117,14 +119,14 @@ struct GreedyPara {
   // near-duplicate mass
   double merge_window = 0;
   // envelopes with an EnvCNN score below min_envcnn are not reported (0 =
-  // all reported)
-  double min_envcnn = 0;
+  // all reported): they are a third of the envelopes, seed the features
+  // that the feature detection would otherwise spend 50% more time on, and
+  // gave no identification (experiment 104, run g6)
+  double min_envcnn = 0.2;
   // research aid for timing: 0 skips the EnvCNN scores
   int envcnn = 1;
   // main's precursor-window step first (1) or not (0)
   int prec_win = 0;
-  // main's mzRefine (monoisotopic choice per envelope) on the result
-  int refine = 0;
   // an envelope within dup_window Da of a mass already found at the same
   // charge is not used (0 = no test): the residual of a subtracted envelope
   // must not come back as an isotope-shifted copy of its mass
@@ -168,8 +170,6 @@ GreedyPara readPara() {
       para.max_seed_num = static_cast<int>(value);
     } else if (name == "prec_win") {
       para.prec_win = static_cast<int>(value);
-    } else if (name == "refine") {
-      para.refine = static_cast<int>(value);
     } else if (name == "dup_window") {
       para.dup_window = value;
     } else if (name == "seed_matched") {
@@ -918,9 +918,6 @@ MatchEnvPtrVec deconv(const PeakPtrVec& peak_list,
   // as DeconvSingleSp::postprocess
   PeakPtrVec peaks = peak_list;
   match_env_util::assignIntensity(peaks, envs);
-  if (getPara().refine != 0) {
-    match_env_refine::mzRefine(envs, env_para_ptr->refine_core_ratio_);
-  }
   if (getPara().envcnn != 0) {
     onnx_env_cnn::computeEnvScores(peak_list, envs);
   }

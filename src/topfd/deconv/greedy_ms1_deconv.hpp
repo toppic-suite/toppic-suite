@@ -25,21 +25,28 @@
 namespace toppic {
 
 // The greedy MS1 deconvolution (topfd --ms1-greedy-deconv), an alternative
-// to the candidate envelopes + dynamic programming of DeconvSingleSp for MS1
-// spectra. It is a THRASH-like subtractive search (Horn et al., JASMS 2000)
-// in which the charge state of a peak is decided with all the charge states
-// of its mass:
-//   1. take the most intense peak of the residual spectrum;
-//   2. for every charge z, align the averagine distribution's apex with the
-//      peak, fit it to the residual intensities and extend the same mass to
-//      the charges z-1, z-2, ... and z+1, z+2, ... while their envelopes fit;
-//      the charge whose series explains the most intensity (minus the
-//      theoretical intensity predicted where the spectrum has no peak) wins;
-//   3. choose the monoisotopic mass among isotope offsets of that series;
+// to the precursor-window step and the candidate envelopes + dynamic
+// programming of DeconvSingleSp for MS1 spectra. It is a THRASH-like
+// subtractive search (Horn et al., JASMS 2000) in which the charge state of
+// a peak is decided with all the charge states of its mass:
+//   1. take the most intense peak of the residual spectrum as the seed;
+//   2. for every charge z with a peak one isotope spacing from the seed,
+//      align the averagine distribution's apex with the seed, fit it to the
+//      residual intensities and extend the same mass to the charges z-1,
+//      z-2, ... and z+1, z+2, ... while their envelopes fit; the charge
+//      whose series explains the most intensity (minus the theoretical
+//      intensity predicted where there is no peak, weighted by the squared
+//      isotope cosine) wins, unless it looks like a harmonic of charge z/2
+//      or z/3;
+//   3. choose the monoisotopic mass among +-2 isotope offsets by the cosine
+//      with the isotope intensities summed over the series' charges
+//      (FLASHDeconv);
 //   4. subtract the theoretical envelopes of the mass at all its charges: a
 //      peak much more intense than its theoretical intensity keeps the
-//      difference, any other matched peak is used up;
+//      difference, any other matched peak is used up, and the tail isotopes
+//      up to where the observed series stops or rises again are removed;
 //   5. repeat from 1 until no peak above the reference intensity is left.
+// The parameters and their sources are in GreedyPara (cpp).
 namespace greedy_ms1_deconv {
 
 // Deconvolute one MS1 peak list (sorted by m/z). The envelopes are matched
