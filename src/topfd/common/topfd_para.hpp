@@ -78,6 +78,7 @@ class TopfdPara {
   bool isOutputCsvFeatureFile() const { return output_csv_feature_file_; }
   bool isOutputDpEnvs() const { return output_dp_envs_; }
   bool isUseFlashDeconv() const { return use_flashdeconv_; }
+  bool isMs1GreedyDeconv() const { return ms1_greedy_deconv_; }
   int getThreadNum() const { return thread_num_; }
   double getMs1EcscoreCutoff() const { return ms1_ecscore_cutoff_; }
   double getMs2EcscoreCutoff() const { return ms2_ecscore_cutoff_; }
@@ -140,6 +141,7 @@ class TopfdPara {
   void setSql3d(bool sql_3d) { sql_3d_ = sql_3d; }
   void setOutputDpEnvs(bool output) { output_dp_envs_ = output; }
   void setUseFlashDeconv(bool use) { use_flashdeconv_ = use; }
+  void setMs1GreedyDeconv(bool greedy) { ms1_greedy_deconv_ = greedy; }
   void setMaxMissPeakNum(int num) { max_miss_peak_num_ = num; }
   void setMsOneRankPeakDistance(double d) { ms1_rank_peak_distance_ = d; }
   void setMsTwoRankPeakDistance(double d) { ms2_rank_peak_distance_ = d; }
@@ -275,6 +277,10 @@ class TopfdPara {
   // option --ms2-flashdeconv: deconvolute the MS/MS spectra with the
   // FLASHDeconv algorithm (FlashDeconvMs2Process) instead of DeconvMs2Process
   bool use_flashdeconv_ = false;
+  // hidden option --ms1-greedy-deconv: deconvolute the MS1 spectra with
+  // greedy_ms1_deconv (deconv_ms1_process::deconvMsOneGreedy) instead of the
+  // precursor-window step + DeconvSingleSp
+  bool ms1_greedy_deconv_ = false;
 
   //** information for each run **
   int frac_id_ = -1;

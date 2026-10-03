@@ -220,7 +220,11 @@ std::string TopfdPara::getTopfdParaStr(const std::string& prefix,
            << banner(prefix, "MS1 spectral deconvolution parameters")
            << std::endl;
     kv("MS1 signal/noise ratio:") << ms_one_sn_ratio_ << std::endl;
-    if (run_filter_by_mz_) {
+    // printed only for the greedy search, so that the default output files
+    // keep main's parameter block
+    if (ms1_greedy_deconv_) {
+      kv("MS1 deconvolution:") << "Greedy" << std::endl;
+    } else if (run_filter_by_mz_) {
       kv("Precursor envelope ranking window:")
           << ms1_rank_peak_distance_ << " Dalton" << std::endl;
     }

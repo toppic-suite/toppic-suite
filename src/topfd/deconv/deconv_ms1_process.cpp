@@ -18,6 +18,7 @@
 
 #include <atomic>
 #include <cstddef>
+#include <cstdlib>
 #include <memory>
 #include <string>
 #include <utility>
@@ -35,6 +36,7 @@
 #include "topfd/deconv/deconv_prec_win.hpp"
 #include "topfd/deconv/deconv_single_sp.hpp"
 #include "topfd/deconv/deconv_util.hpp"
+#include "topfd/deconv/greedy_ms1_deconv.hpp"
 #include "topfd/envcnn/onnx_env_cnn.hpp"
 
 namespace toppic {
@@ -86,6 +88,12 @@ std::size_t estimateRecordBytes(const Ms1SqlRecord& record) {
   }
   return peak_num * BYTES_PER_PEAK;
 }
+
+void writeMsOne(const MzmlMsPtr& ms_ptr, MatchEnvPtrVec& result_envs,
+                double base_inte, double min_ref_inte,
+                const MsAlignWriterPtrVec& ms1_writer_ptr_vec,
+                const SimpleThreadPoolPtr& pool_ptr,
+                const Ms1SqlBufferPtr& sql_buffer_ptr);
 
 void deconvMsOne(const MzmlMsGroupPtr& ms_group_ptr,
                  const TopfdParaPtr& topfd_para_ptr,
@@ -150,6 +158,16 @@ void deconvMsOne(const MzmlMsGroupPtr& ms_group_ptr,
   result_envs.insert(result_envs.end(), deconv_envs.begin(), deconv_envs.end());
   LOG_DEBUG("result num " << result_envs.size());
 
+  writeMsOne(ms_ptr, result_envs, base_inte, min_ref_inte, ms1_writer_ptr_vec,
+             pool_ptr, sql_buffer_ptr);
+}
+
+// Steps 5 and 6 of deconvMsOne: the msalign file and the SQLite buffer.
+void writeMsOne(const MzmlMsPtr& ms_ptr, MatchEnvPtrVec& result_envs,
+                double base_inte, double min_ref_inte,
+                const MsAlignWriterPtrVec& ms1_writer_ptr_vec,
+                const SimpleThreadPoolPtr& pool_ptr,
+                const Ms1SqlBufferPtr& sql_buffer_ptr) {
   // 5. Write to msalign file
   MsHeaderPtr header_ptr = ms_ptr->getMsHeaderPtr();
   DeconvMsPtr deconv_ms_ptr =
@@ -171,6 +189,67 @@ void deconvMsOne(const MzmlMsGroupPtr& ms_group_ptr,
   }
 }
 
+// The alternative to deconvMsOne selected by topfd --ms1-greedy-deconv: the
+// spectrum is deconvoluted by greedy_ms1_deconv (the most intense peak's
+// charge decided with all the charge states of its mass, its envelopes
+// subtracted, repeated) instead of DeconvSingleSp's candidate envelopes and
+// dynamic programming. The precursor-window step of deconvMsOne runs first
+// only when greedy_ms1_deconv::isPrecWinFirst(). The output is written as
+// deconvMsOne writes it.
+void deconvMsOneGreedy(const MzmlMsGroupPtr& ms_group_ptr,
+                       const TopfdParaPtr& topfd_para_ptr,
+                       const MsAlignWriterPtrVec& ms1_writer_ptr_vec,
+                       const SimpleThreadPoolPtr& pool_ptr,
+                       const Ms1SqlBufferPtr& sql_buffer_ptr) {
+  MzmlMsPtr ms_ptr = ms_group_ptr->getMsOnePtr();
+  PeakPtrVec peak_list = ms_ptr->getPeakPtrVec();
+  std::vector<double> intensities;
+  for (std::size_t i = 0; i < peak_list.size(); i++) {
+    intensities.push_back(peak_list[i]->getIntensity());
+  }
+  double base_inte = baseline_util::getBaseLine(intensities);
+  double min_ref_inte = base_inte * topfd_para_ptr->getMsOneSnRatio();
+
+  MatchEnvPtrVec prec_envs;
+  if (greedy_ms1_deconv::isPrecWinFirst()) {
+    prec_envs = deconv_prec_win::deconvPrecWinForMsGroup(
+        ms_group_ptr, topfd_para_ptr->getMaxMass(),
+        topfd_para_ptr->getMaxCharge(), base_inte, min_ref_inte);
+    onnx_env_cnn::computeEnvScores(peak_list, prec_envs);
+    for (const MatchEnvPtr& env : prec_envs) {
+      ExpEnvPtr env_ptr = env->getExpEnvPtr();
+      for (int p = 0; p < env_ptr->getPeakNum(); p++) {
+        if (env_ptr->isExist(p)) {
+          peak_list[env_ptr->getPeakIdx(p)]->setIntensity(0);
+        }
+      }
+    }
+  }
+  // research aid: the decisions of one scan (TOPFD_GREEDY_DEBUG_SCAN)
+  std::string debug_name;
+  const char* debug_scan = std::getenv("TOPFD_GREEDY_DEBUG_SCAN");
+  int scan = ms_ptr->getMsHeaderPtr()->getFirstScanNum();
+  if (debug_scan != nullptr && std::atoi(debug_scan) == scan) {
+    debug_name = "greedy_scan" + std::to_string(scan) + ".txt";
+  }
+  MatchEnvPtrVec deconv_envs =
+      greedy_ms1_deconv::deconv(peak_list, topfd_para_ptr, debug_name);
+  for (const MatchEnvPtr& env : prec_envs) {
+    ExpEnvPtr env_ptr = env->getExpEnvPtr();
+    for (int p = 0; p < env_ptr->getPeakNum(); p++) {
+      if (env_ptr->isExist(p)) {
+        int idx = env_ptr->getPeakIdx(p);
+        peak_list[idx]->setIntensity(intensities[idx]);
+      }
+    }
+  }
+  MatchEnvPtrVec result_envs;
+  result_envs.insert(result_envs.end(), prec_envs.begin(), prec_envs.end());
+  result_envs.insert(result_envs.end(), deconv_envs.begin(), deconv_envs.end());
+  writeMsOne(ms_ptr, result_envs, base_inte, min_ref_inte, ms1_writer_ptr_vec,
+             pool_ptr, sql_buffer_ptr);
+}
+
 std::function<void()> geneTask(const MzmlMsGroupPtr& ms_group_ptr,
                                const TopfdParaPtr& topfd_para_ptr,
                                const MsAlignWriterPtrVec& ms1_writer_ptr_vec,
@@ -178,8 +257,13 @@ std::function<void()> geneTask(const MzmlMsGroupPtr& ms_group_ptr,
                                const Ms1SqlBufferPtr& sql_buffer_ptr) {
   return [ms_group_ptr, topfd_para_ptr, ms1_writer_ptr_vec, pool_ptr,
           sql_buffer_ptr]() {
-    deconvMsOne(ms_group_ptr, topfd_para_ptr, ms1_writer_ptr_vec, pool_ptr,
-                sql_buffer_ptr);
+    if (topfd_para_ptr->isMs1GreedyDeconv()) {
+      deconvMsOneGreedy(ms_group_ptr, topfd_para_ptr, ms1_writer_ptr_vec,
+                        pool_ptr, sql_buffer_ptr);
+    } else {
+      deconvMsOne(ms_group_ptr, topfd_para_ptr, ms1_writer_ptr_vec, pool_ptr,
+                  sql_buffer_ptr);
+    }
   };
 }
 
