@@ -562,7 +562,7 @@ rows) is written as `DeconvSingleSp`'s. Facts to keep straight:
 - **Results** (toppic_test experiment 106, report 0106): on 480_F3_02
   with main's TopPIC in the benchmark setting, 3,296-3,298 PrSMs, 1,961-
   1,964 proteoforms and 427 proteins against main's 3,141 / 1,870 / 420 on
-  the same MS1 output (+200 to +225 targets at E <= 1e-5 to 0.01, no more
+  the same MS1 output (+199 to +228 targets at E <= 1e-5 to 0.01, no more
   decoys); with `--ms1-greedy-deconv` too 3,315 / 1,980 / 433. The gain is
   15% more b/y fragments of the identified proteoforms at main's precision
   (mostly 1,000-5,000 Da: right charges and isotopes, and envelopes the DP
