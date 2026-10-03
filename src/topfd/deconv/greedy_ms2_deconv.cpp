@@ -143,6 +143,22 @@ struct GreedyMs2Para {
   // series' mass better than the masses one isotope lower and higher (1),
   // or whenever it passes (0)
   int nb_consistent = 1;
+  // rounds of the refit pass after the greedy search (0 = none): every mass
+  // is fitted again at +-1 isotope on the spectrum without the envelopes of
+  // all the other masses found, and moved when its seed charge's envelope
+  // scores better there. The greedy order decides a mass before the
+  // weaker species whose peaks lie in its envelope, which then lend
+  // intensity to a wrong isotope offset (a 2,538.39 Da charge 4 fragment
+  // read as 2,537.39 Da through a charge 5 species' peak at its M-1).
+  int refit_rounds = 0;
+  // a mass below alt_max_mass whose seed charge's envelope one isotope
+  // lower or higher scores at least alt_ratio x the chosen one is also
+  // reported at that mass (0 = never). TopPIC tolerates a +-1 isotope error
+  // only above 5,000 Da (its fragment mass extension); below, about 11% of
+  // the fragments found are one isotope off (toppic_test experiment 106).
+  // TopFD's former addMultiMass reported such alternatives too.
+  double alt_ratio = 0;
+  double alt_max_mass = 5000;
 };
 
 GreedyMs2Para readPara() {
@@ -206,6 +222,12 @@ GreedyMs2Para readPara() {
       para.refine = static_cast<int>(value);
     } else if (name == "offset_by_seed") {
       para.offset_by_seed = static_cast<int>(value);
+    } else if (name == "alt_ratio") {
+      para.alt_ratio = value;
+    } else if (name == "alt_max_mass") {
+      para.alt_max_mass = value;
+    } else if (name == "refit_rounds") {
+      para.refit_rounds = static_cast<int>(value);
     } else if (name == "nb_consistent") {
       para.nb_consistent = static_cast<int>(value);
     } else if (name == "near_no_pen") {
@@ -281,6 +303,9 @@ class GreedySearch {
 
   double getMinInte() const { return min_inte_; }
 
+  // the alternative masses (GreedyMs2Para::alt_ratio)
+  const FitVec& getAlts() const { return alts_; }
+
  private:
   const GreedyMs2Para& para_;
   EnvParaPtr env_para_ptr_;
@@ -295,6 +320,8 @@ class GreedySearch {
   std::unordered_map<int, Distr> distr_cache_;
   // the masses found so far, per charge
   std::vector<std::vector<double>> found_masses_;
+  // the alternative masses one isotope away (alt_ratio)
+  FitVec alts_;
 
   const Distr& getDistr(double mono_mass);
 
@@ -322,6 +349,11 @@ class GreedySearch {
   bool isHarmonic(const Fit& fit);
 
   void subtract(const FitVec& series);
+
+  void addContrib(const Fit& fit, std::vector<double>& contrib,
+                  double sign);
+
+  void refit(std::vector<FitVec>& result);
 };
 
 GreedySearch::GreedySearch(const PeakPtrVec& peak_list,
@@ -877,6 +909,22 @@ std::vector<FitVec> GreedySearch::run() {
         best_series[0].cos < para_.single_min_cos) {
       continue;
     }
+    // the alternative mass one isotope away (alt_ratio)
+    if (para_.alt_ratio > 0 && best_series[0].mono_mass < para_.alt_max_mass) {
+      const Fit& chosen = best_series[0];
+      double min_score = para_.alt_ratio * chosen.score();
+      Fit best_alt;
+      for (int k = -1; k <= 1; k += 2) {
+        Fit alt = fitEnv(chosen.mono_mass + k * iso_mass, chosen.charge);
+        if (passes(alt, para_.min_cos) && alt.score() >= min_score &&
+            (!best_alt.valid || alt.score() > best_alt.score())) {
+          best_alt = std::move(alt);
+        }
+      }
+      if (best_alt.valid) {
+        alts_.push_back(std::move(best_alt));
+      }
+    }
     // 3. subtract the envelopes of the mass at all its charges
     subtract(best_series);
     for (const Fit& fit : best_series) {
@@ -893,7 +941,91 @@ std::vector<FitVec> GreedySearch::run() {
     }
     result.push_back(std::move(best_series));
   }
+  refit(result);
   return result;
+}
+
+// adds (sign 1) or removes (sign -1) the theoretical intensities of a fit's
+// matched isotopes to or from their peaks
+void GreedySearch::addContrib(const Fit& fit, std::vector<double>& contrib,
+                              double sign) {
+  const Distr& distr = getDistr(fit.mono_mass);
+  for (int i = fit.first; i <= fit.last; i++) {
+    int idx = fit.peak_idxes[i];
+    if (idx >= 0) {
+      contrib[idx] += sign * fit.scale * distr.intes[i];
+    }
+  }
+}
+
+// The refit pass (GreedyMs2Para::refit_rounds).
+void GreedySearch::refit(std::vector<FitVec>& result) {
+  double iso_mass = mass_constant::getIsotopeMass();
+  auto eraseMass = [this](int charge, double mass) {
+    std::vector<double>& masses = found_masses_[charge];
+    auto it = std::find(masses.begin(), masses.end(), mass);
+    if (it != masses.end()) {
+      masses.erase(it);
+    }
+  };
+  for (int round = 0; round < para_.refit_rounds; round++) {
+    std::vector<double> contrib(intes_.size(), 0.0);
+    for (const FitVec& series : result) {
+      for (const Fit& fit : series) {
+        addContrib(fit, contrib, 1);
+      }
+    }
+    int changed = 0;
+    for (FitVec& series : result) {
+      for (const Fit& fit : series) {
+        addContrib(fit, contrib, -1);
+        eraseMass(fit.charge, fit.mono_mass);
+      }
+      // the spectrum without the other masses' envelopes
+      for (std::size_t p = 0; p < intes_.size(); p++) {
+        residuals_[p] = std::max(intes_[p] - contrib[p], 0.0);
+      }
+      double mass = series[0].mono_mass;
+      int charge = series[0].charge;
+      Fit cur = fitEnv(mass, charge);
+      double best_score = cur.valid ? cur.score() : 0;
+      int best_k = 0;
+      for (int k = -1; k <= 1; k += 2) {
+        Fit alt = fitEnv(mass + k * iso_mass, charge);
+        if (passes(alt, para_.min_cos) && alt.score() > best_score) {
+          best_score = alt.score();
+          best_k = k;
+        }
+      }
+      if (best_k != 0) {
+        double new_mass = mass + best_k * iso_mass;
+        FitVec moved;
+        for (const Fit& fit : series) {
+          Fit alt = fitEnv(new_mass, fit.charge);
+          double min_cos =
+              fit.charge == charge ? para_.min_cos : para_.nb_min_cos;
+          if (passes(alt, min_cos)) {
+            moved.push_back(std::move(alt));
+          }
+        }
+        if (!moved.empty() && moved[0].charge == charge) {
+          if (debug_os_ != nullptr) {
+            *debug_os_ << "refit mass " << mass << " charge " << charge
+                       << " -> " << new_mass << "\n";
+          }
+          series = std::move(moved);
+          changed++;
+        }
+      }
+      for (const Fit& fit : series) {
+        addContrib(fit, contrib, 1);
+        found_masses_[fit.charge].push_back(fit.mono_mass);
+      }
+    }
+    if (changed == 0) {
+      break;
+    }
+  }
 }
 
 // The envelope of a fit as main's MatchEnv: the EnvBase distribution of the
@@ -945,6 +1077,12 @@ MatchEnvPtrVec deconv(const PeakPtrVec& peak_list,
       if (env != nullptr) {
         envs.push_back(env);
       }
+    }
+  }
+  for (const Fit& fit : search.getAlts()) {
+    MatchEnvPtr env = getMatchEnv(peak_list, fit, env_para_ptr, min_inte);
+    if (env != nullptr) {
+      envs.push_back(env);
     }
   }
   // as DeconvSingleSp::postprocess
