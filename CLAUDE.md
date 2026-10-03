@@ -559,7 +559,15 @@ rows) is written as `DeconvSingleSp`'s. Facts to keep straight:
   <scan>` writes one scan's decisions to `greedy_ms2_scan<scan>.txt`.
   Switches kept off by default are listed there with their experiment 106
   results (`refit_rounds`, `alt_ratio`, `mono_by`, `score_mode` 2, ...).
-- **Results**: see toppic_test report 0106.
+- **Results** (toppic_test experiment 106, report 0106): on 480_F3_02
+  with main's TopPIC in the benchmark setting, 3,296-3,298 PrSMs, 1,961-
+  1,964 proteoforms and 427 proteins against main's 3,141 / 1,870 / 420 on
+  the same MS1 output (+200 to +225 targets at E <= 1e-5 to 0.01, no more
+  decoys); with `--ms1-greedy-deconv` too 3,315 / 1,980 / 433. The gain is
+  15% more b/y fragments of the identified proteoforms at main's precision
+  (mostly 1,000-5,000 Da: right charges and isotopes, and envelopes the DP
+  did not report). The MS/MS stage takes about 100 s against main's 135 s
+  at 16 threads. Without the option the branch writes main's output.
 
 ## Post mass matching (`prsm/prsm_post_mass_match`, toppic only)
 
