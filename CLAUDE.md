@@ -447,6 +447,71 @@ deconvoluted with the FLASHDeconv algorithm (OpenMS `SpectralDeconvolution`,
   `DeconvMs2Process`), decoy / FDR runs, target masses, and the tolerance
   auto-estimation.
 
+## Greedy MS1 deconvolution (`topfd/deconv/greedy_ms1_deconv`, `--ms1-greedy-deconv`)
+
+`deconv_ms1_process::deconvMsOneGreedy` is the alternative to `deconvMsOne`
+selected by the hidden topfd option `--ms1-greedy-deconv`
+(`TopfdPara::isMs1GreedyDeconv`; the parameter block then prints
+"MS1 deconvolution: Greedy", and only then, so that default output files
+keep main's block). It replaces the precursor-window step and
+`DeconvSingleSp` (candidate envelopes, filters, DP) for MS1 spectra with
+`greedy_ms1_deconv::deconv`, a THRASH-like subtractive search in which a
+peak's charge is decided with all the charge states of its mass; the
+output (msalign lines per charge state, EnvCNN scores, SQLite rows) is
+written by the same `writeMsOne` as `deconvMsOne`'s. Facts to keep straight:
+
+- **One spectrum** (`GreedySearch::run`): the most intense peak of the
+  residual spectrum (residual >= noise x MS1 S/N, the thresholds of
+  `DeconvData::initMinInte`) is the seed; for every charge z with a peak one
+  isotope spacing from the seed (pre-check), the EnvBase distribution's apex
+  is aligned with the seed, scaled to the residual intensities of its core
+  isotopes (>= 0.5 x apex, least squares), and extended to the same mass at
+  z-1, z-2, ... and z+1, z+2, ... while those envelopes fit (isotope cosine
+  >= 0.6, the apex matched, `min_match_peak_num_`; one failing charge in a
+  row allowed). The charge whose series has the highest score wins; an
+  envelope's score is the explained intensity (sum of min(observed,
+  theoretical)) minus the theoretical intensity predicted where there is no
+  peak, times the squared isotope cosine (`score_mode` 1). Then the
+  monoisotopic offset (+-2 isotopes) is chosen by the cosine of the
+  averagine distribution with the isotope intensities summed over the
+  series' charges (`mono_by` 1, FLASHDeconv's
+  `getIsotopeCosineAndIsoOffset`), and the mass's envelopes at all its
+  charges are subtracted: a matched peak above 1.5x its theoretical
+  intensity keeps the difference, others are used up, and the tail
+  isotopes up to where the observed series stops or rises again are removed
+  whole (`dyn_bound`).
+- **Guards against artefacts**: an envelope within 3.5 Da of a mass already
+  found at the same charge is not used (`dup_window`, as main's 12 Da
+  `filterEnvByMz`; without it about 20% of a dense spectrum's masses have
+  a same-charge near-duplicate, mostly from peaks the earlier envelope never
+  matched rather than from its residual, and the feature detection merges
+  them, so the identifications do not change); a seed charge z whose
+  isotopes off the grid of every 2nd/3rd isotope are much weaker than those
+  on it is rejected as a harmonic (`harm_ratio` 0.4); a mass found at one
+  charge only needs an isotope cosine of 0.8 (`single_min_cos`); envelopes
+  with an EnvCNN score below 0.2 are not written (`min_envcnn`; a third of
+  the envelopes, which only seeded extra MS1 features).
+- **Research switches**: the defaults are in `GreedyPara` (cpp); the
+  environment variable `TOPFD_GREEDY_PARA` ("name=value,...") overrides
+  them, so that variants can be run without a rebuild (toppic_test
+  experiment 104 lists the runs). `TOPFD_GREEDY_DEBUG_SCAN=<scan>` writes
+  the decisions of one MS1 scan to `greedy_scan<scan>.txt` in the working
+  directory.
+- **Cost**: the search itself is cheap (about 70 ms per 480_F3_02 MS1
+  spectrum); almost all of the extra MS1 time against main is EnvCNN on
+  the envelopes before the `min_envcnn` filter (about twice main's
+  number).
+- **Results** (toppic_test experiment 104, report 0104): on 480_F3_02
+  with main's TopPIC in the benchmark setting, 3,181-3,182 PrSMs, 1,887
+  proteoforms and 425 proteins against main's 3,141-3,153 / 1,870 / 420;
+  the gain is corrected precursor isotopes and charges (and fewer decoys
+  on the spectra whose precursor changed). TopFD takes about the same time
+  (334-336 s against 285-333 s) and memory. Without the option the branch
+  writes main's masses, precursors and features.
+- **Not done**: the precursor-window step of `deconvMsOne` (switch
+  `prec_win` runs it first; it did not change the identifications), the
+  MS/MS spectra, and FAIMS/`-T` specifics (the MS1 path is the same).
+
 ## Post mass matching (`prsm/prsm_post_mass_match`, toppic only)
 
 After the search, the clustering, the cluster protein correction and the
