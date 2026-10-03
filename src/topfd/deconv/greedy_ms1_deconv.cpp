@@ -63,6 +63,12 @@ struct GreedyPara {
   double keep_ratio = 1.5;
   // weight of the theoretical intensity predicted where there is no peak
   double miss_weight = 1.0;
+  // the score of an envelope: explained intensity minus the weighted
+  // intensity predicted where there is no peak (0), or that times the
+  // squared isotope cosine (1; the cos^2 weighting of FLASHDeconv's SNR), so
+  // that a charge 2z envelope that matches the peaks of a charge z envelope
+  // and unrelated peaks between them in a dense region loses to charge z
+  int score_mode = 0;
   // monoisotopic offsets (isotopes) searched around the apex alignment
   int max_offset = 2;
   // times a peak may be the seed
@@ -79,6 +85,17 @@ struct GreedyPara {
   // intensity beyond the distribution counted (1; FLASHDeconv's
   // getIsotopeCosineAndIsoOffset)
   int mono_by = 0;
+  // the envelope boundary of the subtraction found from the observed peaks
+  // (1) or the isotopes fitted (0): from the apex outwards, the envelope goes
+  // on while the next isotope has a peak whose residual intensity is at most
+  // dyn_rise x that of the isotope before it; inside the boundary the tail
+  // isotopes (below core_ratio) and the isotopes beyond the fitted ones are
+  // removed whole, so that a tail wider than the averagine distribution
+  // leaves no residual to seed an isotope-shifted copy of the mass
+  int dyn_bound = 0;
+  double dyn_rise = 1.2;
+  // isotopes beyond the fitted ones the boundary may reach
+  int dyn_max_ext = 6;
   // main's precursor-window step first (1) or not (0)
   int prec_win = 0;
   // main's mzRefine (monoisotopic choice per envelope) on the result
@@ -118,6 +135,8 @@ GreedyPara readPara() {
       para.keep_ratio = value;
     } else if (name == "miss_weight") {
       para.miss_weight = value;
+    } else if (name == "score_mode") {
+      para.score_mode = static_cast<int>(value);
     } else if (name == "max_offset") {
       para.max_offset = static_cast<int>(value);
     } else if (name == "max_seed_num") {
@@ -134,6 +153,12 @@ GreedyPara readPara() {
       para.min_explained_frac = value;
     } else if (name == "mono_by") {
       para.mono_by = static_cast<int>(value);
+    } else if (name == "dyn_bound") {
+      para.dyn_bound = static_cast<int>(value);
+    } else if (name == "dyn_rise") {
+      para.dyn_rise = value;
+    } else if (name == "dyn_max_ext") {
+      para.dyn_max_ext = static_cast<int>(value);
     } else {
       LOG_WARN("Unknown TOPFD_GREEDY_PARA entry " << name);
     }
@@ -179,7 +204,10 @@ struct Fit {
   int last = -1;
   // per isotope of the distribution: the matched peak or -1
   std::vector<int> peak_idxes;
-  double score() const { return explained - getPara().miss_weight * penalty; }
+  double score() const {
+    double score = explained - getPara().miss_weight * penalty;
+    return getPara().score_mode == 1 ? score * cos * cos : score;
+  }
 };
 
 using FitVec = std::vector<Fit>;
@@ -221,6 +249,8 @@ class GreedySearch {
   static double seriesScore(const FitVec& series);
 
   int getAggregateOffset(const FitVec& series);
+
+  std::vector<int> getTailPeaks(const Fit& fit);
 
   void subtract(const FitVec& series);
 };
@@ -501,6 +531,10 @@ int GreedySearch::getAggregateOffset(const FitVec& series) {
 void GreedySearch::subtract(const FitVec& series) {
   for (const Fit& fit : series) {
     const Distr& distr = getDistr(fit.mono_mass);
+    std::vector<int> whole;
+    if (para_.dyn_bound != 0) {
+      whole = getTailPeaks(fit);
+    }
     for (int i = fit.first; i <= fit.last; i++) {
       int idx = fit.peak_idxes[i];
       if (idx < 0) {
@@ -513,7 +547,60 @@ void GreedySearch::subtract(const FitVec& series) {
         residuals_[idx] = 0;
       }
     }
+    for (int idx : whole) {
+      residuals_[idx] = 0;
+    }
   }
+}
+
+// The peaks the subtraction of a fit removes whole (dyn_bound): from the
+// apex outwards on each side, the isotopes up to the boundary where the
+// observed series stops (no peak) or rises again (residual > dyn_rise x the
+// residual of the isotope before it); of those, the tail isotopes (relative
+// intensity below core_ratio) and the isotopes beyond the fitted ones.
+std::vector<int> GreedySearch::getTailPeaks(const Fit& fit) {
+  std::vector<int> result;
+  const Distr& distr = getDistr(fit.mono_mass);
+  int n = static_cast<int>(distr.intes.size());
+  int z = fit.charge;
+  double mono_mz = fit.mono_mass / z + mass_constant::getProtonMass();
+  double tolerance = env_para_ptr_->getMzTolerance(z);
+  double iso_mass = mass_constant::getIsotopeMass();
+  auto peakAt = [&](int i) {
+    if (i >= fit.first && i <= fit.last) {
+      return fit.peak_idxes[i];
+    }
+    double offset = (i >= 0 && i < n) ? distr.offsets[i]
+                                      : distr.offsets[0] + i * iso_mass;
+    int idx = findPeak(mono_mz + offset / z, tolerance);
+    return (idx >= 0 && intes_[idx] >= min_inte_) ? idx : -1;
+  };
+  int apex_idx = fit.peak_idxes[distr.apex];
+  if (apex_idx < 0) {
+    return result;
+  }
+  for (int dir = -1; dir <= 1; dir += 2) {
+    double prev = residuals_[apex_idx];
+    int stop = dir > 0 ? fit.last + para_.dyn_max_ext
+                       : fit.first - para_.dyn_max_ext;
+    for (int i = distr.apex + dir; dir > 0 ? i <= stop : i >= stop; i += dir) {
+      if (i < 0) {
+        break;
+      }
+      int idx = peakAt(i);
+      if (idx < 0 || residuals_[idx] <= 0 ||
+          residuals_[idx] > para_.dyn_rise * prev) {
+        break;
+      }
+      prev = residuals_[idx];
+      bool tail = i < fit.first || i > fit.last ||
+                  distr.intes[i] < para_.core_ratio;
+      if (tail) {
+        result.push_back(idx);
+      }
+    }
+  }
+  return result;
 }
 
 std::vector<FitVec> GreedySearch::run() {
