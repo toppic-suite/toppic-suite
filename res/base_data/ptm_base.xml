@@ -176,8 +176,8 @@
 <ptm>
   <name>Diphthamide</name>
   <abbreviation>Diphthamide</abbreviation>
-  <unimod>-1</unimod>
-  <mono_mass>143.117890</mono_mass>
+  <unimod>375</unimod>
+  <mono_mass>142.110613</mono_mass>
 </ptm>
 <ptm>
   <name>AMP</name>
@@ -236,8 +236,8 @@
 <ptm>
   <name>Cholinephosphoryl</name>
   <abbreviation>Cholinephosphoryl</abbreviation>
-  <unimod>-1</unimod>
-  <mono_mass>166.062756</mono_mass>
+  <unimod>2139</unimod>
+  <mono_mass>165.055480</mono_mass>
 </ptm>
 <ptm>
   <name>Phosphopantetheine</name>
