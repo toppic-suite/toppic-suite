@@ -29,10 +29,14 @@ inline double getAmmoniaMass() { /* AME2020 */ return 17.026549099944; }
 
 /**
  * Returns the mass difference between two isotopic peaks.
- * The value is from the paper of the deconvolution tool Thrash.
- * We also double checked with the averagine molecule C494 H776 N136 O148 S4
+ * 1.00228 Da: the spacing between neighbouring isotope peaks at the apex of
+ * human averagine envelopes above about 5 kDa (toppic_test experiments 107,
+ * 108 and 111: the human averagine of the UniProt human reference proteome,
+ * AME2020 masses and IUPAC abundances; 1.00228-1.00231 Da from 1 to 100
+ * kDa). It was 1.00235 Da, from the paper of the deconvolution tool Thrash,
+ * which matches older isotope abundances.
  */
-inline double getIsotopeMass() { /* from Thrash paper */ return 1.00235; }
+inline double getIsotopeMass() { return 1.00228; }
 
 /**
  * Returns the mass of an oxygen atom.
