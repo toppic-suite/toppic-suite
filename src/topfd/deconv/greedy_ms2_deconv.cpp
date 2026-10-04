@@ -87,8 +87,8 @@ struct GreedyMs2Para {
   double dyn_rise = 1.2;
   int dyn_max_ext = 6;
   // a charge z is tried for a seed only when a peak lies one isotope
-  // spacing (1.00235 / z) from it on either side (1), also at the averagine
-  // distribution's own spacing around its apex (2), or always (0)
+  // spacing (getIsotopeMass() / z) from it on either side (1), also at the
+  // averagine distribution's own spacing around its apex (2), or always (0)
   int precheck = 2;
   // harmonic test of the seed charge z (0 = none), as in greedy_ms1_deconv;
   // off for MS/MS: with 0.4 it cost fragments in toppic_test experiment 106
@@ -110,7 +110,7 @@ struct GreedyMs2Para {
   // closer than 2 Da (in one 480_F3_02 spectrum the b/y fragments 1,951.94
   // Da at charge 2 and 627.33 Da at charge 1 lie 1.93 and 0.95 Da from more
   // intense masses of the same charge); an isotope-shifted copy of a mass
-  // is k x 1.00235 Da away.
+  // is k x getIsotopeMass() away.
   int dup_iso = 1;
   double dup_ppm = 20;
   // every charge competes with the best of its isotope offsets (1), or with
@@ -559,10 +559,10 @@ bool GreedySearch::passes(const Fit& fit, double min_cos) const {
 
 // The charge pre-check (GreedyMs2Para::precheck): whether a peak lies one
 // isotope spacing from the seed at the charge, on either side. The spacing
-// is the averaged 1.00235 Da or, with precheck 2, also the spacing of the
+// is getIsotopeMass() or, with precheck 2, also the spacing of the
 // averagine distribution around its apex at the seed's mass: the M+1 peak
 // of averagine is 1.00286 Da from its monoisotopic peak at every mass
-// (toppic_test experiment 107), 3 ppm from the averaged spacing at m/z 203
+// (toppic_test experiment 107), 3 ppm from the constant at m/z 203
 // and charge 1, so that a few ppm of measurement error put it outside a
 // 5 ppm window (6 ppm in a 480_F3_02 spectrum).
 bool GreedySearch::hasNeighbourPeak(int seed, int charge, double ref_mass) {

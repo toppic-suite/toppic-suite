@@ -99,8 +99,8 @@ struct GreedyPara {
   // isotopes beyond the fitted ones the boundary may reach
   int dyn_max_ext = 6;
   // a charge z is tried for a seed only when a peak lies one isotope
-  // spacing (1.00235 / z) from it on either side (1; DeconTools' charge
-  // check) or always (0)
+  // spacing (getIsotopeMass() / z) from it on either side (1; DeconTools'
+  // charge check) or always (0)
   int precheck = 1;
   // harmonic test of the seed charge z (0 = none): for f = 2, 3 dividing z,
   // the observed / theoretical intensity ratio of the isotopes off the grid

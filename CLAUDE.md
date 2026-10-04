@@ -553,9 +553,11 @@ rows) is written as `DeconvSingleSp`'s. Facts to keep straight:
     - the charge pre-check also accepts a neighbour peak at the averagine
       distribution's own isotope spacing (`precheck` 2): the M+1 peak of
       averagine is 1.00286 Da from the monoisotopic peak at every mass,
-      while 1.00235 fits the apex of envelopes above about 5 kDa
-      (toppic_test experiment 107); at m/z 200 and charge 1 the difference
-      is 2.5 ppm, half of the 5 ppm window.
+      while the isotope mass constant (`mass_constant::getIsotopeMass`,
+      1.00228 Da, the apex spacing of human averagine envelopes above about
+      5 kDa; 1.00235 before toppic_test experiment 111) fits the apex
+      (toppic_test experiments 107 and 108); at m/z 200 and charge 1 the
+      difference is 2.9 ppm, more than half of the 5 ppm window.
 - **Research switches**: `TOPFD_GREEDY_MS2_PARA` ("name=value,...")
   overrides the defaults in `GreedyMs2Para`; `TOPFD_GREEDY_MS2_DEBUG_SCAN=
   <scan>` writes one scan's decisions to `greedy_ms2_scan<scan>.txt`.
