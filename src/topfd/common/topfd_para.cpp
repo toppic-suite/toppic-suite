@@ -307,6 +307,12 @@ std::string TopfdPara::getTopfdParaStr(const std::string& prefix,
     kv("Fragment harmonic check:")
         << (ms2_harmonic_check_ ? "Yes" : "No") << std::endl;
   }
+  // printed only with the hidden option, so that the output files keep
+  // their parameter block
+  if (ms2_prec_pair_refine_) {
+    kv("Precursor isotope correction from fragment pairs:") << "Yes"
+                                                            << std::endl;
+  }
   kv("Filtering fragments using estimated fragment number:")
       << (aa_num_based_filter_ ? "Yes" : "No") << std::endl;
   kv("Reported precursor and fragment masses:")

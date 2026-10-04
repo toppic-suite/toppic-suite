@@ -87,6 +87,7 @@ class TopfdPara {
   bool isMs1GreedyDeconv() const { return ms1_deconv_method_ == "greedy"; }
   bool isMs2GreedyDeconv() const { return ms2_deconv_method_ == "greedy"; }
   bool isUseFlashDeconv() const { return ms2_deconv_method_ == "flashdeconv"; }
+  bool isMs2PrecPairRefine() const { return ms2_prec_pair_refine_; }
   int getThreadNum() const { return thread_num_; }
   double getMs1EcscoreCutoff() const { return ms1_ecscore_cutoff_; }
   double getMs2EcscoreCutoff() const { return ms2_ecscore_cutoff_; }
@@ -152,6 +153,7 @@ class TopfdPara {
   // (getMs2DeconvMethods())
   bool setMs1DeconvMethod(const std::string& method);
   bool setMs2DeconvMethod(const std::string& method);
+  void setMs2PrecPairRefine(bool refine) { ms2_prec_pair_refine_ = refine; }
   void setMaxMissPeakNum(int num) { max_miss_peak_num_ = num; }
   void setMsOneRankPeakDistance(double d) { ms1_rank_peak_distance_ = d; }
   void setMsTwoRankPeakDistance(double d) { ms2_rank_peak_distance_ = d; }
@@ -295,6 +297,10 @@ class TopfdPara {
   // DeconvSingleSp; TopDIA's default) or "flashdeconv" (FlashDeconvMs2Process
   // instead of DeconvMs2Process)
   std::string ms2_deconv_method_ = "greedy";
+  // hidden option --ms2-prec-pair-refine: the precursor masses of an MS/MS
+  // spectrum corrected by whole isotopes with the complementary pairs of its
+  // fragment masses (prec_pair_refine::correctIsotopes)
+  bool ms2_prec_pair_refine_ = false;
 
   //** information for each run **
   int frac_id_ = -1;

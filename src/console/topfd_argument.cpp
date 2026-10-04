@@ -210,6 +210,10 @@ bool Argument::parse(int argc, char* argv[]) {
         po::value<std::string>(&ms2_rank_peak_distance),
         "<a positive number>. The same window for MS/MS spectra. The default "
         "value is 2.")(
+        "ms2-prec-pair-refine",
+        "Correct the precursor masses of an MS/MS spectrum by whole isotopes "
+        "with the sums of pairs of its fragment masses (complementary b and "
+        "y ions) and the precursor's MS1 envelope (experimental).")(
         "disable-ms2-harmonic-check",
         "Skip the harmonic check of MS/MS spectra, which replaces an envelope "
         "by a better scoring harmonic parent mass.")(
@@ -383,6 +387,9 @@ bool Argument::parse(int argc, char* argv[]) {
       LOG_ERROR("MS/MS deconvolution method " << deconv_ms2
                 << " should be greedy, msdeconv or flashdeconv.");
       return false;
+    }
+    if (vm.count("ms2-prec-pair-refine")) {
+      topfd_para_ptr_->setMs2PrecPairRefine(true);
     }
 
     if (vm.count("mass-group-boundary")) {
