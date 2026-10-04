@@ -5,9 +5,11 @@ MS/MS spectra, makes one representative spectrum per cluster, gives it the
 cluster's best identification and a decoy spectrum, and writes the targets
 and decoys into a SQLite database. It is a C++ port of the library building
 of TopLib (`src/ms_library_building.py`) and writes the same table, with two
-differences: spectra identified as different proteoforms are never put in
-one cluster (step 2 in section 2), and the PrSM table's columns are also
-found under the names TopPIC 1.9 and 2.0 give them (section 1).
+differences: the PrSM table's columns are also found under the names TopPIC
+1.9 and 2.0 give them (section 1), and a proteoform is its proteoform id and
+protein accession, not its id alone (step 4 in section 2). With
+`--disable-different-proteoform-merge`, spectra identified as different
+proteoforms are never put in one cluster (step 2 in section 2).
 
 ```sh
 toplib_build [options] <msalign file> [<PrSM file>]
@@ -85,13 +87,19 @@ and masses above the precursor mass are left out.
    (average linkage, cosine distance at most 0.7). The cosine distance uses
    the 50 most intense masses of each spectrum with log2 intensities
    scaled to unit length; two masses of equal charge match when they differ
-   by at most 10 ppm, or by 1.00235 Da within 10 ppm. Two spectra
-   identified as different proteoforms (a different proteoform id or
-   protein accession) are never put in one cluster, however similar their
-   spectra; unidentified spectra can join any cluster. (TopPIC 1.9 could
-   give PrSMs of different proteins one proteoform id; 2.0 does not.) (TopLib's script lets them share a cluster, whose
-   representative then keeps only one of their identifications, so the
-   other proteoforms can be left without a representative.)
+   by at most 10 ppm, or by 1.00235 Da within 10 ppm. As in TopLib's
+   script, spectra identified as different proteoforms can share a
+   cluster; its representative then keeps only one of their
+   identifications (step 4), so the other proteoforms can be left without
+   a representative. With `--disable-different-proteoform-merge`, two
+   spectra identified as different proteoforms (a different proteoform id
+   or protein accession) are never put in one cluster, however similar
+   their spectra: in the spectral clustering such a pair gets the distance
+   n × n instead of its cosine distance, n the number of spectra in the
+   precursor mass cluster, which keeps every cluster holding both above
+   the 0.7 cutoff. Unidentified spectra can join any cluster. (TopPIC 1.9
+   could give PrSMs of different proteins one proteoform id; 2.0 does
+   not.)
 3. **Makes one representative per cluster.** `average` (the default)
    merges the members' spectra (all masses): masses of equal charge within
    10 ppm are combined into their intensity-weighted mean mass with the
@@ -151,6 +159,7 @@ numbers and TEXT otherwise, and `cluster_id` is REAL.
 | `-r`, `--representative <average\|single>` | average | The representative spectrum of a cluster: the merged spectrum of its members, or its member with the lowest E-value. |
 | `-c`, `--ppir-cutoff <0..1>` | 0 | Keep only the spectra whose first precursor has at least this fraction of the summed intensity of the spectrum's precursors (the precursor-to-precursor intensity ratio); 0 keeps all spectra. |
 | `-o`, `--output <file>` | TopLib/lib_spectra_ms2.db | The library database. |
+| `--disable-different-proteoform-merge` | off | Never put spectra identified as different proteoforms (a different proteoform id or protein accession) in one cluster, so that every proteoform keeps a representative. By default they are clustered by their spectral similarity like any other spectra, and a cluster's representative keeps the identification of one of them. |
 
 ## 5. Examples
 
@@ -167,6 +176,12 @@ least 0.5:
 
 ```sh
 toplib_build -r single -c 0.5 -o single_lib.db sample_ms2.msalign sample_ms2_toppic_prsm_single.tsv
+```
+
+The first library, with a representative for every proteoform:
+
+```sh
+toplib_build --disable-different-proteoform-merge sample_ms2.msalign sample_ms2_toppic_prsm_single.tsv
 ```
 
 A library from a library msalign file:

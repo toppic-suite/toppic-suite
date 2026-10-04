@@ -36,6 +36,7 @@ std::map<std::string, std::string> ToplibBuildArgument::initArguments() {
   arguments["ppirCutoff"] = "0";
   arguments["outputFileName"] = "TopLib/lib_spectra_ms2.db";
   arguments["clusterFileName"] = "";
+  arguments["disableDifferentProteoformMerge"] = "false";
   arguments["pythonCompatible"] = "false";
   return arguments;
 }
@@ -57,6 +58,12 @@ void ToplibBuildArgument::outputArguments(
          << arguments["ppirCutoff"] << std::endl;
   output << std::setw(gap) << std::left << "Output file:" << "\t"
          << arguments["outputFileName"] << std::endl;
+  output << std::setw(gap) << std::left << "Different proteoform merge:"
+         << "\t"
+         << (arguments["disableDifferentProteoformMerge"] == "true"
+                 ? "disabled"
+                 : "enabled")
+         << std::endl;
   if (arguments["pythonCompatible"] == "true") {
     output << std::setw(gap) << std::left << "Python compatible:" << "\t"
            << "true" << std::endl;
@@ -94,12 +101,18 @@ bool ToplibBuildArgument::parse(int argc, char* argv[]) {
         "Default: 0 (keep all spectra).")(
         "output,o", po::value<std::string>(&output),
         "<file name>. The library database. Default: "
-        "TopLib/lib_spectra_ms2.db.");
+        "TopLib/lib_spectra_ms2.db.")(
+        "disable-different-proteoform-merge",
+        "Never put spectra identified as different proteoforms (a different "
+        "proteoform id or protein accession) in one cluster, so that every "
+        "proteoform keeps a representative. By default they are clustered by "
+        "their spectral similarity like any other spectra, and a cluster's "
+        "representative keeps the identification of one of them.");
     po::options_description desc("Options");
     desc.add(display_desc);
     // hidden: the cluster of every spectrum, for testing; the Python
-    // script's behaviour (spectra of different proteoforms may share a
-    // cluster, TopLib's PrSM table column names only), for comparing with it
+    // script's behaviour (TopLib's PrSM table column names only, one
+    // identified cluster per proteoform id and charge), for comparing with it
     desc.add_options()("cluster-file", po::value<std::string>(&cluster_file),
                        "")("python-compatible", "")("input-file",
                            po::value<std::vector<std::string>>()->multitoken(),
@@ -151,6 +164,9 @@ bool ToplibBuildArgument::parse(int argc, char* argv[]) {
     }
     if (vm.count("cluster-file")) {
       arguments_["clusterFileName"] = cluster_file;
+    }
+    if (vm.count("disable-different-proteoform-merge")) {
+      arguments_["disableDifferentProteoformMerge"] = "true";
     }
     if (vm.count("python-compatible")) {
       arguments_["pythonCompatible"] = "true";

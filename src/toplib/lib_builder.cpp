@@ -402,6 +402,7 @@ void filterPpir(LibData& data, double cutoff) {
 }
 
 LibLibrary build(const LibData& data, LibRepMethod method,
+                 bool disable_different_proteoform_merge,
                  bool python_compatible) {
   LibLibrary lib;
   lib.input_spectrum_num = static_cast<int>(data.spectra.size());
@@ -446,11 +447,12 @@ LibLibrary build(const LibData& data, LibRepMethod method,
   lib.precursor_cluster_num = static_cast<int>(prec_clusters.size());
 
   // clustering_index_50peaks: average linkage on the cosine distances.
-  // Unlike the Python script, two spectra identified as different
-  // proteoforms are never put in one cluster; unidentified spectra may join
-  // any cluster. A proteoform is its proteoform id and protein accession:
-  // TopPIC 1.9 gave PrSMs of different proteins one proteoform id when they
-  // shared a precursor feature (2.0 corrects them to one protein).
+  // With disable_different_proteoform_merge, unlike the Python script, two
+  // spectra identified as different proteoforms are never put in one
+  // cluster; unidentified spectra may join any cluster. A proteoform is its
+  // proteoform id and protein accession: TopPIC 1.9 gave PrSMs of different
+  // proteins one proteoform id when they shared a precursor feature (2.0
+  // corrects them to one protein).
   int form_id_col = columnIndex(data.id_columns, "proteoform_id");
   int acc_col = columnIndex(data.id_columns, "protein_accession");
   std::vector<std::pair<LibValue, LibValue>> forms(spec_num);
@@ -464,8 +466,9 @@ LibLibrary build(const LibData& data, LibRepMethod method,
       }
     }
   }
-  auto different_forms = [&forms, python_compatible](int a, int b) {
-    return !python_compatible &&
+  auto different_forms = [&forms, disable_different_proteoform_merge](int a,
+                                                                      int b) {
+    return disable_different_proteoform_merge &&
            !std::holds_alternative<std::monostate>(forms[a].first) &&
            !std::holds_alternative<std::monostate>(forms[b].first) &&
            forms[a] != forms[b];
