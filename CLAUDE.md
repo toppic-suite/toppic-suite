@@ -393,11 +393,57 @@ rows. `assignIntensity` (called before `mzRefine` and again after sorting)
 only splits an experimental peak among envelopes that share it; it never
 changes theoretical intensities. The greedy MS1 and MS/MS searches (TopFD's
 defaults) do not run this refinement. When touching any of this, validate
-with `topfd -T -g --deconv-ms2-msdeconv` on the myoglobin peak list (without
+with `topfd -T -g --deconv-ms2 msdeconv` on the myoglobin peak list (without
 the option `-T` runs the greedy search): compare the deconvoluted masses
 against the sequence's b/y ions (46 exact / 14 off-by-one-isotope is the
 reference), and count envelopes whose theoretical apex exceeds the observed
 apex by > 20% (77 of 611 before the core fit, 1 after).
+
+## Deconvolution methods (`--deconv-ms1`, `--deconv-ms2`)
+
+topfd and topdia choose the deconvolution of each spectrum level with two
+visible options: `--deconv-ms1 <greedy|msdeconv>` and `--deconv-ms2
+<greedy|msdeconv|flashdeconv>` (`greedy`: the greedy searches of the next
+sections; `msdeconv`: MS-Deconv's dynamic programming, `DeconvSingleSp`;
+`flashdeconv`: the FLASHDeconv port below). Facts to keep straight:
+
+- **`TopfdPara` stores the names** (`ms1_deconv_method_`,
+  `ms2_deconv_method_`; `getMs1DeconvMethods()` / `getMs2DeconvMethods()`
+  list the accepted values, `setMs1DeconvMethod` / `setMs2DeconvMethod`
+  return false for any other, which both parsers report as an error). The
+  drivers ask `isMs1GreedyDeconv()`, `isMs2GreedyDeconv()` and
+  `isUseFlashDeconv()`, so a new method is a new name plus its branch in
+  `deconv_ms1_process::geneTask`, `deconv_ms2_process::deconvMsTwo`,
+  `topfd_single_process` or the `topfd_process` / `topdia_process` choice
+  of the MS/MS process class.
+- **Defaults differ by tool**: `TopfdPara`'s own default, TopFD's, is
+  `greedy` for both; TopDIA's `getTopfdParaPtrForTopdia` sets `msdeconv` for
+  both (the greedy searches were measured on DDA data only), so a default
+  TopDIA run is unchanged. TopDIA's MS/MS step (`ms2_raw.msalign`, run with
+  `setMissingLevelOne(true)`) can use `FlashDeconvMs2Process`, which handles
+  the missing-MS1 mode as `DeconvMs2Process` does.
+- **`-T` refuses `flashdeconv`** (the FLASHDeconv process reads mzML files
+  only); before, `-F` was silently ignored there.
+- **Parameter block**: "MS1 deconvolution: Greedy" and "MS/MS
+  deconvolution: Greedy" / "FLASHDeconv" are printed only for those methods,
+  so `msdeconv` output (and TopDIA's default output) keeps the earlier block
+  with the DP's ranking window and harmonic check lines.
+- **Removed options** (unrecognised now): `-F`/`--ms2-flashdeconv`, the
+  hidden `--ms1-greedy-deconv` / `--ms2-greedy-deconv`, and the short-lived
+  `--deconv-ms1-msdeconv` / `--deconv-ms2-msdeconv` of commit b3d71867.
+  The letter `-F` is free in topfd.
+- **GUI wiring**: `topfddialog.ui` and `topdiadialog.ui` have
+  `ms1DeconvComboBox` and `ms2DeconvComboBox`, whose item texts are the
+  option values (as `activationComboBox`'s are), set from the dialog's
+  default `TopfdPara` (TopFD: a default-constructed one; TopDIA:
+  `Argument::getTopfdParaPtrForTopdia`) and read back with
+  `setMs1DeconvMethod(currentText())`; `gui/util/command.cpp` always emits
+  `--deconv-ms1 <m> --deconv-ms2 <m>`. In topfd_gui they are the third
+  column's rows 4 and 5 (the window grew by 40 pixels, and the former "Use
+  FLASHDeconv for MS/MS" checkbox is gone); in topdia_gui the middle
+  column's rows 3 and 6 ("Use single scan noise level" moved into the
+  Additional settings box). The forms place widgets at fixed coordinates,
+  so moving one means editing the geometries of the widgets below it.
 
 ## FLASHDeconv MS/MS deconvolution (`topfd/deconv/flashdeconv_ms2_process`)
 
@@ -406,8 +452,9 @@ reading, one task per MS/MS spectrum on the thread pool, per-thread msalign
 files merged at the end and buffered SQLite records, but the spectrum is
 deconvoluted with the FLASHDeconv algorithm (OpenMS `SpectralDeconvolution`,
 `PeakGroup`, `PeakGroupScoring`, `FLASHHelperClasses`) instead of
-`DeconvSingleSp`. The option `topfd --ms2-flashdeconv` selects it
-(`TopfdPara::isUseFlashDeconv`, `topfd_process.cpp`). Facts to keep straight:
+`DeconvSingleSp`. `--deconv-ms2 flashdeconv` selects it in topfd and topdia
+(`TopfdPara::isUseFlashDeconv`, `topfd_process.cpp`, `topdia_process.cpp`;
+previous section). Facts to keep straight:
 
 - **Everything lives in the cpp**, in the namespace `flashdeconv_ms2_process`:
   `Averagine` (the theoretical distributions), `LogMzPeak`, `PeakGroup` (one
@@ -459,14 +506,10 @@ and `DeconvSingleSp` (candidate envelopes, filters, MS-Deconv's DP) of
 THRASH-like subtractive search in which a peak's charge is decided with all
 the charge states of its mass; the output (msalign lines per charge state,
 EnvCNN scores, SQLite rows) is written by the same `writeMsOne` as
-`deconvMsOne`'s. `deconvMsOne`, the default up to main 89df2a8c, runs with
-the visible topfd option `--deconv-ms1-msdeconv` (documented in the TopFD
-manual) and in TopDIA (`getTopfdParaPtrForTopdia` sets the flag false: the
-search was measured on DDA data only); the "MS1 deconvolution" line is
-printed only for the greedy search, so that those output files keep the
-earlier parameter block. The hidden `--ms1-greedy-deconv` that selected the
-search before it became the default is gone (an unrecognised option now).
-Facts to keep straight:
+`deconvMsOne`'s. `deconvMsOne`, TopFD's default up to main 89df2a8c, runs
+with `--deconv-ms1 msdeconv`, TopDIA's default (see "Deconvolution
+methods" above for the option, the defaults and the GUIs). Facts to keep
+straight:
 
 - **One spectrum** (`GreedySearch::run`): the most intense peak of the
   residual spectrum (residual >= noise x MS1 S/N, the thresholds of
@@ -519,7 +562,7 @@ Facts to keep straight:
   The search gives fewer MS/MS spectra a precursor on some data: 612 of
   1,381 against MS-Deconv's 855 on st_1.mzML (MS/MS-matched features 894
   against 1,158), 4,289 against 4,303 on 480_F3_02.
-- **`--deconv-ms1-msdeconv` writes the earlier default's output**: on st_1
+- **`--deconv-ms1 msdeconv` writes the earlier default's output**: on st_1
   all 1,418 MS1 scans' masses and charges, both feature files and the
   parameter block equal main 89df2a8c's (the last main with the DP as the
   default), the MS/MS spectra up to the EnvCNN jitter of two runs of one
@@ -536,14 +579,10 @@ Facts to keep straight:
 (`TopfdPara::isMs2GreedyDeconv`, true by default; `deconv_ms2_process::
 deconvMsTwo` and `topfd -T` call it; the parameter block then prints
 "MS/MS deconvolution: Greedy" instead of the DP's ranking window and
-harmonic check lines). `DeconvSingleSp`, the default up to main 89df2a8c,
-runs with the visible topfd option `--deconv-ms2-msdeconv` (documented in
-the TopFD manual) and in TopDIA (`getTopfdParaPtrForTopdia` sets the flag
-false), whose output files keep the earlier parameter block; `-F`
-(FLASHDeconv) still overrides both. The hidden `--ms2-greedy-deconv` that
-selected the search before it became the default is gone (an unrecognised
-option now). `-v`, `-g` and `-n` apply to both methods (`greedy_ms2_deconv::
-deconv` ends with the same filters). It started as a
+harmonic check lines). `DeconvSingleSp`, TopFD's default up to main
+89df2a8c, runs with `--deconv-ms2 msdeconv`, TopDIA's default (see
+"Deconvolution methods" above). `-v`, `-g` and `-n` apply to both methods
+(`greedy_ms2_deconv::deconv` ends with the same filters). It started as a
 copy of the greedy MS1 search (previous section) and keeps its structure;
 the output (msalign lines, EnvCNN scores, the `-F`-relevant score, SQLite
 rows) is written as `DeconvSingleSp`'s. Facts to keep straight:
@@ -595,12 +634,13 @@ rows) is written as `DeconvSingleSp`'s. Facts to keep straight:
   (mostly 1,000-5,000 Da: right charges and isotopes, and envelopes the DP
   did not report). The MS/MS stage takes about 100 s against main's 135 s
   at 16 threads.
-- **`--deconv-ms2-msdeconv` writes the earlier default's output**: on
-  st_1, with `--deconv-ms1-msdeconv` too, the MS/MS spectra equal main
-  89df2a8c's default output up to the EnvCNN jitter, and `topfd -T` on the myoglobin
-  peak list writes main's msalign byte for byte (681 masses; the greedy
-  search 2,476). With the MS1 deconvolution fixed, the greedy MS/MS search
-  is repeatable up to that jitter.
+- **`--deconv-ms2 msdeconv` writes the earlier default's output**: on
+  st_1, with `--deconv-ms1 msdeconv` too, the MS/MS spectra equal main
+  89df2a8c's default output up to the EnvCNN jitter, and `topfd -T` on the
+  myoglobin peak list writes main's msalign byte for byte (681 masses; the
+  greedy search 2,476). With the MS1 deconvolution fixed, the greedy MS/MS
+  search is repeatable up to that jitter. `--deconv-ms2 flashdeconv` writes
+  main 89df2a8c's `-F` MS/MS spectra unchanged (st_1, all 1,381).
 
 ## Post mass matching (`prsm/prsm_post_mass_match`, toppic only)
 

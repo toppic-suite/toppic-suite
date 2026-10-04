@@ -45,17 +45,18 @@ For each file TopDIA prints its parameters, the TopFD deconvolution
 parameters followed by the TopDIA feature and pseudo-spectrum parameters,
 and runs five steps:
 
-1. **MS1 deconvolution.** Every MS1 scan is deconvoluted with the MS-Deconv
-   dynamic programming, as in `topfd --deconv-ms1-msdeconv`; TopFD's default
-   greedy MS1 search is not used.
+1. **MS1 deconvolution.** Every MS1 scan is deconvoluted, by default with
+   the MS-Deconv dynamic programming (`--deconv-ms1 msdeconv`); `--deconv-ms1
+   greedy` selects TopFD's default greedy search.
 2. **MS1 feature detection.** The MS1 envelopes are linked across scans into
    proteoform features, scored with ECScore and filtered by
    `--ms1-ecscore-cutoff` and `--ms1-min-scan-number`.
 3. **MS/MS deconvolution.** Every DIA MS/MS scan is deconvoluted on its own,
-   without precursor information, into `sample_ms2_raw.msalign`, with the
-   MS-Deconv dynamic programming, as in `topfd --deconv-ms2-msdeconv`
-   (TopFD's default greedy MS/MS search is not used). TopDIA
-   deconvolutes these scans with the parameters of version 1.9.0.0: a 12
+   without precursor information, into `sample_ms2_raw.msalign`, by
+   default with the MS-Deconv dynamic programming (`--deconv-ms2 msdeconv`;
+   `greedy` selects TopFD's default greedy search and `flashdeconv` the
+   FLASHDeconv algorithm). For the dynamic programming TopDIA
+   uses the parameters of version 1.9.0.0: a 12
    Dalton envelope ranking window, no harmonic check and a 1,500 Dalton mass
    group boundary. The 2.0.0.0 defaults of TopFD (2 Dalton, harmonic check,
    4,250 Dalton) were measured on DDA data; a DIA MS/MS scan holds the
@@ -119,6 +120,8 @@ Deconvolution:
 | `-s`, `--ms-two-sn-ratio <number>` | 1 | Signal-to-noise ratio for MS/MS spectra. |
 | `-w`, `--precursor-window <number>` | 4.0 (TopFD: 3.0) | Default isolation window width (m/z), used only when the file records none. |
 | `-n`, `--msdeconv` | off | Rank isotopic envelopes with the MS-Deconv score instead of EnvCNN. |
+| `--deconv-ms1 <greedy\|msdeconv>` | msdeconv (TopFD: greedy) | MS1 deconvolution method (section 2, step 1). In `topdia_gui`: "MS1 deconvolution". |
+| `--deconv-ms2 <greedy\|msdeconv\|flashdeconv>` | msdeconv (TopFD: greedy) | MS/MS deconvolution method (section 2, step 3); `flashdeconv` is experimental. In `topdia_gui`: "MS/MS deconvolution". |
 | `-d`, `--final-filtering` | off | Filter the envelopes of MS/MS scans by the estimated number of fragment ions. |
 | `-o`, `--missing-level-one` | off | Accepted, but the run fails at the pseudo-spectrum step without MS1 scans (section 1). |
 | `-u`, `--thread-number <int>` | 1 | Number of threads. |

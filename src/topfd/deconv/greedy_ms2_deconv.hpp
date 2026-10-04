@@ -24,8 +24,8 @@
 
 namespace toppic {
 
-// The greedy MS/MS deconvolution, TopFD's default (topfd
-// --deconv-ms2-msdeconv and TopDIA use the candidate envelopes + dynamic
+// The greedy MS/MS deconvolution, --deconv-ms2 greedy, TopFD's default
+// (msdeconv, TopDIA's default, uses the candidate envelopes + dynamic
 // programming of DeconvSingleSp for MS/MS spectra instead). It is the
 // subtractive search of greedy_ms1_deconv adapted to fragment ions, in
 // which the charge state of a peak is decided with all the charge states of

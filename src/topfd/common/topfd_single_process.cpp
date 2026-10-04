@@ -90,7 +90,7 @@ void processOneFile(const TopfdParaPtr& para_ptr,
 
     MatchEnvPtrVec result_envs;
     if (peak_list.size() > 0 && para_ptr->isMs2GreedyDeconv()) {
-      // the greedy search, TopFD's default (--deconv-ms2-msdeconv: below)
+      // --deconv-ms2 greedy, TopFD's default (msdeconv: below)
       result_envs = greedy_ms2_deconv::deconv(peak_list, para_ptr, max_mass,
                                               static_cast<int>(max_charge));
     } else if (peak_list.size() > 0) {

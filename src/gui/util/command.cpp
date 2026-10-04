@@ -68,9 +68,8 @@ std::string geneTopfdCommand(const TopfdParaPtr& para_ptr,
   } else if (para_ptr->isSql3d()) {
     command = command + "-D ";
   }
-  if (para_ptr->isUseFlashDeconv()) {
-    command = command + "-F ";
-  }
+  command = command + "--deconv-ms1 " + para_ptr->getMs1DeconvMethod() +
+            " --deconv-ms2 " + para_ptr->getMs2DeconvMethod() + " ";
   for (size_t i = 0; i < spec_file_lst.size(); i++) {
     command = command + spec_file_lst[i] + " ";
   }
@@ -120,6 +119,8 @@ std::string geneTopdiaCommand(const TopfdParaPtr& topfd_para_ptr,
   if (topfd_para_ptr->isUseSingleScanNoiseLevel()) {
     command = command + "-i ";
   }
+  command = command + "--deconv-ms1 " + topfd_para_ptr->getMs1DeconvMethod() +
+            " --deconv-ms2 " + topfd_para_ptr->getMs2DeconvMethod() + " ";
   for (size_t i = 0; i < spec_file_lst.size(); i++) {
     command = command + spec_file_lst[i] + " ";
   }

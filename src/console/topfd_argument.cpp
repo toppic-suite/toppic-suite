@@ -86,6 +86,9 @@ bool Argument::parse(int argc, char* argv[]) {
   std::string ms2_rank_peak_distance = "";
   std::string mass_group_boundary = "";
   std::string max_peak_sharing_ratio = "";
+  // deconvolution methods
+  std::string deconv_ms1 = "";
+  std::string deconv_ms2 = "";
 
   // Define and parse the program options
   try {
@@ -163,21 +166,18 @@ bool Argument::parse(int argc, char* argv[]) {
         "Deconvolute a single MS/MS spectrum given as a text peak list: one "
         "peak per line, m/z and intensity separated by a space. The output "
         "files are named after the input file.")(
-        "ms2-flashdeconv,F",
-        "Deconvolute the MS/MS spectra with the FLASHDeconv algorithm instead "
-        "of TopFD's own (experimental).")(
-        "deconv-ms1-msdeconv",
-        "Deconvolute the MS1 spectra with the MS-Deconv dynamic programming, "
-        "the default method of earlier versions. The default method is a "
-        "greedy search, which decides the charge state of the most intense "
-        "peak with all the charge states of its mass and subtracts the "
-        "mass's envelopes.")(
-        "deconv-ms2-msdeconv",
-        "Deconvolute the MS/MS spectra with the MS-Deconv dynamic "
-        "programming, the default method of earlier versions. The default "
-        "method is a greedy search, which decides the charge state of the "
-        "most intense peak with all the charge states of its fragment mass "
-        "and subtracts the mass's envelopes.");
+        "deconv-ms1", po::value<std::string>(&deconv_ms1),
+        "<greedy|msdeconv>. Set the deconvolution method of MS1 spectra: "
+        "greedy, a greedy search that decides the charge state of the most "
+        "intense peak with all the charge states of its mass and subtracts "
+        "the mass's envelopes, or msdeconv, the MS-Deconv dynamic "
+        "programming of earlier versions. The default value is greedy.")(
+        "deconv-ms2", po::value<std::string>(&deconv_ms2),
+        "<greedy|msdeconv|flashdeconv>. Set the deconvolution method of "
+        "MS/MS spectra: greedy, the greedy search of MS1 spectra adapted to "
+        "fragment ions; msdeconv, the MS-Deconv dynamic programming of "
+        "earlier versions; or flashdeconv, the FLASHDeconv algorithm "
+        "(experimental). The default value is greedy.");
 
     // Advanced options accepted on the command line but hidden from the help
     // message; the positional spectrum file argument is also hidden here.
@@ -371,16 +371,18 @@ bool Argument::parse(int argc, char* argv[]) {
       topfd_para_ptr_->setOutputDpEnvs(true);
     }
 
-    if (vm.count("ms2-flashdeconv")) {
-      topfd_para_ptr_->setUseFlashDeconv(true);
+    if (vm.count("deconv-ms1") &&
+        !topfd_para_ptr_->setMs1DeconvMethod(deconv_ms1)) {
+      LOG_ERROR("MS1 deconvolution method " << deconv_ms1
+                << " should be greedy or msdeconv.");
+      return false;
     }
 
-    if (vm.count("deconv-ms1-msdeconv")) {
-      topfd_para_ptr_->setMs1GreedyDeconv(false);
-    }
-
-    if (vm.count("deconv-ms2-msdeconv")) {
-      topfd_para_ptr_->setMs2GreedyDeconv(false);
+    if (vm.count("deconv-ms2") &&
+        !topfd_para_ptr_->setMs2DeconvMethod(deconv_ms2)) {
+      LOG_ERROR("MS/MS deconvolution method " << deconv_ms2
+                << " should be greedy, msdeconv or flashdeconv.");
+      return false;
     }
 
     if (vm.count("mass-group-boundary")) {
@@ -476,6 +478,12 @@ bool Argument::parse(int argc, char* argv[]) {
     }
 
     if (vm.count("text-peak-list")) {
+      // the FLASHDeconv path (FlashDeconvMs2Process) reads mzML files only
+      if (topfd_para_ptr_->isUseFlashDeconv()) {
+        LOG_ERROR("--deconv-ms2 flashdeconv cannot be used with "
+                  "--text-peak-list.");
+        return false;
+      }
       topfd_para_ptr_->setTextPeakList(true);
     }
 

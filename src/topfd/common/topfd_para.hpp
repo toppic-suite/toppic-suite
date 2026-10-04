@@ -21,6 +21,7 @@
 #include <memory>
 #include <string>
 #include <utility>
+#include <vector>
 
 namespace toppic {
 
@@ -77,9 +78,15 @@ class TopfdPara {
   bool isOutputAvgMass() const { return output_avg_mass_; }
   bool isOutputCsvFeatureFile() const { return output_csv_feature_file_; }
   bool isOutputDpEnvs() const { return output_dp_envs_; }
-  bool isUseFlashDeconv() const { return use_flashdeconv_; }
-  bool isMs1GreedyDeconv() const { return ms1_greedy_deconv_; }
-  bool isMs2GreedyDeconv() const { return ms2_greedy_deconv_; }
+  // the deconvolution methods, named as the --deconv-ms1 and --deconv-ms2
+  // options of topfd and topdia name them
+  static const std::vector<std::string>& getMs1DeconvMethods();
+  static const std::vector<std::string>& getMs2DeconvMethods();
+  const std::string& getMs1DeconvMethod() const { return ms1_deconv_method_; }
+  const std::string& getMs2DeconvMethod() const { return ms2_deconv_method_; }
+  bool isMs1GreedyDeconv() const { return ms1_deconv_method_ == "greedy"; }
+  bool isMs2GreedyDeconv() const { return ms2_deconv_method_ == "greedy"; }
+  bool isUseFlashDeconv() const { return ms2_deconv_method_ == "flashdeconv"; }
   int getThreadNum() const { return thread_num_; }
   double getMs1EcscoreCutoff() const { return ms1_ecscore_cutoff_; }
   double getMs2EcscoreCutoff() const { return ms2_ecscore_cutoff_; }
@@ -141,9 +148,10 @@ class TopfdPara {
   void setGeneSql(bool gene_sql) { gene_sql_ = gene_sql; }
   void setSql3d(bool sql_3d) { sql_3d_ = sql_3d; }
   void setOutputDpEnvs(bool output) { output_dp_envs_ = output; }
-  void setUseFlashDeconv(bool use) { use_flashdeconv_ = use; }
-  void setMs1GreedyDeconv(bool greedy) { ms1_greedy_deconv_ = greedy; }
-  void setMs2GreedyDeconv(bool greedy) { ms2_greedy_deconv_ = greedy; }
+  // false, and the method unchanged, for a name not in getMs1DeconvMethods()
+  // (getMs2DeconvMethods())
+  bool setMs1DeconvMethod(const std::string& method);
+  bool setMs2DeconvMethod(const std::string& method);
   void setMaxMissPeakNum(int num) { max_miss_peak_num_ = num; }
   void setMsOneRankPeakDistance(double d) { ms1_rank_peak_distance_ = d; }
   void setMsTwoRankPeakDistance(double d) { ms2_rank_peak_distance_ = d; }
@@ -276,19 +284,17 @@ class TopfdPara {
   // envelopes of every deconvoluted spectrum to win_envs.txt / dp_envs.txt
   // (debugging aid).
   bool output_dp_envs_ = false;
-  // option --ms2-flashdeconv: deconvolute the MS/MS spectra with the
-  // FLASHDeconv algorithm (FlashDeconvMs2Process) instead of DeconvMs2Process
-  bool use_flashdeconv_ = false;
-  // deconvolute the MS1 spectra with greedy_ms1_deconv
-  // (deconv_ms1_process::deconvMsOneGreedy), TopFD's default; false selects
-  // MS-Deconv's precursor-window step + DeconvSingleSp (topfd option
-  // --deconv-ms1-msdeconv, and TopDIA, whose argument parser sets it)
-  bool ms1_greedy_deconv_ = true;
-  // deconvolute the MS/MS spectra with greedy_ms2_deconv (in
-  // deconv_ms2_process::deconvMsTwo and topfd_single_process), TopFD's
-  // default; false selects MS-Deconv's DeconvSingleSp (topfd option
-  // --deconv-ms2-msdeconv, and TopDIA, whose argument parser sets it)
-  bool ms2_greedy_deconv_ = true;
+  // the MS1 deconvolution method (option --deconv-ms1): "greedy"
+  // (greedy_ms1_deconv, deconv_ms1_process::deconvMsOneGreedy; TopFD's
+  // default) or "msdeconv" (MS-Deconv's precursor-window step +
+  // DeconvSingleSp; TopDIA's default, which its argument parser sets)
+  std::string ms1_deconv_method_ = "greedy";
+  // the MS/MS deconvolution method (option --deconv-ms2): "greedy"
+  // (greedy_ms2_deconv, in deconv_ms2_process::deconvMsTwo and
+  // topfd_single_process; TopFD's default), "msdeconv" (MS-Deconv's
+  // DeconvSingleSp; TopDIA's default) or "flashdeconv" (FlashDeconvMs2Process
+  // instead of DeconvMs2Process)
+  std::string ms2_deconv_method_ = "greedy";
 
   //** information for each run **
   int frac_id_ = -1;

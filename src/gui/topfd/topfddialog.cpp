@@ -135,7 +135,10 @@ void TopFDDialog::on_defaultButton_clicked() {
   ui->noSqlCheckBox->setChecked(!para_ptr->isGeneSql());
   ui->sql3dCheckBox->setChecked(para_ptr->isSql3d());
   ui->sql3dCheckBox->setEnabled(para_ptr->isGeneSql());
-  ui->ms2FlashDeconvCheckBox->setChecked(para_ptr->isUseFlashDeconv());
+  ui->ms1DeconvComboBox->setCurrentText(
+      QString::fromStdString(para_ptr->getMs1DeconvMethod()));
+  ui->ms2DeconvComboBox->setCurrentText(
+      QString::fromStdString(para_ptr->getMs2DeconvMethod()));
 
   ui->outputTextBrowser->clear();
   ui->outputTextBrowser->setText(
@@ -320,7 +323,10 @@ toppic::TopfdParaPtr TopFDDialog::getParaPtr() {
       ui->singleScanNoiseLevelCheckBox->isChecked());
   para_ptr_->setGeneSql(!ui->noSqlCheckBox->isChecked());
   para_ptr_->setSql3d(ui->sql3dCheckBox->isChecked());
-  para_ptr_->setUseFlashDeconv(ui->ms2FlashDeconvCheckBox->isChecked());
+  para_ptr_->setMs1DeconvMethod(
+      ui->ms1DeconvComboBox->currentText().toStdString());
+  para_ptr_->setMs2DeconvMethod(
+      ui->ms2DeconvComboBox->currentText().toStdString());
 
   return para_ptr_;
 }
@@ -350,7 +356,8 @@ void TopFDDialog::lockDialog() {
   ui->singleScanNoiseLevelCheckBox->setEnabled(false);
   ui->noSqlCheckBox->setEnabled(false);
   ui->sql3dCheckBox->setEnabled(false);
-  ui->ms2FlashDeconvCheckBox->setEnabled(false);
+  ui->ms1DeconvComboBox->setEnabled(false);
+  ui->ms2DeconvComboBox->setEnabled(false);
 }
 
 void TopFDDialog::unlockDialog() {
@@ -379,7 +386,8 @@ void TopFDDialog::unlockDialog() {
   ui->singleScanNoiseLevelCheckBox->setEnabled(true);
   ui->noSqlCheckBox->setEnabled(true);
   ui->sql3dCheckBox->setEnabled(!ui->noSqlCheckBox->isChecked());
-  ui->ms2FlashDeconvCheckBox->setEnabled(true);
+  ui->ms1DeconvComboBox->setEnabled(true);
+  ui->ms2DeconvComboBox->setEnabled(true);
 }
 
 bool TopFDDialog::checkError() {
