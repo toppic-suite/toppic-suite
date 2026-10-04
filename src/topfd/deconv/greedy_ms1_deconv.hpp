@@ -17,6 +17,7 @@
 #define TOPPIC_TOPFD_DECONV_GREEDY_MS1_DECONV_HPP_
 
 #include <string>
+#include <vector>
 
 #include "ms/env/match_env.hpp"
 #include "ms/spec/peak.hpp"
@@ -47,15 +48,30 @@ namespace toppic {
 //      difference, any other matched peak is used up, and the tail isotopes
 //      up to where the observed series stops or rises again are removed;
 //   5. repeat from 1 until no peak above the reference intensity is left.
+// A postprocessing step then gives every precursor window of the following
+// MS/MS spectra that has no envelope the envelope of its most intense peak
+// (research switch prec_win_post, on by default; see addPrecWinEnvs in the
+// cpp).
 // The parameters and their sources are in GreedyPara (cpp).
 namespace greedy_ms1_deconv {
 
+// The precursor window of an MS/MS spectrum that follows the MS1 spectrum
+struct PrecWin {
+  double begin;
+  double end;
+  // the MS/MS scan, for the window log (TOPFD_GREEDY_PREC_WIN_LOG)
+  int scan;
+};
+
 // Deconvolute one MS1 peak list (sorted by m/z). The envelopes are matched
 // to the peaks of peak_list, have their EnvCNN scores and are sorted as
-// DeconvSingleSp's result. debug_name, when not empty, is the file the
-// decisions of this spectrum are written to.
+// DeconvSingleSp's result. prec_wins are the precursor windows of the MS/MS
+// spectra that follow the spectrum, for the postprocessing step (none: no
+// step). debug_name, when not empty, is the file the decisions of this
+// spectrum are written to.
 MatchEnvPtrVec deconv(const PeakPtrVec& peak_list,
                       const TopfdParaPtr& topfd_para_ptr,
+                      const std::vector<PrecWin>& prec_wins,
                       const std::string& debug_name = "");
 
 // Whether main's precursor-window step runs before the greedy search

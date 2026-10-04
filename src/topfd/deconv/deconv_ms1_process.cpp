@@ -195,8 +195,9 @@ void writeMsOne(const MzmlMsPtr& ms_ptr, MatchEnvPtrVec& result_envs,
 // charge states of its mass, its envelopes subtracted, repeated) instead of
 // DeconvSingleSp's candidate envelopes and dynamic programming. The
 // precursor-window step of deconvMsOne runs first only when
-// greedy_ms1_deconv::isPrecWinFirst(). The output is written as deconvMsOne
-// writes it.
+// greedy_ms1_deconv::isPrecWinFirst(); otherwise the greedy search gets the
+// precursor windows of the MS/MS spectra for its postprocessing step. The
+// output is written as deconvMsOne writes it.
 void deconvMsOneGreedy(const MzmlMsGroupPtr& ms_group_ptr,
                        const TopfdParaPtr& topfd_para_ptr,
                        const MsAlignWriterPtrVec& ms1_writer_ptr_vec,
@@ -212,6 +213,7 @@ void deconvMsOneGreedy(const MzmlMsGroupPtr& ms_group_ptr,
   double min_ref_inte = base_inte * topfd_para_ptr->getMsOneSnRatio();
 
   MatchEnvPtrVec prec_envs;
+  std::vector<greedy_ms1_deconv::PrecWin> prec_wins;
   if (greedy_ms1_deconv::isPrecWinFirst()) {
     prec_envs = deconv_prec_win::deconvPrecWinForMsGroup(
         ms_group_ptr, topfd_para_ptr->getMaxMass(),
@@ -225,6 +227,15 @@ void deconvMsOneGreedy(const MzmlMsGroupPtr& ms_group_ptr,
         }
       }
     }
+  } else {
+    for (const MzmlMsPtr& ms_two_ptr : ms_group_ptr->getMsTwoPtrVec()) {
+      MsHeaderPtr header_ptr = ms_two_ptr->getMsHeaderPtr();
+      if (header_ptr->getPrecWinBegin() > 0) {
+        prec_wins.push_back({header_ptr->getPrecWinBegin(),
+                             header_ptr->getPrecWinEnd(),
+                             header_ptr->getFirstScanNum()});
+      }
+    }
   }
   // research aid: the decisions of one scan (TOPFD_GREEDY_DEBUG_SCAN)
   std::string debug_name;
@@ -233,8 +244,8 @@ void deconvMsOneGreedy(const MzmlMsGroupPtr& ms_group_ptr,
   if (debug_scan != nullptr && std::atoi(debug_scan) == scan) {
     debug_name = "greedy_scan" + std::to_string(scan) + ".txt";
   }
-  MatchEnvPtrVec deconv_envs =
-      greedy_ms1_deconv::deconv(peak_list, topfd_para_ptr, debug_name);
+  MatchEnvPtrVec deconv_envs = greedy_ms1_deconv::deconv(
+      peak_list, topfd_para_ptr, prec_wins, debug_name);
   for (const MatchEnvPtr& env : prec_envs) {
     ExpEnvPtr env_ptr = env->getExpEnvPtr();
     for (int p = 0; p < env_ptr->getPeakNum(); p++) {

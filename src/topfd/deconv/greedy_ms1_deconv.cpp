@@ -21,8 +21,10 @@
 #include <cstdlib>
 #include <fstream>
 #include <memory>
+#include <mutex>
 #include <queue>
 #include <sstream>
+#include <string>
 #include <unordered_map>
 #include <utility>
 #include <vector>
@@ -131,6 +133,11 @@ struct GreedyPara {
   // charge is not used (0 = no test): the residual of a subtracted envelope
   // must not come back as an isotope-shifted copy of its mass
   double dup_window = 3.5;
+  // the postprocessing step (1) or not (0): every precursor window of the
+  // following MS/MS spectra in which no reported envelope has its apex gets
+  // the envelope of its most intense peak (addPrecWinEnvs; toppic_test
+  // experiment 113)
+  int prec_win_post = 1;
 };
 
 GreedyPara readPara() {
@@ -196,6 +203,8 @@ GreedyPara readPara() {
       para.dyn_rise = value;
     } else if (name == "dyn_max_ext") {
       para.dyn_max_ext = static_cast<int>(value);
+    } else if (name == "prec_win_post") {
+      para.prec_win_post = static_cast<int>(value);
     } else {
       LOG_WARN("Unknown TOPFD_GREEDY_PARA entry " << name);
     }
@@ -249,6 +258,20 @@ struct Fit {
 
 using FitVec = std::vector<Fit>;
 
+// The envelope detection redone in a precursor window (fitWindow).
+struct WinFit {
+  // the envelope of the window's charge; not valid when there is none
+  Fit fit;
+  // the peaks in the window and the most intense one (-1: none)
+  int peak_num = 0;
+  int seed = -1;
+  // the score of the mass's series and its number of charges
+  double score = 0;
+  int charge_num = 0;
+  // the monoisotopic offset applied to the apex alignment (isotopes)
+  int offset = 0;
+};
+
 // One spectrum's search.
 class GreedySearch {
  public:
@@ -257,6 +280,10 @@ class GreedySearch {
 
   // the charge series of the masses found, in the order they were found
   std::vector<FitVec> run();
+
+  // the envelope of the most intense peak in an m/z window, on a search
+  // that has not subtracted anything
+  WinFit fitWindow(double bgn, double end);
 
  private:
   const GreedyPara& para_;
@@ -855,6 +882,89 @@ std::vector<FitVec> GreedySearch::run() {
   return result;
 }
 
+// The envelope of the most intense peak in the m/z window [bgn, end], for a
+// precursor window without an envelope (GreedyPara::prec_win_post). It is
+// run on a search that has not subtracted anything, so on the original
+// intensities. With one peak in the window, the peak is of charge 1. With
+// more, every charge is tried as run() tries a seed (the averagine apex
+// aligned with the peak, the series of the mass at the neighbouring
+// charges), without the acceptance thresholds (isotope cosine, matched
+// peaks, pre-check, single_min_cos) but with the harmonic test, and the
+// best series score wins even when it is negative. The monoisotopic offset
+// is chosen as in run() and kept only when the apex stays in the window.
+// A peak below the noise level lowers the level to its intensity for this
+// envelope, so that it is matched.
+WinFit GreedySearch::fitWindow(double bgn, double end) {
+  WinFit result;
+  for (auto it = std::lower_bound(mzs_.begin(), mzs_.end(), bgn);
+       it != mzs_.end() && *it <= end; ++it) {
+    int i = static_cast<int>(it - mzs_.begin());
+    if (intes_[i] <= 0) {
+      continue;
+    }
+    result.peak_num++;
+    if (result.seed < 0 || intes_[i] > intes_[result.seed]) {
+      result.seed = i;
+    }
+  }
+  if (result.seed < 0) {
+    return result;
+  }
+  int seed = result.seed;
+  double noise_inte = min_inte_;
+  min_inte_ = std::min(min_inte_, intes_[seed]);
+  double proton = mass_constant::getProtonMass();
+  int max_charge = result.peak_num == 1 ? 1 : max_charge_;
+  FitVec best_series;
+  for (int z = 1; z <= max_charge; z++) {
+    double ref_mass = (mzs_[seed] - proton) * z;
+    if (ref_mass >= max_mass_ || ref_mass < env_para_ptr_->min_mass_) {
+      continue;
+    }
+    EnvPtr ref_env = EnvBase::getEnvByRefMass(ref_mass);
+    if (ref_env == nullptr) {
+      continue;
+    }
+    double mono_mass =
+        ref_mass - (ref_env->getReferMz() - ref_env->getMonoMz());
+    Fit fit = fitEnv(mono_mass, z);
+    if (!fit.valid || !fit.apex_match || isHarmonic(fit)) {
+      continue;
+    }
+    FitVec series = getSeries(mono_mass, z, fit);
+    double score = seriesScore(series);
+    if (best_series.empty() || score > result.score) {
+      result.score = score;
+      best_series = std::move(series);
+    }
+  }
+  if (!best_series.empty()) {
+    result.fit = best_series[0];
+    result.charge_num = static_cast<int>(best_series.size());
+    int k = getAggregateOffset(best_series);
+    int z = result.fit.charge;
+    double mono_mass =
+        result.fit.mono_mass + k * mass_constant::getIsotopeMass();
+    Fit fit = k == 0 ? Fit() : fitEnv(mono_mass, z);
+    bool has_seed = false;
+    for (int i = fit.first; fit.valid && i <= fit.last; i++) {
+      if (fit.peak_idxes[i] == seed) {
+        has_seed = true;
+      }
+    }
+    if (has_seed && fit.apex_match) {
+      const Distr& distr = getDistr(mono_mass);
+      double apex_mz = mono_mass / z + proton + distr.offsets[distr.apex] / z;
+      if (apex_mz > bgn && apex_mz < end) {
+        result.fit = std::move(fit);
+        result.offset = k;
+      }
+    }
+  }
+  min_inte_ = noise_inte;
+  return result;
+}
+
 // The envelope of a fit as main's MatchEnv: the EnvBase distribution of the
 // mass at the charge, scaled to the fit and cut to the isotopes used,
 // matched to the peaks of the spectrum.
@@ -875,12 +985,132 @@ MatchEnvPtr getMatchEnv(const PeakPtrVec& peak_list, const Fit& fit,
   return env;
 }
 
+// The window log (TOPFD_GREEDY_PREC_WIN_LOG=<file>): one line per precursor
+// window, appended by the worker threads under a lock.
+std::mutex prec_win_log_mutex;
+bool prec_win_log_started = false;
+
+void writePrecWinLog(const std::string& lines) {
+  const char* name = std::getenv("TOPFD_GREEDY_PREC_WIN_LOG");
+  if (name == nullptr || lines.empty()) {
+    return;
+  }
+  std::lock_guard<std::mutex> lock(prec_win_log_mutex);
+  std::ofstream os(name, std::ios::app);
+  if (!prec_win_log_started) {
+    os << "ms2_scan\twin_begin\twin_end\tstatus\tpeak_num\tseed_mz\t"
+       << "seed_inte\tnoise_inte\tref_inte\tseed_in_env\tcharge\t"
+       << "mono_mass\toffset\tcos\tmatch_num\tcharge_num\tscore\t"
+       << "envcnn\tapex_mz\tapex_in_win\n";
+    prec_win_log_started = true;
+  }
+  os << lines;
+}
+
+// The postprocessing step (GreedyPara::prec_win_post): every precursor
+// window in which no envelope of envs has its reference (apex) m/z, the
+// test of the MS1 feature detection's search for precursor windows without
+// a feature (env_coll_detect, SeedEnv::getReferMz), gets the envelope of its
+// most intense peak (GreedySearch::fitWindow), with its EnvCNN score and
+// whatever the score; a window without a peak gets nothing. The envelopes
+// are added to envs, so an envelope added for one window counts for the
+// next windows.
+void addPrecWinEnvs(const PeakPtrVec& peak_list,
+                    const TopfdParaPtr& topfd_para_ptr,
+                    const EnvParaPtr& env_para_ptr, double min_inte,
+                    const std::vector<PrecWin>& prec_wins,
+                    MatchEnvPtrVec& envs) {
+  bool write_log = std::getenv("TOPFD_GREEDY_PREC_WIN_LOG") != nullptr;
+  std::ostringstream log;
+  log.precision(10);
+  std::unique_ptr<GreedySearch> search;
+  for (const PrecWin& win : prec_wins) {
+    log << win.scan << "\t" << win.begin << "\t" << win.end << "\t";
+    MatchEnvPtr win_env = nullptr;
+    for (const MatchEnvPtr& env : envs) {
+      double mz = env->getTheoEnvPtr()->getReferMz();
+      if (mz > win.begin && mz < win.end) {
+        win_env = env;
+        break;
+      }
+    }
+    if (win_env != nullptr) {
+      EnvPtr theo = win_env->getTheoEnvPtr();
+      log << "env\t\t\t\t\t\t\t" << theo->getCharge() << "\t"
+          << theo->getMonoNeutralMass() << "\t\t\t\t\t\t"
+          << win_env->getEnvcnnScore() << "\t" << theo->getReferMz()
+          << "\t1\n";
+      continue;
+    }
+    if (search == nullptr) {
+      search = std::make_unique<GreedySearch>(peak_list, topfd_para_ptr,
+                                              env_para_ptr, nullptr);
+    }
+    WinFit win_fit = search->fitWindow(win.begin, win.end);
+    if (win_fit.seed < 0) {
+      log << "no_peak\t0\n";
+      continue;
+    }
+    MatchEnvPtr env = nullptr;
+    if (win_fit.fit.valid) {
+      double seed_inte = peak_list[win_fit.seed]->getIntensity();
+      env = getMatchEnv(peak_list, win_fit.fit, env_para_ptr,
+                        std::min(min_inte, seed_inte));
+    }
+    if (env != nullptr) {
+      MatchEnvPtrVec win_envs = {env};
+      if (getPara().envcnn != 0) {
+        onnx_env_cnn::computeEnvScores(peak_list, win_envs);
+      }
+    }
+    if (write_log) {
+      // whether the seed is matched in an envelope reported before
+      int seed_in_env = 0;
+      for (const MatchEnvPtr& e : envs) {
+        ExpEnvPtr exp_env = e->getExpEnvPtr();
+        for (int p = 0; p < exp_env->getPeakNum(); p++) {
+          if (exp_env->isExist(p) && exp_env->getPeakIdx(p) == win_fit.seed) {
+            seed_in_env = 1;
+          }
+        }
+      }
+      std::vector<double> intes;
+      for (const PeakPtr& peak : peak_list) {
+        intes.push_back(peak->getIntensity());
+      }
+      double noise_inte = baseline_util::getBaseLine(intes);
+      log << (env != nullptr ? "new" : "none") << "\t" << win_fit.peak_num
+          << "\t" << peak_list[win_fit.seed]->getPosition() << "\t"
+          << peak_list[win_fit.seed]->getIntensity() << "\t" << noise_inte
+          << "\t" << noise_inte * topfd_para_ptr->getMsOneSnRatio() << "\t"
+          << seed_in_env << "\t";
+      if (env != nullptr) {
+        const Fit& fit = win_fit.fit;
+        double apex_mz = env->getTheoEnvPtr()->getReferMz();
+        log << fit.charge << "\t" << fit.mono_mass << "\t" << win_fit.offset
+            << "\t" << fit.cos << "\t" << fit.match_num << "\t"
+            << win_fit.charge_num << "\t" << win_fit.score << "\t"
+            << env->getEnvcnnScore() << "\t" << apex_mz << "\t"
+            << (apex_mz > win.begin && apex_mz < win.end ? 1 : 0);
+      }
+      log << "\n";
+    }
+    if (env != nullptr) {
+      envs.push_back(env);
+    }
+  }
+  if (write_log) {
+    writePrecWinLog(log.str());
+  }
+}
+
 }  // namespace
 
 bool isPrecWinFirst() { return getPara().prec_win != 0; }
 
 MatchEnvPtrVec deconv(const PeakPtrVec& peak_list,
                       const TopfdParaPtr& topfd_para_ptr,
+                      const std::vector<PrecWin>& prec_wins,
                       const std::string& debug_name) {
   MatchEnvPtrVec envs;
   if (peak_list.empty()) {
@@ -929,6 +1159,10 @@ MatchEnvPtrVec deconv(const PeakPtrVec& peak_list,
       }
     }
     envs = std::move(kept);
+  }
+  if (getPara().prec_win_post != 0 && !prec_wins.empty()) {
+    addPrecWinEnvs(peak_list, topfd_para_ptr, env_para_ptr, min_inte,
+                   prec_wins, envs);
   }
   if (topfd_para_ptr->isSortUseMsDeconv()) {
     std::sort(envs.begin(), envs.end(), MatchEnv::cmpMsdeconvScoreDec);

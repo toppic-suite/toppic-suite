@@ -544,6 +544,32 @@ straight:
   charge only needs an isotope cosine of 0.8 (`single_min_cos`); envelopes
   with an EnvCNN score below 0.2 are not written (`min_envcnn`; a third of
   the envelopes, which only seeded extra MS1 features).
+- **Precursor windows without an envelope** (postprocessing step,
+  `addPrecWinEnvs`, switch `prec_win_post`, on by default; toppic_test
+  experiment 113): `deconvMsOneGreedy` passes the precursor windows of the
+  MS/MS spectra that follow the MS1 spectrum (`PrecWin`, not when
+  `prec_win` runs the precursor-window step first). After the EnvCNN
+  filter, a window in which no reported envelope has its reference (apex)
+  m/z, the test the MS1 feature detection uses to seed its search for
+  windows without a feature (`env_coll_detect`, `SeedEnv::getReferMz`),
+  gets the envelope of its most intense peak (`GreedySearch::fitWindow`,
+  on the original intensities): one peak in the window is a charge 1
+  peak; with more, every charge is tried as for a seed but without the
+  acceptance thresholds (the harmonic test stays) and the best series
+  score wins; the monoisotopic offset is kept only when the apex stays in
+  the window. One envelope per window (the window's charge), with its
+  EnvCNN score but not filtered by it; a window without a peak gets
+  nothing. `TOPFD_GREEDY_PREC_WIN_LOG=<file>` writes one line per window.
+  On 480_F3_02 (toppic_test experiment 113, report 0113) 80 of 4,323
+  windows had no envelope (40 deconvoluted at charge 1); 20 more MS/MS
+  spectra got a precursor (4,318 against 4,298), none identified (their
+  MS/MS spectra have a median of 4 fragment masses), and one harmonic
+  precursor was corrected (3,487 Da at charge 3 -> 6,974 Da at charge 6, a
+  better PTMS proteoform). PrSMs 3,331 and 3,338 against main's 3,337 and
+  3,338 (the run-to-run variation); same TopFD time. A new charge 1 feature
+  can cover a later window at the same m/z, so that the feature search for
+  windows without a feature skips it (scans 5806 and 5815 lost a 10,943 Da
+  precursor this way; neither is identified in any run).
 - **Research switches**: the defaults are in `GreedyPara` (cpp); the
   environment variable `TOPFD_GREEDY_PARA` ("name=value,...") overrides
   them, so that variants can be run without a rebuild (toppic_test
