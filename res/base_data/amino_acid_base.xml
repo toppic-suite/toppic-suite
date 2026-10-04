@@ -13,7 +13,7 @@
   <one_letter>A</one_letter>
   <three_letter>Ala</three_letter>
   <composition>C3H5ON</composition>
-  <mono_mass>71.0371137846</mono_mass>
+  <mono_mass>71.037113783000</mono_mass>
   <average_mass>71.079000000000</average_mass>
   <frequency>0.0828</frequency>
 </amino_acid>
@@ -22,7 +22,7 @@
   <one_letter>R</one_letter>
   <three_letter>Arg</three_letter>
   <composition>C6H12ON4</composition>
-  <mono_mass>156.10111102302</mono_mass>
+  <mono_mass>156.101111019036</mono_mass>
   <average_mass>156.189000000000</average_mass>
   <frequency>0.0554</frequency>
 </amino_acid>
@@ -31,7 +31,7 @@
   <one_letter>N</one_letter>
   <three_letter>Asn</three_letter>
   <composition>C4H6O2N2</composition>
-  <mono_mass>114.04292744016</mono_mass>
+  <mono_mass>114.042927438408</mono_mass>
   <average_mass>114.104000000000</average_mass>
   <frequency>0.0404</frequency>
 </amino_acid>
@@ -40,7 +40,7 @@
   <one_letter>D</one_letter>
   <three_letter>Asp</three_letter>
   <composition>C4H5O3N</composition>
-  <mono_mass>115.02694302280</mono_mass>
+  <mono_mass>115.026943021520</mono_mass>
   <average_mass>115.088000000000</average_mass>
   <frequency>0.0545</frequency>
 </amino_acid>
@@ -49,7 +49,7 @@
   <one_letter>C</one_letter>
   <three_letter>Cys</three_letter>
   <composition>C3H5ONS</composition>
-  <mono_mass>103.0091849595</mono_mass>
+  <mono_mass>103.009184956540</mono_mass>
   <average_mass>103.139000000000</average_mass>
   <frequency>0.0136</frequency>
 </amino_acid>
@@ -58,7 +58,7 @@
   <one_letter>E</one_letter>
   <three_letter>Glu</three_letter>
   <composition>C5H7O3N</composition>
-  <mono_mass>129.04259308732</mono_mass>
+  <mono_mass>129.042593085316</mono_mass>
   <average_mass>129.115000000000</average_mass>
   <frequency>0.0394</frequency>
 </amino_acid>
@@ -67,7 +67,7 @@
   <one_letter>Q</one_letter>
   <three_letter>Gln</three_letter>
   <composition>C5H8O2N2</composition>
-  <mono_mass>128.05857750468</mono_mass>
+  <mono_mass>128.058577502204</mono_mass>
   <average_mass>128.131000000000</average_mass>
   <frequency>0.0677</frequency>
 </amino_acid>
@@ -76,7 +76,7 @@
   <one_letter>G</one_letter>
   <three_letter>Gly</three_letter>
   <composition>C2H3ON</composition>
-  <mono_mass>57.02146372008</mono_mass>
+  <mono_mass>57.021463719204</mono_mass>
   <average_mass>57.052000000000</average_mass>
   <frequency>0.0709</frequency>
 </amino_acid>
@@ -85,7 +85,7 @@
   <one_letter>H</one_letter>
   <three_letter>His</three_letter>
   <composition>C6H7ON3</composition>
-  <mono_mass>137.05891185752</mono_mass>
+  <mono_mass>137.058911855296</mono_mass>
   <average_mass>137.142000000000</average_mass>
   <frequency>0.0227</frequency>
 </amino_acid>
@@ -94,7 +94,7 @@
   <one_letter>I</one_letter>
   <three_letter>Ile</three_letter>
   <composition>C6H11ON</composition>
-  <mono_mass>113.08406397816</mono_mass>
+  <mono_mass>113.084063974388</mono_mass>
   <average_mass>113.160000000000</average_mass>
   <frequency>0.0599</frequency>
 </amino_acid>
@@ -103,7 +103,7 @@
   <one_letter>L</one_letter>
   <three_letter>Leu</three_letter>
   <composition>C6H11ON</composition>
-  <mono_mass>113.08406397816</mono_mass>
+  <mono_mass>113.084063974388</mono_mass>
   <average_mass>113.160000000000</average_mass>
   <frequency>0.0967</frequency>
 </amino_acid>
@@ -112,7 +112,7 @@
   <one_letter>K</one_letter>
   <three_letter>Lys</three_letter>
   <composition>C6H12ON2</composition>
-  <mono_mass>128.09496301462</mono_mass>
+  <mono_mass>128.094963010536</mono_mass>
   <average_mass>128.175000000000</average_mass>
   <frequency>0.0586</frequency>
 </amino_acid>
@@ -121,7 +121,7 @@
   <one_letter>M</one_letter>
   <three_letter>Met</three_letter>
   <composition>C5H9ONS</composition>
-  <mono_mass>131.04048508854</mono_mass>
+  <mono_mass>131.040485084132</mono_mass>
   <average_mass>131.193000000000</average_mass>
   <frequency>0.0243</frequency>
 </amino_acid>
@@ -130,7 +130,7 @@
   <one_letter>F</one_letter>
   <three_letter>Phe</three_letter>
   <composition>C9H9ON</composition>
-  <mono_mass>147.06841391364</mono_mass>
+  <mono_mass>147.068413910592</mono_mass>
   <average_mass>147.177000000000</average_mass>
   <frequency>0.0386</frequency>
 </amino_acid>
@@ -139,7 +139,7 @@
   <one_letter>P</one_letter>
   <three_letter>Pro</three_letter>
   <composition>C5H7ON</composition>
-  <mono_mass>97.05276384912</mono_mass>
+  <mono_mass>97.052763846796</mono_mass>
   <average_mass>97.117000000000</average_mass>
   <frequency>0.0468</frequency>
 </amino_acid>
@@ -148,7 +148,7 @@
   <one_letter>S</one_letter>
   <three_letter>Ser</three_letter>
   <composition>C3H5O2N</composition>
-  <mono_mass>87.03202840370</mono_mass>
+  <mono_mass>87.032028402260</mono_mass>
   <average_mass>87.078000000000</average_mass>
   <frequency>0.0649</frequency>
 </amino_acid>
@@ -157,7 +157,7 @@
   <one_letter>T</one_letter>
   <three_letter>Thr</three_letter>
   <composition>C4H7O2N</composition>
-  <mono_mass>101.04767846822</mono_mass>
+  <mono_mass>101.047678466056</mono_mass>
   <average_mass>101.105000000000</average_mass>
   <frequency>0.0532</frequency>
 </amino_acid>
@@ -166,7 +166,7 @@
   <one_letter>W</one_letter>
   <three_letter>Trp</three_letter>
   <composition>C11H10ON2</composition>
-  <mono_mass>186.07931295010</mono_mass>
+  <mono_mass>186.079312946740</mono_mass>
   <average_mass>186.214000000000</average_mass>
   <frequency>0.0108</frequency>
 </amino_acid>
@@ -175,7 +175,7 @@
   <one_letter>Y</one_letter>
   <three_letter>Tyr</three_letter>
   <composition>C9H9NO2</composition>
-  <mono_mass>163.06332853274</mono_mass>
+  <mono_mass>163.063328529852</mono_mass>
   <average_mass>163.176000000000</average_mass>
   <frequency>0.0291</frequency>
 </amino_acid>
@@ -184,7 +184,7 @@
   <one_letter>V</one_letter>
   <three_letter>Val</three_letter>
   <composition>C5H9NO</composition>
-  <mono_mass>99.06841391364</mono_mass>
+  <mono_mass>99.068413910592</mono_mass>
   <average_mass>99.133000000000</average_mass>
   <frequency>0.0688</frequency>
 </amino_acid>
