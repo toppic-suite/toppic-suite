@@ -544,6 +544,22 @@ straight:
   charge only needs an isotope cosine of 0.8 (`single_min_cos`); envelopes
   with an EnvCNN score below 0.2 are not written (`min_envcnn`; a third of
   the envelopes, which only seeded extra MS1 features).
+- **Precursor windows without an envelope** (postprocessing step,
+  `addPrecWinEnvs`, switch `prec_win_post`, on by default; toppic_test
+  experiment 113): `deconvMsOneGreedy` passes the precursor windows of the
+  MS/MS spectra that follow the MS1 spectrum (`PrecWin`, not when
+  `prec_win` runs the precursor-window step first). After the EnvCNN
+  filter, a window in which no reported envelope has its reference (apex)
+  m/z, the test the MS1 feature detection uses to seed its search for
+  windows without a feature (`env_coll_detect`, `SeedEnv::getReferMz`),
+  gets the envelope of its most intense peak (`GreedySearch::fitWindow`,
+  on the original intensities): one peak in the window is a charge 1
+  peak; with more, every charge is tried as for a seed but without the
+  acceptance thresholds (the harmonic test stays) and the best series
+  score wins; the monoisotopic offset is kept only when the apex stays in
+  the window. One envelope per window (the window's charge), with its
+  EnvCNN score but not filtered by it; a window without a peak gets
+  nothing. `TOPFD_GREEDY_PREC_WIN_LOG=<file>` writes one line per window.
 - **Research switches**: the defaults are in `GreedyPara` (cpp); the
   environment variable `TOPFD_GREEDY_PARA` ("name=value,...") overrides
   them, so that variants can be run without a rebuild (toppic_test
