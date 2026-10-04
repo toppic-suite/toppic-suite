@@ -216,10 +216,11 @@ bool TopPIC_init(std::map<std::string, std::string>& arguments) {
   std::strftime(buf, 50, "%a %b %d %H:%M:%S %Y", std::localtime(&start));
 
   arguments["startTime"] = buf;
-  ToppicArgument::outputArguments(std::cout, " ", arguments);
-
+  // the base data first: the printout takes the masses of C57 and C58 from it
   std::string resource_dir = arguments["resourceDir"];
   base_data::init(resource_dir);
+  ToppicArgument::outputArguments(std::cout, " ", arguments);
+
   EnvBase::initBase(resource_dir);
 
   LOG_DEBUG("Init base data completed");

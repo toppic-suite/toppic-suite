@@ -18,12 +18,14 @@
 
 namespace toppic {
 
-// mass values are obtained from protpi.ch
+// Monoisotopic masses are sums of the AME2020 atomic masses (the Atomic Mass
+// Evaluation 2020, the masses IUPAC's CIAAW uses): 1H 1.007825031898,
+// 14N 14.00307400425, 16O 15.99491461926. The proton mass is CODATA 2022's.
 namespace mass_constant {
 /**
  * Returns the mass of an ammonia (NH3).
  */
-inline double getAmmoniaMass() { /* from IUPAC */ return 17.02654910098; }
+inline double getAmmoniaMass() { /* AME2020 */ return 17.026549099944; }
 
 /**
  * Returns the mass difference between two isotopic peaks.
@@ -33,25 +35,25 @@ inline double getAmmoniaMass() { /* from IUPAC */ return 17.02654910098; }
 inline double getIsotopeMass() { /* from Thrash paper */ return 1.00235; }
 
 /**
- * Returns the mass of an oxygen molecular.
+ * Returns the mass of an oxygen atom.
  */
-inline double getOxygenMass() { /* from IUPAC */ return 15.9949146191; }
+inline double getOxygenMass() { /* AME2020 */ return 15.99491461926; }
 
 /**
  * Returns the mass of a proton.
  */
-inline double getProtonMass() { /* from wikipedia */ return 1.007276466879; }
+inline double getProtonMass() { /* CODATA 2022 */ return 1.0072764665789; }
 
 /**
  * Returns the mass of a water molecule (H2O).
  */
-inline double getWaterMass() { /* from IUPAC */ return 18.01056468362; }
+inline double getWaterMass() { /* AME2020 */ return 18.010564683056; }
 
 /**
  * Returns the shift between the mass of a neutral y ion
  * and its corresponding suffix residue mass.
  */
-inline double getYIonShift() { /* from IUPAC */ return 18.01056468362; }
+inline double getYIonShift() { /* AME2020 */ return 18.010564683056; }
 
 }  // namespace mass_constant
 
