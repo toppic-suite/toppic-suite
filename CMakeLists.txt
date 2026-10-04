@@ -406,6 +406,11 @@ toppic_console_exe(toplib_build
 toppic_console_exe(toplib_search
   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/toplib_search.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/toplib_search_argument.cpp)
+# theo_patt_gen writes TopFD's averagine table res/base_data/theo_patt.txt
+# (common/emass). A developer tool: not part of the default target (build it
+# with `make theo_patt_gen`) and not in TOPPIC_EXECUTABLES, so not installed.
+toppic_console_exe(theo_patt_gen EXCLUDE_FROM_ALL
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/console/theo_patt_gen.cpp)
 
 # ---------------------------------------------------------------------------
 # GUI executables (Qt6)

@@ -261,7 +261,9 @@ custom prefix both work:
 - `install(TARGETS ${TOPPIC_EXECUTABLES} ...)` puts the seven CLI tools and
   the six `*_gui` counterparts (toplib_build and toplib_search have none) in `<prefix>/bin`. **When you add a new executable
   target, append it to the `TOPPIC_EXECUTABLES` list** (end of the file) so it
-  is installed and gets the rpath below — nothing else is needed.
+  is installed and gets the rpath below — nothing else is needed. The one
+  exception is a developer tool outside the default target, such as
+  `theo_patt_gen` (`EXCLUDE_FROM_ALL`), which stays out of the list.
 - On Linux the vendored `ext/onnx/libonnxruntime.so.1.23.2` and its SONAME symlink (which every
   executable loads at run time, via `toppic_common`) is installed to
   `<prefix>/${CMAKE_INSTALL_LIBDIR}` (= `lib/toppic`), and the executables get
@@ -1067,6 +1069,51 @@ because nothing in the search was changed. Facts to keep straight:
   `representative_id`, `flag`, `calculated_cosine_dist`), the table the
   script computes in `ms_query` and does not store.
 
+## Isotope distributions (`common/emass`)
+
+`common/emass` is a C++ port of toppic_test's `emass.py` (experiments 107,
+108 and 111): emass's convolutions of isotope patterns (abundance and
+abundance-weighted mass offset per number of extra neutrons, trailing peaks
+<= 1e-100 pruned, binary powers for whole atoms) and J.C.P. Miller's
+recurrence for fractional atom numbers (`BelowOne::kMixture` takes fewer
+than one atom as a mixture with and without it). `isotope_data` holds the
+isotopes of C, H, N, O and S (AME2020 masses, IUPAC representative
+abundances) and the averagine compositions: `kHumanAveragine` (the UniProt
+human reference proteome, experiment 108; the default),
+`kHumanNoSulphurAveragine` (the same proteome without cysteine and
+methionine, so C, H, N and O only; experiment 112) and `kSenkoAveragine`. `averagine_table::writeAveragineTable` writes TopFD's
+`res/base_data/theo_patt.txt` and reproduces the file of experiment 111
+byte for byte (toppic_test experiment 112, in 2.5 s against `emass.py`'s
+14 s). Facts to keep straight:
+
+- **Bit-identical to `emass.py`**, which experiment 112 checked for every
+  rounding and fractional atoms on 14 masses from 100 Da to 100 kDa: the
+  monoisotopic masses and the averagine unit mass are summed with
+  Neumaier's compensation as Python's `sum()` does (Python >= 3.12), the
+  convolutions sum each output in the order of the longer series as
+  `numpy.convolve` does, and `averagineFormula` rounds halves to even as
+  Python's `round()`. The elements are always convolved in the order C, H,
+  N, O, S; `emass.py`'s H-filled formulas list H last, which moves those
+  distributions by about 1e-16.
+- **It does not replace `EnvBase`.** TopFD still reads the table from
+  `theo_patt.txt` (`ms/env/env_base`); `common` cannot depend on `ms`, so
+  the table's 11,000 entries and 10 Da interval are repeated in
+  `averagine_table.cpp`. Keep the two in step.
+- **`theo_patt_gen`** (`src/console/theo_patt_gen.cpp`) is the command-line
+  front end: `theo_patt_gen [-o file] [-c human|human_no_sulphur|senko]
+  [-s k]` (`--output`, `--composition`, `--sulphur-num`; defaults
+  `theo_patt.txt`, `human`, 0). It is a
+  developer tool, declared
+  `EXCLUDE_FROM_ALL`: `make` does not build it (`make theo_patt_gen`
+  does), it is deliberately absent from `TOPPIC_EXECUTABLES` (CMake
+  documents installing an `EXCLUDE_FROM_ALL` target as undefined behaviour)
+  and it has no manual. Regenerate the resource with
+  `bin/theo_patt_gen -o res/base_data/theo_patt.txt`. `--sulphur-num k`
+  (0-5; k > 0 only with `human_no_sulphur`) gives every formula exactly k
+  S (`averagineFormulaWithSulphur`): the composition is scaled to the entry
+  mass minus k 32S masses (at least 0, so the lightest entries are S_k
+  alone) and k S are added.
+
 ## Source layout
 
 `src` is the include root, so headers are included by their path from `src`
@@ -1077,7 +1124,8 @@ are linked directly into each executable, so **no `libtoppic_common.so`/`.a` is
 built**; the executables are self-contained. Each layer depends only on the ones
 above it, never the reverse:
 
-- `src/common` — foundation: `base`, `util`, `xml`, `thread`.
+- `src/common` — foundation: `base`, `util`, `xml`, `thread`, `emass`
+  (isotope distributions; see its section).
 - `src/sql` — thin SQLite helper (`sql_util`: `execSql`, `prepareSql`,
   `stepAndReset`, all abort on error — use them rather than re-implementing
   the prepare/step boilerplate) plus `ms_sql_writer`, the
@@ -1247,7 +1295,8 @@ NOT in `COMMON_SRCS`; each is its own `add_executable` that links
 
 - `src/console` — the command-line tools. Each is a `main()` (`topfd.cpp`,
   `topdia.cpp`, `topindex.cpp`, `toppic.cpp`, `topmg.cpp`, `topdiff.cpp`,
-  `toplib_build.cpp`, `toplib_search.cpp`) plus
+  `toplib_build.cpp`, `toplib_search.cpp`; plus the developer tool
+  `theo_patt_gen.cpp`, a single file outside the default target) plus
   its `<tool>_argument.cpp` parser (`boost::program_options`) plus, for the four
   multi-step tools, its `<tool>_process.cpp` orchestrator. topfd/topdia have no
   `*_process` here — they drive the `topfd_process`/`topdia_process`
