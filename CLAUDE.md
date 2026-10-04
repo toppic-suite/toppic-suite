@@ -1049,13 +1049,26 @@ not a variable PTM. Facts to keep straight:
   acetylated form was allowed; now only the `-i`/`-b` file's PTMs are
   names) and set `NME` for every start at residue 1.
 - **Unexpected shifts are not read as forms**: an N-terminal acetylation
-  that an alignment explains with an unexpected shift (`--num-shift` > 0)
-  stays one.
+  that an alignment explains with an unexpected shift (topmg's default
+  `--num-shift 1` allows one) stays one.
 - **MCMC E-values** (`comp_pvalue_mcmc`): the residue sequence's N-terminal
   mod is added to the N-terminal fragment masses of the PrSM and of the
   random sequences (`n_term_shift_`); the candidate counts already have
   the forms (`CountTestNum`). TDGF (toppic `--topmg`) handles the forms as
   for toppic's own PrSMs.
+- **Results** (toppic_test experiment 115, report 0115; 480_F3_02, topmg
+  `-f C57 -d -t FDR -T FDR`, oxidation M, acetyl K, phospho STY): on the
+  spectra topmg and toppic both identify with the same protein and toppic
+  starts at residue 1-2, the same form and start in 89.9% (main 21.7%;
+  `--topmg topmg-only` 81.6%, main 18.5%); the final topmg table has 299
+  NME_ACETYLATION and 35 M_ACETYLATION PrSMs and no variable Acetyl where
+  an acetylated form fits (main: 188 such PrSMs, 140 Acetyls on ranges
+  without K). topmg 2,009 and 1,995 PrSMs against 1,854 (the acetylated
+  forms' MCMC E-values, a median 10^0.63 better); `--topmg topmg-only`
+  2,976 against 2,979 (TDGF: one PTM fewer, x1/4). No time cost. The
+  remaining disagreements with toppic are alignments: histone H2B starts,
+  isobaric alternatives (acetyl-S N-terminus against a C-terminal E;
+  acetylation + K adduct against Phospho), an acetyl put on a K further in.
 
 ## Precursor +-1 Da error per identification stage (`para/sp_para`)
 
