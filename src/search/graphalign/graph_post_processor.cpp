@@ -20,7 +20,9 @@
 #include <unordered_map>
 #include <vector>
 
+#include "common/base/mod_base.hpp"
 #include "common/base/prot_mod_base.hpp"
+#include "common/base/prot_mod_util.hpp"
 #include "common/base/ptm_base.hpp"
 #include "common/base/ptm_util.hpp"
 #include "common/util/file_util.hpp"
@@ -33,6 +35,8 @@
 #include "prsm/prsm_xml_writer.hpp"
 #include "search/graphalign/graph_align_mng.hpp"
 #include "seq/mass_shift.hpp"
+#include "seq/proteoform_factory.hpp"
+#include "seq/residue_seq.hpp"
 
 namespace toppic {
 
@@ -55,19 +59,11 @@ std::vector<double> mass_split(double mass,
 }
 
 void GraphPostProcessor::geneMassPtmMap() {
-  PrsmParaPtr prsm_para_ptr = mng_ptr_->prsm_para_ptr_;
   std::string var_mod_file_name = mng_ptr_->var_mod_file_name_;
 
+  // the variable PTMs of the file only: the acetylation of a protein
+  // N-terminal form is the form's (chooseNTermForm), not a variable PTM
   std::vector<PtmPtr> ptm_vec = toppic::ptm_util::readPtmTxt(var_mod_file_name);
-
-  ProtModPtrVec prot_mod_vec = prsm_para_ptr->getProtModPtrVec();
-  for (size_t i = 0; i < prot_mod_vec.size(); i++) {
-    if (prot_mod_vec[i]->getType() == ProtModBase::getType_M_ACETYLATION() ||
-        prot_mod_vec[i]->getType() == ProtModBase::getType_NME_ACETYLATION()) {
-      ptm_vec.push_back(PtmBase::getPtmPtrByAbbrName("Acetyl"));
-      break;
-    }
-  }
 
   std::sort(ptm_vec.begin(), ptm_vec.end(),
             [](const PtmPtr& a, const PtmPtr& b) {
@@ -220,6 +216,170 @@ std::vector<PtmPtrVec> GraphPostProcessor::choosePtmCombs(
   return combs;
 }
 
+int GraphPostProcessor::nearestPtmComb(int mass, int max_ptm_num,
+                                       PtmPtrVec& ptm_vec) {
+  int err = -1;
+  ptm_vec.clear();
+  for (auto it = mass_ptm_map_.begin(); it != mass_ptm_map_.end(); it++) {
+    if (static_cast<int>(it->second.size()) > max_ptm_num) {
+      continue;
+    }
+    if (err < 0 || std::abs(mass - it->first) < err) {
+      err = std::abs(mass - it->first);
+      ptm_vec = it->second;
+    }
+  }
+  return err;
+}
+
+namespace {
+
+double ptmMassSum(const PtmPtrVec& ptm_vec) {
+  double mass = 0;
+  for (size_t i = 0; i < ptm_vec.size(); i++) {
+    mass += ptm_vec[i]->getMonoMass();
+  }
+  return mass;
+}
+
+// A mass shift of a proteoform that starts offset residues later: its
+// positions moved by offset, a shift that began on a removed residue
+// beginning on the new first residue.
+MassShiftPtr moveShift(const MassShiftPtr& shift_ptr, int offset) {
+  int left = std::max(0, shift_ptr->getLeftBpPos() - offset);
+  int right = std::max(left, shift_ptr->getRightBpPos() - offset);
+  MassShiftPtr new_shift_ptr =
+      std::make_shared<MassShift>(left, right, shift_ptr->getMassShift());
+  AlterPtrVec alter_ptrs = shift_ptr->getAlterPtrVec();
+  AlterPtrVec new_alter_ptrs;
+  for (size_t i = 0; i < alter_ptrs.size(); i++) {
+    int alter_left = std::max(0, alter_ptrs[i]->getLeftBpPos() - offset);
+    int alter_right =
+        std::max(alter_left, alter_ptrs[i]->getRightBpPos() - offset);
+    new_alter_ptrs.push_back(std::make_shared<Alter>(
+        alter_left, alter_right, alter_ptrs[i]->getTypePtr(),
+        alter_ptrs[i]->getMass(), alter_ptrs[i]->getModPtr()));
+  }
+  new_shift_ptr->setAlterPtrVec(new_alter_ptrs);
+  return new_shift_ptr;
+}
+
+}  // namespace
+
+// The protein N-terminal form of a PrSM, among those -n allows and allowMod
+// accepts for its protein. The graph alignment's form edges are at residue 0
+// (ProteoAnno::anno) and take a variable PTM layer, so an alignment that
+// used one starts at the protein N-terminus and has a variable shift that
+// begins at its first residue: its mass is the form's acetylation, alone or
+// with variable PTMs of the residues after it. Start 0: NONE, M_ACETYLATION
+// (the shift less the acetyl) or NME_ACETYLATION (the acetyl in place of the
+// M: the shift less the acetyl plus the M; the proteoform starts at residue
+// 1). Start 1: NME when allowed, else NONE (a truncation), or
+// NME_ACETYLATION (the shift less the acetyl). Later starts: NONE.
+//
+// The shift named as it is (the nearest PTM combination, as choosePtmCombs
+// names it while the proteoform keeps --var-ptm) is the form without an
+// acetylation. An acetylated form leaves
+// the rest of the shift: nothing, or the nearest PTM combination. It is
+// taken when it explains the shift at least as well, with a mass error (in
+// Da) within the alignment tolerance or no larger than the shift's own error
+// up to twice the tolerance, and with fewer variable PTMs, or as many and a
+// smaller error. The errors are compared in Da: the integer masses round the
+// two explanations of one shift differently. The shift's own error allows
+// for the diagonals' mass estimates, which miss a PTM's mass by more than
+// the tolerance at times (0.10-0.15 Da for an acetylation).
+GraphNTermForm GraphPostProcessor::chooseNTermForm(
+    const ProteoformPtr& form_ptr, const MassShiftPtr& first_shift_ptr) {
+  GraphNTermForm plain;
+  plain.prot_mod_ptr = ProtModBase::getProtModPtr_NONE();
+  int start = form_ptr->getStartPos();
+  if (start > 1) {
+    return plain;
+  }
+  PrsmParaPtr prsm_para_ptr = mng_ptr_->prsm_para_ptr_;
+  ProteoformPtr db_form_ptr = proteoform_factory::geneDbProteoformPtr(
+      form_ptr->getFastaSeqPtr(), prsm_para_ptr->getFixModPtrVec());
+  const ResiduePtrVec& residues = db_form_ptr->getResSeqPtr()->getResidues();
+
+  std::vector<GraphNTermForm> acetyl_forms;
+  ProtModPtrVec prot_mod_ptrs = prsm_para_ptr->getProtModPtrVec();
+  for (size_t i = 0; i < prot_mod_ptrs.size(); i++) {
+    const ProtModPtr& mod_ptr = prot_mod_ptrs[i];
+    if (!prot_mod_util::allowMod(mod_ptr, residues)) {
+      continue;
+    }
+    std::string type = mod_ptr->getType();
+    if (type == ProtModBase::getType_NME()) {
+      if (start == 1) {
+        plain.prot_mod_ptr = mod_ptr;
+      }
+      continue;
+    }
+    if (first_shift_ptr == nullptr) {
+      continue;
+    }
+    double acetyl_mass = mod_ptr->getModPtr()->getShift();
+    GraphNTermForm form;
+    form.prot_mod_ptr = mod_ptr;
+    form.takes_first_shift = true;
+    if (type == ProtModBase::getType_M_ACETYLATION() && start == 0) {
+      form.remain_mass = first_shift_ptr->getMassShift() - acetyl_mass;
+    } else if (type == ProtModBase::getType_NME_ACETYLATION() && start == 0) {
+      form.start_offset = 1;
+      form.remain_mass = first_shift_ptr->getMassShift() -
+                         (acetyl_mass - residues[0]->getMass());
+    } else if (type == ProtModBase::getType_NME_ACETYLATION() && start == 1) {
+      form.remain_mass = first_shift_ptr->getMassShift() - acetyl_mass;
+    } else {
+      continue;
+    }
+    acetyl_forms.push_back(form);
+  }
+  if (acetyl_forms.empty()) {
+    return plain;
+  }
+
+  double tole = mng_ptr_->topmg_align_error_tolerance_;
+  double shift_mass = first_shift_ptr->getMassShift();
+  PtmPtrVec ptm_vec;
+  nearestPtmComb(std::ceil(shift_mass * mng_ptr_->convert_ratio_),
+                 mng_ptr_->max_known_mods_, ptm_vec);
+  double plain_err = std::abs(shift_mass - ptmMassSum(ptm_vec));
+  double max_err = std::max(tole, std::min(plain_err, 2 * tole));
+  // a margin for the rounding of masses that are equal
+  const double eps = 1e-6;
+  GraphNTermForm best = plain;
+  int best_ptm_num = static_cast<int>(ptm_vec.size());
+  double best_err = plain_err;
+  for (size_t i = 0; i < acetyl_forms.size(); i++) {
+    GraphNTermForm form = acetyl_forms[i];
+    double err;
+    int ptm_num = 0;
+    if (std::abs(form.remain_mass) <= max_err + eps) {
+      form.drop_first_shift = true;
+      err = std::abs(form.remain_mass);
+    } else {
+      if (nearestPtmComb(
+              std::ceil(form.remain_mass * mng_ptr_->convert_ratio_),
+              mng_ptr_->max_known_mods_, ptm_vec) < 0) {
+        continue;
+      }
+      err = std::abs(form.remain_mass - ptmMassSum(ptm_vec));
+      ptm_num = static_cast<int>(ptm_vec.size());
+    }
+    if (err > max_err + eps) {
+      continue;
+    }
+    if (ptm_num < best_ptm_num ||
+        (ptm_num == best_ptm_num && err < best_err - eps)) {
+      best = form;
+      best_ptm_num = ptm_num;
+      best_err = err;
+    }
+  }
+  return best;
+}
+
 void GraphPostProcessor::process() {
   PrsmParaPtr prsm_para_ptr = mng_ptr_->prsm_para_ptr_;
   SpParaPtr sp_para_ptr = prsm_para_ptr->getSpParaPtr();
@@ -275,9 +435,34 @@ void GraphPostProcessor::process() {
           std::sort(pair_vec.begin(), pair_vec.end(),
                     PeakIonPair::cmpTheoPeakPosInc);
 
+          ProteoformPtr form_ptr = prsm_ptr->getProteoformPtr();
           MassShiftPtrVec shift_vec =
-              prsm_ptr->getProteoformPtr()->getMassShiftPtrVec(
-                  AlterType::VARIABLE);
+              form_ptr->getMassShiftPtrVec(AlterType::VARIABLE);
+
+          // The protein N-terminal form first: an acetylated form takes its
+          // acetylation from the variable shift that begins at the first
+          // residue, and the rest of that shift is named below, or the shift
+          // is dropped when nothing is left.
+          int first_idx = -1;
+          for (size_t k = 0; k < shift_vec.size(); k++) {
+            if (shift_vec[k]->getLeftBpPos() == 0) {
+              first_idx = static_cast<int>(k);
+              break;
+            }
+          }
+          MassShiftPtr first_shift_ptr =
+              first_idx < 0 ? nullptr : shift_vec[first_idx];
+          GraphNTermForm n_form = chooseNTermForm(form_ptr, first_shift_ptr);
+          if (n_form.takes_first_shift) {
+            if (n_form.drop_first_shift) {
+              shift_vec.erase(shift_vec.begin() + first_idx);
+            } else {
+              MassShiftPtr remain_ptr =
+                  std::make_shared<MassShift>(shift_vec[first_idx], 0);
+              remain_ptr->setMassShift(n_form.remain_mass);
+              shift_vec[first_idx] = remain_ptr;
+            }
+          }
 
           std::vector<PtmPtrVec> ptm_combs = choosePtmCombs(shift_vec);
           for (size_t k = 0; k < shift_vec.size(); k++) {
@@ -311,12 +496,8 @@ void GraphPostProcessor::process() {
             shift_vec[k] = shift_ptr;
           }
 
-          ProtModPtr prot_mod = prsm_ptr->getProteoformPtr()->getProtModPtr();
-
-          if (prsm_ptr->getProteoformPtr()->getStartPos() == 1) {
-            prot_mod =
-                ProtModBase::getProtModPtrByName(ProtModBase::getType_NME());
-          }
+          // it used to be NME whenever the proteoform started at residue 1
+          ProtModPtr prot_mod = n_form.prot_mod_ptr;
 
           MassShiftPtrVec unknown_shift_vec =
               prsm_ptr->getProteoformPtr()->getMassShiftPtrVec(
@@ -367,11 +548,38 @@ void GraphPostProcessor::process() {
           fix_shift_vec.insert(fix_shift_vec.end(), shift_vec.begin(),
                                shift_vec.end());
 
+          // The form as toppic builds it (proteoform_factory::
+          // geneProtModProteoform): the residues from the form's start, the
+          // acetylation as the N-terminal modification of the residue
+          // sequence (its mass) and a PROTEIN_VARIABLE shift on the first
+          // residue (the annotation).
+          int offset = n_form.start_offset;
+          ResSeqPtr res_seq_ptr = form_ptr->getResSeqPtr();
+          ModPtr n_term_mod_ptr = prot_mod->getModPtr();
+          bool acetylated = !ModBase::isNTermNoneModPtr(n_term_mod_ptr);
+          if (offset > 0) {
+            for (size_t k = 0; k < fix_shift_vec.size(); k++) {
+              fix_shift_vec[k] = moveShift(fix_shift_vec[k], offset);
+            }
+          }
+          if (offset > 0 || acetylated) {
+            const ResiduePtrVec& residues = res_seq_ptr->getResidues();
+            ResiduePtrVec form_residues(residues.begin() + offset,
+                                        residues.end());
+            res_seq_ptr =
+                std::make_shared<ResidueSeq>(form_residues, n_term_mod_ptr);
+          }
+          if (acetylated) {
+            AlterPtr alter_ptr = std::make_shared<Alter>(
+                0, 1, AlterType::PROTEIN_VARIABLE, n_term_mod_ptr->getShift(),
+                n_term_mod_ptr);
+            fix_shift_vec.push_back(std::make_shared<MassShift>(alter_ptr));
+          }
+
           ProteoformPtr new_form = std::make_shared<Proteoform>(
-              prsm_ptr->getProteoformPtr()->getFastaSeqPtr(), prot_mod,
-              prsm_ptr->getProteoformPtr()->getStartPos(),
-              prsm_ptr->getProteoformPtr()->getEndPos(),
-              prsm_ptr->getProteoformPtr()->getResSeqPtr(), fix_shift_vec);
+              form_ptr->getFastaSeqPtr(), prot_mod,
+              form_ptr->getStartPos() + offset, form_ptr->getEndPos(),
+              res_seq_ptr, fix_shift_vec);
 
           // new_form->setVariablePtmNum(prsm_ptr->getProteoformPtr()->getVariablePtmNum());
 

@@ -180,7 +180,9 @@ void GraphAlign::initTable() {
   LOG_DEBUG("init table step 1");
   int init_aa_num = proteo_ver_num_;
   if (mng_ptr_->whole_protein_only_) {
-    init_aa_num = std::min(2, proteo_ver_num_);
+    // the protein N-terminus, or its second residue when NME is allowed for
+    // the protein (the acetylated forms start at the N-terminus)
+    init_aa_num = std::min(proteo_graph_ptr_->isNme() ? 2 : 1, proteo_ver_num_);
   }
   for (int i = 0; i < init_aa_num; i++) {
     size_t cell = getCellIdx(i, 0);

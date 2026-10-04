@@ -87,6 +87,9 @@ class CompPValueMCMC {
 
   double pep_mass_;
 
+  // the mass of the protein N-terminal modification (0 without one)
+  double n_term_shift_ = 0;
+
   std::vector<long long> mu_;
 
   ActivationPtr act_;

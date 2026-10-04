@@ -28,10 +28,13 @@ namespace toppic {
 
 std::mt19937 rng(0);
 
+// n_term_shift: the mass of the protein N-terminal form's modification (the
+// acetylation of M_ACETYLATION and NME_ACETYLATION), on every N-terminal
+// fragment and on none of the C-terminal ones
 void getTheoMassVec(const ResiduePtrVec& residues,
                     const IonTypePtr& n_ion_type_ptr,
                     const IonTypePtr& c_ion_type_ptr, double min_mass,
-                    std::vector<double>& n_theo_masses,
+                    double n_term_shift, std::vector<double>& n_theo_masses,
                     std::vector<double>& c_theo_masses) {
   n_theo_masses.clear();
 
@@ -46,7 +49,7 @@ void getTheoMassVec(const ResiduePtrVec& residues,
     prm += residues[i]->getMass();
     double srm = res_mass - prm;
 
-    double n_mass = prm + n_ion_type_ptr->getShift();
+    double n_mass = prm + n_term_shift + n_ion_type_ptr->getShift();
     n_theo_masses.push_back(n_mass);
 
     double c_mass = srm + c_ion_type_ptr->getShift();
@@ -126,6 +129,10 @@ double CompPValueMCMC::compOneProbMCMC(const PrsmPtr& prsm_ptr,
 
   pep_mass_ = residue_util::compResiduePtrVecMass(
       prot_form->getResSeqPtr()->getResidues());
+
+  // the protein N-terminal form's modification stays on the N-terminus of
+  // the PrSM and of every random sequence
+  n_term_shift_ = prot_form->getResSeqPtr()->getNModPtr()->getShift();
 
   ptm_vec_ = prot_form->getPtmVec(AlterType::VARIABLE);
 
@@ -248,7 +255,7 @@ int CompPValueMCMC::compScoreNoPtm() {
 
 int CompPValueMCMC::getMaxScore(const ResiduePtrVec& residues) {
   getTheoMassVec(residues, act_->getNIonTypePtr(), act_->getCIonTypePtr(),
-                 min_mass_, n_theo_masses_, c_theo_masses_);
+                 min_mass_, n_term_shift_, n_theo_masses_, c_theo_masses_);
 
   // no ptm. almost never happen
   if (this->ptm_vec_.size() == 0) return compScoreNoPtm();
