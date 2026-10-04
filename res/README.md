@@ -34,7 +34,7 @@ Data tables:
 
 | File | Contents |
 |---|---|
-| `theo_patt.txt` | Theoretical isotopic distributions, tabulated by mass, used by TopFD's envelope detection (`EnvBase`). Stored with Git LFS (about 18 MB). |
+| `theo_patt.txt` | Theoretical isotopic distributions, tabulated by mass, used by TopFD's envelope detection (`EnvBase`): 11,000 entries, one per 10 Da of monoisotopic mass (entry i for 10 i Da; entry 0 repeats entry 1). Each is the human averagine of the UniProt human reference proteome (UP000005640, release 2026_03: C 4.9202, H 7.7647, N 1.3745, O 1.4842, S 0.0443 per residue of the 20 standard amino acids) scaled to the mass with each of the five atom numbers rounded (no hydrogen filling the mass, so an entry's exact mass, in its formula line, lies up to about 35 Da from 10 i Da), computed by the emass method with AME2020 isotope masses and IUPAC representative abundances (toppic_test experiments 107, 108 and 111). Every peak from the monoisotopic one is listed (`Env::Env` takes the first listed peak as the monoisotopic one), up to the last of at least 5e-9 of the apex; intensities in % of the apex. The previous table was emass output with emass's old abundances, another composition and no monoisotopic peak from 36 kDa. Stored with Git LFS (about 21 MB). |
 | `mass_table.txt` | Table of residue combinations by mass, used by TopMG's TopMCMC p-value estimation. |
 | `env_rescore_para.txt` | Parameters of a former envelope re-scoring model; not read by the tools. |
 
