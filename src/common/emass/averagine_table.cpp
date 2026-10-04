@@ -38,9 +38,9 @@ const double kMassInterval = 10.0;
 const double kTailLimit = 5e-9;
 
 void writeEntry(std::ostream &out, double mass,
-                const Composition &composition) {
-  Formula formula = averagineFormula(mass, AtomRounding::kRoundEach,
-                                     composition);
+                const Composition &composition, int sulphur_num) {
+  Formula formula = averagineFormulaWithSulphur(
+      mass, sulphur_num, AtomRounding::kRoundEach, composition);
   IsotopeDistribution distr = getDistribution(formula);
   const std::vector<double> &rel = distr.rel_abundances;
   size_t apex = std::distance(rel.begin(),
@@ -73,23 +73,25 @@ void writeEntry(std::ostream &out, double mass,
 
 }  // namespace
 
-void writeAveragineTable(std::ostream &out, const Composition &composition) {
+void writeAveragineTable(std::ostream &out, const Composition &composition,
+                         int sulphur_num) {
   for (int i = 0; i < kEntryNum; i++) {
     if (i > 0) {
       out << "\n";
     }
-    writeEntry(out, kMassInterval * std::max(i, 1), composition);
+    writeEntry(out, kMassInterval * std::max(i, 1), composition,
+               sulphur_num);
   }
 }
 
 void writeAveragineTable(const std::string &file_name,
-                         const Composition &composition) {
+                         const Composition &composition, int sulphur_num) {
   std::ofstream out(file_name);
   if (!out.is_open()) {
     LOG_ERROR("Cannot open the averagine table file " << file_name << "!");
     exit(EXIT_FAILURE);
   }
-  writeAveragineTable(out, composition);
+  writeAveragineTable(out, composition, sulphur_num);
   out.close();
   if (out.fail()) {
     LOG_ERROR("Cannot write the averagine table file " << file_name << "!");

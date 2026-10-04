@@ -104,6 +104,16 @@ Formula averagineFormula(double mono_mass, AtomRounding rounding,
   return formula;
 }
 
+Formula averagineFormulaWithSulphur(double mono_mass, int sulphur_num,
+                                    AtomRounding rounding,
+                                    const Composition &composition) {
+  double rest = mono_mass - sulphur_num * getIsotopes(kSulfur)[0].mass;
+  Formula formula = averagineFormula(std::max(rest, 0.0), rounding,
+                                     composition);
+  formula[kSulfur] += sulphur_num;
+  return formula;
+}
+
 double getMonoMass(const Formula &formula) {
   std::vector<double> terms;
   for (int e = 0; e < kElementNum; e++) {

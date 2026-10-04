@@ -63,6 +63,16 @@ Formula averagineFormula(double mono_mass,
                          AtomRounding rounding = AtomRounding::kRoundEach,
                          const Composition &composition = kHumanAveragine);
 
+// The averagine formula of mono_mass with sulphur_num sulphur atoms: the
+// composition, normally a sulphur-free one, scaled to mono_mass minus
+// sulphur_num times the 32S mass (0 if that is negative) and rounded as
+// averagineFormula does, plus sulphur_num S. With sulphur_num 0 it is
+// averagineFormula.
+Formula averagineFormulaWithSulphur(
+    double mono_mass, int sulphur_num,
+    AtomRounding rounding = AtomRounding::kRoundEach,
+    const Composition &composition = kHumanNoSulphurAveragine);
+
 // The monoisotopic mass of a formula.
 double getMonoMass(const Formula &formula);
 

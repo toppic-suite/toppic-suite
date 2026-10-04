@@ -17,6 +17,8 @@
 // (common/emass/averagine_table). A developer tool: not built by default
 // (make theo_patt_gen) and not installed.
 
+#include <algorithm>
+#include <cctype>
 #include <cstdlib>
 #include <iostream>
 #include <string>
@@ -27,10 +29,18 @@
 #include "common/emass/isotope_data.hpp"
 #include "common/util/version.hpp"
 
+namespace {
+
+// The largest value of --sulphur-num.
+const int kMaxSulphurNum = 5;
+
+}  // namespace
+
 int main(int argc, char* argv[]) {
   namespace po = boost::program_options;
   std::string output = "theo_patt.txt";
   std::string composition = "human";
+  std::string sulphur_str = "0";
   po::options_description desc("Options");
   desc.add_options()("help,h", "Print the help message.")(
       "output,o", po::value<std::string>(&output),
@@ -40,7 +50,11 @@ int main(int argc, char* argv[]) {
       "residue of the UniProt human reference proteome (UP000005640, "
       "release 2026_03); human_no_sulphur, the same without cysteine and "
       "methionine (C, H, N and O only); senko, Senko, Beu and McLafferty's "
-      "(JASMS 6:229, 1995). Default: human.");
+      "(JASMS 6:229, 1995). Default: human.")(
+      "sulphur-num", po::value<std::string>(&sulphur_str),
+      "<0-5>. The number k of sulphur atoms in every formula: the "
+      "composition is scaled to the mass minus k 32S masses and k S are "
+      "added. Only with human_no_sulphur when k > 0. Default: 0.");
   po::variables_map vm;
   try {
     // no positional arguments: a stray one is an error, not ignored
@@ -79,9 +93,32 @@ int main(int argc, char* argv[]) {
               << "; use human, human_no_sulphur or senko." << std::endl;
     return EXIT_FAILURE;
   }
+  if (sulphur_str.empty() ||
+      !std::all_of(sulphur_str.begin(), sulphur_str.end(),
+                   [](unsigned char c) { return std::isdigit(c); })) {
+    std::cerr << "Error: --sulphur-num " << sulphur_str
+              << " is not a non-negative integer." << std::endl;
+    return EXIT_FAILURE;
+  }
+  if (sulphur_str.size() > 2 || std::stoi(sulphur_str) > kMaxSulphurNum) {
+    std::cerr << "Error: --sulphur-num " << sulphur_str << " is above "
+              << kMaxSulphurNum << ", the largest value." << std::endl;
+    return EXIT_FAILURE;
+  }
+  int sulphur_num = std::stoi(sulphur_str);
+  if (sulphur_num > 0 && composition != "human_no_sulphur") {
+    std::cerr << "Error: --sulphur-num " << sulphur_num
+              << " needs the human_no_sulphur composition (-c "
+                 "human_no_sulphur)." << std::endl;
+    return EXIT_FAILURE;
+  }
   std::cout << "Writing the averagine table (" << composition
-            << " averagine) to " << output << " - started." << std::endl;
-  toppic::emass::writeAveragineTable(output, comp);
+            << " averagine";
+  if (sulphur_num > 0) {
+    std::cout << ", " << sulphur_num << " S per formula";
+  }
+  std::cout << ") to " << output << " - started." << std::endl;
+  toppic::emass::writeAveragineTable(output, comp, sulphur_num);
   std::cout << "Writing the averagine table - finished." << std::endl;
   return EXIT_SUCCESS;
 }

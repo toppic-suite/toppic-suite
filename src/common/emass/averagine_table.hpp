@@ -36,11 +36,17 @@ namespace emass {
 // last peak of at least 5e-9 of the apex (emass's print limit). Masses have
 // six decimals, intensities seven significant digits. With the default
 // human averagine the output is the table of toppic_test experiment 111.
+// With sulphur_num k > 0, every formula has exactly k S
+// (averagineFormulaWithSulphur): the composition, normally
+// kHumanNoSulphurAveragine, is scaled to the entry mass minus k 32S masses
+// (an entry lighter than those, or up to about 7 Da heavier, is S_k alone).
 void writeAveragineTable(std::ostream &out,
-                         const Composition &composition = kHumanAveragine);
+                         const Composition &composition = kHumanAveragine,
+                         int sulphur_num = 0);
 
 void writeAveragineTable(const std::string &file_name,
-                         const Composition &composition = kHumanAveragine);
+                         const Composition &composition = kHumanAveragine,
+                         int sulphur_num = 0);
 
 }  // namespace emass
 
