@@ -1067,6 +1067,36 @@ because nothing in the search was changed. Facts to keep straight:
   `representative_id`, `flag`, `calculated_cosine_dist`), the table the
   script computes in `ms_query` and does not store.
 
+## Isotope distributions (`common/emass`)
+
+`common/emass` is a C++ port of toppic_test's `emass.py` (experiments 107,
+108 and 111): emass's convolutions of isotope patterns (abundance and
+abundance-weighted mass offset per number of extra neutrons, trailing peaks
+<= 1e-100 pruned, binary powers for whole atoms) and J.C.P. Miller's
+recurrence for fractional atom numbers (`BelowOne::kMixture` takes fewer
+than one atom as a mixture with and without it). `isotope_data` holds the
+isotopes of C, H, N, O and S (AME2020 masses, IUPAC representative
+abundances) and the averagine compositions: `kHumanAveragine` (the UniProt
+human reference proteome, experiment 108; the default) and
+`kSenkoAveragine`. `averagine_table::writeAveragineTable` writes TopFD's
+`res/base_data/theo_patt.txt` and reproduces the file of experiment 111
+byte for byte (toppic_test experiment 112, in 2.5 s against `emass.py`'s
+14 s). Facts to keep straight:
+
+- **Bit-identical to `emass.py`**, which experiment 112 checked for every
+  rounding and fractional atoms on 14 masses from 100 Da to 100 kDa: the
+  monoisotopic masses and the averagine unit mass are summed with
+  Neumaier's compensation as Python's `sum()` does (Python >= 3.12), the
+  convolutions sum each output in the order of the longer series as
+  `numpy.convolve` does, and `averagineFormula` rounds halves to even as
+  Python's `round()`. The elements are always convolved in the order C, H,
+  N, O, S; `emass.py`'s H-filled formulas list H last, which moves those
+  distributions by about 1e-16.
+- **It does not replace `EnvBase`.** TopFD still reads the table from
+  `theo_patt.txt` (`ms/env/env_base`); `common` cannot depend on `ms`, so
+  the table's 11,000 entries and 10 Da interval are repeated in
+  `averagine_table.cpp`. Keep the two in step.
+
 ## Source layout
 
 `src` is the include root, so headers are included by their path from `src`
@@ -1077,7 +1107,8 @@ are linked directly into each executable, so **no `libtoppic_common.so`/`.a` is
 built**; the executables are self-contained. Each layer depends only on the ones
 above it, never the reverse:
 
-- `src/common` — foundation: `base`, `util`, `xml`, `thread`.
+- `src/common` — foundation: `base`, `util`, `xml`, `thread`, `emass`
+  (isotope distributions; see its section).
 - `src/sql` — thin SQLite helper (`sql_util`: `execSql`, `prepareSql`,
   `stepAndReset`, all abort on error — use them rather than re-implementing
   the prepare/step boilerplate) plus `ms_sql_writer`, the
