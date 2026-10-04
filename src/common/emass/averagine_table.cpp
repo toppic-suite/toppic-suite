@@ -90,6 +90,11 @@ void writeAveragineTable(const std::string &file_name,
     exit(EXIT_FAILURE);
   }
   writeAveragineTable(out, composition);
+  out.close();
+  if (out.fail()) {
+    LOG_ERROR("Cannot write the averagine table file " << file_name << "!");
+    exit(EXIT_FAILURE);
+  }
 }
 
 }  // namespace emass

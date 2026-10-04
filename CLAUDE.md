@@ -261,7 +261,9 @@ custom prefix both work:
 - `install(TARGETS ${TOPPIC_EXECUTABLES} ...)` puts the seven CLI tools and
   the six `*_gui` counterparts (toplib_build and toplib_search have none) in `<prefix>/bin`. **When you add a new executable
   target, append it to the `TOPPIC_EXECUTABLES` list** (end of the file) so it
-  is installed and gets the rpath below — nothing else is needed.
+  is installed and gets the rpath below — nothing else is needed. The one
+  exception is a developer tool outside the default target, such as
+  `theo_patt_gen` (`EXCLUDE_FROM_ALL`), which stays out of the list.
 - On Linux the vendored `ext/onnx/libonnxruntime.so.1.23.2` and its SONAME symlink (which every
   executable loads at run time, via `toppic_common`) is installed to
   `<prefix>/${CMAKE_INSTALL_LIBDIR}` (= `lib/toppic`), and the executables get
@@ -1096,6 +1098,14 @@ byte for byte (toppic_test experiment 112, in 2.5 s against `emass.py`'s
   `theo_patt.txt` (`ms/env/env_base`); `common` cannot depend on `ms`, so
   the table's 11,000 entries and 10 Da interval are repeated in
   `averagine_table.cpp`. Keep the two in step.
+- **`theo_patt_gen`** (`src/console/theo_patt_gen.cpp`) is the command-line
+  front end: `theo_patt_gen [-o file] [-c human|senko]` (defaults
+  `theo_patt.txt`, `human`). It is a developer tool, declared
+  `EXCLUDE_FROM_ALL`: `make` does not build it (`make theo_patt_gen`
+  does), it is deliberately absent from `TOPPIC_EXECUTABLES` (CMake
+  documents installing an `EXCLUDE_FROM_ALL` target as undefined behaviour)
+  and it has no manual. Regenerate the resource with
+  `bin/theo_patt_gen -o res/base_data/theo_patt.txt`.
 
 ## Source layout
 
@@ -1278,7 +1288,8 @@ NOT in `COMMON_SRCS`; each is its own `add_executable` that links
 
 - `src/console` — the command-line tools. Each is a `main()` (`topfd.cpp`,
   `topdia.cpp`, `topindex.cpp`, `toppic.cpp`, `topmg.cpp`, `topdiff.cpp`,
-  `toplib_build.cpp`, `toplib_search.cpp`) plus
+  `toplib_build.cpp`, `toplib_search.cpp`; plus the developer tool
+  `theo_patt_gen.cpp`, a single file outside the default target) plus
   its `<tool>_argument.cpp` parser (`boost::program_options`) plus, for the four
   multi-step tools, its `<tool>_process.cpp` orchestrator. topfd/topdia have no
   `*_process` here — they drive the `topfd_process`/`topdia_process`
