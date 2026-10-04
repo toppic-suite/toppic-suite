@@ -36,9 +36,11 @@ int main(int argc, char* argv[]) {
       "output,o", po::value<std::string>(&output),
       "<file name>. The averagine table. Default: theo_patt.txt.")(
       "composition,c", po::value<std::string>(&composition),
-      "<human|senko>. The averagine: human, the mean residue of the UniProt "
-      "human reference proteome (UP000005640, release 2026_03); senko, "
-      "Senko, Beu and McLafferty's (JASMS 6:229, 1995). Default: human.");
+      "<human|human_no_sulphur|senko>. The averagine: human, the mean "
+      "residue of the UniProt human reference proteome (UP000005640, "
+      "release 2026_03); human_no_sulphur, the same without cysteine and "
+      "methionine (C, H, N and O only); senko, Senko, Beu and McLafferty's "
+      "(JASMS 6:229, 1995). Default: human.");
   po::variables_map vm;
   try {
     // no positional arguments: a stray one is an error, not ignored
@@ -68,11 +70,13 @@ int main(int argc, char* argv[]) {
   toppic::emass::Composition comp;
   if (composition == "human") {
     comp = toppic::emass::kHumanAveragine;
+  } else if (composition == "human_no_sulphur") {
+    comp = toppic::emass::kHumanNoSulphurAveragine;
   } else if (composition == "senko") {
     comp = toppic::emass::kSenkoAveragine;
   } else {
     std::cerr << "Error: unknown composition " << composition
-              << "; use human or senko." << std::endl;
+              << "; use human, human_no_sulphur or senko." << std::endl;
     return EXIT_FAILURE;
   }
   std::cout << "Writing the averagine table (" << composition

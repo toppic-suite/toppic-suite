@@ -53,6 +53,13 @@ using Composition = std::array<double, kElementNum>;
 inline constexpr Composition kHumanAveragine = {4.920188, 7.764730, 1.374482,
                                                 1.484151, 0.044276};
 
+// The human averagine without sulphur: the mean residue of the same
+// proteome over the 20 standard amino acids minus cysteine and methionine
+// (the only ones with sulphur), weighted by their frequencies renormalized
+// over the 18 (toppic_test experiment 112). C, H, N and O only.
+inline constexpr Composition kHumanNoSulphurAveragine = {
+    4.964606, 7.803735, 1.391831, 1.506580, 0.0};
+
 // Senko's averagine (Senko, Beu and McLafferty, JASMS 6:229, 1995).
 inline constexpr Composition kSenkoAveragine = {4.9384, 7.7583, 1.3577,
                                                 1.4773, 0.0417};

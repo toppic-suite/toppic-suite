@@ -1079,8 +1079,9 @@ recurrence for fractional atom numbers (`BelowOne::kMixture` takes fewer
 than one atom as a mixture with and without it). `isotope_data` holds the
 isotopes of C, H, N, O and S (AME2020 masses, IUPAC representative
 abundances) and the averagine compositions: `kHumanAveragine` (the UniProt
-human reference proteome, experiment 108; the default) and
-`kSenkoAveragine`. `averagine_table::writeAveragineTable` writes TopFD's
+human reference proteome, experiment 108; the default),
+`kHumanNoSulphurAveragine` (the same proteome without cysteine and
+methionine, so C, H, N and O only; experiment 112) and `kSenkoAveragine`. `averagine_table::writeAveragineTable` writes TopFD's
 `res/base_data/theo_patt.txt` and reproduces the file of experiment 111
 byte for byte (toppic_test experiment 112, in 2.5 s against `emass.py`'s
 14 s). Facts to keep straight:
@@ -1099,7 +1100,8 @@ byte for byte (toppic_test experiment 112, in 2.5 s against `emass.py`'s
   the table's 11,000 entries and 10 Da interval are repeated in
   `averagine_table.cpp`. Keep the two in step.
 - **`theo_patt_gen`** (`src/console/theo_patt_gen.cpp`) is the command-line
-  front end: `theo_patt_gen [-o file] [-c human|senko]` (defaults
+  front end: `theo_patt_gen [-o file] [-c human|human_no_sulphur|senko]`
+  (defaults
   `theo_patt.txt`, `human`). It is a developer tool, declared
   `EXCLUDE_FROM_ALL`: `make` does not build it (`make theo_patt_gen`
   does), it is deliberately absent from `TOPPIC_EXECUTABLES` (CMake
