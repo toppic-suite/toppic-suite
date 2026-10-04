@@ -257,8 +257,9 @@ int TopMG_identify(std::map<std::string, std::string>& arguments) {
     bool whole_protein_only = (arguments["allowProtType"] == "COMPLETE");
     GraphAlignMngPtr ga_mng_ptr = std::make_shared<GraphAlignMng>(
         prsm_para_ptr, var_mod_file_name, shift_num, max_mod_num, gap,
-        var_ptm_in_gap, max_shift_mass, thread_num, whole_protein_only,
-        "topmg_graph_filter", "topmg_graph_align");
+        var_ptm_in_gap, max_shift_mass,
+        std::stod(arguments["topmgAlignErrorTolerance"]), thread_num,
+        whole_protein_only, "topmg_graph_filter", "topmg_graph_align");
     std::cout << "Graph alignment - started." << std::endl;
     GraphAlignProcessorPtr ga_processor_ptr =
         std::make_shared<GraphAlignProcessor>(ga_mng_ptr);

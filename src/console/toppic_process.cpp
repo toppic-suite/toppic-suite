@@ -630,8 +630,9 @@ std::string TopPIC_topmg_identify(
     bool whole_protein_only = (arguments["allowProtType"] == "COMPLETE");
     GraphAlignMngPtr ga_mng_ptr = std::make_shared<GraphAlignMng>(
         prsm_para_ptr, var_mod_file_name, shift_num, max_mod_num, gap,
-        var_ptm_in_gap, max_shift_mass, thread_num, whole_protein_only,
-        "toppic_topmg_graph_filter", "toppic_topmg_graph_align");
+        var_ptm_in_gap, max_shift_mass,
+        std::stod(arguments["topmgAlignErrorTolerance"]), thread_num,
+        whole_protein_only, "toppic_topmg_graph_filter", "toppic_topmg_graph_align");
     // the graph alignment searches these spectra and no others
     ga_mng_ptr->search_spec_ids_ = search_spec_ids;
     ga_mng_ptr->search_all_ = false;

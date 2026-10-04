@@ -68,6 +68,10 @@ std::map<std::string, std::string> TopmgArgument::initArguments() {
   arguments["envCnnCutoff"] = "0.4";
   arguments["proteoformPpmError"] = "false";
   arguments["proteoformErrorTolerance"] = "1.2";
+  // the error tolerance (Da) of the graph alignment
+  // (GraphAlignMng::topmg_align_error_tolerance_); toppic's hidden
+  // --topmg-align-error-tolerance sets the same key
+  arguments["topmgAlignErrorTolerance"] = "0.1";
   arguments["cutoffSpectralType"] = "EVALUE";
   arguments["cutoffSpectralValue"] = "0.01";
   arguments["cutoffProteoformType"] = "EVALUE";
@@ -212,6 +216,9 @@ void TopmgArgument::outputArguments(
   output << std::setw(gap) << std::left
          << "Error tolerance for identifying PrSM clusters:" << sep
          << arguments["proteoformErrorTolerance"] << " Da" << std::endl;
+  output << std::setw(gap) << std::left
+         << "Error tolerance for graph alignment:" << sep
+         << arguments["topmgAlignErrorTolerance"] << " Da" << std::endl;
 
   if (arguments["useFeatureFile"] == "true") {
     output << std::setw(gap) << std::left << "Use TopFD feature file:" << sep
@@ -262,6 +269,7 @@ bool TopmgArgument::parse(int argc, char* argv[]) {
   std::string prec_error_tole = "";
   std::string env_cnn_cutoff = "";
   std::string form_error_tole = "";
+  std::string align_error_tole = "";
   std::string max_shift_mass = "";
   std::string cutoff_spectral_type = "";
   std::string cutoff_spectral_value = "";
@@ -322,6 +330,10 @@ bool TopmgArgument::parse(int argc, char* argv[]) {
         po::value<std::string>(&form_error_tole),
         "<a positive number>. Error tolerance for identifying PrSM clusters "
         "(in Dalton). Default value: 1.2 Dalton.")(
+        "align-error-tolerance", po::value<std::string>(&align_error_tole),
+        "<a positive number>. Error tolerance for matching mass differences "
+        "of the spectrum and proteoform graphs in the graph alignment (in "
+        "Dalton). Default value: 0.1 Dalton.")(
         "max-shift,M", po::value<std::string>(&max_shift_mass),
         "<a positive number>. Maximum absolute value of the mass shift (in "
         "Dalton). Default value: 500.")(
@@ -389,6 +401,8 @@ bool TopmgArgument::parse(int argc, char* argv[]) {
         "proteoform-ppm-error,Q", "")("proteoform-error-tolerance,p",
                                       po::value<std::string>(&form_error_tole),
                                       "")(
+        "align-error-tolerance", po::value<std::string>(&align_error_tole),
+        "")(
         "max-shift,M", po::value<std::string>(&max_shift_mass), "")(
         "spectrum-cutoff-type,t", po::value<std::string>(&cutoff_spectral_type),
         "")("spectrum-cutoff-value,v",
@@ -512,6 +526,10 @@ bool TopmgArgument::parse(int argc, char* argv[]) {
 
     if (vm.count("proteoform-error-tolerance")) {
       arguments_["proteoformErrorTolerance"] = form_error_tole;
+    }
+
+    if (vm.count("align-error-tolerance")) {
+      arguments_["topmgAlignErrorTolerance"] = align_error_tole;
     }
 
     if (vm.count("max-shift")) {
@@ -767,6 +785,19 @@ bool TopmgArgument::validateArguments() {
               << cutoff_protein_type
               << " error! FDR cutoff cannot be used when no decoy database is "
                  "used! Please add argument '-d' in the command.");
+    return false;
+  }
+
+  std::string align_error_tole = arguments_["topmgAlignErrorTolerance"];
+  try {
+    if (std::stod(align_error_tole) <= 0) {
+      LOG_ERROR("Graph alignment error tolerance "
+                << align_error_tole << " error! The value should be positive.");
+      return false;
+    }
+  } catch (const std::exception& ex) {
+    LOG_ERROR("Graph alignment error tolerance " << align_error_tole
+                                                 << " should be a number.");
     return false;
   }
 

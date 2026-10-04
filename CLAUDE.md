@@ -932,6 +932,49 @@ localization M tables (`LocalMng::frag_tole_ptr_`). Neither `SpPara` nor
 `XmlDOMElement` constructors were never called and were removed; `SpPara`
 is built only from the toppic/topmg arguments in `PrsmPara`.
 
+## Graph alignment tolerance (`search/graphalign`, TopMG)
+
+TopMG's graph alignment matches the mass differences (distances) of the
+spectrum graph with those of the proteoform graph within
+`GraphAlignMng::topmg_align_error_tolerance_` (Da; a constructor argument,
+so both drivers must pass it), applied as `getIntTolerance()` in the
+integer masses of `convert_ratio_` (274.335215 per Da: 0.1 Da is 28
+units) by `graph_align.cpp` (distance matching and cutoffs),
+`SpecGraph::compDistCover` and `graph_post_processor.cpp` (PTM masses this
+close are merged). It is the argument `topmgAlignErrorTolerance`, default
+0.1 Da (the former hard-coded `error_tolerance_`): topmg's visible
+`--align-error-tolerance` (a topmg_gui field, "Alignment error tolerance
+(Da)" on the Advanced Parameters tab, emitted by `gui/util/command.cpp`) and
+toppic's hidden `--topmg-align-error-tolerance` for `--topmg pipeline` /
+`topmg-only`, as `topmgShiftNumber` is `--num-shift` / `--topmg-num-shift`.
+Both parsers refuse a value that is not a positive number. It is
+independent of `-e` / `-E` (ppm): the precursor tolerance enters the graph
+step only through the spectrum graph's zero and precursor PRM peaks
+(`spec_graph_reader`) and the precursor refinement after an alignment.
+The MCMC E-values (`MCMCMng::error_tolerance_`) keep their own hard-coded
+0.1 Da. Facts to keep straight:
+
+- **The post-processing keeps the variable PTM limit.**
+  `GraphPostProcessor` explains each variable shift by the PTM combination
+  of `mass_ptm_map_` nearest to its mass; the map holds combinations of up
+  to `max_known_mods_` PTMs, a combination being left out when a mass
+  within the tolerance is already there. Below 0.1 Da fewer are left out,
+  and the nearest combinations gave proteoforms more variable PTMs than
+  `--var-ptm` (6-9 of 5 at 0.02 and 0.05 Da on the first 200 spectra of
+  480_F3_02; 4-5 of toppic's 3), which overran `ptm_mass_vec2d` in
+  `mcmc_dpr_processor.cpp` (indexed by the variable PTM number; a
+  segmentation fault). A shift now takes only combinations that leave one
+  PTM for each later shift within `max_known_mods_`; wherever the nearest
+  combinations kept the limit (every PrSM at 0.1 and 0.5 Da) the choice is
+  unchanged.
+- **TopMG's final tables are not repeatable with more than one thread.**
+  `comp_pvalue_mcmc.cpp` shuffles with one global `std::mt19937 rng(0)`
+  that all MCMC threads share, so the E-values differ between runs (1-2 of
+  344 identical between two `-u 16` runs of main 0f938697, 110 and 113
+  PrSMs); the intermediate files up to `topmg_graph_post` are repeatable
+  and are what to compare (`-k`). toppic's `--topmg` stage with its default
+  generating-function E-values is repeatable.
+
 ## Precursor +-1 Da error per identification stage (`para/sp_para`)
 
 `SpPara` holds one precursor-offset list per stage; each filter/search

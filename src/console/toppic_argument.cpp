@@ -77,6 +77,9 @@ std::map<std::string, std::string> ToppicArgument::initArguments() {
   // stages, or with the hidden --topmg-use-mcmc TopMG's MCMC
   arguments["topmgUseMcmc"] = "false";
   arguments["topmgShiftNumber"] = "1";
+  // the error tolerance (Da) of that stage's graph alignment
+  // (GraphAlignMng::topmg_align_error_tolerance_), TopMG's own default
+  arguments["topmgAlignErrorTolerance"] = "0.1";
   // the results the ASF filtering of that stage keeps per spectrum, TopMG's
   // own number; toppic's own stages keep filteringResultNumber
   arguments["asfFilteringResultNumber"] = "15";
@@ -351,6 +354,7 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
   std::string shift_num = "";
   std::string topmg_mode = "";
   std::string topmg_shift_num = "";
+  std::string topmg_align_error_tole = "";
   std::string asf_filtering_result_num = "";
   std::string min_shift_mass = "";
   std::string max_shift_mass = "";
@@ -573,6 +577,8 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
         "topmg", po::value<std::string>(&topmg_mode), "")(
         "topmg-use-mcmc", "")(
         "topmg-num-shift", po::value<std::string>(&topmg_shift_num), "")(
+        "topmg-align-error-tolerance",
+        po::value<std::string>(&topmg_align_error_tole), "")(
         "asf-filtering-result-number",
         po::value<std::string>(&asf_filtering_result_num), "")(
         "filtering-result-number",
@@ -791,6 +797,11 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
     // number, which --num-shift does not change
     if (vm.count("topmg-num-shift")) {
       arguments_["topmgShiftNumber"] = topmg_shift_num;
+    }
+    // hidden: the error tolerance (Da) of that graph alignment, TopMG's
+    // --align-error-tolerance
+    if (vm.count("topmg-align-error-tolerance")) {
+      arguments_["topmgAlignErrorTolerance"] = topmg_align_error_tole;
     }
     // hidden: the ASF filtering result number of that stage, TopMG's own,
     // which --filtering-result-number does not change
@@ -1239,6 +1250,19 @@ bool ToppicArgument::validateArguments() {
               "file (-b).");
     return false;
   }
+  std::string topmg_align_error_tole = arguments_["topmgAlignErrorTolerance"];
+  try {
+    if (std::stod(topmg_align_error_tole) <= 0) {
+      LOG_ERROR("--topmg-align-error-tolerance " << topmg_align_error_tole
+                << " error! The value should be positive.");
+      return false;
+    }
+  } catch (const std::exception& ex) {
+    LOG_ERROR("--topmg-align-error-tolerance " << topmg_align_error_tole
+              << " should be a number.");
+    return false;
+  }
+
   // the E-value method of TopMG's identification means nothing without it
   if (arguments_["topmgUseMcmc"] == "true" && topmg_mode == "disabled") {
     LOG_ERROR("--topmg-use-mcmc error! It needs --topmg pipeline or "
