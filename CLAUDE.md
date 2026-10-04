@@ -1101,7 +1101,8 @@ byte for byte (toppic_test experiment 112, in 2.5 s against `emass.py`'s
   `averagine_table.cpp`. Keep the two in step.
 - **`theo_patt_gen`** (`src/console/theo_patt_gen.cpp`) is the command-line
   front end: `theo_patt_gen [-o file] [-c human|human_no_sulphur|senko]
-  [--sulphur-num k]` (defaults `theo_patt.txt`, `human`, 0). It is a
+  [-s k]` (`--output`, `--composition`, `--sulphur-num`; defaults
+  `theo_patt.txt`, `human`, 0). It is a
   developer tool, declared
   `EXCLUDE_FROM_ALL`: `make` does not build it (`make theo_patt_gen`
   does), it is deliberately absent from `TOPPIC_EXECUTABLES` (CMake

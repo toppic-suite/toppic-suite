@@ -51,7 +51,7 @@ int main(int argc, char* argv[]) {
       "release 2026_03); human_no_sulphur, the same without cysteine and "
       "methionine (C, H, N and O only); senko, Senko, Beu and McLafferty's "
       "(JASMS 6:229, 1995). Default: human.")(
-      "sulphur-num", po::value<std::string>(&sulphur_str),
+      "sulphur-num,s", po::value<std::string>(&sulphur_str),
       "<0-5>. The number k of sulphur atoms in every formula: the "
       "composition is scaled to the mass minus k 32S masses and k S are "
       "added. Only with human_no_sulphur when k > 0. Default: 0.");
