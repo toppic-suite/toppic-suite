@@ -1100,14 +1100,18 @@ byte for byte (toppic_test experiment 112, in 2.5 s against `emass.py`'s
   the table's 11,000 entries and 10 Da interval are repeated in
   `averagine_table.cpp`. Keep the two in step.
 - **`theo_patt_gen`** (`src/console/theo_patt_gen.cpp`) is the command-line
-  front end: `theo_patt_gen [-o file] [-c human|human_no_sulphur|senko]`
-  (defaults
-  `theo_patt.txt`, `human`). It is a developer tool, declared
+  front end: `theo_patt_gen [-o file] [-c human|human_no_sulphur|senko]
+  [--sulphur-num k]` (defaults `theo_patt.txt`, `human`, 0). It is a
+  developer tool, declared
   `EXCLUDE_FROM_ALL`: `make` does not build it (`make theo_patt_gen`
   does), it is deliberately absent from `TOPPIC_EXECUTABLES` (CMake
   documents installing an `EXCLUDE_FROM_ALL` target as undefined behaviour)
   and it has no manual. Regenerate the resource with
-  `bin/theo_patt_gen -o res/base_data/theo_patt.txt`.
+  `bin/theo_patt_gen -o res/base_data/theo_patt.txt`. `--sulphur-num k`
+  (0-5; k > 0 only with `human_no_sulphur`) gives every formula exactly k
+  S (`averagineFormulaWithSulphur`): the composition is scaled to the entry
+  mass minus k 32S masses (at least 0, so the lightest entries are S_k
+  alone) and k S are added.
 
 ## Source layout
 
