@@ -36,7 +36,6 @@ Data tables:
 |---|---|
 | `theo_patt.txt` | Theoretical isotopic distributions, tabulated by mass, used by TopFD's envelope detection (`EnvBase`). Stored with Git LFS (about 18 MB). |
 | `mass_table.txt` | Table of residue combinations by mass, used by TopMG's TopMCMC p-value estimation. |
-| `unimod_ptm.xml` | The Unimod PTM list in the `ptm_base.xml` format, kept for reference; not read by the tools. |
 | `env_rescore_para.txt` | Parameters of a former envelope re-scoring model; not read by the tools. |
 
 ## `envcnn_models/`
