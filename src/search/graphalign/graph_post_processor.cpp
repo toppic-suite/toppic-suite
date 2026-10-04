@@ -127,6 +127,99 @@ void GraphPostProcessor::geneMassPtmMap() {
   }
 }
 
+// Each shift takes the combination of mass_ptm_map_ nearest to its mass.
+// When these exceed max_known_mods_ (--var-ptm) PTMs in all, the combinations
+// are chosen together instead: the smallest sum of mass differences with at
+// most max_known_mods_ PTMs, by a dynamic programme over the shifts and the
+// number of PTMs used (for each shift and PTM number, the nearest combination
+// of that number). Below the default 0.1 Da alignment tolerance the map keeps
+// more multi-PTM combinations, and the nearest ones gave proteoforms up to 9
+// variable PTMs of 5, which overran the MCMC E-value tables (indexed by the
+// variable PTM number; toppic_test experiment 114). Choosing each shift's
+// combination in turn within the PTMs left kept the limit but labelled a
+// 70.06 Da shift with one Phospho; the joint choice explains it as Acetyl and
+// two Methyl. While the nearest combinations keep the limit, as every PrSM
+// did at 0.1 and 0.5 Da, they are the choice.
+std::vector<PtmPtrVec> GraphPostProcessor::choosePtmCombs(
+    const MassShiftPtrVec& shift_vec) {
+  int max_num = mng_ptr_->max_known_mods_;
+  size_t shift_num = shift_vec.size();
+  std::vector<PtmPtrVec> nearest(shift_num);
+  // best_err[k][c] and best_comb[k][c]: the nearest combination of c PTMs to
+  // shift k (-1: none)
+  std::vector<std::vector<int>> best_err(shift_num,
+                                         std::vector<int>(max_num + 1, -1));
+  std::vector<std::vector<const PtmPtrVec*>> best_comb(
+      shift_num, std::vector<const PtmPtrVec*>(max_num + 1, nullptr));
+  int total_num = 0;
+  for (size_t k = 0; k < shift_num; k++) {
+    int mass =
+        std::ceil(shift_vec[k]->getMassShift() * mng_ptr_->convert_ratio_);
+    int err = -1;
+    for (auto it = mass_ptm_map_.begin(); it != mass_ptm_map_.end(); it++) {
+      int e = std::abs(mass - it->first);
+      if (err < 0 || e < err) {
+        err = e;
+        nearest[k] = it->second;
+      }
+      int c = static_cast<int>(it->second.size());
+      if (c <= max_num && (best_err[k][c] < 0 || e < best_err[k][c])) {
+        best_err[k][c] = e;
+        best_comb[k][c] = &it->second;
+      }
+    }
+    total_num += static_cast<int>(nearest[k].size());
+  }
+  if (total_num <= max_num) {
+    return nearest;
+  }
+  // cost[k][u]: the smallest sum of mass differences of shifts 0..k-1 with u
+  // PTMs (-1: not reachable); num[k][u]: the PTM number of shift k-1 there
+  std::vector<std::vector<long long>> cost(
+      shift_num + 1, std::vector<long long>(max_num + 1, -1));
+  std::vector<std::vector<int>> num(shift_num + 1,
+                                    std::vector<int>(max_num + 1, 0));
+  cost[0][0] = 0;
+  for (size_t k = 0; k < shift_num; k++) {
+    for (int u = 0; u <= max_num; u++) {
+      if (cost[k][u] < 0) {
+        continue;
+      }
+      for (int c = 1; u + c <= max_num; c++) {
+        if (best_err[k][c] < 0) {
+          continue;
+        }
+        long long v = cost[k][u] + best_err[k][c];
+        if (cost[k + 1][u + c] < 0 || v < cost[k + 1][u + c]) {
+          cost[k + 1][u + c] = v;
+          num[k + 1][u + c] = c;
+        }
+      }
+    }
+  }
+  int best_u = -1;
+  for (int u = 0; u <= max_num; u++) {
+    if (cost[shift_num][u] >= 0 &&
+        (best_u < 0 || cost[shift_num][u] < cost[shift_num][best_u])) {
+      best_u = u;
+    }
+  }
+  if (best_u < 0) {
+    // more variable shifts than max_known_mods_, which the alignment does
+    // not produce
+    LOG_WARN("Variable shifts exceed the maximum number of variable PTMs.");
+    return nearest;
+  }
+  std::vector<PtmPtrVec> combs(shift_num);
+  int u = best_u;
+  for (size_t k = shift_num; k > 0; k--) {
+    int c = num[k][u];
+    combs[k - 1] = *best_comb[k - 1][c];
+    u -= c;
+  }
+  return combs;
+}
+
 void GraphPostProcessor::process() {
   PrsmParaPtr prsm_para_ptr = mng_ptr_->prsm_para_ptr_;
   SpParaPtr sp_para_ptr = prsm_para_ptr->getSpParaPtr();
@@ -186,34 +279,9 @@ void GraphPostProcessor::process() {
               prsm_ptr->getProteoformPtr()->getMassShiftPtrVec(
                   AlterType::VARIABLE);
 
-          // Each shift takes the PTM combination of mass_ptm_map_ nearest to
-          // its mass, among the combinations that leave one PTM for each
-          // later shift within max_known_mods_ (--var-ptm). The limit changes
-          // nothing while the nearest combinations keep the proteoform within
-          // it, as they did at the default 0.1 Da alignment tolerance; below
-          // it the map keeps more multi-PTM combinations (fewer are merged)
-          // and the nearest ones exceeded the limit, which also overran the
-          // MCMC E-value tables (indexed by the variable PTM number).
-          int used_ptm_num = 0;
+          std::vector<PtmPtrVec> ptm_combs = choosePtmCombs(shift_vec);
           for (size_t k = 0; k < shift_vec.size(); k++) {
-            int max_ptm_num =
-                std::max(1, mng_ptr_->max_known_mods_ - used_ptm_num -
-                                static_cast<int>(shift_vec.size() - k - 1));
-            int mass = std::ceil(shift_vec[k]->getMassShift() *
-                                 mng_ptr_->convert_ratio_);
-            int err = -1;
-            PtmPtrVec ptm_vec;
-            for (auto it = mass_ptm_map_.begin(); it != mass_ptm_map_.end();
-                 it++) {
-              if (static_cast<int>(it->second.size()) > max_ptm_num) {
-                continue;
-              }
-              if (err < 0 || std::abs(mass - it->first) < err) {
-                err = std::abs(mass - it->first);
-                ptm_vec = it->second;
-              }
-            }
-            used_ptm_num += static_cast<int>(ptm_vec.size());
+            const PtmPtrVec& ptm_vec = ptm_combs[k];
 
             MassShiftPtr shift_ptr =
                 std::make_shared<toppic::MassShift>(shift_vec[k], 0);

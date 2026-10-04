@@ -955,18 +955,23 @@ The MCMC E-values (`MCMCMng::error_tolerance_`) keep their own hard-coded
 0.1 Da. Facts to keep straight:
 
 - **The post-processing keeps the variable PTM limit.**
-  `GraphPostProcessor` explains each variable shift by the PTM combination
-  of `mass_ptm_map_` nearest to its mass; the map holds combinations of up
-  to `max_known_mods_` PTMs, a combination being left out when a mass
-  within the tolerance is already there. Below 0.1 Da fewer are left out,
-  and the nearest combinations gave proteoforms more variable PTMs than
-  `--var-ptm` (6-9 of 5 at 0.02 and 0.05 Da on the first 200 spectra of
-  480_F3_02; 4-5 of toppic's 3), which overran `ptm_mass_vec2d` in
-  `mcmc_dpr_processor.cpp` (indexed by the variable PTM number; a
-  segmentation fault). A shift now takes only combinations that leave one
-  PTM for each later shift within `max_known_mods_`; wherever the nearest
-  combinations kept the limit (every PrSM at 0.1 and 0.5 Da) the choice is
-  unchanged.
+  `GraphPostProcessor` explains each variable shift by a PTM combination of
+  `mass_ptm_map_`, which holds combinations of up to `max_known_mods_` PTMs,
+  a combination being left out when a mass within the tolerance is already
+  there. Each shift takes its nearest combination; when these exceed
+  `max_known_mods_` (`--var-ptm`) PTMs in all, `choosePtmCombs` chooses the
+  combinations together: the smallest sum of mass differences with at most
+  `max_known_mods_` PTMs (a dynamic programme over the shifts and the PTM
+  number). Below 0.1 Da fewer combinations are left out, and the nearest
+  ones gave proteoforms more variable PTMs than `--var-ptm` (6-9 of 5 at
+  0.02 and 0.05 Da on the first 200 spectra of 480_F3_02; 4-5 of toppic's
+  3), which overran `ptm_mass_vec2d` in `mcmc_dpr_processor.cpp` (indexed
+  by the variable PTM number; a segmentation fault). Main 1f88b6e8 kept the
+  limit by giving each shift in turn only the PTMs left, which labelled a
+  70.06 Da shift of H2B1N as one Phospho (mass split 70.06); the joint
+  choice gives Acetyl + 2 Methyl (toppic_test experiment 114). Wherever the
+  nearest combinations keep the limit (every PrSM at 0.1 and 0.5 Da) they
+  are the choice, so those outputs are unchanged.
 - **TopMG's final tables are not repeatable with more than one thread.**
   `comp_pvalue_mcmc.cpp` shuffles with one global `std::mt19937 rng(0)`
   that all MCMC threads share, so the E-values differ between runs (1-2 of
