@@ -15,7 +15,7 @@
   <composition>C3H5ON</composition>
   <mono_mass>71.037113783</mono_mass>
   <average_mass>71.079</average_mass>
-  <frequency>0.0828</frequency>
+  <frequency>0.070130</frequency>
 </amino_acid>
 <amino_acid>
   <name>Arginine</name>
@@ -24,7 +24,7 @@
   <composition>C6H12ON4</composition>
   <mono_mass>156.101111019036</mono_mass>
   <average_mass>156.189</average_mass>
-  <frequency>0.0554</frequency>
+  <frequency>0.056389</frequency>
 </amino_acid>
 <amino_acid>
   <name>Asparagine</name>
@@ -33,7 +33,7 @@
   <composition>C4H6O2N2</composition>
   <mono_mass>114.042927438408</mono_mass>
   <average_mass>114.104</average_mass>
-  <frequency>0.0404</frequency>
+  <frequency>0.035787</frequency>
 </amino_acid>
 <amino_acid>
   <name>Aspartic_acid</name>
@@ -42,7 +42,7 @@
   <composition>C4H5O3N</composition>
   <mono_mass>115.02694302152</mono_mass>
   <average_mass>115.088</average_mass>
-  <frequency>0.0545</frequency>
+  <frequency>0.047313</frequency>
 </amino_acid>
 <amino_acid>
   <name>Cysteine</name>
@@ -51,7 +51,7 @@
   <composition>C3H5ONS</composition>
   <mono_mass>103.00918495654</mono_mass>
   <average_mass>103.139</average_mass>
-  <frequency>0.0136</frequency>
+  <frequency>0.022993</frequency>
 </amino_acid>
 <amino_acid>
   <name>Glutamic_acid</name>
@@ -60,7 +60,7 @@
   <composition>C5H7O3N</composition>
   <mono_mass>129.042593085316</mono_mass>
   <average_mass>129.115</average_mass>
-  <frequency>0.0394</frequency>
+  <frequency>0.071050</frequency>
 </amino_acid>
 <amino_acid>
   <name>Glutamine</name>
@@ -69,7 +69,7 @@
   <composition>C5H8O2N2</composition>
   <mono_mass>128.058577502204</mono_mass>
   <average_mass>128.131</average_mass>
-  <frequency>0.0677</frequency>
+  <frequency>0.047669</frequency>
 </amino_acid>
 <amino_acid>
   <name>Glycine</name>
@@ -78,7 +78,7 @@
   <composition>C2H3ON</composition>
   <mono_mass>57.021463719204</mono_mass>
   <average_mass>57.052</average_mass>
-  <frequency>0.0709</frequency>
+  <frequency>0.065715</frequency>
 </amino_acid>
 <amino_acid>
   <name>Histidine</name>
@@ -87,7 +87,7 @@
   <composition>C6H7ON3</composition>
   <mono_mass>137.058911855296</mono_mass>
   <average_mass>137.142</average_mass>
-  <frequency>0.0227</frequency>
+  <frequency>0.026248</frequency>
 </amino_acid>
 <amino_acid>
   <name>Isoleucine</name>
@@ -96,7 +96,7 @@
   <composition>C6H11ON</composition>
   <mono_mass>113.084063974388</mono_mass>
   <average_mass>113.16</average_mass>
-  <frequency>0.0599</frequency>
+  <frequency>0.043294</frequency>
 </amino_acid>
 <amino_acid>
   <name>Leucine</name>
@@ -105,7 +105,7 @@
   <composition>C6H11ON</composition>
   <mono_mass>113.084063974388</mono_mass>
   <average_mass>113.16</average_mass>
-  <frequency>0.0967</frequency>
+  <frequency>0.099610</frequency>
 </amino_acid>
 <amino_acid>
   <name>Lysine</name>
@@ -114,7 +114,7 @@
   <composition>C6H12ON2</composition>
   <mono_mass>128.094963010536</mono_mass>
   <average_mass>128.175</average_mass>
-  <frequency>0.0586</frequency>
+  <frequency>0.057239</frequency>
 </amino_acid>
 <amino_acid>
   <name>Methionine</name>
@@ -123,7 +123,7 @@
   <composition>C5H9ONS</composition>
   <mono_mass>131.040485084132</mono_mass>
   <average_mass>131.193</average_mass>
-  <frequency>0.0243</frequency>
+  <frequency>0.021284</frequency>
 </amino_acid>
 <amino_acid>
   <name>Phenylalanine</name>
@@ -132,7 +132,7 @@
   <composition>C9H9ON</composition>
   <mono_mass>147.068413910592</mono_mass>
   <average_mass>147.177</average_mass>
-  <frequency>0.0386</frequency>
+  <frequency>0.036456</frequency>
 </amino_acid>
 <amino_acid>
   <name>Proline</name>
@@ -141,7 +141,7 @@
   <composition>C5H7ON</composition>
   <mono_mass>97.052763846796</mono_mass>
   <average_mass>97.117</average_mass>
-  <frequency>0.0468</frequency>
+  <frequency>0.063214</frequency>
 </amino_acid>
 <amino_acid>
   <name>Serine</name>
@@ -150,7 +150,7 @@
   <composition>C3H5O2N</composition>
   <mono_mass>87.03202840226</mono_mass>
   <average_mass>87.078</average_mass>
-  <frequency>0.0649</frequency>
+  <frequency>0.083614</frequency>
 </amino_acid>
 <amino_acid>
   <name>Threonine</name>
@@ -159,7 +159,7 @@
   <composition>C4H7O2N</composition>
   <mono_mass>101.047678466056</mono_mass>
   <average_mass>101.105</average_mass>
-  <frequency>0.0532</frequency>
+  <frequency>0.053768</frequency>
 </amino_acid>
 <amino_acid>
   <name>Tryptophan</name>
@@ -168,7 +168,7 @@
   <composition>C11H10ON2</composition>
   <mono_mass>186.07931294674</mono_mass>
   <average_mass>186.214</average_mass>
-  <frequency>0.0108</frequency>
+  <frequency>0.012121</frequency>
 </amino_acid>
 <amino_acid>
   <name>Tyrosine</name>
@@ -177,7 +177,7 @@
   <composition>C9H9NO2</composition>
   <mono_mass>163.063328529852</mono_mass>
   <average_mass>163.176</average_mass>
-  <frequency>0.0291</frequency>
+  <frequency>0.026585</frequency>
 </amino_acid>
 <amino_acid>
   <name>Valine</name>
@@ -186,7 +186,7 @@
   <composition>C5H9NO</composition>
   <mono_mass>99.068413910592</mono_mass>
   <average_mass>99.133</average_mass>
-  <frequency>0.0688</frequency>
+  <frequency>0.059516</frequency>
 </amino_acid>
 <amino_acid>
   <name>Selenocysteine</name>
@@ -195,7 +195,7 @@
   <composition>C3H5NOSe</composition>
   <mono_mass>150.953635544</mono_mass>
   <average_mass>150.05</average_mass>
-  <frequency>0</frequency>
+  <frequency>0.000003</frequency>
 </amino_acid>
 <amino_acid>
   <name>Pyrrolysine</name>
@@ -204,6 +204,6 @@
   <composition>C12H19N3O2</composition>
   <mono_mass>237.147726857332</mono_mass>
   <average_mass>237.303</average_mass>
-  <frequency>0</frequency>
+  <frequency>0.000000</frequency>
 </amino_acid>
 </amino_acid_list>
