@@ -26,7 +26,7 @@ start-up by the matching `*_base` class in `src/common/base`:
 | `prot_mod_base.xml` | Protein N-terminal forms: methionine excision, N-terminal acetylation and their combinations. |
 | `trunc_base.xml` | N- and C-terminal truncations allowed for proteoforms. |
 | `activation_base.xml` | Fragmentation methods (CID, HCD, ETD, UVPD, MPD) with the ion types each produces. |
-| `ion_type_base.xml` | Fragment ion types (a, b, c, x, y, z, ...) and their mass shifts. |
+| `ion_type_base.xml` | Fragment ion types (a, b, c, x, y, z, ...) and their mass shifts. The shifts are sums of the AME2020 isotope masses (¹H, ¹²C, ¹⁴N, ¹⁶O), written exactly with all their decimals. |
 | `neutral_loss_base.xml` | Neutral losses considered for fragment ions. Their masses are sums of the AME2020 isotope masses (water 2 ¹H + ¹⁶O, ammonia ¹⁴N + 3 ¹H), written exactly with all their decimals, as in `mass_constant.hpp`. |
 | `support_peak_type_base.xml` | Peak types that count as support for a fragment in scoring. |
 

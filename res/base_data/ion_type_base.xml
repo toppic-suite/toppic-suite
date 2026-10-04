@@ -1,11 +1,13 @@
 <!--
+ Mass shifts: sums of the AME2020 atomic masses (1H 1.007825031898, 12C 12,
+ 14N 14.00307400425, 16O 15.99491461926), written exactly with all decimals.
  B: 0
- A: -CO        -27.9949146
- C: +NH3       +17.0265491
- Y: +H2O       +18.0105647
- X: +O + CO    +43.9898292
- Z: H2O - NH3   +0.9840156
- Z_DOT: Z + H   +1.9918406
+ A: -CO          -27.99491461926
+ C: +NH3         +17.026549099944
+ Y: +H2O         +18.010564683056
+ X: +O + CO      +43.98982923852
+ Z: H2O - NH3    +0.984015583112
+ Z_DOT: Z + H    +1.99184061501
 -->
 <ion_type_list>
 <ion_type>
@@ -16,36 +18,36 @@
 <ion_type>
 	<name>Y</name>
 	<n_term>false</n_term>
-	<shift>18.0105647</shift>
+	<shift>18.010564683056</shift>
 </ion_type>
 <ion_type>
 	<name>C</name>
 	<n_term>true</n_term>
- 	<shift>17.0265491</shift>
+ 	<shift>17.026549099944</shift>
 </ion_type>
 <ion_type>
 	<name>Z_DOT</name>
 	<n_term>false</n_term>
- 	<shift>1.9918406</shift>
+ 	<shift>1.99184061501</shift>
 </ion_type>
 <ion_type>
 	<name>Z</name>
 	<n_term>false</n_term>
- 	<shift>0.9840156</shift>
+ 	<shift>0.984015583112</shift>
 </ion_type>
 <ion_type>
 	<name>A</name>
 	<n_term>true</n_term>
- 	<shift>-27.9949146</shift>
+ 	<shift>-27.99491461926</shift>
 </ion_type>
 <ion_type>
 	<name>X</name>
 	<n_term>false</n_term>
- 	<shift>43.9898292</shift>
+ 	<shift>43.98982923852</shift>
 </ion_type>
 <ion_type>
 	<name>PREC</name>
 	<n_term>false</n_term>
-	<shift>18.0105647</shift>
+	<shift>18.010564683056</shift>
 </ion_type>
 </ion_type_list>
