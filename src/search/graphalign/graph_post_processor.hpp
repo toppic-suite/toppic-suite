@@ -18,8 +18,10 @@
 
 #include <string>
 #include <unordered_map>
+#include <vector>
 
 #include "search/graphalign/graph_align_mng.hpp"
+#include "seq/mass_shift.hpp"
 
 namespace toppic {
 
@@ -35,6 +37,10 @@ class GraphPostProcessor {
   void geneMassPtmMap();
 
  private:
+  // the PTM combinations (mass_ptm_map_ entries) explaining the variable
+  // shifts of one proteoform, at most max_known_mods_ PTMs in all
+  std::vector<PtmPtrVec> choosePtmCombs(const MassShiftPtrVec& shift_vec);
+
   GraphAlignMngPtr mng_ptr_;
 
   std::string input_ext_;
