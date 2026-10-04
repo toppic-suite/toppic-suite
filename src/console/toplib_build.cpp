@@ -70,8 +70,10 @@ int main(int argc, char* argv[]) {
   toplib::LibRepMethod method = arguments["representative"] == "single"
                                     ? toplib::LibRepMethod::kSingle
                                     : toplib::LibRepMethod::kAverage;
-  toplib::LibLibrary lib =
-      toplib::lib_builder::build(data, method, python_compatible);
+  bool disable_different_proteoform_merge =
+      arguments["disableDifferentProteoformMerge"] == "true";
+  toplib::LibLibrary lib = toplib::lib_builder::build(
+      data, method, disable_different_proteoform_merge, python_compatible);
   int written = 0;
   for (const toplib::LibRep& rep : lib.reps) {
     written += rep.identified ? 1 : 0;

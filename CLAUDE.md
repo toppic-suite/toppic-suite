@@ -1085,36 +1085,49 @@ and writes target and decoy representatives into the SQLite table
 for value, and the tests that show it (toppic_test experiments 81 and 82,
 reports 0081 and 0082: data/480_lib and 480_F3_02's TopPIC 1.9 and 2.0
 output) compare every cell. By default it departs from the script in two
-ways (experiment 82):
+ways, and `--disable-different-proteoform-merge` adds a third (experiment
+82):
 
-- **Spectra of different proteoforms are never clustered together.** A
-  proteoform is the pair (proteoform id, protein accession): TopPIC 1.9
-  gave PrSMs of different proteins sharing a precursor feature one
-  proteoform id (43 of 1,818 ids on 480_F3_02; 2.0's cluster protein
-  correction removed that), so the id alone is not enough. In the spectral
-  clustering a pair of identified spectra of different proteoforms gets
-  the distance n * n (n the precursor cluster's size) instead of the
-  cosine distance (`clusterGroup`'s `cannot_link`): every average linkage
-  merge containing such a pair then averages at least 4, above the 0.7
-  cutoff, so no flat cluster holds it, while unidentified spectra can still
-  join any cluster. The script's clusters joined different proteoforms (46
-  of 47 multi-member clusters on data/480_lib, 34 of them different
-  proteins), and as each representative keeps one identification, 50
-  proteoforms got none. The step that keeps one cluster's identification
-  per proteoform and precursor charge uses the same pair (the script uses
-  the id alone, which on 1.9 tables dropped one protein's identification
-  when two proteins shared an id). Do not replace this by a stricter cosine
-  cutoff:
-  that changes the clustering of every spectrum, not only of the mixed
-  ones, and still does not guarantee the separation.
+- **A proteoform is the pair (proteoform id, protein accession)** in the
+  step that keeps one cluster's identification per proteoform and
+  precursor charge: TopPIC 1.9 gave PrSMs of different proteins sharing a
+  precursor feature one proteoform id (43 of 1,818 ids on 480_F3_02; 2.0's
+  cluster protein correction removed that), and the script, which groups
+  by the id alone, dropped one protein's identification when two proteins
+  shared an id.
 - **The PrSM table's optional columns are also found under TopPIC 1.9's and
   2.0's names** (`idColumnMap`: TopLib's name, TopPIC 1.7's, first; then
   e.g. `Unexpected modifications`, `# Masses`, `# Matched masses` /
   `# Matched exp fragments`). The script looks for 1.7's names only, so
   from 1.9 and 2.0 tables it copied none of the eight renamed columns.
+- **`--disable-different-proteoform-merge`** (visible, argument key
+  `disableDifferentProteoformMerge`, default false; `build`'s
+  `disable_different_proteoform_merge`): spectra of different proteoforms
+  (the same pair) are never clustered together. In the spectral
+  clustering a pair of identified spectra of different proteoforms gets
+  the distance n * n (n the precursor cluster's size) instead of the
+  cosine distance (`clusterGroup`'s `cannot_link`): every average linkage
+  merge containing such a pair then averages at least 4, above the 0.7
+  cutoff, so no flat cluster holds it, while unidentified spectra can still
+  join any cluster. This was the default up to main 47b9fc57; the user made
+  the script's behaviour the default (2026-10-04). By default every pair
+  gets its cosine distance, so the clusters are the script's: they join
+  different proteoforms (46 of 47 multi-member clusters on data/480_lib,
+  34 of them different proteins), and as each representative keeps one
+  identification, 50 of 4,630 proteoforms get none (8 of 1,908 on
+  480_F3_02's TopPIC 2.0 output, 21 of 1,868 on its 1.9 output). With the
+  option the library and cluster files equal main 47b9fc57's default byte
+  for byte on experiment 82's inputs; without it the cluster files equal
+  `--python-compatible`'s. The parameter block prints
+  `Different proteoform merge: enabled|disabled`. Do not replace the
+  option by a stricter cosine cutoff: that changes the clustering of every
+  spectrum, not only of the mixed ones, and still does not guarantee the
+  separation.
 
-`--python-compatible` turns both off (it is what the comparisons with the
-Python script use). Facts to keep straight:
+`--python-compatible` turns the first two off (it is what the comparisons
+with the Python script use); it is independent of
+`--disable-different-proteoform-merge`, so without that option it
+reproduces the script. Facts to keep straight:
 
 - **The Python choices are kept on purpose**, including odd ones: the
   top-50 peaks, precursor clusters by charge then complete linkage within

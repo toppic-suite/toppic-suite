@@ -86,11 +86,14 @@ void filterPpir(LibData& data, double cutoff);
 // representative per cluster, gives it the identification of its member
 // with the lowest E-value (keeping only the best cluster per proteoform and
 // precursor charge) and a decoy spectrum. Spectra identified as different
-// proteoforms (proteoform id and protein accession) are never clustered
-// together, so every proteoform keeps a representative; python_compatible
-// lets them be and keeps one cluster per proteoform id and charge, as the
-// Python script does.
+// proteoforms may share a cluster, as in the Python script;
+// disable_different_proteoform_merge never clusters spectra identified as
+// different proteoforms (proteoform id and protein accession) together, so
+// every proteoform keeps a representative. python_compatible keeps one
+// identified cluster per proteoform id and charge, as the Python script
+// does, instead of one per proteoform (id and accession) and charge.
 LibLibrary build(const LibData& data, LibRepMethod method,
+                 bool disable_different_proteoform_merge = false,
                  bool python_compatible = false);
 
 }  // namespace lib_builder
