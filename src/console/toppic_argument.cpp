@@ -18,10 +18,12 @@
 #include <exception>
 #include <filesystem>
 #include <iomanip>
+#include <sstream>
 #include <string>
 #include <utility>
 
 #include "common/base/mod_util.hpp"
+#include "common/base/ptm_base.hpp"
 #include "common/util/file_util.hpp"
 #include "common/util/logger.hpp"
 #include "common/util/mem_check.hpp"
@@ -32,6 +34,18 @@
 #include "seq/fasta_util.hpp"
 
 namespace toppic {
+
+namespace {
+
+// A built-in PTM's mass as ptm_base.xml gives it: 15 significant digits
+// write each mass of the file back exactly
+std::string ptmMassStr(const PtmPtr& ptm_ptr) {
+  std::ostringstream stream;
+  stream << std::setprecision(15) << ptm_ptr->getMonoMass();
+  return stream.str();
+}
+
+}  // namespace
 
 ToppicArgument::ToppicArgument() { arguments_ = initArguments(); }
 
@@ -141,14 +155,14 @@ void ToppicArgument::outputArguments(
       output << std::setw(gap) << std::left << "Fixed modifications BEGIN"
              << std::endl;
       output << std::setw(gap) << std::left << "Carbamidomethylation" << sep
-             << 57.021464 << sep << "C" << std::endl;
+             << ptmMassStr(PtmBase::getPtmPtr_C57()) << sep << "C" << std::endl;
       output << std::setw(gap) << std::left << "Fixed modifications END"
              << std::endl;
     } else if (arguments["fixedMod"] == "C58") {
       output << std::setw(gap) << std::left << "Fixed modifications BEGIN"
              << std::endl;
       output << std::setw(gap) << std::left << "Carboxymethylation" << sep
-             << 58.005479 << sep << "C" << std::endl;
+             << ptmMassStr(PtmBase::getPtmPtr_C58()) << sep << "C" << std::endl;
       output << std::setw(gap) << std::left << "Fixed modifications END"
              << std::endl;
     } else {

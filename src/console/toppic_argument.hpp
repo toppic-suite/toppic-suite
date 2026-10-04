@@ -28,6 +28,8 @@ class ToppicArgument {
  public:
   ToppicArgument();
 
+  // needs the base data (base_data::init): the fixed modifications C57 and
+  // C58 are printed with their ptm_base.xml masses
   static void outputArguments(std::ostream& output, const std::string& sep,
                               std::map<std::string, std::string> arguments);
 
