@@ -45,12 +45,16 @@ For each file TopDIA prints its parameters, the TopFD deconvolution
 parameters followed by the TopDIA feature and pseudo-spectrum parameters,
 and runs five steps:
 
-1. **MS1 deconvolution.** Every MS1 scan is deconvoluted, as in TopFD.
+1. **MS1 deconvolution.** Every MS1 scan is deconvoluted with the MS-Deconv
+   dynamic programming, as in `topfd --deconv-ms1-msdeconv`; TopFD's default
+   greedy MS1 search is not used.
 2. **MS1 feature detection.** The MS1 envelopes are linked across scans into
    proteoform features, scored with ECScore and filtered by
    `--ms1-ecscore-cutoff` and `--ms1-min-scan-number`.
 3. **MS/MS deconvolution.** Every DIA MS/MS scan is deconvoluted on its own,
-   without precursor information, into `sample_ms2_raw.msalign`. TopDIA
+   without precursor information, into `sample_ms2_raw.msalign`, with the
+   MS-Deconv dynamic programming, as in `topfd --deconv-ms2-msdeconv`
+   (TopFD's default greedy MS/MS search is not used). TopDIA
    deconvolutes these scans with the parameters of version 1.9.0.0: a 12
    Dalton envelope ranking window, no harmonic check and a 1,500 Dalton mass
    group boundary. The 2.0.0.0 defaults of TopFD (2 Dalton, harmonic check,

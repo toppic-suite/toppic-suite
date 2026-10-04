@@ -279,14 +279,16 @@ class TopfdPara {
   // option --ms2-flashdeconv: deconvolute the MS/MS spectra with the
   // FLASHDeconv algorithm (FlashDeconvMs2Process) instead of DeconvMs2Process
   bool use_flashdeconv_ = false;
-  // hidden option --ms1-greedy-deconv: deconvolute the MS1 spectra with
-  // greedy_ms1_deconv (deconv_ms1_process::deconvMsOneGreedy) instead of the
-  // precursor-window step + DeconvSingleSp
-  bool ms1_greedy_deconv_ = false;
-  // hidden option --ms2-greedy-deconv: deconvolute the MS/MS spectra with
-  // greedy_ms2_deconv (in deconv_ms2_process::deconvMsTwo) instead of
-  // DeconvSingleSp
-  bool ms2_greedy_deconv_ = false;
+  // deconvolute the MS1 spectra with greedy_ms1_deconv
+  // (deconv_ms1_process::deconvMsOneGreedy), TopFD's default; false selects
+  // MS-Deconv's precursor-window step + DeconvSingleSp (topfd option
+  // --deconv-ms1-msdeconv, and TopDIA, whose argument parser sets it)
+  bool ms1_greedy_deconv_ = true;
+  // deconvolute the MS/MS spectra with greedy_ms2_deconv (in
+  // deconv_ms2_process::deconvMsTwo and topfd_single_process), TopFD's
+  // default; false selects MS-Deconv's DeconvSingleSp (topfd option
+  // --deconv-ms2-msdeconv, and TopDIA, whose argument parser sets it)
+  bool ms2_greedy_deconv_ = true;
 
   //** information for each run **
   int frac_id_ = -1;

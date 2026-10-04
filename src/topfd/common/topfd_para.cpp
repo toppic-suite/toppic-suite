@@ -220,8 +220,9 @@ std::string TopfdPara::getTopfdParaStr(const std::string& prefix,
            << banner(prefix, "MS1 spectral deconvolution parameters")
            << std::endl;
     kv("MS1 signal/noise ratio:") << ms_one_sn_ratio_ << std::endl;
-    // printed only for the greedy search, so that the default output files
-    // keep main's parameter block
+    // printed only for the greedy search (TopFD's default), so that the
+    // output files of topfd --deconv-ms1-msdeconv and TopDIA keep the
+    // parameter block of earlier versions
     if (ms1_greedy_deconv_) {
       kv("MS1 deconvolution:") << "Greedy" << std::endl;
     } else if (run_filter_by_mz_) {
@@ -257,11 +258,13 @@ std::string TopfdPara::getTopfdParaStr(const std::string& prefix,
       << (sort_use_msdeconv_ ? "MS-Deconv score" : "EnvCNN score") << std::endl;
   kv("Fragment envelope EnvCNN score cutoff:")
       << ms2_env_cnn_score_cutoff_ << std::endl;
-  // both steps belong to TopFD's own MS/MS deconvolution: the FLASHDeconv
-  // path (--ms2-flashdeconv) and the greedy search (--ms2-greedy-deconv) do
-  // not run them, and the ranking window has no meaning when the
-  // filtering-by-mz step is disabled. The greedy search's line is printed
-  // only when it runs, so that the default output files keep main's block.
+  // both steps belong to MS-Deconv's MS/MS deconvolution (topfd
+  // --deconv-ms2-msdeconv, TopDIA): the FLASHDeconv path (--ms2-flashdeconv)
+  // and the greedy search (TopFD's default) do not run them, and the ranking
+  // window has no meaning when the filtering-by-mz step is disabled. The
+  // greedy search's line is printed only when it runs, so that the output
+  // files of --deconv-ms2-msdeconv and TopDIA keep the block of earlier
+  // versions.
   if (ms2_greedy_deconv_ && !use_flashdeconv_) {
     kv("MS/MS deconvolution:") << "Greedy" << std::endl;
   } else if (!use_flashdeconv_) {

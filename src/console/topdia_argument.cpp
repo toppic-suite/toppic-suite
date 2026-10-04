@@ -86,6 +86,12 @@ TopfdParaPtr Argument::getTopfdParaPtrForTopdia() {
   topfd_para_ptr->setMsTwoRankPeakDistance(TOPDIA_MS2_RANK_PEAK_DISTANCE);
   topfd_para_ptr->setMsTwoHarmonicCheck(false);
   topfd_para_ptr->setMassGroupBoundary(TOPDIA_MASS_GROUP_BOUNDARY);
+  // TopDIA also keeps MS-Deconv's MS1 and MS/MS deconvolution: TopFD's
+  // default greedy searches (topfd --deconv-ms1-msdeconv and
+  // --deconv-ms2-msdeconv turn them off) were measured on DDA data only
+  // (toppic_test experiments 104, 106 and 109).
+  topfd_para_ptr->setMs1GreedyDeconv(false);
+  topfd_para_ptr->setMs2GreedyDeconv(false);
   return topfd_para_ptr;
 }
 

@@ -165,7 +165,19 @@ bool Argument::parse(int argc, char* argv[]) {
         "files are named after the input file.")(
         "ms2-flashdeconv,F",
         "Deconvolute the MS/MS spectra with the FLASHDeconv algorithm instead "
-        "of TopFD's own (experimental).");
+        "of TopFD's own (experimental).")(
+        "deconv-ms1-msdeconv",
+        "Deconvolute the MS1 spectra with the MS-Deconv dynamic programming, "
+        "the default method of earlier versions. The default method is a "
+        "greedy search, which decides the charge state of the most intense "
+        "peak with all the charge states of its mass and subtracts the "
+        "mass's envelopes.")(
+        "deconv-ms2-msdeconv",
+        "Deconvolute the MS/MS spectra with the MS-Deconv dynamic "
+        "programming, the default method of earlier versions. The default "
+        "method is a greedy search, which decides the charge state of the "
+        "most intense peak with all the charge states of its fragment mass "
+        "and subtracts the mass's envelopes.");
 
     // Advanced options accepted on the command line but hidden from the help
     // message; the positional spectrum file argument is also hidden here.
@@ -198,16 +210,6 @@ bool Argument::parse(int argc, char* argv[]) {
         po::value<std::string>(&ms2_rank_peak_distance),
         "<a positive number>. The same window for MS/MS spectra. The default "
         "value is 2.")(
-        "ms1-greedy-deconv",
-        "Deconvolute the MS1 spectra with the greedy search, which decides the "
-        "charge state of the most intense peak with all the charge states of "
-        "its mass and subtracts the mass's envelopes, instead of the dynamic "
-        "programming (experimental).")(
-        "ms2-greedy-deconv",
-        "Deconvolute the MS/MS spectra with the greedy search, which decides "
-        "the charge state of the most intense peak with all the charge states "
-        "of its fragment mass and subtracts the mass's envelopes, instead of "
-        "the dynamic programming (experimental).")(
         "disable-ms2-harmonic-check",
         "Skip the harmonic check of MS/MS spectra, which replaces an envelope "
         "by a better scoring harmonic parent mass.")(
@@ -373,12 +375,12 @@ bool Argument::parse(int argc, char* argv[]) {
       topfd_para_ptr_->setUseFlashDeconv(true);
     }
 
-    if (vm.count("ms1-greedy-deconv")) {
-      topfd_para_ptr_->setMs1GreedyDeconv(true);
+    if (vm.count("deconv-ms1-msdeconv")) {
+      topfd_para_ptr_->setMs1GreedyDeconv(false);
     }
 
-    if (vm.count("ms2-greedy-deconv")) {
-      topfd_para_ptr_->setMs2GreedyDeconv(true);
+    if (vm.count("deconv-ms2-msdeconv")) {
+      topfd_para_ptr_->setMs2GreedyDeconv(false);
     }
 
     if (vm.count("mass-group-boundary")) {

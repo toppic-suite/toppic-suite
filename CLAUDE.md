@@ -391,8 +391,10 @@ The theoretical intensities set here are what reach the outputs: the
 the `.env` file's `THEO_INTE` column, and the SQLite `ms1_env`/`ms2_env`
 rows. `assignIntensity` (called before `mzRefine` and again after sorting)
 only splits an experimental peak among envelopes that share it; it never
-changes theoretical intensities. When touching any of this, validate with
-`topfd -T -g` on the myoglobin peak list: compare the deconvoluted masses
+changes theoretical intensities. The greedy MS1 and MS/MS searches (TopFD's
+defaults) do not run this refinement. When touching any of this, validate
+with `topfd -T -g --deconv-ms2-msdeconv` on the myoglobin peak list (without
+the option `-T` runs the greedy search): compare the deconvoluted masses
 against the sequence's b/y ions (46 exact / 14 off-by-one-isotope is the
 reference), and count envelopes whose theoretical apex exceeds the observed
 apex by > 20% (77 of 611 before the core fit, 1 after).
@@ -447,18 +449,24 @@ deconvoluted with the FLASHDeconv algorithm (OpenMS `SpectralDeconvolution`,
   `DeconvMs2Process`), decoy / FDR runs, target masses, and the tolerance
   auto-estimation.
 
-## Greedy MS1 deconvolution (`topfd/deconv/greedy_ms1_deconv`, `--ms1-greedy-deconv`)
+## Greedy MS1 deconvolution (`topfd/deconv/greedy_ms1_deconv`, TopFD's default)
 
-`deconv_ms1_process::deconvMsOneGreedy` is the alternative to `deconvMsOne`
-selected by the hidden topfd option `--ms1-greedy-deconv`
-(`TopfdPara::isMs1GreedyDeconv`; the parameter block then prints
-"MS1 deconvolution: Greedy", and only then, so that default output files
-keep main's block). It replaces the precursor-window step and
-`DeconvSingleSp` (candidate envelopes, filters, DP) for MS1 spectra with
-`greedy_ms1_deconv::deconv`, a THRASH-like subtractive search in which a
-peak's charge is decided with all the charge states of its mass; the
-output (msalign lines per charge state, EnvCNN scores, SQLite rows) is
-written by the same `writeMsOne` as `deconvMsOne`'s. Facts to keep straight:
+`deconv_ms1_process::deconvMsOneGreedy` is TopFD's MS1 deconvolution
+(`TopfdPara::isMs1GreedyDeconv`, true by default; the parameter block then
+prints "MS1 deconvolution: Greedy"). It replaces the precursor-window step
+and `DeconvSingleSp` (candidate envelopes, filters, MS-Deconv's DP) of
+`deconvMsOne` for MS1 spectra with `greedy_ms1_deconv::deconv`, a
+THRASH-like subtractive search in which a peak's charge is decided with all
+the charge states of its mass; the output (msalign lines per charge state,
+EnvCNN scores, SQLite rows) is written by the same `writeMsOne` as
+`deconvMsOne`'s. `deconvMsOne`, the default up to main 89df2a8c, runs with
+the visible topfd option `--deconv-ms1-msdeconv` (documented in the TopFD
+manual) and in TopDIA (`getTopfdParaPtrForTopdia` sets the flag false: the
+search was measured on DDA data only); the "MS1 deconvolution" line is
+printed only for the greedy search, so that those output files keep the
+earlier parameter block. The hidden `--ms1-greedy-deconv` that selected the
+search before it became the default is gone (an unrecognised option now).
+Facts to keep straight:
 
 - **One spectrum** (`GreedySearch::run`): the most intense peak of the
   residual spectrum (residual >= noise x MS1 S/N, the thresholds of
@@ -506,21 +514,36 @@ written by the same `writeMsOne` as `deconvMsOne`'s. Facts to keep straight:
   proteoforms and 425 proteins against main's 3,141-3,153 / 1,870 / 420;
   the gain is corrected precursor isotopes and charges (and fewer decoys
   on the spectra whose precursor changed). TopFD takes about the same time
-  (334-336 s against 285-333 s) and memory. Without the option the branch
-  writes main's masses, precursors and features.
+  (334-336 s against 285-333 s) and memory. With both greedy searches
+  (toppic_test experiment 109, rounds 2 and 3): 3,316-3,318 / 1,981 / 433.
+  The search gives fewer MS/MS spectra a precursor on some data: 612 of
+  1,381 against MS-Deconv's 855 on st_1.mzML (MS/MS-matched features 894
+  against 1,158), 4,289 against 4,303 on 480_F3_02.
+- **`--deconv-ms1-msdeconv` writes the earlier default's output**: on st_1
+  all 1,418 MS1 scans' masses and charges, both feature files and the
+  parameter block equal main 89df2a8c's (the last main with the DP as the
+  default), the MS/MS spectra up to the EnvCNN jitter of two runs of one
+  binary. The greedy search itself is not exactly repeatable (about 5% of
+  st_1's MS1 scans differ between two runs).
 - **Not done**: the precursor-window step of `deconvMsOne` (switch
   `prec_win` runs it first; it did not change the identifications) and
   FAIMS/`-T` specifics (the MS1 path is the same). The MS/MS spectra have
   their own greedy search (next section).
 
-## Greedy MS/MS deconvolution (`topfd/deconv/greedy_ms2_deconv`, `--ms2-greedy-deconv`)
+## Greedy MS/MS deconvolution (`topfd/deconv/greedy_ms2_deconv`, TopFD's default)
 
-`greedy_ms2_deconv::deconv` is the alternative to `DeconvSingleSp` for
-MS/MS spectra selected by the hidden topfd option `--ms2-greedy-deconv`
-(`TopfdPara::isMs2GreedyDeconv`; `deconv_ms2_process::deconvMsTwo` and
-`topfd -T` call it; the parameter block then prints "MS/MS deconvolution:
-Greedy" instead of the DP's ranking window and harmonic check lines, and
-only then, so that default output files keep main's block). It started as a
+`greedy_ms2_deconv::deconv` is TopFD's MS/MS deconvolution
+(`TopfdPara::isMs2GreedyDeconv`, true by default; `deconv_ms2_process::
+deconvMsTwo` and `topfd -T` call it; the parameter block then prints
+"MS/MS deconvolution: Greedy" instead of the DP's ranking window and
+harmonic check lines). `DeconvSingleSp`, the default up to main 89df2a8c,
+runs with the visible topfd option `--deconv-ms2-msdeconv` (documented in
+the TopFD manual) and in TopDIA (`getTopfdParaPtrForTopdia` sets the flag
+false), whose output files keep the earlier parameter block; `-F`
+(FLASHDeconv) still overrides both. The hidden `--ms2-greedy-deconv` that
+selected the search before it became the default is gone (an unrecognised
+option now). `-v`, `-g` and `-n` apply to both methods (`greedy_ms2_deconv::
+deconv` ends with the same filters). It started as a
 copy of the greedy MS1 search (previous section) and keeps its structure;
 the output (msalign lines, EnvCNN scores, the `-F`-relevant score, SQLite
 rows) is written as `DeconvSingleSp`'s. Facts to keep straight:
@@ -567,11 +590,17 @@ rows) is written as `DeconvSingleSp`'s. Facts to keep straight:
   with main's TopPIC in the benchmark setting, 3,296-3,298 PrSMs, 1,961-
   1,964 proteoforms and 427 proteins against main's 3,141 / 1,870 / 420 on
   the same MS1 output (+199 to +228 targets at E <= 1e-5 to 0.01, no more
-  decoys); with `--ms1-greedy-deconv` too 3,315 / 1,980 / 433. The gain is
+  decoys); with the greedy MS1 search too 3,315 / 1,980 / 433. The gain is
   15% more b/y fragments of the identified proteoforms at main's precision
   (mostly 1,000-5,000 Da: right charges and isotopes, and envelopes the DP
   did not report). The MS/MS stage takes about 100 s against main's 135 s
-  at 16 threads. Without the option the branch writes main's output.
+  at 16 threads.
+- **`--deconv-ms2-msdeconv` writes the earlier default's output**: on
+  st_1, with `--deconv-ms1-msdeconv` too, the MS/MS spectra equal main
+  89df2a8c's default output up to the EnvCNN jitter, and `topfd -T` on the myoglobin
+  peak list writes main's msalign byte for byte (681 masses; the greedy
+  search 2,476). With the MS1 deconvolution fixed, the greedy MS/MS search
+  is repeatable up to that jitter.
 
 ## Post mass matching (`prsm/prsm_post_mass_match`, toppic only)
 
