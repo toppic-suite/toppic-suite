@@ -24,11 +24,12 @@
 
 namespace toppic {
 
-// The greedy MS1 deconvolution (topfd --ms1-greedy-deconv), an alternative
-// to the precursor-window step and the candidate envelopes + dynamic
-// programming of DeconvSingleSp for MS1 spectra. It is a THRASH-like
-// subtractive search (Horn et al., JASMS 2000) in which the charge state of
-// a peak is decided with all the charge states of its mass:
+// The greedy MS1 deconvolution, --deconv-ms1 greedy, TopFD's default
+// (msdeconv, TopDIA's default, uses the precursor-window step and the
+// candidate envelopes + dynamic programming of DeconvSingleSp for MS1
+// spectra instead). It is a THRASH-like subtractive search (Horn et al.,
+// JASMS 2000) in which the charge state of a peak is decided with all the
+// charge states of its mass:
 //   1. take the most intense peak of the residual spectrum as the seed;
 //   2. for every charge z with a peak one isotope spacing from the seed,
 //      align the averagine distribution's apex with the seed, fit it to the

@@ -86,6 +86,12 @@ TopfdParaPtr Argument::getTopfdParaPtrForTopdia() {
   topfd_para_ptr->setMsTwoRankPeakDistance(TOPDIA_MS2_RANK_PEAK_DISTANCE);
   topfd_para_ptr->setMsTwoHarmonicCheck(false);
   topfd_para_ptr->setMassGroupBoundary(TOPDIA_MASS_GROUP_BOUNDARY);
+  // TopDIA also keeps MS-Deconv's MS1 and MS/MS deconvolution by default:
+  // TopFD's default greedy searches were measured on DDA data only
+  // (toppic_test experiments 104, 106 and 109). --deconv-ms1 and
+  // --deconv-ms2 select them.
+  topfd_para_ptr->setMs1DeconvMethod("msdeconv");
+  topfd_para_ptr->setMs2DeconvMethod("msdeconv");
   return topfd_para_ptr;
 }
 
@@ -116,6 +122,9 @@ bool Argument::parse(int argc, char* argv[]) {
   std::string pseudo_min_peaks = "";
   std::string ms1_seed_env_inte_corr_tole_cutoff = "";
   std::string ms2_seed_env_inte_corr_tole_cutoff = "";
+  // deconvolution methods
+  std::string deconv_ms1 = "";
+  std::string deconv_ms2 = "";
 
   // Define and parse the program options
   try {
@@ -184,7 +193,19 @@ bool Argument::parse(int argc, char* argv[]) {
         "fragment ions.")(
         "thread-number,u", po::value<std::string>(&thread_number),
         "<a positive integer>. Number of threads used in spectral "
-        "deconvolution. Default value: 1.");
+        "deconvolution. Default value: 1.")(
+        "deconv-ms1", po::value<std::string>(&deconv_ms1),
+        "<greedy|msdeconv>. Set the deconvolution method of MS1 spectra: "
+        "msdeconv, the MS-Deconv dynamic programming, or greedy, TopFD's "
+        "default greedy search, which decides the charge state of the most "
+        "intense peak with all the charge states of its mass and subtracts "
+        "the mass's envelopes. The default value is msdeconv.")(
+        "deconv-ms2", po::value<std::string>(&deconv_ms2),
+        "<greedy|msdeconv|flashdeconv>. Set the deconvolution method of "
+        "MS/MS spectra: msdeconv, the MS-Deconv dynamic programming; greedy, "
+        "TopFD's default greedy search adapted to fragment ions; or "
+        "flashdeconv, the FLASHDeconv algorithm (experimental). The default "
+        "value is msdeconv.");
 
     // Advanced options accepted on the command line but hidden from the help
     // message; the positional spectrum file argument is also hidden here.
@@ -298,6 +319,20 @@ bool Argument::parse(int argc, char* argv[]) {
 
     if (vm.count("msdeconv")) {
       topfd_para_ptr_->setSortUseMsDeconv(true);
+    }
+
+    if (vm.count("deconv-ms1") &&
+        !topfd_para_ptr_->setMs1DeconvMethod(deconv_ms1)) {
+      LOG_ERROR("MS1 deconvolution method " << deconv_ms1
+                << " should be greedy or msdeconv.");
+      return false;
+    }
+
+    if (vm.count("deconv-ms2") &&
+        !topfd_para_ptr_->setMs2DeconvMethod(deconv_ms2)) {
+      LOG_ERROR("MS/MS deconvolution method " << deconv_ms2
+                << " should be greedy, msdeconv or flashdeconv.");
+      return false;
     }
 
     if (vm.count("max-mass")) {

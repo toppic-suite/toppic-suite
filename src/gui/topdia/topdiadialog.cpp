@@ -142,6 +142,10 @@ void TopDIADialog::on_defaultButton_clicked() {
       topfd_para_ptr_->isAANumBasedFilter());
   ui->singleScanNoiseLevelCheckBox->setChecked(
       topfd_para_ptr_->isUseSingleScanNoiseLevel());
+  ui->ms1DeconvComboBox->setCurrentText(
+      QString::fromStdString(topfd_para_ptr_->getMs1DeconvMethod()));
+  ui->ms2DeconvComboBox->setCurrentText(
+      QString::fromStdString(topfd_para_ptr_->getMs2DeconvMethod()));
 
   //////////////////////////////////////
   ui->ms1EcscoreCutoffEdit->setText(
@@ -325,6 +329,10 @@ void TopDIADialog::getParaPtr() {
       ui->activationComboBox->currentText().toStdString());
   topfd_para_ptr_->setAANumBasedFilter(
       ui->finalFilteringCheckBox->isChecked());
+  topfd_para_ptr_->setMs1DeconvMethod(
+      ui->ms1DeconvComboBox->currentText().toStdString());
+  topfd_para_ptr_->setMs2DeconvMethod(
+      ui->ms2DeconvComboBox->currentText().toStdString());
 
   //////////////////////////////////////
   topfd_para_ptr_->setMs1EcscoreCutoff(
@@ -367,6 +375,8 @@ void TopDIADialog::lockDialog() {
   ui->activationComboBox->setEnabled(false);
   ui->finalFilteringCheckBox->setEnabled(false);
   ui->singleScanNoiseLevelCheckBox->setEnabled(false);
+  ui->ms1DeconvComboBox->setEnabled(false);
+  ui->ms2DeconvComboBox->setEnabled(false);
 
   ui->ms1EcscoreCutoffEdit->setEnabled(false);
   ui->ms2EcscoreCutoffEdit->setEnabled(false);
@@ -397,6 +407,8 @@ void TopDIADialog::unlockDialog() {
   ui->activationComboBox->setEnabled(true);
   ui->finalFilteringCheckBox->setEnabled(true);
   ui->singleScanNoiseLevelCheckBox->setEnabled(true);
+  ui->ms1DeconvComboBox->setEnabled(true);
+  ui->ms2DeconvComboBox->setEnabled(true);
 
   ui->ms1EcscoreCutoffEdit->setEnabled(true);
   ui->ms2EcscoreCutoffEdit->setEnabled(true);

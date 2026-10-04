@@ -520,6 +520,34 @@ li.checked::marker { content: &quot;\2612&quot;; }
     <property name="title">
      <string>Additional settings</string>
     </property>
+    <widget class="QWidget" name="horizontalLayoutWidget_17">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>20</y>
+       <width>251</width>
+       <height>25</height>
+      </rect>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout_17">
+      <item>
+       <widget class="QCheckBox" name="singleScanNoiseLevelCheckBox">
+        <property name="acceptDrops">
+         <bool>false</bool>
+        </property>
+        <property name="text">
+         <string>Use single scan noise level</string>
+        </property>
+        <property name="checkable">
+         <bool>true</bool>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
     <widget class="QWidget" name="horizontalLayoutWidget_12">
      <property name="geometry">
       <rect>
@@ -974,34 +1002,6 @@ li.checked::marker { content: &quot;\2612&quot;; }
      </item>
     </layout>
    </widget>
-   <widget class="QWidget" name="horizontalLayoutWidget_17">
-    <property name="geometry">
-     <rect>
-      <x>300</x>
-      <y>240</y>
-      <width>291</width>
-      <height>41</height>
-     </rect>
-    </property>
-    <layout class="QHBoxLayout" name="horizontalLayout_17">
-     <item>
-      <widget class="QCheckBox" name="singleScanNoiseLevelCheckBox">
-       <property name="acceptDrops">
-        <bool>false</bool>
-       </property>
-       <property name="text">
-        <string>Use single scan noise level</string>
-       </property>
-       <property name="checkable">
-        <bool>true</bool>
-       </property>
-       <property name="checked">
-        <bool>true</bool>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </widget>
    <widget class="QWidget" name="horizontalLayoutWidget_14">
     <property name="geometry">
      <rect>
@@ -1042,6 +1042,107 @@ li.checked::marker { content: &quot;\2612&quot;; }
        <property name="text">
         <string>0</string>
        </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+   <widget class="QWidget" name="horizontalLayoutWidget_24">
+    <property name="geometry">
+     <rect>
+      <x>300</x>
+      <y>240</y>
+      <width>291</width>
+      <height>42</height>
+     </rect>
+    </property>
+    <layout class="QHBoxLayout" name="horizontalLayout_24">
+     <property name="spacing">
+      <number>7</number>
+     </property>
+     <property name="sizeConstraint">
+      <enum>QLayout::SetNoConstraint</enum>
+     </property>
+     <item>
+      <widget class="QLabel" name="ms1DeconvLabel">
+       <property name="text">
+        <string>MS1 deconvolution:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QComboBox" name="ms1DeconvComboBox">
+       <property name="maximumSize">
+        <size>
+         <width>100</width>
+         <height>16777215</height>
+        </size>
+       </property>
+       <property name="toolTip">
+        <string>The deconvolution method of MS1 spectra (--deconv-ms1): greedy, a greedy search that decides the charge state of the most intense peak with all the charge states of its mass, or msdeconv, the MS-Deconv dynamic programming.</string>
+       </property>
+       <item>
+        <property name="text">
+         <string>greedy</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>msdeconv</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+   <widget class="QWidget" name="horizontalLayoutWidget_25">
+    <property name="geometry">
+     <rect>
+      <x>300</x>
+      <y>360</y>
+      <width>291</width>
+      <height>42</height>
+     </rect>
+    </property>
+    <layout class="QHBoxLayout" name="horizontalLayout_25">
+     <property name="spacing">
+      <number>7</number>
+     </property>
+     <property name="sizeConstraint">
+      <enum>QLayout::SetNoConstraint</enum>
+     </property>
+     <item>
+      <widget class="QLabel" name="ms2DeconvLabel">
+       <property name="text">
+        <string>MS/MS deconvolution:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QComboBox" name="ms2DeconvComboBox">
+       <property name="maximumSize">
+        <size>
+         <width>100</width>
+         <height>16777215</height>
+        </size>
+       </property>
+       <property name="toolTip">
+        <string>The deconvolution method of MS/MS spectra (--deconv-ms2): greedy, the greedy search adapted to fragment ions; msdeconv, the MS-Deconv dynamic programming; or flashdeconv, the FLASHDeconv algorithm (experimental).</string>
+       </property>
+       <item>
+        <property name="text">
+         <string>greedy</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>msdeconv</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>flashdeconv</string>
+        </property>
+       </item>
       </widget>
      </item>
     </layout>

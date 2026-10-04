@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>965</width>
-    <height>630</height>
+    <height>670</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -19,13 +19,13 @@
   <property name="minimumSize">
    <size>
     <width>965</width>
-    <height>630</height>
+    <height>670</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
     <width>965</width>
-    <height>630</height>
+    <height>670</height>
    </size>
   </property>
   <property name="windowTitle">
@@ -374,7 +374,7 @@
     <property name="geometry">
      <rect>
       <x>30</x>
-      <y>580</y>
+      <y>620</y>
       <width>901</width>
       <height>50</height>
      </rect>
@@ -489,7 +489,7 @@
     <property name="geometry">
      <rect>
       <x>30</x>
-      <y>440</y>
+      <y>480</y>
       <width>901</width>
       <height>131</height>
      </rect>
@@ -592,7 +592,7 @@ p, li { white-space: pre-wrap; }
     <property name="geometry">
      <rect>
       <x>30</x>
-      <y>330</y>
+      <y>370</y>
       <width>901</width>
       <height>111</height>
      </rect>
@@ -783,37 +783,6 @@ p, li { white-space: pre-wrap; }
       </item>
      </layout>
     </widget>
-    <widget class="QWidget" name="horizontalLayoutWidget_22">
-     <property name="geometry">
-      <rect>
-       <x>270</x>
-       <y>80</y>
-       <width>300</width>
-       <height>25</height>
-      </rect>
-     </property>
-     <layout class="QHBoxLayout" name="horizontalLayout_22">
-      <item>
-       <widget class="QCheckBox" name="ms2FlashDeconvCheckBox">
-        <property name="toolTip">
-         <string>Deconvolute the MS/MS spectra with the FLASHDeconv algorithm instead of TopFD's own (topfd --ms2-flashdeconv, experimental).</string>
-        </property>
-        <property name="acceptDrops">
-         <bool>false</bool>
-        </property>
-        <property name="text">
-         <string>Use FLASHDeconv for MS/MS</string>
-        </property>
-        <property name="checkable">
-         <bool>true</bool>
-        </property>
-        <property name="checked">
-         <bool>false</bool>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
     <widget class="QWidget" name="horizontalLayoutWidget_17">
      <property name="geometry">
       <rect>
@@ -971,6 +940,107 @@ p, li { white-space: pre-wrap; }
        <property name="text">
         <string>3</string>
        </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+   <widget class="QWidget" name="horizontalLayoutWidget_23">
+    <property name="geometry">
+     <rect>
+      <x>620</x>
+      <y>280</y>
+      <width>311</width>
+      <height>42</height>
+     </rect>
+    </property>
+    <layout class="QHBoxLayout" name="horizontalLayout_23">
+     <property name="spacing">
+      <number>7</number>
+     </property>
+     <property name="sizeConstraint">
+      <enum>QLayout::SetNoConstraint</enum>
+     </property>
+     <item>
+      <widget class="QLabel" name="ms1DeconvLabel">
+       <property name="text">
+        <string>MS1 deconvolution:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QComboBox" name="ms1DeconvComboBox">
+       <property name="maximumSize">
+        <size>
+         <width>100</width>
+         <height>16777215</height>
+        </size>
+       </property>
+       <property name="toolTip">
+        <string>The deconvolution method of MS1 spectra (--deconv-ms1): greedy, a greedy search that decides the charge state of the most intense peak with all the charge states of its mass, or msdeconv, the MS-Deconv dynamic programming.</string>
+       </property>
+       <item>
+        <property name="text">
+         <string>greedy</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>msdeconv</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+   <widget class="QWidget" name="horizontalLayoutWidget_24">
+    <property name="geometry">
+     <rect>
+      <x>620</x>
+      <y>320</y>
+      <width>311</width>
+      <height>42</height>
+     </rect>
+    </property>
+    <layout class="QHBoxLayout" name="horizontalLayout_24">
+     <property name="spacing">
+      <number>7</number>
+     </property>
+     <property name="sizeConstraint">
+      <enum>QLayout::SetNoConstraint</enum>
+     </property>
+     <item>
+      <widget class="QLabel" name="ms2DeconvLabel">
+       <property name="text">
+        <string>MS/MS deconvolution:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QComboBox" name="ms2DeconvComboBox">
+       <property name="maximumSize">
+        <size>
+         <width>100</width>
+         <height>16777215</height>
+        </size>
+       </property>
+       <property name="toolTip">
+        <string>The deconvolution method of MS/MS spectra (--deconv-ms2): greedy, the greedy search adapted to fragment ions; msdeconv, the MS-Deconv dynamic programming; or flashdeconv, the FLASHDeconv algorithm (experimental).</string>
+       </property>
+       <item>
+        <property name="text">
+         <string>greedy</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>msdeconv</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>flashdeconv</string>
+        </property>
+       </item>
       </widget>
      </item>
     </layout>

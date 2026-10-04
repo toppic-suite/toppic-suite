@@ -17,12 +17,14 @@
 
 #include <sqlite3.h>
 
+#include <algorithm>
 #include <cstdlib>
 #include <filesystem>
 #include <iomanip>
 #include <ostream>
 #include <sstream>
 #include <string>
+#include <vector>
 
 #include "common/util/file_util.hpp"
 #include "common/util/logger.hpp"
@@ -47,6 +49,35 @@ TopfdPara::~TopfdPara() {
   if (sql_db_ != nullptr) {
     sqlite3_close(sql_db_);
   }
+}
+
+const std::vector<std::string>& TopfdPara::getMs1DeconvMethods() {
+  static const std::vector<std::string> methods = {"greedy", "msdeconv"};
+  return methods;
+}
+
+const std::vector<std::string>& TopfdPara::getMs2DeconvMethods() {
+  static const std::vector<std::string> methods = {"greedy", "msdeconv",
+                                                   "flashdeconv"};
+  return methods;
+}
+
+bool TopfdPara::setMs1DeconvMethod(const std::string& method) {
+  const std::vector<std::string>& methods = getMs1DeconvMethods();
+  if (std::find(methods.begin(), methods.end(), method) == methods.end()) {
+    return false;
+  }
+  ms1_deconv_method_ = method;
+  return true;
+}
+
+bool TopfdPara::setMs2DeconvMethod(const std::string& method) {
+  const std::vector<std::string>& methods = getMs2DeconvMethods();
+  if (std::find(methods.begin(), methods.end(), method) == methods.end()) {
+    return false;
+  }
+  ms2_deconv_method_ = method;
+  return true;
 }
 
 void TopfdPara::setMzmlFileNameAndFaims(const std::string& mzml_file_name,
@@ -220,9 +251,10 @@ std::string TopfdPara::getTopfdParaStr(const std::string& prefix,
            << banner(prefix, "MS1 spectral deconvolution parameters")
            << std::endl;
     kv("MS1 signal/noise ratio:") << ms_one_sn_ratio_ << std::endl;
-    // printed only for the greedy search, so that the default output files
-    // keep main's parameter block
-    if (ms1_greedy_deconv_) {
+    // printed only for the greedy search (TopFD's default), so that the
+    // output files of --deconv-ms1 msdeconv (TopDIA's default) keep the
+    // parameter block of earlier versions
+    if (isMs1GreedyDeconv()) {
       kv("MS1 deconvolution:") << "Greedy" << std::endl;
     } else if (run_filter_by_mz_) {
       kv("Precursor envelope ranking window:")
@@ -257,14 +289,17 @@ std::string TopfdPara::getTopfdParaStr(const std::string& prefix,
       << (sort_use_msdeconv_ ? "MS-Deconv score" : "EnvCNN score") << std::endl;
   kv("Fragment envelope EnvCNN score cutoff:")
       << ms2_env_cnn_score_cutoff_ << std::endl;
-  // both steps belong to TopFD's own MS/MS deconvolution: the FLASHDeconv
-  // path (--ms2-flashdeconv) and the greedy search (--ms2-greedy-deconv) do
-  // not run them, and the ranking window has no meaning when the
-  // filtering-by-mz step is disabled. The greedy search's line is printed
-  // only when it runs, so that the default output files keep main's block.
-  if (ms2_greedy_deconv_ && !use_flashdeconv_) {
+  // the ranking window and the harmonic check belong to MS-Deconv's MS/MS
+  // deconvolution (--deconv-ms2 msdeconv, TopDIA's default): the greedy
+  // search (TopFD's default) and FLASHDeconv do not run them, and the ranking
+  // window has no meaning when the filtering-by-mz step is disabled. The
+  // method's line is printed only for the other two, so that the output
+  // files of --deconv-ms2 msdeconv keep the block of earlier versions.
+  if (isMs2GreedyDeconv()) {
     kv("MS/MS deconvolution:") << "Greedy" << std::endl;
-  } else if (!use_flashdeconv_) {
+  } else if (isUseFlashDeconv()) {
+    kv("MS/MS deconvolution:") << "FLASHDeconv" << std::endl;
+  } else {
     if (run_filter_by_mz_) {
       kv("Fragment envelope ranking window:")
           << ms2_rank_peak_distance_ << " Dalton" << std::endl;
