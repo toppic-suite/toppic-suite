@@ -297,7 +297,8 @@ std::map<std::string, std::string> topmg_para{
     {"varPtmNumber", "-P "},
     {"allowProtType", "-w "},
     {"proteoGraphGap", "-j "},
-    {"varPtmNumInGap", "-G "}};
+    {"varPtmNumInGap", "-G "},
+    {"topmgAlignErrorTolerance", "--align-error-tolerance "}};
 
 std::string geneTopmgCommand(std::map<std::string, std::string> arguments_,
                              std::vector<std::string> spec_file_lst_) {
