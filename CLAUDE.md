@@ -560,6 +560,16 @@ straight:
   the window. One envelope per window (the window's charge), with its
   EnvCNN score but not filtered by it; a window without a peak gets
   nothing. `TOPFD_GREEDY_PREC_WIN_LOG=<file>` writes one line per window.
+  On 480_F3_02 (toppic_test experiment 113, report 0113) 80 of 4,323
+  windows had no envelope (40 deconvoluted at charge 1); 20 more MS/MS
+  spectra got a precursor (4,318 against 4,298), none identified (their
+  MS/MS spectra have a median of 4 fragment masses), and one harmonic
+  precursor was corrected (3,487 Da at charge 3 -> 6,974 Da at charge 6, a
+  better PTMS proteoform). PrSMs 3,331 and 3,338 against main's 3,337 and
+  3,338 (the run-to-run variation); same TopFD time. A new charge 1 feature
+  can cover a later window at the same m/z, so that the feature search for
+  windows without a feature skips it (scans 5806 and 5815 lost a 10,943 Da
+  precursor this way; neither is identified in any run).
 - **Research switches**: the defaults are in `GreedyPara` (cpp); the
   environment variable `TOPFD_GREEDY_PARA` ("name=value,...") overrides
   them, so that variants can be run without a rebuild (toppic_test
