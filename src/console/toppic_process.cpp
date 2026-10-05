@@ -427,14 +427,15 @@ std::string TopPIC_identify(std::map<std::string, std::string>& arguments) {
     processor = nullptr;
     std::cout << "E-value computation - finished." << std::endl;
 
-    // With deamidation as a variable PTM, a spectrum's zero-PTM PrSM and
-    // deamidation PrSM of the same protein and positions (the unmodified
-    // proteoform one isotope below the precursor and the deamidated one at
-    // it) are compared by matched fragments and precursor mass errors, and
-    // only one kind goes on to the top PrSM selection (toppic_test
-    // experiment 123).
+    // With the hidden --deamid-selector and deamidation as a variable PTM, a
+    // spectrum's zero-PTM PrSM and deamidation PrSM of the same protein and
+    // positions (the unmodified proteoform one isotope below the precursor
+    // and the deamidated one at it) are compared by matched fragments and
+    // precursor mass errors, and only one kind goes on to the top PrSM
+    // selection (toppic_test experiment 123). Off by default.
     std::string evalue_ext = "toppic_evalue";
-    if (var_ptm_num >= 1 && var_ptm_file_name != "") {
+    if (arguments["deamidSelector"] == "true" && var_ptm_num >= 1 &&
+        var_ptm_file_name != "") {
       std::set<std::string> deamid_ptm_names =
           prsm_deamid_selector::getDeamidPtmNames(var_ptm_file_name);
       if (!deamid_ptm_names.empty()) {

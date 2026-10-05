@@ -28,7 +28,8 @@ namespace toppic {
 // E-values come from PRM spectra of different precursor masses and do not
 // decide between them (toppic_test experiment 117), so on each spectrum the
 // two are compared by their matched fragments and precursor mass errors
-// before the top PrSM selection (toppic_test experiment 123).
+// before the top PrSM selection (toppic_test experiment 123). toppic runs it
+// only with the hidden --deamid-selector.
 namespace prsm_deamid_selector {
 
 // The abbreviations of the deamidations of a variable PTM file: its PTMs

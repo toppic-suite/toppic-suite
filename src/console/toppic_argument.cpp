@@ -126,6 +126,7 @@ std::map<std::string, std::string> ToppicArgument::initArguments() {
   arguments["fragMassExtension"] = "true";
   arguments["fragExtendMinMass"] = "5000";
   arguments["varPtmFilterCandNum"] = "";
+  arguments["deamidSelector"] = "false";
   arguments["fragMassDedup"] = "false";
   arguments["multiSkipEvalue"] = "";
   arguments["multiTypeAlign"] = "true";
@@ -211,6 +212,10 @@ void ToppicArgument::outputArguments(
              << "Variable PTM filter candidates per spectrum:" << sep
              << arguments["varPtmFilterCandNum"]
              << " (complete,prefix/suffix,internal)" << std::endl;
+    }
+    if (arguments["deamidSelector"] == "true") {
+      output << std::setw(gap) << std::left
+             << "Deamidation PrSM selection:" << sep << "true" << std::endl;
     }
     output << std::setw(gap) << std::left
            << "Variable modifications file name:" << sep
@@ -584,6 +589,7 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
         "frag-extend-min-mass", po::value<std::string>(&frag_extend_min_mass),
         "")("var-ptm-filter-cand-num",
             po::value<std::string>(&var_ptm_filter_cand_num), "")(
+        "deamid-selector", "")(
         "multi-skip-evalue", po::value<std::string>(&multi_skip_evalue),
             "")("disable-multi-type-align", "")(
         "topmg", po::value<std::string>(&topmg_mode), "")(
@@ -863,6 +869,13 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
     }
     if (vm.count("var-ptm-filter-cand-num")) {
       arguments_["varPtmFilterCandNum"] = var_ptm_filter_cand_num;
+    }
+    // hidden: with a deamidation in the variable PTM file, choose between a
+    // spectrum's zero-PTM and deamidation PrSMs of the same protein and
+    // positions before the top PrSM selection (prsm_deamid_selector,
+    // toppic_test experiment 123)
+    if (vm.count("deamid-selector")) {
+      arguments_["deamidSelector"] = "true";
     }
     if (vm.count("multi-skip-evalue")) {
       arguments_["multiSkipEvalue"] = multi_skip_evalue;

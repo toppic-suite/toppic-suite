@@ -1307,12 +1307,14 @@ merged into main on 2026-10-05). Facts to keep straight:
 ## Deamidation or the -1 isotope offset (`prsm/prsm_deamid_selector`)
 
 Branch `deamid_prec_error` (toppic_test experiment 123, report 0123; not
-merged). With a deamidation in the variable PTM file (a PTM with Unimod id 7
-or a monoisotopic mass within 0.001 Da of 0.984016 Da;
-`getDeamidPtmNames`), `TopPIC_identify` runs `prsm_deamid_selector::
-process` between the E-value computation and the top PrSM selection: it
-reads `toppic_evalue` and writes `toppic_evalue_deamid`, which
-`prsm_top_selector` then reads. Facts to keep straight:
+merged). **Off by default**; the hidden toppic option `--deamid-selector`
+(key `deamidSelector`, default `"false"`; printed in the parameter block
+only when set) turns it on. Then, with a deamidation in the variable PTM
+file (a PTM with Unimod id 7 or a monoisotopic mass within 0.001 Da of
+0.984016 Da; `getDeamidPtmNames`), `TopPIC_identify` runs
+`prsm_deamid_selector::process` between the E-value computation and the top
+PrSM selection: it reads `toppic_evalue` and writes `toppic_evalue_deamid`,
+which `prsm_top_selector` then reads. Facts to keep straight:
 
 - **Why.** The unmodified proteoform matched at the -1 offset (a zero-shift
   PrSM whose adjusted precursor mass is P - 1.00228) and the deamidated one
@@ -1339,7 +1341,8 @@ reads `toppic_evalue` and writes `toppic_evalue_deamid`, which
   top PrSM selection can pick a third PrSM (on 480: one-shift PrSMs of the
   same protein).
 - **Results on 480_F3_02** (`-s 2`, oxidation and deamidation, against main
-  7c8e00e6; TopFD 47b9fc57 / ead67ddc outputs):
+  7c8e00e6; TopFD 47b9fc57 / ead67ddc outputs; run with the step on, before
+  the option made it opt-in):
     - The step: 539 / 544 pairs, half of them decoys, 620 / 621 PrSMs
       removed, 3.4 s. A Python copy of the rule predicts
       `toppic_evalue_deamid` exactly.
