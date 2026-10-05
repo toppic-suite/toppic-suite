@@ -125,6 +125,7 @@ std::map<std::string, std::string> ToppicArgument::initArguments() {
   arguments["varPtmPrecOneDaError"] = "false";
   arguments["fragMassExtension"] = "true";
   arguments["fragExtendMinMass"] = "5000";
+  arguments["varPtmFilterCandNum"] = "";
   arguments["fragMassDedup"] = "false";
   arguments["multiSkipEvalue"] = "";
   arguments["multiTypeAlign"] = "true";
@@ -202,6 +203,14 @@ void ToppicArgument::outputArguments(
     if (arguments.at("useFdrGroups") == "true") {
       output << std::setw(gap) << std::left << "FDR computation:" << sep
              << "separate PrSM groups" << std::endl;
+    }
+    // printed only when set, so that the default parameter block is
+    // unchanged
+    if (arguments["varPtmFilterCandNum"] != "") {
+      output << std::setw(gap) << std::left
+             << "Variable PTM filter candidates per spectrum:" << sep
+             << arguments["varPtmFilterCandNum"]
+             << " (complete,prefix/suffix,internal)" << std::endl;
     }
     output << std::setw(gap) << std::left
            << "Variable modifications file name:" << sep
@@ -378,6 +387,7 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
   std::string post_min_peak_num = "";
   std::string frag_extend_min_mass = "";
   std::string multi_skip_evalue = "";
+  std::string var_ptm_filter_cand_num = "";
 
   /** Define and parse the program options*/
   try {
@@ -572,7 +582,9 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
         "fdr-groups", "")("disable-frag-mass-extension", "")(
         "frag-mass-dedup", "")(
         "frag-extend-min-mass", po::value<std::string>(&frag_extend_min_mass),
-        "")("multi-skip-evalue", po::value<std::string>(&multi_skip_evalue),
+        "")("var-ptm-filter-cand-num",
+            po::value<std::string>(&var_ptm_filter_cand_num), "")(
+        "multi-skip-evalue", po::value<std::string>(&multi_skip_evalue),
             "")("disable-multi-type-align", "")(
         "topmg", po::value<std::string>(&topmg_mode), "")(
         "topmg-use-mcmc", "")(
@@ -848,6 +860,9 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
     }
     if (vm.count("frag-extend-min-mass")) {
       arguments_["fragExtendMinMass"] = frag_extend_min_mass;
+    }
+    if (vm.count("var-ptm-filter-cand-num")) {
+      arguments_["varPtmFilterCandNum"] = var_ptm_filter_cand_num;
     }
     if (vm.count("multi-skip-evalue")) {
       arguments_["multiSkipEvalue"] = multi_skip_evalue;
@@ -1218,6 +1233,26 @@ bool ToppicArgument::validateArguments() {
     LOG_ERROR("Fragment extension minimum mass " << frag_extend_min_mass
                                                  << " should be a number.");
     return false;
+  }
+
+  // the variable PTM filter's candidates kept per spectrum, for complete,
+  // prefix and suffix, and internal proteoforms (VarPtmFilterMng)
+  std::string var_cand_num = arguments_["varPtmFilterCandNum"];
+  if (var_cand_num != "") {
+    std::vector<std::string> nums = str_util::split(var_cand_num, ",");
+    bool valid = nums.size() == 3;
+    for (size_t i = 0; valid && i < nums.size(); i++) {
+      valid = !nums[i].empty() &&
+              nums[i].find_first_not_of("0123456789") == std::string::npos &&
+              nums[i].size() <= 6 && std::stoi(nums[i]) > 0;
+    }
+    if (!valid) {
+      LOG_ERROR("--var-ptm-filter-cand-num "
+                << var_cand_num
+                << " should be three positive integers separated by commas "
+                   "(complete,prefix/suffix,internal).");
+      return false;
+    }
   }
 
   std::string topmg_mode = arguments_["topmgMode"];
