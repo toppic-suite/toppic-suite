@@ -173,6 +173,24 @@ double refinePrecursorAndHeaderShift(const ProteoformPtr& proteo_ptr,
   return prec_mass + best_delta;
 }
 
+double refineVarPtmPrecursorAndHeaderShift(const ProteoformPtr& proteo_ptr,
+                                           const DiagHeaderPtrVec& header_ptrs,
+                                           double ptm_mass) {
+  double refine_prec_mass = proteo_ptr->getMass() + ptm_mass;
+  // as VarPtmSlowMatch::geneVarPtmNTermShiftHeaders sets them, with the
+  // refined precursor mass in place of the observed one. With the observed
+  // one, a precursor 0.02 Da above the proteoform mass put every C-terminal
+  // ion below 2 kDa outside the fragment tolerance, and the shift range
+  // between two diagonals grew over the ions (toppic_test experiment 120)
+  double seq_mass = proteo_ptr->getResSeqPtr()->getSeqMass();
+  for (size_t i = 0; i < header_ptrs.size(); i++) {
+    double c_shift =
+        refine_prec_mass - seq_mass - header_ptrs[i]->getProtNTermShift();
+    header_ptrs[i]->initHeader(c_shift, proteo_ptr);
+  }
+  return refine_prec_mass;
+}
+
 DiagHeaderPtrVec refineHeadersBgnEnd(const ProteoformPtr& proteo_ptr,
                                      const ExtendMsPtrVec& ms_three_ptr_vec,
                                      const DiagHeaderPtrVec& header_ptrs,
