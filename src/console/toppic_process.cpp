@@ -1320,7 +1320,11 @@ int TopPICProgress(std::map<std::string, std::string>& arguments) {
     return 1;
   }
   TopPIC_postprocess(arguments, raw_prsm_ext);
-  TopPIC_report(arguments);
+  // In a combined run (-c) the file is reported after the combined result,
+  // with its proteoform ids (TopPICProgress_multi_file).
+  if (arguments["combinedOutputName"] == "") {
+    TopPIC_report(arguments);
+  }
   return 0;
 }
 
@@ -1389,13 +1393,18 @@ int TopPICProgress_multi_file(std::map<std::string, std::string>& arguments,
       if (toppic::TopPICProgress(arguments) != 0) {
         return 1;
       }
-      // the post mass matching replaces the spectrum file name
-      std::string post_sp_name = "";
-      if (arguments["spectrumFileName"] != spec_file_lst[k]) {
-        post_sp_name = arguments["spectrumFileName"];
+      // with -c the file is reported, and then cleaned up, after the
+      // combined result (below): the report needs the spectra and their
+      // index
+      if (arguments["combinedOutputName"] == "") {
+        // the post mass matching replaces the spectrum file name
+        std::string post_sp_name = "";
+        if (arguments["spectrumFileName"] != spec_file_lst[k]) {
+          post_sp_name = arguments["spectrumFileName"];
+        }
+        cleanToppicDir(ori_db_file_name, spec_file_lst[k], keep_temp_files,
+                       post_sp_name);
       }
-      cleanToppicDir(ori_db_file_name, spec_file_lst[k], keep_temp_files,
-                     post_sp_name);
     }
   }
 
@@ -1455,6 +1464,35 @@ int TopPICProgress_multi_file(std::map<std::string, std::string>& arguments,
     TopPIC_multi_postprocess(arguments);
     TopPIC_report(arguments);
     cleanToppicDir(ori_db_file_name, sp_file_name, keep_temp_files, "");
+
+    // The files' reports. The PrSMs of each file's record file get the
+    // proteoform ids of the combined result, so that a proteoform has one
+    // id in the combined tables and in every file's tables; then each file
+    // is reported and cleaned up as in a run without -c (with -C, from the
+    // record files of the earlier run). The files' FDRs, protein cluster
+    // ids and everything else in the record files are kept.
+    std::cout << "Updating the proteoform ids of the files - started."
+              << std::endl;
+    prsm_util::updateProteoClusterIds(prsm_file_lst,
+                                      SpPara::getMaxSpecNumPerFile(),
+                                      merged_file_name +
+                                          "_ms2.toppic_record_prsm");
+    std::cout << "Updating the proteoform ids of the files - finished."
+              << std::endl;
+    for (size_t k = 0; k < spec_file_lst.size(); k++) {
+      // the spectra the file's PrSMs were matched against: the post-matched
+      // ones (<frac>_post_ms2.msalign), or the file itself with -D
+      std::string file_sp_name =
+          post_matched ? record_base_list[k] + ms2_suffix : spec_file_lst[k];
+      std::cout << "Reporting " << file_sp_name << " - started." << std::endl;
+      arguments["spectrumFileName"] = file_sp_name;
+      arguments["startTime"] = combined_start_time;
+      msalign_util::geneSpIndex(file_sp_name);
+      TopPIC_report(arguments);
+      cleanToppicDir(ori_db_file_name, spec_file_lst[k], keep_temp_files,
+                     post_matched ? file_sp_name : "");
+      std::cout << "Reporting " << file_sp_name << " - finished." << std::endl;
+    }
   }
 
   base_data::release();

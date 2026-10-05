@@ -864,6 +864,30 @@ instead of the input. Facts to keep straight:
   characterization on the merged set. The record file is always kept, so
   `-C` (combine-result-only) does not need `-k`. Combined results are
   always `<name>_ms2_toppic_*`.
+- **With `-c` the files are reported after the combined result, with its
+  proteoform ids.** `TopPICProgress` skips the file's `TopPIC_report`
+  when `combinedOutputName` is set, and `TopPICProgress_multi_file` defers
+  the file's `cleanToppicDir` (the report needs the post-matched spectra
+  and their index, and the cleanup copies the report's cutoff files to the
+  XML outputs). After the combined report,
+  `prsm_util::updateProteoClusterIds` (the counterpart of
+  `mergePrsmFiles`) gives every PrSM of each file's `toppic_record_prsm`
+  the `proteo_cluster_id` of its combined PrSM (spectrum id
+  `SpPara::getMaxSpecNumPerFile()` x file index + its own, same precursor
+  id, protein, start and end; a PrSM without one, not expected, gets a new
+  id above the combined ones with a warning) and rewrites the file; then
+  each file gets `geneSpIndex` on its spectra (`<frac>_post_ms2.msalign`,
+  or the input file with `-D`), `TopPIC_report` (start time = the combined
+  run's, as before) and `cleanToppicDir`. With `-C` the same runs on the
+  record files of the earlier run, so their reports are rewritten. Only
+  the proteoform ids change: the files' FDRs (the proteoform-level FDR of
+  a PrSM is still that of its cluster in the file), `prot_cluster_id`s and
+  everything else stay the file's own, so the PrSM and protein selections
+  are those of a run without `-c`; the proteoform table picks the best
+  PrSM per combined id among the PrSMs that pass, so where the combined
+  clustering (`prsm_simple_cluster`) splits or joins the file's clusters
+  (`prsm_feature_cluster`) it lists more or fewer proteoforms. TopMG's
+  combined runs (`topmg_process`) are unchanged.
 - **The multiple-shift stage runs after the first-pass top selection
   (`TopPIC_identify` → `TopPIC_multi_ptm_search` → `TopPIC_postprocess` →
   `TopPIC_report`, no `TopPIC_post` any more; a combined run's merged set
