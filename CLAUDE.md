@@ -1160,8 +1160,8 @@ number).
 
 ## E-values of PrSMs found at a +-1 isotope offset (`stat/tdgf/comp_pvalue_array`)
 
-Branch `evalue_adjusted_prec` (toppic_test experiment 117, report 0117; not
-merged). `CompPValueArray::process` (the shared mode that every toppic
+Branch `evalue_adjusted_prec` (toppic_test experiment 117, report 0117;
+merged into main on 2026-10-05). `CompPValueArray::process` (the shared mode that every toppic
 E-value pass uses: the first pass, the multiple-shift pass, the cluster
 protein correction and `--topmg`'s TDGF E-values) groups the PrSMs of a
 spectrum by isotope offset. Facts to keep straight:
@@ -1201,6 +1201,16 @@ spectrum by isotope offset. Facts to keep straight:
       precursor gives and wins over the deamidation PrSM (1 shift, (N)[+0.98]),
       with 4-11 fewer matched fragments. Deamidated PrSMs at 1% FDR fall
       from 50 to 45 and from 60 to 53.
+    - **Deamidation as a variable PTM repairs only part of it**
+      (`Deamidated,0.984016,NQ,any,7` next to oxidation, report 0117
+      section 8): 86 / 96 PrSMs with a Deamidated variable PTM against
+      main's 91 / 102. In HMGN1 scans 2833, 2838 and 2974 the offset match
+      still wins: the generating function on the PRM spectrum of P - 1
+      gives its fewer fragments a smaller probability per candidate than the
+      one on P gives the variable-PTM PrSM, although the precursor mass is
+      4-7 mDa above the deamidated mass and 11-15 mDa below the unmodified
+      mass + 1 isotope. Not implemented: choosing by precursor error between
+      a PrSM at P and an offset PrSM of the same protein and positions.
 
 ## Truncation N-terminal modifications (`-b`, Position `N-term`)
 
