@@ -1302,7 +1302,44 @@ merged into main on 2026-10-05). Facts to keep straight:
       PrSM). 3 / 5 PrSMs are new, all borderline (E 0.006-2). None is lost.
 - **Remaining:** a variable PTM shift's range is still the gap between the
   refined diagonals and can be wider than the modifiable residues. 5211's
-  oxidation of M44 is reported on P43-M44.
+  oxidation of M44 is reported on P43-M44. Branch `var_ptm_narrow_range`
+  (next section) narrows it.
+
+## Range of a variable PTM shift (`seq/mass_shift`, `search/varptmsearch/var_ptm_align`)
+
+Branch `var_ptm_narrow_range` (toppic_test experiment 122, report 0122).
+Facts to keep straight:
+
+- **The ranges.** `VarPtmAlign::geneShiftVec` takes the variable PTM shifts
+  from the gaps between the refined diagonals
+  (`diag_header_util::getDiagonalMassChanges`) and narrows each alteration
+  to the residues of its gap that can carry its PTM. It now also calls
+  `MassShift::narrowRangeToAlters`, which sets the shift's range to the
+  union of its alterations' ranges (alterations covering no residue are
+  skipped; with none left the range stays as it is). A shift with several
+  alterations (a diagonal between two PTMs was empty) covers all of them.
+- **What the range decides.** `Proteoform::getSeqSegmentPtrVec` generates
+  no ion inside a shift's range, and the proteoform string and the
+  "Variable PTMs" column show it (`P(M)[Oxidation]`, `Oxidation:[44]`
+  instead of `(PM)[Oxidation]`, `Oxidation:[43-44]`).
+- **No ion of the search spectrum is gained.** The range refinement trims
+  each diagonal to its matched ions in the same extended spectrum, so the
+  ions the narrowing adds were already unmatched there. On 480_F3_02 the
+  first-pass PrSMs keep their counts and E-values (10,791 / 11,854 variable
+  PTM PrSMs, a Python copy of `findPairs` predicts every count).
+- **Fragments are gained after the search.** The post mass matching looks
+  for every unmatched theoretical fragment of the best PrSM in TopFD's raw
+  peaks, and the recount uses every mass. With more theoretical ions both
+  find more: of the best PrSMs of every spectrum, 203 / 231 gain 482 / 541
+  final fragments (88-89% of them masses the post mass matching added);
+  none loses. E-values come from the search, so they do not change, except
+  for a PrSM that the cluster protein correction gives another spectrum's
+  proteoform (the correction recomputes its E-value): 1 of 4,075.
+- **Identifications are unchanged** (oxidation 3,336 / 1,998 / 437,
+  oxidation + deamidation 3,336 / 1,992 / 436), as are the decoys and the
+  run time. Of the reported variable PTM shifts, 438 / 480 (ox) and 543 /
+  592 (ox + deamidation) are on one residue (main: 143 and 208); every
+  other one covers two or more residues that can carry its PTMs.
 
 ## Truncation N-terminal modifications (`-b`, Position `N-term`)
 
