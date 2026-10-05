@@ -1224,6 +1224,14 @@ straight:
   written as `C[Carbamidomethylation]` than with `-f C57`). The MCMC's
   random residues (`mcmc_mass_table_util`) take the fixed modifications of
   `-f` only.
+- **Protein hits** (`prsm/search_fasta_match`, the other proteins of a PrSM
+  in the TSV and SQLite tables of toppic and topmg) index the residues, one
+  letter each, and a hit must have the same FASTA PTMs. The raw string was
+  indexed and cut at the proteoform's residue positions: with brackets
+  before the start the cut was a piece of a PTM name and the next residues,
+  which matched thousands of proteins (350,183 extra rows in topmg's PrSM
+  table of 480_F3_02 with every C written as `C[Carbamidomethylation]`).
+  A database without PTMs is indexed and searched as before.
 - The PTM localization of toppic (`-l`, `stat/local/local_proteoform`)
   still reads the raw string (`getRawSeq`); topmg has no such stage.
 

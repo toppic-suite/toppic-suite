@@ -36,6 +36,13 @@ namespace toppic {
 // database. The result is the same as running std::string::find on every
 // protein: the proteins in database order, each with the position of the
 // first occurrence of the sequence.
+//
+// A sequence with PTMs written in it (M[Oxidation]) is indexed by its
+// residues, one letter each, so that positions are residue positions, and a
+// match must also have the same PTMs on its residues. The raw string with
+// the brackets used to be indexed and cut at the proteoform's residue
+// positions, which gave pieces of PTM names that matched thousands of
+// proteins (toppic_test experiment 122).
 class SearchFastaMatch {
  public:
   explicit SearchFastaMatch(const std::string& db_file_name);
@@ -47,6 +54,11 @@ class SearchFastaMatch {
   std::vector<std::pair<FastaSeqPtr, int>> findMatches(
       const std::string& seq) const;
 
+  // The same with the PTM of each residue of seq (ptmCode); without PTMs in
+  // the database the codes are not compared.
+  std::vector<std::pair<FastaSeqPtr, int>> findMatches(
+      const std::string& seq, const std::vector<uint16_t>& ptm_codes) const;
+
  private:
   static constexpr int K = 4;
   // 'A'..'Z' -> 0..25, any other character -> 26
@@ -55,6 +67,14 @@ class SearchFastaMatch {
   void buildIndex();
 
   static uint32_t charCode(char c);
+
+  // 0 for a residue without a PTM, else the PTM's index in ptm_names_ + 1
+  uint16_t ptmCode(const std::string& ptm_name);
+
+  // the residue letters of a sequence from start to end and their PTM
+  // codes: the raw string's when it has no PTM
+  void getResidues(const FastaSeqPtr& seq_ptr, int start, int end,
+                   std::string* letters, std::vector<uint16_t>* codes);
 
   std::string db_file_name_;
   FastaSeqPtrVec fasta_seq_vec_;
@@ -66,6 +86,11 @@ class SearchFastaMatch {
   // positions, in increasing order, where the K-mer with code c starts
   std::vector<uint32_t> bucket_start_;
   std::vector<uint32_t> positions_;
+  // the PTM code of each character of text_, kept only when a sequence of
+  // the database has PTMs
+  bool has_ptm_ = false;
+  std::vector<uint16_t> ptm_codes_;
+  std::vector<std::string> ptm_names_;
 };
 
 using SearchFastaMatchPtr = std::shared_ptr<SearchFastaMatch>;

@@ -24,6 +24,7 @@
 #include <utility>
 #include <vector>
 
+#include "common/base/ptm_base.hpp"
 #include "common/util/logger.hpp"
 #include "prsm/prsm.hpp"
 #include "seq/fasta_reader.hpp"
@@ -47,11 +48,53 @@ SearchFastaMatch::SearchFastaMatch(const std::string& db_file_name)
   while (seq_ptr != nullptr) {
     fasta_seq_vec_.push_back(seq_ptr);
     seq_start_.push_back(static_cast<uint32_t>(text_.size()));
-    text_ += seq_ptr->getRawSeq();
+    std::string letters;
+    std::vector<uint16_t> codes;
+    getResidues(seq_ptr, 0, seq_ptr->getAcidPtmPairLen() - 1, &letters,
+                &codes);
+    if (!has_ptm_ && !ptm_names_.empty()) {
+      // the first sequence with PTMs: the codes of the text so far are 0
+      has_ptm_ = true;
+      ptm_codes_.assign(text_.size(), 0);
+    }
+    text_ += letters;
+    if (has_ptm_) {
+      ptm_codes_.insert(ptm_codes_.end(), codes.begin(), codes.end());
+    }
     seq_ptr = reader.getNextSeq();
   }
   seq_start_.push_back(static_cast<uint32_t>(text_.size()));
   buildIndex();
+}
+
+uint16_t SearchFastaMatch::ptmCode(const std::string& ptm_name) {
+  if (ptm_name == PtmBase::getEmptyPtmPtr()->getAbbrName()) {
+    return 0;
+  }
+  auto it = std::find(ptm_names_.begin(), ptm_names_.end(), ptm_name);
+  if (it == ptm_names_.end()) {
+    ptm_names_.push_back(ptm_name);
+    return static_cast<uint16_t>(ptm_names_.size());
+  }
+  return static_cast<uint16_t>(it - ptm_names_.begin() + 1);
+}
+
+void SearchFastaMatch::getResidues(const FastaSeqPtr& seq_ptr, int start,
+                                   int end, std::string* letters,
+                                   std::vector<uint16_t>* codes) {
+  const std::string& raw_seq = seq_ptr->getRawSeq();
+  if (raw_seq.find('[') == std::string::npos) {
+    *letters = raw_seq.substr(start, end - start + 1);
+    codes->assign(letters->size(), 0);
+    return;
+  }
+  const StringPairVec& pairs = seq_ptr->getAcidPtmPairVec();
+  letters->clear();
+  codes->clear();
+  for (int i = start; i <= end; i++) {
+    *letters += pairs[i].first;
+    codes->push_back(ptmCode(pairs[i].second));
+  }
 }
 
 uint32_t SearchFastaMatch::charCode(char c) {
@@ -106,6 +149,16 @@ void SearchFastaMatch::buildIndex() {
 
 std::vector<std::pair<FastaSeqPtr, int>> SearchFastaMatch::findMatches(
     const std::string& seq) const {
+  return findMatches(seq, std::vector<uint16_t>(seq.size(), 0));
+}
+
+std::vector<std::pair<FastaSeqPtr, int>> SearchFastaMatch::findMatches(
+    const std::string& seq, const std::vector<uint16_t>& ptm_codes) const {
+  // the PTMs of a match at text position start are those of seq
+  auto samePtms = [&](size_t start) {
+    return !has_ptm_ || std::equal(ptm_codes.begin(), ptm_codes.end(),
+                                   ptm_codes_.begin() + start);
+  };
   std::vector<std::pair<FastaSeqPtr, int>> matches;
   size_t m = seq.size();
   if (m == 0) {
@@ -117,6 +170,10 @@ std::vector<std::pair<FastaSeqPtr, int>> SearchFastaMatch::findMatches(
       std::string_view protein(text_.data() + seq_start_[i],
                                seq_start_[i + 1] - seq_start_[i]);
       size_t found = protein.find(seq);
+      while (found != std::string_view::npos &&
+             !samePtms(seq_start_[i] + found)) {
+        found = protein.find(seq, found + 1);
+      }
       if (found != std::string_view::npos) {
         matches.emplace_back(fasta_seq_vec_[i], static_cast<int>(found));
       }
@@ -164,7 +221,8 @@ std::vector<std::pair<FastaSeqPtr, int>> SearchFastaMatch::findMatches(
     if (start < seq_start_[i] || start + m > seq_start_[i + 1]) {
       continue;
     }
-    if (std::memcmp(text_.data() + start, seq.data(), m) == 0) {
+    if (std::memcmp(text_.data() + start, seq.data(), m) == 0 &&
+        samePtms(start)) {
       matches.emplace_back(fasta_seq_vec_[i],
                            static_cast<int>(start - seq_start_[i]));
       last_protein = i;
@@ -175,13 +233,13 @@ std::vector<std::pair<FastaSeqPtr, int>> SearchFastaMatch::findMatches(
 
 std::vector<std::pair<FastaSeqPtr, int>> SearchFastaMatch::process(
     const PrsmPtr& prsm_ptr) {
-  std::string raw_seq =
-      prsm_ptr->getProteoformPtr()->getFastaSeqPtr()->getRawSeq();
-  int start_pos = prsm_ptr->getProteoformPtr()->getStartPos();
-  int end_pos = prsm_ptr->getProteoformPtr()->getEndPos();
-  std::string form_seq = raw_seq.substr(start_pos, end_pos - start_pos + 1);
+  ProteoformPtr form_ptr = prsm_ptr->getProteoformPtr();
+  std::string form_seq;
+  std::vector<uint16_t> codes;
+  getResidues(form_ptr->getFastaSeqPtr(), form_ptr->getStartPos(),
+              form_ptr->getEndPos(), &form_seq, &codes);
   LOG_DEBUG("proteoform seq " << form_seq);
-  return findMatches(form_seq);
+  return findMatches(form_seq, codes);
 }
 
 }  // namespace toppic
