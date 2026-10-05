@@ -35,10 +35,20 @@ class CompPValueArray {
                                const PrsmPtr& prsm_ptr, double ppo,
                                double n_term_label_mass);
 
+  // is_separate false: the PrSMs of a spectrum share the generating
+  // function of its PRM spectra, except those matched at +-1 isotope from
+  // its precursor mass (getIsotopeOffset), which get the PRM spectra of
+  // that mass
   void process(const SpectrumSetPtr& spec_set_ptr, PrsmPtrVec& prsm_ptrs,
                double ppo, bool is_separate);
 
  private:
+  // +1 or -1 for a PrSM without mass shifts whose adjusted precursor mass
+  // differs from the spectrum's precursor mass by more than the precursor
+  // error tolerance, 0 otherwise
+  int getIsotopeOffset(const SpectrumSetPtr& spec_set_ptr,
+                       const PrsmPtr& prsm_ptr, double ppo);
+
   TdgfMngPtr mng_ptr_;
 
   CompProbValuePtr comp_prob_ptr_;
