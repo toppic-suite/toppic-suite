@@ -1351,6 +1351,18 @@ merged into main on 2026-10-05). Facts to keep straight:
   run time. Of the reported variable PTM shifts, 438 / 480 (ox) and 543 /
   592 (ox + deamidation) are on one residue (main: 143 and 208); every
   other one covers two or more residues that can carry its PTMs.
+- **Determined sites** (branch `var_ptm_split_sites`, toppic_test
+  experiment 124, report 0124). A shift holds several PTMs when the
+  diagonal between them had no matched fragment. When each of its PTMs has
+  as many candidate residues as copies (and no residue is a candidate of
+  two PTMs), the sites are known: `VarPtmAlign::splitDeterminedShift` makes
+  one shift per PTM on its residue, with that residue's modification
+  (`(MAQM)[Oxidation;Oxidation]` -> `(M)[Oxidation]AQ(M)[Oxidation]`,
+  `Oxidation:[33];Oxidation:[36]`). Any other shift is left as it is. The
+  fragments between the sites cannot match in the search spectrum (that
+  diagonal was empty), so on 480_F3_02 no first-pass count or E-value
+  changes (1,589 / 2,451 first-pass PrSMs split); 11 reported PrSMs per
+  run change their notation, 3-4 of them gain a final fragment.
 
 ## Truncation N-terminal modifications (`-b`, Position `N-term`)
 
