@@ -337,6 +337,16 @@ std::string TopPIC_identify(std::map<std::string, std::string>& arguments) {
           var_filter_thread_num, use_approx_spec, "toppic_var_filter");
       var_ptm_type_num = var_filter_mng_ptr->getSingleShiftNum();
       n_term_var_ptm_type_num = var_filter_mng_ptr->getNTermShiftNum();
+      // the hidden --var-ptm-filter-cand-num <complete>,<prefix/suffix>,
+      // <internal> replaces the candidates kept per spectrum (5,20,30);
+      // ToppicArgument has checked the three numbers
+      if (arguments["varPtmFilterCandNum"] != "") {
+        std::vector<std::string> nums =
+            str_util::split(arguments["varPtmFilterCandNum"], ",");
+        var_filter_mng_ptr->comp_num_ = std::stoi(nums[0]);
+        var_filter_mng_ptr->pref_suff_num_ = std::stoi(nums[1]);
+        var_filter_mng_ptr->internal_num_ = std::stoi(nums[2]);
+      }
       var_ptm_filter_processor::process(var_filter_mng_ptr);
       std::cout << "Variable PTM filtering - finished." << std::endl;
 
