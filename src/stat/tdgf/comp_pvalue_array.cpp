@@ -16,6 +16,7 @@
 #include "stat/tdgf/comp_pvalue_array.hpp"
 
 #include <cmath>
+#include <map>
 
 #include "common/base/proteoform_type.hpp"
 #include "common/base/mass_constant.hpp"
@@ -93,10 +94,11 @@ void CompPValueArray::compMultiExpectedValues(const PrmMsPtrVec& ms_six_ptr_vec,
 
   double tolerance =
       ms_six_ptr_vec[0]->getMsHeaderPtr()->getFirstPrecErrorTolerance(ppo);
-  // the original precursor mass of a PrSM includes the N-terminal label
-  // (toppic -N), its adjusted precursor mass does not
-  double n_term_label_mass =
-      mng_ptr_->prsm_para_ptr_->getSpParaPtr()->getNTermLabelMass();
+  // the precursor mass of the PRM spectra (label-free): the original
+  // precursor's, or the adjusted one for the PrSMs of a +-1 isotope offset
+  // (process)
+  double spec_prec_mass =
+      ms_six_ptr_vec[0]->getMsHeaderPtr()->getFirstPrecMonoMass();
   for (size_t i = 0; i < prsm_ptrs.size(); i++) {
     double prec_mass =
         ms_six_ptr_vec[0]->getMsHeaderPtr()->getFirstPrecMonoMassMinusWater();
@@ -113,12 +115,13 @@ void CompPValueArray::compMultiExpectedValues(const PrmMsPtrVec& ms_six_ptr_vec,
         n_term_var_ptm_num == 0) {
       // in ZERO PTM searching, +/-1 Da was allowed.
       // We need to adjust the prec mass for candidate number computation
-      // if there was 1 Da difference between original prec mass and adjusted
-      // prec mass.
-      double ori_prec_mass = prsm_ptrs[i]->getOriPrecMass() - n_term_label_mass;
-      if (std::abs(ori_prec_mass - prsm_ptrs[i]->getAdjustedPrecMass()) >
+      // if there was 1 Da difference between the precursor mass of the PRM
+      // spectra and the adjusted prec mass (process passes the PrSMs of an
+      // offset with the PRM spectra of the adjusted precursor, so that the
+      // offset is not applied twice).
+      if (std::abs(spec_prec_mass - prsm_ptrs[i]->getAdjustedPrecMass()) >
           tolerance) {
-        if (ori_prec_mass < prsm_ptrs[i]->getAdjustedPrecMass()) {
+        if (spec_prec_mass < prsm_ptrs[i]->getAdjustedPrecMass()) {
           search_mass = prec_mass + mass_constant::getIsotopeMass();
         } else {
           search_mass = prec_mass - mass_constant::getIsotopeMass();
@@ -185,6 +188,28 @@ void CompPValueArray::compSingleExpectedValue(const DeconvMsPtrVec& ms_ptr_vec,
   compMultiExpectedValues(prm_ms_ptr_vec, prsm_ptrs, ppo, true);
 }
 
+int CompPValueArray::getIsotopeOffset(const SpectrumSetPtr& spec_set_ptr,
+                                      const PrsmPtr& prsm_ptr, double ppo) {
+  ProteoformPtr proteo_ptr = prsm_ptr->getProteoformPtr();
+  if (proteo_ptr->getAlterNum(AlterType::UNEXPECTED) > 0 ||
+      proteo_ptr->getAlterNum(AlterType::VARIABLE) > 0 ||
+      proteo_ptr->hasTruncNTermMod()) {
+    return 0;
+  }
+  // the rule of compMultiExpectedValues's candidate number: a PrSM without
+  // mass shifts whose adjusted precursor mass differs from the spectrum's
+  // (label-free) precursor mass by more than the precursor error tolerance
+  // was matched at one isotope above or below it
+  MsHeaderPtr header_ptr = spec_set_ptr->getMsSixPtrVec()[0]->getMsHeaderPtr();
+  double tolerance = header_ptr->getFirstPrecErrorTolerance(ppo);
+  double prec_mass = header_ptr->getFirstPrecMonoMass();
+  double adjusted_mass = prsm_ptr->getAdjustedPrecMass();
+  if (std::abs(prec_mass - adjusted_mass) <= tolerance) {
+    return 0;
+  }
+  return prec_mass < adjusted_mass ? 1 : -1;
+}
+
 void CompPValueArray::process(const SpectrumSetPtr& spec_set_ptr,
                               PrsmPtrVec& prsm_ptrs, double ppo,
                               bool is_separate) {
@@ -194,9 +219,36 @@ void CompPValueArray::process(const SpectrumSetPtr& spec_set_ptr,
       compSingleExpectedValue(spec_set_ptr->getDeconvMsPtrVec(), prsm_ptrs[i],
                               ppo, n_term_label_mass);
     }
-  } else {
-    compMultiExpectedValues(spec_set_ptr->getMsSixPtrVec(), prsm_ptrs, ppo,
-                            false);
+    return;
+  }
+  // The zero-shift search scores a spectrum at its precursor mass P and at
+  // P +- 1 isotope (SpPara::getZeroShiftSearchPrecErrorVec). A PrSM found
+  // at P +- 1 gets its E-value on the PRM spectra of the spectrum set the
+  // search built for that mass, with that mass as the generating function's
+  // precursor mass, as if the precursor were reported there; the other
+  // PrSMs share the generating function of the spectrum set's PRM spectra
+  // (toppic_test experiment 117).
+  std::map<int, PrsmPtrVec> offset_prsms;
+  for (size_t i = 0; i < prsm_ptrs.size(); i++) {
+    int offset = getIsotopeOffset(spec_set_ptr, prsm_ptrs[i], ppo);
+    offset_prsms[offset].push_back(prsm_ptrs[i]);
+  }
+  for (auto& offset_prsm : offset_prsms) {
+    int offset = offset_prsm.first;
+    if (offset == 0) {
+      compMultiExpectedValues(spec_set_ptr->getMsSixPtrVec(),
+                              offset_prsm.second, ppo, false);
+      continue;
+    }
+    // the PRM spectra of spectrum_set_factory::geneSpectrumSetPtr for the
+    // observed precursor mass + offset isotopes, as the search built them
+    double prec_mono_mass = spec_set_ptr->getPrecMonoMass() +
+                            offset * mass_constant::getIsotopeMass();
+    PrmMsPtrVec ms_six_ptr_vec = prm_ms_factory::geneMsSixPtrVec(
+        spec_set_ptr->getDeconvMsPtrVec(),
+        mng_ptr_->prsm_para_ptr_->getSpParaPtr(), prec_mono_mass,
+        spec_set_ptr->getNTermLabelMass());
+    compMultiExpectedValues(ms_six_ptr_vec, offset_prsm.second, ppo, false);
   }
 }
 
