@@ -887,7 +887,20 @@ instead of the input. Facts to keep straight:
   PrSM per combined id among the PrSMs that pass, so where the combined
   clustering (`prsm_simple_cluster`) splits or joins the file's clusters
   (`prsm_feature_cluster`) it lists more or fewer proteoforms. TopMG's
-  combined runs (`topmg_process`) are unchanged.
+  combined runs (`topmg_process`) are unchanged. Results (toppic_test
+  experiment 122, 480_F3_02 as two TopFD replicates and as two retention
+  time parts at 0-55 / 45-100 min, setting d with `-c`): every row of the
+  files' record files, tables and SQLite tables has its combined PrSM's id;
+  without the ids the record files, PrSM and protein tables equal main's;
+  the combined outputs, `-C` reruns and a run without `-c` equal main's or
+  the full run's; the proteoform tables gain 5-6 rows per file where the
+  file's feature clustering joined same-protein, same-mass PrSMs of
+  barely overlapping ranges (HMGN2 28-56 / 60-90) and lose 1 where it
+  compares adjusted precursor masses 1.25 Da apart and the combined one
+  the observed ones 1.02 Da apart (PTMA). Combined proteoforms reported
+  in both files under one id: replicates 2,002 of 2,002 (main 1,658 of
+  1,996), parts 404 of 404 (main 2 of 403). Time unchanged (id update
+  ~1 s).
 - **The multiple-shift stage runs after the first-pass top selection
   (`TopPIC_identify` → `TopPIC_multi_ptm_search` → `TopPIC_postprocess` →
   `TopPIC_report`, no `TopPIC_post` any more; a combined run's merged set
