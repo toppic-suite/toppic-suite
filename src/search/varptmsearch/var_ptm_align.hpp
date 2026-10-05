@@ -55,6 +55,13 @@ class VarPtmAlign {
                                DiagHeaderPtrVec& ori_header_ptrs,
                                DiagHeaderPtrVec& refined_header_ptrs);
 
+  // A shift whose PTMs have as many candidate residues as alterations (the
+  // residues of its range that a modification of the PTM modifies, none a
+  // candidate of two PTMs) has known sites: it becomes one shift per PTM on
+  // its own residue, e.g. (MAQM)[Oxidation;Oxidation] -> (M)[Oxidation]AQ
+  // (M)[Oxidation]. Any other shift is returned as it is.
+  MassShiftPtrVec splitDeterminedShift(const MassShiftPtr& shift_ptr);
+
   PrsmPtr geneResult(const ProteoformPtr& sub_proteo_ptr,
                      DeconvMsPtrVec& deconv_ms_ptr_vec,
                      const PrsmParaPtr& prsm_para_ptr);

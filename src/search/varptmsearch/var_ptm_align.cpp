@@ -18,10 +18,13 @@
 #include <algorithm>
 #include <limits>
 
+#include "common/base/ptm.hpp"
 #include "common/util/logger.hpp"
 #include "ms/factory/extend_ms_factory.hpp"
 #include "search/diag/diag_header_util.hpp"
 #include "search/diag/diagonal_util.hpp"
+#include "seq/alter.hpp"
+#include "seq/mass_shift.hpp"
 #include "seq/proteoform_factory.hpp"
 
 namespace toppic {
@@ -313,7 +316,89 @@ MassShiftPtrVec VarPtmAlign::geneShiftVec(
       idx++;
     }
   }
-  return shift_ptrs;
+  // a shift with as many candidate residues as PTMs becomes one shift per
+  // PTM on its residue
+  MassShiftPtrVec result_ptrs;
+  for (size_t i = 0; i < shift_ptrs.size(); i++) {
+    MassShiftPtrVec cur_ptrs = splitDeterminedShift(shift_ptrs[i]);
+    result_ptrs.insert(result_ptrs.end(), cur_ptrs.begin(), cur_ptrs.end());
+  }
+  return result_ptrs;
+}
+
+MassShiftPtrVec VarPtmAlign::splitDeterminedShift(
+    const MassShiftPtr& shift_ptr) {
+  MassShiftPtrVec result_ptrs{shift_ptr};
+  const AlterPtrVec& alter_ptrs = shift_ptr->getAlterPtrVec();
+  if (alter_ptrs.size() < 2) {
+    return result_ptrs;
+  }
+  // the alterations of each PTM and the candidate residues of the PTM
+  std::vector<AlterPtrVec> ptm_alter_ptrs;
+  std::vector<std::vector<int>> ptm_positions;
+  for (size_t i = 0; i < alter_ptrs.size(); i++) {
+    const PtmPtr& ptm_ptr =
+        alter_ptrs[i]->getModPtr()->getModResiduePtr()->getPtmPtr();
+    size_t g = 0;
+    while (g < ptm_alter_ptrs.size() &&
+           !ptm_alter_ptrs[g][0]->getModPtr()->getModResiduePtr()
+                ->getPtmPtr()->isSame(ptm_ptr)) {
+      g++;
+    }
+    if (g == ptm_alter_ptrs.size()) {
+      const ModPtrVec& ptm_mod_ptrs =
+          mng_ptr_->getPtmModPtrVec(alter_ptrs[i]->getModPtr());
+      std::vector<int> positions;
+      for (int pos = shift_ptr->getLeftBpPos();
+           pos < shift_ptr->getRightBpPos(); pos++) {
+        if (isModifiable(sub_res_seq_ptr_->getResiduePtr(pos), ptm_mod_ptrs)) {
+          positions.push_back(pos);
+        }
+      }
+      ptm_alter_ptrs.push_back(AlterPtrVec());
+      ptm_positions.push_back(positions);
+    }
+    ptm_alter_ptrs[g].push_back(alter_ptrs[i]);
+  }
+  // determined: as many candidate residues as alterations for each PTM, and
+  // no residue a candidate of two PTMs
+  std::vector<int> used_positions;
+  for (size_t g = 0; g < ptm_alter_ptrs.size(); g++) {
+    if (ptm_positions[g].size() != ptm_alter_ptrs[g].size()) {
+      return result_ptrs;
+    }
+    for (size_t j = 0; j < ptm_positions[g].size(); j++) {
+      if (std::find(used_positions.begin(), used_positions.end(),
+                    ptm_positions[g][j]) != used_positions.end()) {
+        return result_ptrs;
+      }
+      used_positions.push_back(ptm_positions[g][j]);
+    }
+  }
+  // one shift per alteration, with the modification of its residue
+  // (Deamidated on N or on Q)
+  result_ptrs.clear();
+  for (size_t g = 0; g < ptm_alter_ptrs.size(); g++) {
+    const ModPtrVec& ptm_mod_ptrs =
+        mng_ptr_->getPtmModPtrVec(ptm_alter_ptrs[g][0]->getModPtr());
+    for (size_t j = 0; j < ptm_alter_ptrs[g].size(); j++) {
+      int pos = ptm_positions[g][j];
+      const ResiduePtr& res_ptr = sub_res_seq_ptr_->getResiduePtr(pos);
+      ModPtr mod_ptr = ptm_alter_ptrs[g][j]->getModPtr();
+      for (size_t k = 0; k < ptm_mod_ptrs.size(); k++) {
+        if (res_ptr->isSame(ptm_mod_ptrs[k]->getOriResiduePtr())) {
+          mod_ptr = ptm_mod_ptrs[k];
+          break;
+        }
+      }
+      AlterPtr alter_ptr = std::make_shared<Alter>(
+          pos, pos + 1, AlterType::VARIABLE, ptm_alter_ptrs[g][j]->getMass(),
+          mod_ptr);
+      result_ptrs.push_back(std::make_shared<MassShift>(alter_ptr));
+    }
+  }
+  std::sort(result_ptrs.begin(), result_ptrs.end(), MassShift::cmpPosInc);
+  return result_ptrs;
 }
 
 PrsmPtr VarPtmAlign::geneResult(const ProteoformPtr& sub_proteo_ptr,
