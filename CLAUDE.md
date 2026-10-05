@@ -1093,7 +1093,15 @@ not a variable PTM. Facts to keep straight:
   most matched fragments whatever its PTM number, so an acetylated
   truncation plus PTMs can displace a protein form (24 PrSMs of the
   ported TopMG start elsewhere than toppic's, 11 where toppic has NME or
-  NME_ACETYLATION).
+  NME_ACETYLATION). With the tie rule (fcba5f51) topmg reports 14 (9 of
+  toppic's) and `--topmg topmg-only` 26 (the same 9): where toppic has a
+  protein form 6 instead of 11, the other unconfirmed ones 11 instead of
+  19 (H2B2E, H2B2F, CLCB now toppic's forms with its E-values). The 6 left
+  are not ties: the truncation matches at least as many fragments as the
+  best path main finds, or (YBOX3, one spectrum) has the higher DP score in
+  the protein form's layer, so the form is dropped before its fragments
+  are counted; giving the mod's paths their own DP layers would let both
+  reach the fragment count.
 - **Results** (toppic_test experiment 115, report 0115; 480_F3_02, topmg
   `-f C57 -d -t FDR -T FDR`, oxidation M, acetyl K, phospho STY): on the
   spectra topmg and toppic both identify with the same protein and toppic
