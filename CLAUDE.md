@@ -1076,6 +1076,17 @@ not a variable PTM. Facts to keep straight:
   MCMC candidate number of a PrSM with the mod sums over the N-term masses;
   `toppic --topmg topmg-only` sets `nTermVarPtmTypeNum` (the TopMG stage's
   and the cluster correction's generating function multiply by T_N + 1).
+  Results (toppic_test experiment 116, report 0116; 480_F3_02, topmg
+  `-f C57 -d -t FDR -T FDR`, oxidation M, phospho STY, `Acetyl,*,N-term`):
+  topmg reports 12 and 16 truncation N-terminal acetylations at 1% FDR,
+  8 and 9 of toppic's 11 (DDX17 from residue 25, JUPI2 44, CLCB 69, TRIR
+  28), `--topmg topmg-only` 39 with 9 of them (main: none); PrSMs 1,973
+  and 2,022 against 2,005 (MCMC noise), no time cost. The modification
+  competes with the protein forms: the alignment keeps the path with the
+  most matched fragments whatever its PTM number, so an acetylated
+  truncation plus PTMs can displace a protein form (24 PrSMs of the
+  ported TopMG start elsewhere than toppic's, 11 where toppic has NME or
+  NME_ACETYLATION).
 - **Results** (toppic_test experiment 115, report 0115; 480_F3_02, topmg
   `-f C57 -d -t FDR -T FDR`, oxidation M, acetyl K, phospho STY): on the
   spectra topmg and toppic both identify with the same protein and toppic
