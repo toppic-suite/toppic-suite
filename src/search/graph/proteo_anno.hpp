@@ -24,6 +24,7 @@
 
 #include "common/base/base_data.hpp"
 #include "common/util/file_util.hpp"
+#include "common/util/str_util.hpp"
 #include "common/xml/xml_dom_document.hpp"
 #include "para/prsm_para.hpp"
 #include "seq/fasta_reader.hpp"
@@ -37,7 +38,9 @@ class ProteoAnno {
              const ProtModPtrVec& prot_mod_ptr_vec,
              const ModPtrVec& var_mod_ptr_vec);
 
-  void anno(const std::string& seq, bool is_complete = true);
+  // the residues of a sequence's residue/PTM pairs (FastaSeq::
+  // getAcidPtmPairVec), with the fixed modifications
+  void anno(const StringPairVec& acid_ptm_pairs, bool is_complete = true);
 
   const ResiduePtrVec2D& getResiduePtrVec() { return res_vec_2d_; }
 

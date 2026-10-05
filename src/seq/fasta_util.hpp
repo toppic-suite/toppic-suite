@@ -36,6 +36,11 @@ void dbPreprocess(const std::string& ori_db_file_name,
                   const std::string& db_file_name, bool decoy, int block_size,
                   int max_frag_len, int min_block_num);
 
+// Adds the residues of the PTMs written in the sequences of a FASTA file
+// (M[Oxidation]) to ResidueBase, which the searches' threads would otherwise
+// add to while others read it. Throws for a PTM that ptm_base.xml lacks.
+void addPtmResidues(const std::string& fasta_file);
+
 int countProteinNum(const std::string& fasta_file);
 
 // Check whether the FASTA file contains duplicated protein ids (the header

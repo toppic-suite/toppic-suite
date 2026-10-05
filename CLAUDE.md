@@ -1176,6 +1176,57 @@ not a variable PTM. Facts to keep straight:
   isobaric alternatives (acetyl-S N-terminus against a C-terminal E;
   acetylation + K adduct against Phospho), an acetyl put on a K further in.
 
+## PTMs written in FASTA sequences in TopMG (`search/graph`, `search/graphalign`)
+
+A FASTA sequence can carry PTMs in the extended format, a residue followed
+by the PTM's abbreviation of `res/base_data/ptm_base.xml` in brackets
+(`M[Oxidation]`, `C[Carbamidomethylation]`). `FastaSeq` reads them into
+residue/PTM pairs (`getAcidPtmPairVec`), and `proteoform_factory::
+geneDbProteoformPtr` builds the modified residues with an `INPUT` mass shift
+on each (shown in the Proteoform column as `(M)[Oxidation]` and in the
+Database protein sequence; not in the Fixed PTMs column or the variable PTM
+counts). Since branch `topmg_fasta_ptm` TopMG's graph alignment (topmg and
+toppic `--topmg`) treats them as fixed modifications. Facts to keep
+straight:
+
+- **The mass graph is built from the pairs** (`ProteoAnno::anno` takes a
+  `StringPairVec`). It used to take the raw string, whose
+  `convertStrToResiduePtrVec` dropped the brackets and lower-case letters
+  and kept the rest: `M[Oxidation]` became M and O (pyrrolysine), the graph
+  had more vertices than the proteoform had residues, and topmg and toppic
+  `--topmg` ended with a segmentation fault at the start of the graph
+  alignment (toppic_test experiment 122).
+- **One edge per modified residue.** A residue with a PTM, of the FASTA or
+  of `-f`, is marked `FIXED`, and `getMassGraphPtr` gives a position with a
+  `FIXED` residue that edge alone: no variable PTM edge and, on residue 0,
+  no protein N-terminal form edge (`M_ACETYLATION`, `NME_ACETYLATION`).
+  `GraphPostProcessor::chooseNTermForm` takes no acetylated form for a
+  protein whose first residue has a FASTA PTM. NME (a start, not an edge)
+  and the truncation N-terminal modifications (not edges either) stay open,
+  as for a fixed modification's residue. A `-f` modification is not
+  applied to a residue with a FASTA PTM (`applyFixedMod` compares with the
+  unmodified residue).
+- **The post-processing keeps the `INPUT` shifts** (it rebuilds each
+  proteoform from its `FIXED`, `VARIABLE` and `UNEXPECTED` shifts, which
+  dropped them from the reported proteoforms).
+- **Residues are registered before the threads start.**
+  `fasta_util::dbPreprocess` ends with `addPtmResidues`, which adds the
+  residues of the database's FASTA PTMs to `ResidueBase` (a bracket is
+  looked for first; a database without PTMs is read once more as text and
+  nothing else happens). `ResidueBase::getBaseResiduePtr` appends a new
+  residue to a shared vector without a lock, which the search threads did
+  for a PTM not in the `-i`/`-b` file. An unknown PTM name now throws there.
+- **E-values**: `count_util::updateResidueCounts` (the residue frequencies
+  of `CountTestNum`: TDGF and the MCMC's candidate numbers) adds a residue
+  that is not in the list, so that a residue with a FASTA PTM is counted as
+  its own residue, as a fixed modification's residue is; it used to be
+  left out (toppic `--topmg` E-values a median 10^0.1 larger with every C
+  written as `C[Carbamidomethylation]` than with `-f C57`). The MCMC's
+  random residues (`mcmc_mass_table_util`) take the fixed modifications of
+  `-f` only.
+- The PTM localization of toppic (`-l`, `stat/local/local_proteoform`)
+  still reads the raw string (`getRawSeq`); topmg has no such stage.
+
 ## Precursor +-1 Da error per identification stage (`para/sp_para`)
 
 `SpPara` holds one precursor-offset list per stage; each filter/search

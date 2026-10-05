@@ -29,7 +29,7 @@ void updateNTermResidueCounts(ResiduePtrVec& residue_list,
                               std::vector<double>& counts,
                               const ProteoformPtrVec& mod_proteo_ptrs);
 
-void updateResidueCounts(const ResiduePtrVec& residue_list,
+void updateResidueCounts(ResiduePtrVec& residue_list,
                          std::vector<double>& counts,
                          const ProteoformPtr& prot_ptr);
 
