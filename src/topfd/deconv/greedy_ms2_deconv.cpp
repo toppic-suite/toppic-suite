@@ -86,9 +86,14 @@ struct GreedyMs2Para {
   int dyn_bound = 1;
   double dyn_rise = 1.2;
   int dyn_max_ext = 6;
-  // a charge z is tried for a seed only when a peak lies one isotope
-  // spacing (getIsotopeMass() / z) from it on either side (1), also at the
-  // averagine distribution's own spacing around its apex (2), or always (0)
+  // the charge pre-check (hasNeighbourPeak): a charge z is tried for a seed
+  // only when a peak lies on either side of the seed at one of the spacings
+  // below, divided by z.
+  // 0: no pre-check, every charge is tried;
+  // 1: getIsotopeMass() only;
+  // 2: getIsotopeMass() and also the averagine distribution's two spacings
+  //    around its apex (apex - 1 to apex, apex to apex + 1); a peak at any
+  //    of the three is enough
   int precheck = 2;
   // harmonic test of the seed charge z (0 = none), as in greedy_ms1_deconv;
   // off for MS/MS: with 0.4 it cost fragments in toppic_test experiment 106
@@ -558,10 +563,12 @@ bool GreedySearch::passes(const Fit& fit, double min_cos) const {
 }
 
 // The charge pre-check (GreedyMs2Para::precheck): whether a peak lies one
-// isotope spacing from the seed at the charge, on either side. The spacing
-// is getIsotopeMass() or, with precheck 2, also the spacing of the
-// averagine distribution around its apex at the seed's mass: the M+1 peak
-// of averagine is 1.00286 Da from its monoisotopic peak at every mass
+// isotope spacing from the seed at the charge, on either side. precheck 1
+// tries getIsotopeMass() only. precheck 2 tries getIsotopeMass() and, in
+// addition, the two spacings of the averagine distribution around its apex
+// at the seed's mass (apex - 1 to apex, apex to apex + 1); a peak at any of
+// the three is enough. The averagine spacings help at low mass: the M+1
+// peak of averagine is 1.00286 Da from its monoisotopic peak at every mass
 // (toppic_test experiment 107), 3 ppm from the constant at m/z 203
 // and charge 1, so that a few ppm of measurement error put it outside a
 // 5 ppm window (6 ppm in a 480_F3_02 spectrum).
