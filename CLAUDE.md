@@ -1318,6 +1318,18 @@ Facts to keep straight:
   union of its alterations' ranges (alterations covering no residue are
   skipped; with none left the range stays as it is). A shift with several
   alterations (a diagonal between two PTMs was empty) covers all of them.
+- **All residues of the PTM** (amendment 1). An alteration covers every
+  residue that one of the modifications of its PTM modifies:
+  `VarPtmSearchMng::ptm_mod_ptr_vec_2d_` keeps them in one list per PTM
+  (grouped by PTM, not by mass), `getPtmModPtrVec(mod)` returns it, and
+  `geneShiftVec` tests each. `Deamidated,0.984016,NQ,...` gives Deamidated
+  on N and on Q; the alignment puts a tied PTM on the first N or Q of its
+  stretch (the `>` tie rule of `VarPtmAlign::dp`) and the backtrack takes
+  that residue's modification, so testing only it (as before) left the
+  other type out of the range (FOXK1 4009 `AVT(Q)[Deamidated]NGK`, now
+  `AVT(QN)[Deamidated]GK`). On 480_F3_02 (ox + deamidation) 3,247 first-pass
+  ranges and 8 reported ones change; search fragments, E-values and
+  identifications do not, and oxidation-only runs are identical.
 - **What the range decides.** `Proteoform::getSeqSegmentPtrVec` generates
   no ion inside a shift's range, and the proteoform string and the
   "Variable PTMs" column show it (`P(M)[Oxidation]`, `Oxidation:[44]`
