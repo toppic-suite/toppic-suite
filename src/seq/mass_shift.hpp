@@ -56,6 +56,11 @@ class MassShift {
     alter_vec_ = std::move(alter_vec);
   }
 
+  // Sets the range to that of the alterations, from the leftmost left to
+  // the rightmost right break point of the alterations that cover a
+  // residue. The range stays as it is when none does.
+  void narrowRangeToAlters();
+
   AlterTypePtr getTypePtr() const;
 
   double getMassShift() const { return shift_; }

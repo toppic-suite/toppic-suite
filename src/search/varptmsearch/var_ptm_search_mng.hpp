@@ -18,6 +18,7 @@
 
 #include <string>
 
+#include "common/base/mod.hpp"
 #include "para/prsm_para.hpp"
 
 namespace toppic {
@@ -52,6 +53,14 @@ class VarPtmSearchMng {
   ModPtrVec2D mod_ptr_vec_2d_;
 
   ResiduePtrVec2D res_ptr_vec_2d_;
+
+  // The modifications of each variable PTM, e.g. Deamidated on N and on Q.
+  // An alteration of a PTM can sit on any residue that one of them modifies,
+  // not only on the residue the alignment chose.
+  ModPtrVec2D ptm_mod_ptr_vec_2d_;
+
+  // the modifications of the PTM of mod_ptr (a list of ptm_mod_ptr_vec_2d_)
+  const ModPtrVec& getPtmModPtrVec(const ModPtr& mod_ptr) const;
 
   // Variable PTMs of the proteoform N-terminus (Position N-term). They are
   // not shifts of the alignment: the search adds one to a candidate as its

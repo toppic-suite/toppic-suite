@@ -16,8 +16,11 @@
 #include "search/varptmsearch/var_ptm_search_mng.hpp"
 
 #include <cmath>
+#include <cstdlib>
 
 #include "common/base/mod_util.hpp"
+#include "common/base/ptm.hpp"
+#include "common/base/residue.hpp"
 #include "common/util/logger.hpp"
 
 namespace toppic {
@@ -57,6 +60,21 @@ VarPtmSearchMng::VarPtmSearchMng(const PrsmParaPtr& prsm_para_ptr, int n_report,
       mod_ptr_vec_2d_[pos].push_back(mod_ptr_list[i]);
       res_ptr_vec_2d_[pos].push_back(mod_ptr_list[i]->getOriResiduePtr());
     }
+    // the modifications of the same PTM in one list
+    const PtmPtr& ptm_ptr = mod_ptr_list[i]->getModResiduePtr()->getPtmPtr();
+    int ptm_pos = -1;
+    for (size_t j = 0; j < ptm_mod_ptr_vec_2d_.size(); j++) {
+      if (ptm_mod_ptr_vec_2d_[j][0]->getModResiduePtr()->getPtmPtr()->isSame(
+              ptm_ptr)) {
+        ptm_pos = j;
+        break;
+      }
+    }
+    if (ptm_pos == -1) {
+      ptm_mod_ptr_vec_2d_.push_back(ModPtrVec{mod_ptr_list[i]});
+    } else {
+      ptm_mod_ptr_vec_2d_[ptm_pos].push_back(mod_ptr_list[i]);
+    }
   }
   n_term_mod_ptr_vec_ = mod_util::readNTermModTxt(var_ptm_file_name);
   // get round single shifts
@@ -67,6 +85,20 @@ VarPtmSearchMng::VarPtmSearchMng(const PrsmParaPtr& prsm_para_ptr, int n_report,
   }
 
   computeShifts();
+}
+
+const ModPtrVec& VarPtmSearchMng::getPtmModPtrVec(
+    const ModPtr& mod_ptr) const {
+  const PtmPtr& ptm_ptr = mod_ptr->getModResiduePtr()->getPtmPtr();
+  for (size_t i = 0; i < ptm_mod_ptr_vec_2d_.size(); i++) {
+    if (ptm_mod_ptr_vec_2d_[i][0]->getModResiduePtr()->getPtmPtr()->isSame(
+            ptm_ptr)) {
+      return ptm_mod_ptr_vec_2d_[i];
+    }
+  }
+  LOG_ERROR("The PTM " << ptm_ptr->getAbbrName()
+                       << " is not a variable PTM!");
+  exit(EXIT_FAILURE);
 }
 
 void VarPtmSearchMng::computeShifts() {
