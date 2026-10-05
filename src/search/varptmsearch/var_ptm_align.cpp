@@ -291,6 +291,10 @@ MassShiftPtrVec VarPtmAlign::geneShiftVec(
 
     if (refined_header_ptrs[i] != nullptr) {
       shift_ptrs[idx]->setAlterPtrVec(alter_ptr_vec);
+      // the shift covers the residues that can carry its PTMs, not the whole
+      // gap between the refined diagonals: the cleavages outside them keep
+      // their ions
+      shift_ptrs[idx]->narrowRangeToAlters();
       alter_ptr_vec.clear();
       idx++;
     }
