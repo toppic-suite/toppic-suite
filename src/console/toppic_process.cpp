@@ -52,6 +52,7 @@
 #include "para/prsm_para.hpp"
 #include "prsm/prsm_coverage.hpp"
 #include "prsm/prsm_cutoff_selector.hpp"
+#include "prsm/prsm_deamid_selector.hpp"
 #include "prsm/prsm_decoy_filter.hpp"
 #include "prsm/prsm_fdr.hpp"
 #include "prsm/prsm_fdr_groups.hpp"
@@ -426,9 +427,29 @@ std::string TopPIC_identify(std::map<std::string, std::string>& arguments) {
     processor = nullptr;
     std::cout << "E-value computation - finished." << std::endl;
 
+    // With deamidation as a variable PTM, a spectrum's zero-PTM PrSM and
+    // deamidation PrSM of the same protein and positions (the unmodified
+    // proteoform one isotope below the precursor and the deamidated one at
+    // it) are compared by matched fragments and precursor mass errors, and
+    // only one kind goes on to the top PrSM selection (toppic_test
+    // experiment 123).
+    std::string evalue_ext = "toppic_evalue";
+    if (var_ptm_num >= 1 && var_ptm_file_name != "") {
+      std::set<std::string> deamid_ptm_names =
+          prsm_deamid_selector::getDeamidPtmNames(var_ptm_file_name);
+      if (!deamid_ptm_names.empty()) {
+        std::cout << "Deamidation PrSM selection - started." << std::endl;
+        prsm_deamid_selector::process(sp_file_name, evalue_ext,
+                                      "toppic_evalue_deamid",
+                                      deamid_ptm_names);
+        evalue_ext = "toppic_evalue_deamid";
+        std::cout << "Deamidation PrSM selection - finished." << std::endl;
+      }
+    }
+
     std::cout << "Top PrSM selecting - started" << std::endl;
-    prsm_top_selector::process(sp_file_name, "toppic_evalue",
-                               "toppic_pre_raw_prsm", n_top);
+    prsm_top_selector::process(sp_file_name, evalue_ext, "toppic_pre_raw_prsm",
+                               n_top);
     std::cout << "Top PrSM selecting - finished." << std::endl;
 
   } catch (const char* e) {
