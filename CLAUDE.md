@@ -1158,6 +1158,50 @@ through the hidden `--frag-extend-min-mass <Da>` (key `fragExtendMinMass`,
 default `"5000"`, the `SpPara` default; validated as a non-negative
 number).
 
+## E-values of PrSMs found at a +-1 isotope offset (`stat/tdgf/comp_pvalue_array`)
+
+Branch `evalue_adjusted_prec` (toppic_test experiment 117, report 0117; not
+merged). `CompPValueArray::process` (the shared mode that every toppic
+E-value pass uses: the first pass, the multiple-shift pass, the cluster
+protein correction and `--topmg`'s TDGF E-values) groups the PrSMs of a
+spectrum by isotope offset. Facts to keep straight:
+
+- **The offset rule** (`getIsotopeOffset`) is the one the candidate number
+  already used. A PrSM without unexpected shifts, variable PTMs or a
+  truncation N-terminal modification has offset +1 / -1 when its adjusted
+  precursor mass is more than the precursor error tolerance above / below
+  the spectrum's label-free precursor mass. All other PrSMs have offset 0,
+  including the one-shift and variable-PTM offsets of the opt-in
+  `--enable-*-prec-error` options, as on main.
+- **Offset 0** keeps main's computation: the spectrum set's PRM spectra
+  and generating function. Their E-values are unchanged (equal on every
+  PrSM of 480_F3_02); a smaller maximum score in the group only changes the
+  height of the generating function's table, whose top row saturates.
+- **Offset +-1** gets `prm_ms_factory::geneMsSixPtrVec` for the observed
+  precursor mass +- 1.00228 Da, the PRM spectra the zero-shift search built
+  for that mass, so the generating function's precursor mass is the
+  adjusted one. `compMultiExpectedValues` takes the candidate number's
+  offset from the PRM spectra's precursor mass instead of the PrSM's
+  original precursor, so that the offset is not applied twice. This also
+  fixes the separate mode (`compSingleExpectedValue`, unused by toppic),
+  which already built the PRM spectra at the adjusted mass and then shifted
+  the candidate number once more.
+- **Results on 480_F3_02** (`-s 2`, oxidation only):
+    - For 94 spectra that experiment 116's oracle searched with the right
+      precursor, the new offset E-values equal the direct ones exactly. On
+      main the same matches differ by 10^-16.9 to 10^2.6.
+    - 1% FDR: 3,336 / 1,996 / 437 against main's 3,337 / 1,997 / 438 on
+      TopFD 47b9fc57's output, 3,339 / 2,000 / 437 against 3,340 / 2,001 /
+      438 on TopFD ead67ddc's. The E-value pass takes 4-5 s longer (+4%).
+    - Decoy E-values move little (log10 ratio within -1.35..1.12); target
+      offset PrSMs move by up to 17 orders of magnitude, in both directions.
+    - **The best PrSM changes for deamidated spectra.** For an Asn-Gly
+      deamidated proteoform whose precursor is right, the unmodified
+      zero-shift match through the -1 offset now gets the E-value a right
+      precursor gives and wins over the deamidation PrSM (1 shift, (N)[+0.98]),
+      with 4-11 fewer matched fragments. Deamidated PrSMs at 1% FDR fall
+      from 50 to 45 and from 60 to 53.
+
 ## Truncation N-terminal modifications (`-b`, Position `N-term`)
 
 A variable PTM file line with Position `N-term` is a variable PTM of the
