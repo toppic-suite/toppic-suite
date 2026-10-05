@@ -1258,6 +1258,52 @@ spectrum by isotope offset. Facts to keep straight:
       mass + 1 isotope. Not implemented: choosing by precursor error between
       a PrSM at P and an offset PrSM of the same protein and positions.
 
+## Precursor refinement of the variable PTM search (`search/diag/diagonal_util`, `search/varptmsearch/var_ptm_align`)
+
+Branch `var_ptm_refine_prec` (toppic_test experiment 121, report 0121; not
+merged). Facts to keep straight:
+
+- **The headers.** `VarPtmSlowMatch::geneVarPtmNTermShiftHeaders` builds one
+  diagonal header per variable PTM mass combination, with C-terminal shift =
+  observed (label-free) precursor mass - sequence mass - N-terminal shift.
+  The C-terminal diagonal is the one whose C-terminal shift is within the
+  precursor tolerance, so its C-terminal shift is the precursor error.
+- **The refinement.** `VarPtmAlign::geneResult` gets `refine_prec_mass`
+  (the proteoform mass plus the variable PTMs of the C-terminal diagonal)
+  from `diagonal_util::refineVarPtmPrecursorAndHeaderShift`. That function
+  also sets every backtracked header's C-terminal shift from it
+  (`DiagHeader::initHeader`, as the slow match built them).
+  `diagonal_util::refineVarPtmHeadersBgnEnd` then generates C-terminal ions
+  without the precursor error.
+- **On main** the headers keep the observed precursor's C-terminal shifts,
+  so every y ion of the range refinement carries the precursor error.
+    - Scan 5211 of 480_F3_02 is a deamidated proteoform whose precursor
+      TopFD's fragment pairs moved by an isotope, 0.0202 Da above the
+      proteoform mass. Every y ion below 2,020 Da was lost.
+    - The variable PTM shift range spread over the lost ions (report 0120),
+      and no ion inside a shift's range is counted.
+- **The shift searches** (`PSAlign`, `PSAlignMultiType`, TopMG's graph
+  alignment) do their own precursor refinement
+  (`refinePrecursorAndHeaderShift`, the median fragment error). The
+  variable PTM search needs none: its proteoform mass is exact once the
+  alignment has chosen the variable PTMs.
+- **Unchanged:** the dynamic programming (`VarPtmAlign::dp`) and the
+  first-pass PrSMs without variable PTMs (31,702 identical on 480_F3_02).
+- **Results on 480_F3_02** (`-s 2`, TopFD ead67ddc output):
+    - Oxidation: 3,336 / 1,998 / 437 against main's 3,333 / 1,998 / 437.
+      Oxidation + deamidation: 3,336 / 1,992 / 436 against 3,331 / 1,989 /
+      436. Decoys at fixed E-values are unchanged.
+    - First-pass variable PTM PrSMs of the same spectrum and proteoform: 708
+      / 743 gain fragments, none lose; E-values better in 250 / 383, worse in
+      none. Most gains are at precursor errors of 0.015 Da or more.
+    - Reported PrSMs: 15 / 16 of the same proteoform gain fragments (ACBP
+      scans 2000-2008 +9 to +13; 5211 38 -> 52, E 9.2e-17 -> 4.2e-33).
+      1 / 4 change proteoform (a one-shift PrSM becomes a variable PTM
+      PrSM). 3 / 5 PrSMs are new, all borderline (E 0.006-2). None is lost.
+- **Remaining:** a variable PTM shift's range is still the gap between the
+  refined diagonals and can be wider than the modifiable residues. 5211's
+  oxidation of M44 is reported on P43-M44.
+
 ## Truncation N-terminal modifications (`-b`, Position `N-term`)
 
 A variable PTM file line with Position `N-term` is a variable PTM of the
