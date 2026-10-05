@@ -1076,6 +1076,13 @@ not a variable PTM. Facts to keep straight:
   MCMC candidate number of a PrSM with the mod sums over the N-term masses;
   `toppic --topmg topmg-only` sets `nTermVarPtmTypeNum` (the TopMG stage's
   and the cluster correction's generating function multiply by T_N + 1).
+  **Ties go to the path without the mod**, so that a protein N-terminal
+  form wins a tie against it: `GraphAlign` keeps a flag per DP entry
+  (`trunc_paths_`; a mod's consistent pair stores its cell c as -1 - c),
+  and wherever two paths score the same (the best predecessor, a variable
+  against an unexpected-shift path, the best shift node, the end cell, and
+  equal matched fragment numbers over the PTM numbers in `geneResult`) the
+  one without the mod is kept. Without N-term lines nothing changes.
   Results (toppic_test experiment 116, report 0116; 480_F3_02, topmg
   `-f C57 -d -t FDR -T FDR`, oxidation M, phospho STY, `Acetyl,*,N-term`):
   topmg reports 12 and 16 truncation N-terminal acetylations at 1% FDR,

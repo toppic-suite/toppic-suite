@@ -79,14 +79,23 @@ class GraphAlign {
   std::vector<double> best_scores_;
   std::vector<int> best_shift_nodes_;
   std::vector<double> best_shift_scores_;
+  // whether the entry's best path starts with a truncation N-terminal
+  // modification: on equal scores, the path without one (a protein
+  // N-terminal form, or a truncation without the modification) is kept
+  std::vector<char> trunc_paths_;
 
   // The consistent pairs of a cell and a variable modification number m:
   // the cells cons_prev_cells_[cons_begins_[k]] ... [cons_begins_[k + 1] - 1]
-  // with k = cell * mod_layer_num_ + m, in the order they were found.
+  // with k = cell * mod_layer_num_ + m, in the order they were found. A pair
+  // of a truncation N-terminal modification stores its cell c as -1 - c.
   std::vector<int> cons_begins_;
   std::vector<int> cons_prev_cells_;
 
   GraphResultNodePtrVec3D result_nodes_;
+
+  // whether the path of result_nodes_[s][m] starts with a truncation
+  // N-terminal modification
+  std::vector<std::vector<char>> result_truncs_;
 
   GraphResultNodePtrVec2D nodes_2d_;
 
@@ -102,11 +111,18 @@ class GraphAlign {
     return (cell * shift_layer_num_ + s) * mod_layer_num_ + m;
   }
 
+  // whether the best path of a cell (-1: none) in layer (s, m) starts with
+  // a truncation N-terminal modification
+  bool isTruncPath(int cell, int s, int m) {
+    return cell >= 0 && trunc_paths_[getEntryIdx(cell, s, m)];
+  }
+
   void getConsistentPairs();
 
   void initTable();
 
-  int compBestVariableNode(size_t cell, int s, int m, int& best_edge_mod_num);
+  int compBestVariableNode(size_t cell, int s, int m, int& best_edge_mod_num,
+                           bool& best_trunc);
 
   int compBestShiftNode(int i, int j, int s, int m);
 
@@ -114,7 +130,7 @@ class GraphAlign {
 
   void dp();
 
-  GraphResultNodePtrVec backtrace(int s, int m);
+  GraphResultNodePtrVec backtrace(int s, int m, bool& trunc);
 
   void backtrace();
 
