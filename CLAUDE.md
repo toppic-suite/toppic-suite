@@ -1304,6 +1304,61 @@ merged into main on 2026-10-05). Facts to keep straight:
   refined diagonals and can be wider than the modifiable residues. 5211's
   oxidation of M44 is reported on P43-M44.
 
+## Deamidation or the -1 isotope offset (`prsm/prsm_deamid_selector`)
+
+Branch `deamid_prec_error` (toppic_test experiment 123, report 0123; not
+merged). With a deamidation in the variable PTM file (a PTM with Unimod id 7
+or a monoisotopic mass within 0.001 Da of 0.984016 Da;
+`getDeamidPtmNames`), `TopPIC_identify` runs `prsm_deamid_selector::
+process` between the E-value computation and the top PrSM selection: it
+reads `toppic_evalue` and writes `toppic_evalue_deamid`, which
+`prsm_top_selector` then reads. Facts to keep straight:
+
+- **Why.** The unmodified proteoform matched at the -1 offset (a zero-shift
+  PrSM whose adjusted precursor mass is P - 1.00228) and the deamidated one
+  at P (a variable PTM PrSM) explain a spectrum with masses 18.3 mDa apart.
+  Since experiment 117 their E-values come from generating functions on the
+  PRM spectra of different precursor masses, and the offset match often
+  wins with fewer fragments.
+- **The pairs.** Per spectrum (all its precursors, as the top PrSM selection
+  groups them) and per protein, start and end: the zero-PTM PrSMs
+  (`unexpected_ptm_num` and `variable_ptm_num` 0) and the deamidation PrSMs
+  (no unexpected shift, a `Variable` alteration whose PTM abbreviation is a
+  deamidation, read with `MassShift(XmlDOMElement)`). The best of each kind
+  by E-value is compared. The pairs are zero-PTM PrSMs at the -1 offset in
+  practice: no other offset gives the two masses within the tolerance.
+- **The rule:** matched fragments (`match_theo_frag_num`, the E-value's
+  score) 5 or more apart decide. Otherwise the smaller |precursor error|
+  decides: the label-free precursor mass + k x 1.00228 - the adjusted
+  precursor mass (the proteoform mass in both searches), k = round((adjusted
+  - precursor) / 1.00228). A tie keeps the better E-value. Every PrSM of the
+  losing kind in the group is removed, so that another deamidation site
+  cannot take the loser's place. E-values are not changed.
+- **The loser may have been the best PrSM, the winner need not be.** When
+  the zero-PTM PrSM wins with a worse E-value than the deamidation PrSM, the
+  top PrSM selection can pick a third PrSM (on 480: one-shift PrSMs of the
+  same protein).
+- **Results on 480_F3_02** (`-s 2`, oxidation and deamidation, against main
+  7c8e00e6; TopFD 47b9fc57 / ead67ddc outputs):
+    - The step: 539 / 544 pairs, half of them decoys, 620 / 621 PrSMs
+      removed, 3.4 s. A Python copy of the rule predicts
+      `toppic_evalue_deamid` exactly.
+    - 3,335 / 1,994 / 436 and 3,338 / 1,997 / 436 at 1% FDR (main 3,335 /
+      1,993 / 436 and 3,338 / 1,996 / 436), the same cutoff and decoys.
+    - It recovers report 0117's five HMGN1/HMGN2 deamidations (2488, 2752,
+      2833, 2838, 2974) on both inputs and keeps 4679's offset match on D.
+    - It loses 7 other deamidations per input: PTMS 33-80 (5,553 Da; five
+      scans on S, six on D) and PTMA (12 kDa) by precursor error, LMNA 3734
+      (S) by fragments; one-shift PrSMs are reported instead. Deamidated
+      PrSMs at 1% FDR 94 -> 92 and 102 -> 100.
+- **The cause of the PTMS losses:** TopFD's precursor masses are
+  systematically high by about +1.3 to +1.6 ppm (+7 mDa at 5.5 kDa, +17.5
+  mDa above 10 kDa; the median of the confident zero-shift PrSMs), so the
+  deamidated explanation (+10 to +13 mDa) looks worse than the -1 offset
+  (-5 to -8 mDa). Measured from the run's median ppm error instead of zero,
+  the deamidation is closer in all five (report 0123's simulation; not
+  implemented).
+
 ## Truncation N-terminal modifications (`-b`, Position `N-term`)
 
 A variable PTM file line with Position `N-term` is a variable PTM of the
