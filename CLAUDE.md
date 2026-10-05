@@ -670,6 +670,66 @@ rows) is written as `DeconvSingleSp`'s. Facts to keep straight:
   search is repeatable up to that jitter. `--deconv-ms2 flashdeconv` writes
   main 89df2a8c's `-F` MS/MS spectra unchanged (st_1, all 1,381).
 
+## Precursor isotope correction from fragment pairs (`topfd/deconv/prec_pair_refine`, `--skip-ms2-prec-pair-refine`)
+
+On by default in topfd; `--skip-ms2-prec-pair-refine` turns it off (branch
+`high_res_prec_pair_refine`, toppic_test experiment 116, report 0116; tested
+as the hidden `--ms2-prec-pair-refine`, which the merge into main replaced).
+b + y = the proteoform mass, so fragment pair sums show the mass of the
+molecule that was fragmented. Facts to keep straight:
+
+- **Two functions.** `prec_pair_refine::refine` is the low-resolution
+  method (`-R`, branch `low_res_greedy_ms1` f902aa09, copied unchanged; main
+  has no `-R`, so nothing calls it here; a later merge of a low-resolution
+  branch has to rename its `--ms2-prec-pair-refine` too). `correctIsotopes`
+  is the high-resolution one that TopFD runs, in `deconvMsTwo` after the
+  precursors are built from the features.
+- **Where it runs.** `TopfdPara::ms2_prec_pair_refine_` is true by default.
+  It runs in `DeconvMs2Process` only (greedy and msdeconv MS/MS
+  deconvolution, not FLASHDeconv or `-T`) and only for MS/MS spectra with an
+  MS1 spectrum: without one (`-o`) the MS1 check cannot run, and with the
+  pairs alone the rule moved 47 right precursors of the known-mass spectra
+  away and fixed 18 (report 0116 section 3).
+  TopDIA's argument parser turns it off (DIA MS/MS scans hold the fragments
+  of every co-isolated precursor; not tested). The parameter line
+  `Precursor isotope correction from fragment pairs: Yes` is printed only
+  when the correction runs, so the other output files keep the parameter
+  block of earlier versions.
+- **The rule (`correctIsotopes`).** For every precursor of a spectrum (TopPIC
+  searches only the first), it counts the pair sums of the fragment masses
+  with EnvCNN >= 0.4 within 10 ppm of P - 1, P and P + 1 isotope (1.00228 Da).
+  The precursor moves to the best offset when it has >= 3 pairs, more than at P
+  and >= 2 x the count at P. It does not move when the averagine fit of the
+  precursor in the group's MS1 spectrum prefers P by 0.05 or more (cosines on
+  one grid of isotope positions, +-2 isotopes around the envelope, summed
+  over the charges z-1..z+1).
+    - The moved precursor keeps its charge, feature id and intensity; its m/z
+      moves by j x 1.00228 / z.
+    - `DeconvMs2Process::process` passes the group's MS1 spectrum to the
+      MS/MS task only when the correction is on.
+- **Research switches** in `TOPFD_PREC_REFINE_PARA`: `iso_range` (1),
+  `iso_tol_ppm` (10), `iso_min_envcnn` (0.4), `iso_min_pairs` (3),
+  `iso_ratio` (2), `iso_ms1_check` (1), `iso_ms1_margin` (0.05),
+  `iso_ms1_tol_ppm` (10), `iso_ms1_min_rel` (0.05). The low-resolution
+  `window`, `tol_ppm`, `min_pairs` and `promote` are unchanged.
+- **Results on 480_F3_02** (`-s 2`, oxidation only):
+    - It moves 96 first precursors. At 1% FDR TopPIC finds 3,341 PrSMs /
+      2,003 proteoforms / 438 proteins, against main's 3,337 / 1,997 / 438.
+    - The moved spectra get better PrSMs: of 86 identified by either run,
+      56 match more fragments and 10 fewer.
+    - 12 of them are Asn-Gly deamidations (HMGN1, parathymosin, hnRNP A1-like
+      2) that main reports without the deamidation. A deamidated proteoform is
+      0.018 Da short of one isotope heavier, and MS1 cannot separate its
+      envelope from the unmodified one.
+- **Why the rule is conservative.** TopFD's fragment masses carry isotope
+  errors, mostly one isotope light: they are right in 98% of the matches
+  below 1 kDa but 78% at 3-4 kDa and 55% at 6-10 kDa. A pair sum has the
+  isotope error of its larger fragment. With pairs alone (no MS1 check,
+  moves of +-2) 240 precursors move and many PrSMs get worse.
+- **TopFD's own precursor errors** are rare: 97 of 1,866 known-mass spectra,
+  half of them histone H2B at 13.8 kDa (one isotope light). The pairs cannot
+  reach those: complementary pairs are missing or flat there.
+
 ## Post mass matching (`prsm/prsm_post_mass_match`, toppic only)
 
 After the search, the clustering, the cluster protein correction and the

@@ -92,6 +92,10 @@ TopfdParaPtr Argument::getTopfdParaPtrForTopdia() {
   // --deconv-ms2 select them.
   topfd_para_ptr->setMs1DeconvMethod("msdeconv");
   topfd_para_ptr->setMs2DeconvMethod("msdeconv");
+  // nor does it correct precursor isotopes with fragment pairs (TopFD's
+  // default, measured on DDA data in experiment 116): the fragments of a DIA
+  // MS/MS scan come from every co-isolated precursor.
+  topfd_para_ptr->setMs2PrecPairRefine(false);
   return topfd_para_ptr;
 }
 

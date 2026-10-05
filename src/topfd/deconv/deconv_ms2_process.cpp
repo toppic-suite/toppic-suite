@@ -36,6 +36,7 @@
 #include "ms/spec/msalign_writer.hpp"
 #include "topfd/deconv/deconv_single_sp.hpp"
 #include "topfd/deconv/greedy_ms2_deconv.hpp"
+#include "topfd/deconv/prec_pair_refine.hpp"
 
 namespace toppic {
 
@@ -97,8 +98,10 @@ std::string updateMsTwoMsg(const MsHeaderPtr& header_ptr, int scan_cnt,
   return msg;
 }
 
+// ms1_ptr: the MS1 spectrum of the MS/MS spectrum's group (nullptr without
+// MS1 spectra), used by the precursor isotope correction
 void deconvMsTwo(const MzmlMsPtr& ms_ptr, SpecFeaturePtrVec sp_feat_ptr_vec,
-                 const TopfdParaPtr& topfd_para_ptr,
+                 const MzmlMsPtr& ms1_ptr, const TopfdParaPtr& topfd_para_ptr,
                  const MsAlignWriterPtrVec& ms2_writer_ptr_vec,
                  const SimpleThreadPoolPtr& pool_ptr,
                  const Ms2SqlBufferPtr& sql_buffer_ptr) {
@@ -159,6 +162,14 @@ void deconvMsTwo(const MzmlMsPtr& ms_ptr, SpecFeaturePtrVec sp_feat_ptr_vec,
         std::make_shared<Precursor>(prec_id, feat_id, mono_mz, charge, inte);
     prec_ptr_vec.push_back(prec_ptr);
   }
+  if (topfd_para_ptr->isMs2PrecPairRefine() && ms1_ptr != nullptr) {
+    // the precursor isotope correction, on by default
+    // (--skip-ms2-prec-pair-refine turns it off); not run without an MS1
+    // spectrum, as with the pairs alone it moves more right precursors away
+    // than it fixes (toppic_test experiment 116)
+    prec_pair_refine::correctIsotopes(deconv_envs, ms1_ptr->getPeakPtrVec(),
+                                      prec_ptr_vec);
+  }
   header_ptr->setPrecPtrVec(prec_ptr_vec);
 
   // 4. Write to msalign file
@@ -187,14 +198,14 @@ void deconvMsTwo(const MzmlMsPtr& ms_ptr, SpecFeaturePtrVec sp_feat_ptr_vec,
 
 std::function<void()> geneMsTwoTask(
     const MzmlMsPtr& ms_ptr, const SpecFeaturePtrVec& feat_ptr_vec,
-    const TopfdParaPtr& topfd_para_ptr,
+    const MzmlMsPtr& ms1_ptr, const TopfdParaPtr& topfd_para_ptr,
     const MsAlignWriterPtrVec& ms2_writer_ptr_vec,
     const SimpleThreadPoolPtr& pool_ptr,
     const Ms2SqlBufferPtr& sql_buffer_ptr) {
-  return [ms_ptr, feat_ptr_vec, topfd_para_ptr, ms2_writer_ptr_vec, pool_ptr,
-          sql_buffer_ptr]() {
-    deconvMsTwo(ms_ptr, feat_ptr_vec, topfd_para_ptr, ms2_writer_ptr_vec,
-                pool_ptr, sql_buffer_ptr);
+  return [ms_ptr, feat_ptr_vec, ms1_ptr, topfd_para_ptr, ms2_writer_ptr_vec,
+          pool_ptr, sql_buffer_ptr]() {
+    deconvMsTwo(ms_ptr, feat_ptr_vec, ms1_ptr, topfd_para_ptr,
+                ms2_writer_ptr_vec, pool_ptr, sql_buffer_ptr);
   };
 }
 
@@ -339,9 +350,13 @@ void DeconvMs2Process::process() {
                                 << " features.");
         }
       }
+      // the MS1 spectrum is kept only for the precursor isotope correction
+      MzmlMsPtr ms1_ptr = topfd_para_ptr_->isMs2PrecPairRefine()
+                              ? ms_group_ptr->getMsOnePtr()
+                              : nullptr;
       pool_ptr->enqueue(deconv_ms2_process::geneMsTwoTask(
-          ms_ptr, sp_feat_ptr_vec, topfd_para_ptr_, ms2_writer_ptr_vec,
-          pool_ptr, sql_buffer_ptr));
+          ms_ptr, sp_feat_ptr_vec, ms1_ptr, topfd_para_ptr_,
+          ms2_writer_ptr_vec, pool_ptr, sql_buffer_ptr));
       std::string msg = deconv_ms2_process::updateMsTwoMsg(
           ms_ptr->getMsHeaderPtr(), spec_cnt, total_spec_num);
       std::cout << "\r" << msg << std::flush;
