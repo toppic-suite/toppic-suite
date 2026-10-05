@@ -1301,7 +1301,9 @@ reproduces the script. Facts to keep straight:
 
 - **The Python choices are kept on purpose**, including odd ones: the
   top-50 peaks, precursor clusters by charge then complete linkage within
-  2.2 Da, the 10 ppm cosine distance with the 1.00235 Da shift and its
+  2.2 Da, the 10 ppm cosine distance with an isotope shift (TopPIC's
+  `mass_constant::getIsotopeMass()`, 1.00228 Da; the script's 1.00235 Da
+  is not kept) and its
   early return when the sum passes 1, average linkage at 0.7, the
   `weighted_mass_sum_inte_cal` merge (a peak of the first spectrum takes
   every matching peak of the second; a second-spectrum peak may be merged
@@ -1352,8 +1354,9 @@ because nothing in the search was changed. Facts to keep straight:
 
 - **The script's choices are kept on purpose**: the library rows with a
   proteoform, targets and decoys alike; only the query's first precursor;
-  the ppm test in ppm of the *library* mass with the 1.00235 Da isotope
-  shift (Da mode has no shift); the cosine loop of
+  the ppm test in ppm of the *library* mass with the isotope shift
+  (`mass_constant::getIsotopeMass()`, 1.00228 Da, not the script's
+  1.00235; Da mode has no shift); the cosine loop of
   `peak_50_cosine_mass_ppm` with the library spectrum first and its early
   return; the *first* candidate of the smallest distance (`np.argmin`,
   a NaN distance first) kept when Python's `min()` is at most 1; the

@@ -29,6 +29,7 @@
 #include <variant>
 #include <vector>
 
+#include "common/base/mass_constant.hpp"
 #include "toplib/lib_cluster.hpp"
 #include "toplib/lib_numeric.hpp"
 
@@ -44,7 +45,9 @@ namespace {
 const double kPrecursorTolerance = 2.2;
 const double kSpectrumDistance = 0.7;
 const double kPpm = 10;
-const double kIsotopeShift = 1.00235;
+// the isotope shift is TopPIC's (mass_constant::getIsotopeMass(), 1.00228
+// Da), not the script's 1.00235 Da
+const double kIsotopeShift = mass_constant::getIsotopeMass();
 
 // the 19 amino acid residue masses of decoy_mass_gen (no leucine)
 const double kAaMasses[19] = {

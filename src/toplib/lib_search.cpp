@@ -21,6 +21,7 @@
 #include <numeric>
 #include <vector>
 
+#include "common/base/mass_constant.hpp"
 #include "toplib/lib_builder.hpp"
 #include "toplib/lib_numeric.hpp"
 
@@ -32,7 +33,9 @@ namespace lib_search {
 
 namespace {
 
-const double kIsotopeShift = 1.00235;
+// the isotope shift is TopPIC's (mass_constant::getIsotopeMass(), 1.00228
+// Da), not the script's 1.00235 Da
+const double kIsotopeShift = mass_constant::getIsotopeMass();
 // dist_cal keeps a query's best library spectrum if its distance is at
 // most 1 (every one without a NaN distance)
 const double kDistanceThreshold = 1.0;

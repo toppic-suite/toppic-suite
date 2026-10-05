@@ -110,7 +110,7 @@ bool ToplibSearchArgument::parse(int argc, char* argv[]) {
         "<a nonnegative number>. The precursor mass error tolerance. In "
         "ppm (of the library spectrum's precursor mass), a library spectrum "
         "matches when its precursor mass is within the tolerance of the "
-        "query's or one isotope shift (1.00235 Da) away from it within the "
+        "query's or one isotope shift (1.00228 Da) away from it within the "
         "tolerance; in Da, when it is within the tolerance. Default: 10 ppm "
         "or 2.2 Da.")(
         "fragment-error,e", po::value<std::string>(&frag_tol),

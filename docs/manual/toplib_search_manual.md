@@ -37,7 +37,7 @@ toplib_search [options] <library file> <msalign file>
    spectrum:
    - The candidates are the library spectra whose precursor mass matches
      the query's: by default within 10 ppm of the library spectrum's
-     precursor mass, or one isotope shift (1.00235 Da) away within 10 ppm
+     precursor mass, or one isotope shift (1.00228 Da) away within 10 ppm
      (`-E`); with `-T Da`, within 2.2 Da. With `-c yes` the precursor
      charge must be the same too.
    - The query's 50 most intense masses are sorted by mass and their log2
@@ -80,7 +80,7 @@ numbers (`924.0`), and empty values as empty cells.
 | Option | Default | Meaning |
 |---|---|---|
 | `-T`, `--precursor-error-type <ppm\|Da>` | ppm | The unit of the precursor mass error tolerance. |
-| `-E`, `--precursor-error <number>` | 10 ppm or 2.2 Da | The precursor mass error tolerance. In ppm (of the library spectrum's precursor mass), a library spectrum matches when its precursor mass is within the tolerance of the query's or one isotope shift (1.00235 Da) away from it within the tolerance; in Da, when it is within the tolerance. |
+| `-E`, `--precursor-error <number>` | 10 ppm or 2.2 Da | The precursor mass error tolerance. In ppm (of the library spectrum's precursor mass), a library spectrum matches when its precursor mass is within the tolerance of the query's or one isotope shift (1.00228 Da) away from it within the tolerance; in Da, when it is within the tolerance. |
 | `-e`, `--fragment-error <number>` | 10 | The fragment mass error tolerance in ppm. |
 | `-c`, `--charge-state <yes\|no>` | no | Whether a library spectrum must have the query's precursor charge. |
 | `-o`, `--output <file>` | toplib_output/query_res.tsv | The table of identifications. |

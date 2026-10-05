@@ -87,7 +87,7 @@ and masses above the precursor mass are left out.
    (average linkage, cosine distance at most 0.7). The cosine distance uses
    the 50 most intense masses of each spectrum with log2 intensities
    scaled to unit length; two masses of equal charge match when they differ
-   by at most 10 ppm, or by 1.00235 Da within 10 ppm. As in TopLib's
+   by at most 10 ppm, or by 1.00228 Da within 10 ppm. As in TopLib's
    script, spectra identified as different proteoforms can share a
    cluster; its representative then keeps only one of their
    identifications (step 4), so the other proteoforms can be left without
