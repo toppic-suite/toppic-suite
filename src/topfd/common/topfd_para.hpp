@@ -297,10 +297,13 @@ class TopfdPara {
   // DeconvSingleSp; TopDIA's default) or "flashdeconv" (FlashDeconvMs2Process
   // instead of DeconvMs2Process)
   std::string ms2_deconv_method_ = "greedy";
-  // hidden option --ms2-prec-pair-refine: the precursor masses of an MS/MS
-  // spectrum corrected by whole isotopes with the complementary pairs of its
-  // fragment masses (prec_pair_refine::correctIsotopes)
-  bool ms2_prec_pair_refine_ = false;
+  // the precursor masses of an MS/MS spectrum corrected by whole isotopes
+  // with the complementary pairs of its fragment masses and the MS1 spectrum
+  // (prec_pair_refine::correctIsotopes; toppic_test experiment 116): on by
+  // default, off with --skip-ms2-prec-pair-refine and in TopDIA. It runs in
+  // DeconvMs2Process (not FLASHDeconv) and only for MS/MS spectra with an
+  // MS1 spectrum.
+  bool ms2_prec_pair_refine_ = true;
 
   //** information for each run **
   int frac_id_ = -1;

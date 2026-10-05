@@ -307,9 +307,11 @@ std::string TopfdPara::getTopfdParaStr(const std::string& prefix,
     kv("Fragment harmonic check:")
         << (ms2_harmonic_check_ ? "Yes" : "No") << std::endl;
   }
-  // printed only with the hidden option, so that the output files keep
-  // their parameter block
-  if (ms2_prec_pair_refine_) {
+  // printed only when the correction runs (not with
+  // --skip-ms2-prec-pair-refine, without MS1 spectra, with FLASHDeconv or in
+  // TopDIA), so that those output files keep the parameter block of earlier
+  // versions
+  if (ms2_prec_pair_refine_ && !missing_level_one_ && !isUseFlashDeconv()) {
     kv("Precursor isotope correction from fragment pairs:") << "Yes"
                                                             << std::endl;
   }

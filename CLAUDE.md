@@ -670,18 +670,31 @@ rows) is written as `DeconvSingleSp`'s. Facts to keep straight:
   search is repeatable up to that jitter. `--deconv-ms2 flashdeconv` writes
   main 89df2a8c's `-F` MS/MS spectra unchanged (st_1, all 1,381).
 
-## Precursor isotope correction from fragment pairs (`topfd/deconv/prec_pair_refine`, `--ms2-prec-pair-refine`)
+## Precursor isotope correction from fragment pairs (`topfd/deconv/prec_pair_refine`, `--skip-ms2-prec-pair-refine`)
 
-A hidden topfd option, off by default (branch `high_res_prec_pair_refine`;
-toppic_test experiment 116, report 0116). b + y = the proteoform mass, so
-fragment pair sums show the mass of the molecule that was fragmented. Facts
-to keep straight:
+On by default in topfd; `--skip-ms2-prec-pair-refine` turns it off (branch
+`high_res_prec_pair_refine`, toppic_test experiment 116, report 0116; tested
+as the hidden `--ms2-prec-pair-refine`, which the merge into main replaced).
+b + y = the proteoform mass, so fragment pair sums show the mass of the
+molecule that was fragmented. Facts to keep straight:
 
 - **Two functions.** `prec_pair_refine::refine` is the low-resolution
   method (`-R`, branch `low_res_greedy_ms1` f902aa09, copied unchanged; main
-  has no `-R`, so nothing calls it here). `correctIsotopes` is the
-  high-resolution one that the option runs, in `deconvMsTwo` after the
+  has no `-R`, so nothing calls it here; a later merge of a low-resolution
+  branch has to rename its `--ms2-prec-pair-refine` too). `correctIsotopes`
+  is the high-resolution one that TopFD runs, in `deconvMsTwo` after the
   precursors are built from the features.
+- **Where it runs.** `TopfdPara::ms2_prec_pair_refine_` is true by default.
+  It runs in `DeconvMs2Process` only (greedy and msdeconv MS/MS
+  deconvolution, not FLASHDeconv or `-T`) and only for MS/MS spectra with an
+  MS1 spectrum: without one (`-o`) the MS1 check cannot run, and with the
+  pairs alone the rule moved 47 right precursors of the known-mass spectra
+  away and fixed 18 (report 0116 section 3).
+  TopDIA's argument parser turns it off (DIA MS/MS scans hold the fragments
+  of every co-isolated precursor; not tested). The parameter line
+  `Precursor isotope correction from fragment pairs: Yes` is printed only
+  when the correction runs, so the other output files keep the parameter
+  block of earlier versions.
 - **The rule (`correctIsotopes`).** For every precursor of a spectrum (TopPIC
   searches only the first), it counts the pair sums of the fragment masses
   with EnvCNN >= 0.4 within 10 ppm of P - 1, P and P + 1 isotope (1.00228 Da).
@@ -693,7 +706,7 @@ to keep straight:
     - The moved precursor keeps its charge, feature id and intensity; its m/z
       moves by j x 1.00228 / z.
     - `DeconvMs2Process::process` passes the group's MS1 spectrum to the
-      MS/MS task only with the option.
+      MS/MS task only when the correction is on.
 - **Research switches** in `TOPFD_PREC_REFINE_PARA`: `iso_range` (1),
   `iso_tol_ppm` (10), `iso_min_envcnn` (0.4), `iso_min_pairs` (3),
   `iso_ratio` (2), `iso_ms1_check` (1), `iso_ms1_margin` (0.05),

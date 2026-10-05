@@ -22,8 +22,8 @@
 
 namespace toppic {
 
-// Precursor masses from complementary fragment pairs (topfd
-// --ms2-prec-pair-refine): in HCD a b ion and its complementary y ion (b =
+// Precursor masses from complementary fragment pairs (topfd's precursor
+// isotope correction, on by default, --skip-ms2-prec-pair-refine): in HCD a b ion and its complementary y ion (b =
 // residues, y = residues + water) sum to the proteoform's neutral mass
 // whatever the proteoform's truncations and modifications, so the sums of
 // pairs of deconvoluted fragment masses cluster at the precursor mass.

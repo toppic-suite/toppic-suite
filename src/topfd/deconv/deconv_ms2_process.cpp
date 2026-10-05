@@ -99,7 +99,7 @@ std::string updateMsTwoMsg(const MsHeaderPtr& header_ptr, int scan_cnt,
 }
 
 // ms1_ptr: the MS1 spectrum of the MS/MS spectrum's group (nullptr without
-// MS1 spectra), used by --ms2-prec-pair-refine
+// MS1 spectra), used by the precursor isotope correction
 void deconvMsTwo(const MzmlMsPtr& ms_ptr, SpecFeaturePtrVec sp_feat_ptr_vec,
                  const MzmlMsPtr& ms1_ptr, const TopfdParaPtr& topfd_para_ptr,
                  const MsAlignWriterPtrVec& ms2_writer_ptr_vec,
@@ -162,13 +162,13 @@ void deconvMsTwo(const MzmlMsPtr& ms_ptr, SpecFeaturePtrVec sp_feat_ptr_vec,
         std::make_shared<Precursor>(prec_id, feat_id, mono_mz, charge, inte);
     prec_ptr_vec.push_back(prec_ptr);
   }
-  if (topfd_para_ptr->isMs2PrecPairRefine()) {
-    // hidden option --ms2-prec-pair-refine
-    PeakPtrVec ms1_peaks;
-    if (ms1_ptr != nullptr) {
-      ms1_peaks = ms1_ptr->getPeakPtrVec();
-    }
-    prec_pair_refine::correctIsotopes(deconv_envs, ms1_peaks, prec_ptr_vec);
+  if (topfd_para_ptr->isMs2PrecPairRefine() && ms1_ptr != nullptr) {
+    // the precursor isotope correction, on by default
+    // (--skip-ms2-prec-pair-refine turns it off); not run without an MS1
+    // spectrum, as with the pairs alone it moves more right precursors away
+    // than it fixes (toppic_test experiment 116)
+    prec_pair_refine::correctIsotopes(deconv_envs, ms1_ptr->getPeakPtrVec(),
+                                      prec_ptr_vec);
   }
   header_ptr->setPrecPtrVec(prec_ptr_vec);
 
@@ -350,7 +350,7 @@ void DeconvMs2Process::process() {
                                 << " features.");
         }
       }
-      // the MS1 spectrum is kept only for --ms2-prec-pair-refine
+      // the MS1 spectrum is kept only for the precursor isotope correction
       MzmlMsPtr ms1_ptr = topfd_para_ptr_->isMs2PrecPairRefine()
                               ? ms_group_ptr->getMsOnePtr()
                               : nullptr;
