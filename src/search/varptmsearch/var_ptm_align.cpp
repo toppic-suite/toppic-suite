@@ -26,6 +26,20 @@
 
 namespace toppic {
 
+namespace {
+
+// whether one of the modifications modifies the residue
+bool isModifiable(const ResiduePtr& res_ptr, const ModPtrVec& mod_ptrs) {
+  for (size_t i = 0; i < mod_ptrs.size(); i++) {
+    if (res_ptr->isSame(mod_ptrs[i]->getOriResiduePtr())) {
+      return true;
+    }
+  }
+  return false;
+}
+
+}  // namespace
+
 VarPtmAlign::VarPtmAlign(const std::vector<double>& ms_masses,
                          const std::vector<double>& seq_masses,
                          const ResSeqPtr& sub_res_seq_ptr,
@@ -267,19 +281,19 @@ MassShiftPtrVec VarPtmAlign::geneShiftVec(
     int left_bp_pos = shift_ptrs[idx]->getLeftBpPos();
     int right_bp_pos = shift_ptrs[idx]->getRightBpPos();
     ModPtr mod_ptr = backtrack_mod_ptrs_[i - 1];
-    ResiduePtr mod_res_ptr = mod_ptr->getOriResiduePtr();
-    // find modifiable residues
+    // find modifiable residues: those of every modification of the PTM
+    // (Deamidated on N and on Q), not only of the residue the alignment chose
+    const ModPtrVec& ptm_mod_ptrs = mng_ptr_->getPtmModPtrVec(mod_ptr);
     while (left_bp_pos < right_bp_pos) {
-      ResiduePtr seq_res_ptr = sub_res_seq_ptr_->getResiduePtr(left_bp_pos);
-      if (seq_res_ptr->isSame(mod_res_ptr)) {
+      if (isModifiable(sub_res_seq_ptr_->getResiduePtr(left_bp_pos),
+                       ptm_mod_ptrs)) {
         break;
       }
       left_bp_pos++;
     }
     while (right_bp_pos > left_bp_pos) {
-      ResiduePtr seq_res_ptr =
-          sub_res_seq_ptr_->getResiduePtr(right_bp_pos - 1);
-      if (seq_res_ptr->isSame(mod_res_ptr)) {
+      if (isModifiable(sub_res_seq_ptr_->getResiduePtr(right_bp_pos - 1),
+                       ptm_mod_ptrs)) {
         break;
       }
       right_bp_pos--;
