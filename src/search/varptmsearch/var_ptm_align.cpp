@@ -305,8 +305,12 @@ PrsmPtr VarPtmAlign::geneResult(const ProteoformPtr& sub_proteo_ptr,
     return nullptr;
   }
 
-  double refine_prec_mass =
-      sub_proteo_ptr->getMass() + mng_ptr_->shift_list_[best_d_];
+  // the precursor mass of the proteoform with the variable PTMs of the
+  // C-terminal diagonal; the backtracked headers take their C-terminal
+  // shifts from it before their ranges are refined
+  double refine_prec_mass = diagonal_util::refineVarPtmPrecursorAndHeaderShift(
+      sub_proteo_ptr, backtrack_diag_header_ptrs_,
+      mng_ptr_->shift_list_[best_d_]);
 
   SpParaPtr sp_para_ptr = prsm_para_ptr->getSpParaPtr();
   ExtendMsPtrVec refine_ms_ptr_vec = extend_ms_factory::geneMsThreePtrVec(

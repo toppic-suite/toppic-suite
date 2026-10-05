@@ -29,6 +29,18 @@ double refinePrecursorAndHeaderShift(const ProteoformPtr& proteo_ptr,
                                      DiagHeaderPtrVec& header_ptrs, double ppo,
                                      double min_mass,
                                      double refine_prec_step_width);
+
+// The precursor refinement of the variable PTM search. Once the alignment
+// has chosen the variable PTMs, the proteoform mass is exact: the refined
+// precursor mass is the proteoform mass plus ptm_mass, the mass of the
+// variable PTMs of the C-terminal diagonal, not a median of fragment errors
+// as in refinePrecursorAndHeaderShift. The headers' C-terminal shifts, which
+// VarPtmSlowMatch computed from the observed precursor mass, are taken from
+// the refined one, so that the C-terminal ions of refineVarPtmHeadersBgnEnd
+// carry no precursor error. Returns the refined precursor mass.
+double refineVarPtmPrecursorAndHeaderShift(const ProteoformPtr& proteo_ptr,
+                                           const DiagHeaderPtrVec& header_ptrs,
+                                           double ptm_mass);
 // for ps align
 DiagHeaderPtrVec refineHeadersBgnEnd(const ProteoformPtr& proteo_ptr,
                                      const ExtendMsPtrVec& ms_three_ptr_vec,
