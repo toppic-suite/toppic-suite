@@ -1116,6 +1116,52 @@ not a variable PTM. Facts to keep straight:
   random sequences (`n_term_shift_`); the candidate counts already have
   the forms (`CountTestNum`). TDGF (toppic `--topmg`) handles the forms as
   for toppic's own PrSMs.
+- **Truncation N-terminal modifications** (proteoform N-terminal variable
+  PTMs, Position `N-term` of the PTM file; toppic's since experiment 100,
+  "Truncation N-terminal modifications" below). The graph has no edge for
+  them: `GraphAlign::getConsistentPairs` also matches each distance of the
+  spectrum's zero vertex (the N-terminus) with proteoform distances m
+  shorter (m: each N-term mass, `GraphAlignMng::n_term_int_masses_`, filled
+  by `GraphAlignProcessor::process`) from the vertices where the mod is
+  allowed (`GraphAlign::n_term_starts_`: protein residue 3 or later, an
+  amino acid of the line), one variable PTM layer more; the spectrum's
+  distance cover marks those distances (`SpecGraph::compDistCover`).
+  `chooseNTermForm` reads the mod back from the variable shift that begins
+  at the first residue of a proteoform starting at residue 3 or later (the
+  same rule as the protein forms) and sets it with
+  `Proteoform::setTruncNTermModPtr`. Variable shifts are named only with the
+  side-chain PTMs (`readModTxt` list 2), in the post-processing and in the
+  MCMC's combinations (an N-term line used to name side-chain shifts, and
+  one name on an N-term and a side-chain line made `readPtmTxt` throw); the
+  MCMC candidate number of a PrSM with the mod sums over the N-term masses;
+  `toppic --topmg topmg-only` sets `nTermVarPtmTypeNum` (the TopMG stage's
+  and the cluster correction's generating function multiply by T_N + 1).
+  **Ties go to the path without the mod**, so that a protein N-terminal
+  form wins a tie against it: `GraphAlign` keeps a flag per DP entry
+  (`trunc_paths_`; a mod's consistent pair stores its cell c as -1 - c),
+  and wherever two paths score the same (the best predecessor, a variable
+  against an unexpected-shift path, the best shift node, the end cell, and
+  equal matched fragment numbers over the PTM numbers in `geneResult`) the
+  one without the mod is kept. Without N-term lines nothing changes.
+  Results (toppic_test experiment 116, report 0116; 480_F3_02, topmg
+  `-f C57 -d -t FDR -T FDR`, oxidation M, phospho STY, `Acetyl,*,N-term`):
+  topmg reports 12 and 16 truncation N-terminal acetylations at 1% FDR,
+  8 and 9 of toppic's 11 (DDX17 from residue 25, JUPI2 44, CLCB 69, TRIR
+  28), `--topmg topmg-only` 39 with 9 of them (main: none); PrSMs 1,973
+  and 2,022 against 2,005 (MCMC noise), no time cost. The modification
+  competes with the protein forms: the alignment keeps the path with the
+  most matched fragments whatever its PTM number, so an acetylated
+  truncation plus PTMs can displace a protein form (24 PrSMs of the
+  ported TopMG start elsewhere than toppic's, 11 where toppic has NME or
+  NME_ACETYLATION). With the tie rule (fcba5f51) topmg reports 14 (9 of
+  toppic's) and `--topmg topmg-only` 26 (the same 9): where toppic has a
+  protein form 6 instead of 11, the other unconfirmed ones 11 instead of
+  19 (H2B2E, H2B2F, CLCB now toppic's forms with its E-values). The 6 left
+  are not ties: the truncation matches at least as many fragments as the
+  best path main finds, or (YBOX3, one spectrum) has the higher DP score in
+  the protein form's layer, so the form is dropped before its fragments
+  are counted; giving the mod's paths their own DP layers would let both
+  reach the fragment count.
 - **Results** (toppic_test experiment 115, report 0115; 480_F3_02, topmg
   `-f C57 -d -t FDR -T FDR`, oxidation M, acetyl K, phospho STY): on the
   spectra topmg and toppic both identify with the same protein and toppic

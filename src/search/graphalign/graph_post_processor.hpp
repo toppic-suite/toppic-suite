@@ -20,6 +20,7 @@
 #include <unordered_map>
 #include <vector>
 
+#include "common/base/mod.hpp"
 #include "common/base/prot_mod.hpp"
 #include "search/graphalign/graph_align_mng.hpp"
 #include "seq/mass_shift.hpp"
@@ -39,6 +40,10 @@ struct GraphNTermForm {
   bool takes_first_shift = false;
   double remain_mass = 0;
   bool drop_first_shift = false;
+  // a truncation N-terminal modification (a proteoform N-terminal PTM of
+  // the file, Position N-term) of a NONE proteoform starting at protein
+  // residue 3 or later; nullptr when none
+  ModPtr trunc_n_term_mod_ptr = nullptr;
 };
 
 class GraphPostProcessor {
@@ -64,6 +69,10 @@ class GraphPostProcessor {
   std::string output_ext_;
 
   std::unordered_map<int, PtmPtrVec> mass_ptm_map_;
+
+  // the proteoform N-terminal PTMs of the file (Position N-term), one per
+  // amino acid as mod_util::readModTxt lists them
+  ModPtrVec n_term_mod_ptrs_;
 
   // the PTM combination of mass_ptm_map_ nearest to an integer mass, among
   // those of at most max_ptm_num PTMs; returns the integer mass error (-1

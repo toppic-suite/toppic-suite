@@ -64,6 +64,11 @@ class DprProcessor {
 
   std::vector<std::vector<double> > ptm_mass_vec2d_;
 
+  // the masses of the proteoform N-terminal PTMs (Position N-term), each
+  // once: the candidate number of a PrSM with a truncation N-terminal
+  // modification sums over them
+  std::vector<double> n_term_mass_vec_;
+
   std::map<PtmPtr, std::vector<ResiduePtr> > ptm_residue_map_;
 
   std::map<int, std::vector<std::string> > mass_table_;

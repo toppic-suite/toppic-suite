@@ -21,10 +21,10 @@
 #include <vector>
 
 #include "common/base/mod_base.hpp"
+#include "common/base/mod_util.hpp"
 #include "common/base/prot_mod_base.hpp"
 #include "common/base/prot_mod_util.hpp"
 #include "common/base/ptm_base.hpp"
-#include "common/base/ptm_util.hpp"
 #include "common/util/file_util.hpp"
 #include "common/util/logger.hpp"
 #include "ms/factory/extend_ms_factory.hpp"
@@ -61,9 +61,20 @@ std::vector<double> mass_split(double mass,
 void GraphPostProcessor::geneMassPtmMap() {
   std::string var_mod_file_name = mng_ptr_->var_mod_file_name_;
 
-  // the variable PTMs of the file only: the acetylation of a protein
-  // N-terminal form is the form's (chooseNTermForm), not a variable PTM
-  std::vector<PtmPtr> ptm_vec = toppic::ptm_util::readPtmTxt(var_mod_file_name);
+  // The side-chain variable PTMs of the file (Position any) are the names of
+  // the variable shifts. The acetylation of a protein N-terminal form and a
+  // proteoform N-terminal PTM (Position N-term) are not (chooseNTermForm):
+  // an N-term line used to name side-chain shifts too, and with the same
+  // name as a side-chain line made the file unreadable here.
+  ModPtrVec2D mod_ptr_vec2d = mod_util::readModTxt(var_mod_file_name);
+  std::vector<PtmPtr> ptm_vec;
+  for (size_t i = 0; i < mod_ptr_vec2d[2].size(); i++) {
+    PtmPtr ptm_ptr = mod_ptr_vec2d[2][i]->getModResiduePtr()->getPtmPtr();
+    if (std::find(ptm_vec.begin(), ptm_vec.end(), ptm_ptr) == ptm_vec.end()) {
+      ptm_vec.push_back(ptm_ptr);
+    }
+  }
+  n_term_mod_ptrs_ = mod_ptr_vec2d[3];
 
   std::sort(ptm_vec.begin(), ptm_vec.end(),
             [](const PtmPtr& a, const PtmPtr& b) {
@@ -275,7 +286,10 @@ MassShiftPtr moveShift(const MassShiftPtr& shift_ptr, int offset) {
 // (the shift less the acetyl) or NME_ACETYLATION (the acetyl in place of the
 // M: the shift less the acetyl plus the M; the proteoform starts at residue
 // 1). Start 1: NME when allowed, else NONE (a truncation), or
-// NME_ACETYLATION (the shift less the acetyl). Later starts: NONE.
+// NME_ACETYLATION (the shift less the acetyl). Later starts: NONE, with or
+// without a truncation N-terminal modification of the file's proteoform
+// N-terminal PTMs (the shift less its mass), whose consistent pairs the
+// graph alignment starts with (GraphAlign::getConsistentPairs).
 //
 // The shift named as it is (the nearest PTM combination, as choosePtmCombs
 // names it while the proteoform keeps --var-ptm) is the form without an
@@ -293,16 +307,37 @@ GraphNTermForm GraphPostProcessor::chooseNTermForm(
   GraphNTermForm plain;
   plain.prot_mod_ptr = ProtModBase::getProtModPtr_NONE();
   int start = form_ptr->getStartPos();
-  if (start > 1) {
-    return plain;
+  std::vector<GraphNTermForm> mod_forms;
+  if (start >= 2) {
+    // A truncated proteoform: its truncation N-terminal modifications (the
+    // proteoform N-terminal PTMs of the file whose amino acid is its first
+    // residue's), as Proteoform::setTruncNTermModPtr allows them.
+    if (first_shift_ptr != nullptr && form_ptr->getResSeqPtr()->getLen() > 0) {
+      AminoAcidPtr acid_ptr =
+          form_ptr->getResSeqPtr()->getResiduePtr(0)->getAminoAcidPtr();
+      for (size_t i = 0; i < n_term_mod_ptrs_.size(); i++) {
+        const ModPtr& mod_ptr = n_term_mod_ptrs_[i];
+        if (mod_ptr->getOriResiduePtr()->getAminoAcidPtr() != acid_ptr) {
+          continue;
+        }
+        GraphNTermForm form;
+        form.prot_mod_ptr = plain.prot_mod_ptr;
+        form.trunc_n_term_mod_ptr = mod_ptr;
+        form.takes_first_shift = true;
+        form.remain_mass = first_shift_ptr->getMassShift() - mod_ptr->getShift();
+        mod_forms.push_back(form);
+      }
+    }
   }
   PrsmParaPtr prsm_para_ptr = mng_ptr_->prsm_para_ptr_;
-  ProteoformPtr db_form_ptr = proteoform_factory::geneDbProteoformPtr(
-      form_ptr->getFastaSeqPtr(), prsm_para_ptr->getFixModPtrVec());
-  const ResiduePtrVec& residues = db_form_ptr->getResSeqPtr()->getResidues();
-
-  std::vector<GraphNTermForm> acetyl_forms;
-  ProtModPtrVec prot_mod_ptrs = prsm_para_ptr->getProtModPtrVec();
+  ProtModPtrVec prot_mod_ptrs;
+  ResiduePtrVec residues;
+  if (start <= 1) {
+    prot_mod_ptrs = prsm_para_ptr->getProtModPtrVec();
+    ProteoformPtr db_form_ptr = proteoform_factory::geneDbProteoformPtr(
+        form_ptr->getFastaSeqPtr(), prsm_para_ptr->getFixModPtrVec());
+    residues = db_form_ptr->getResSeqPtr()->getResidues();
+  }
   for (size_t i = 0; i < prot_mod_ptrs.size(); i++) {
     const ProtModPtr& mod_ptr = prot_mod_ptrs[i];
     if (!prot_mod_util::allowMod(mod_ptr, residues)) {
@@ -333,9 +368,9 @@ GraphNTermForm GraphPostProcessor::chooseNTermForm(
     } else {
       continue;
     }
-    acetyl_forms.push_back(form);
+    mod_forms.push_back(form);
   }
-  if (acetyl_forms.empty()) {
+  if (mod_forms.empty()) {
     return plain;
   }
 
@@ -351,8 +386,8 @@ GraphNTermForm GraphPostProcessor::chooseNTermForm(
   GraphNTermForm best = plain;
   int best_ptm_num = static_cast<int>(ptm_vec.size());
   double best_err = plain_err;
-  for (size_t i = 0; i < acetyl_forms.size(); i++) {
-    GraphNTermForm form = acetyl_forms[i];
+  for (size_t i = 0; i < mod_forms.size(); i++) {
+    GraphNTermForm form = mod_forms[i];
     double err;
     int ptm_num = 0;
     if (std::abs(form.remain_mass) <= max_err + eps) {
@@ -580,6 +615,13 @@ void GraphPostProcessor::process() {
               form_ptr->getFastaSeqPtr(), prot_mod,
               form_ptr->getStartPos() + offset, form_ptr->getEndPos(),
               res_seq_ptr, fix_shift_vec);
+          // a truncation N-terminal modification: the residue sequence's
+          // N-terminal modification, as toppic's variable PTM search sets it
+          if (n_form.trunc_n_term_mod_ptr != nullptr &&
+              !new_form->setTruncNTermModPtr(n_form.trunc_n_term_mod_ptr)) {
+            LOG_WARN("The truncation N-terminal modification of a proteoform "
+                     "of " << new_form->getSeqName() << " cannot be added!");
+          }
 
           // new_form->setVariablePtmNum(prsm_ptr->getProteoformPtr()->getVariablePtmNum());
 

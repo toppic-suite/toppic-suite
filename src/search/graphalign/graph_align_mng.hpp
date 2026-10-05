@@ -19,7 +19,9 @@
 #include <cmath>
 #include <set>
 #include <string>
+#include <vector>
 
+#include "common/base/amino_acid.hpp"
 #include "para/prsm_para.hpp"
 
 namespace toppic {
@@ -107,6 +109,14 @@ class GraphAlignMng {
   std::string input_file_ext_;
 
   std::string output_file_ext_;
+
+  // The proteoform N-terminal variable PTMs (Position N-term of the PTM
+  // file; truncation N-terminal modifications), grouped by mass: the integer
+  // mass of each (convert_ratio_) and the amino acids it may modify.
+  // GraphAlignProcessor::process fills them from var_mod_file_name_.
+  std::vector<int> n_term_int_masses_;
+
+  std::vector<std::vector<AminoAcidPtr>> n_term_acid_ptrs_;
 };
 
 using GraphAlignMngPtr = std::shared_ptr<GraphAlignMng>;

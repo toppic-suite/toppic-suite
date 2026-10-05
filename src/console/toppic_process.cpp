@@ -667,6 +667,12 @@ std::string TopPIC_topmg_identify(
       TdgfMngPtr tdgf_mng_ptr = std::make_shared<TdgfMng>(
           prsm_para_ptr, shift_num, max_shift_mass, var_ptm_type_num,
           thread_num, "toppic_topmg_graph_post", "toppic_topmg_evalue");
+      // the truncation N-terminal modifications' own type number, as
+      // toppic's own stages count it
+      tdgf_mng_ptr->n_term_var_ptm_type_num_ =
+          arguments["nTermVarPtmTypeNum"] == ""
+              ? 0
+              : std::stoi(arguments["nTermVarPtmTypeNum"]);
       EValueProcessorPtr processor =
           std::make_shared<EValueProcessor>(tdgf_mng_ptr);
       processor->init();
@@ -1263,13 +1269,29 @@ int TopPICProgress(std::map<std::string, std::string>& arguments) {
     // the candidate number of a PrSM for each variable PTM. TopPIC_identify
     // counts it in its variable-PTM stage, from the same file.
     int var_ptm_type_num = 0;
+    // and the number of proteoform N-terminal PTM masses (Position N-term),
+    // by which it multiplies the candidate number of a PrSM with a
+    // truncation N-terminal modification (VarPtmFilterMng::getNTermShiftNum)
+    int n_term_var_ptm_type_num = 0;
     if (std::stoi(arguments["variablePtmNum"]) >= 1 &&
         arguments["variablePtmFileName"] != "") {
       var_ptm_type_num = static_cast<int>(
           mod_util::readModTxtToShiftList(arguments["variablePtmFileName"])
               .size());
+      ModPtrVec n_term_mod_ptrs =
+          mod_util::readNTermModTxt(arguments["variablePtmFileName"]);
+      std::vector<double> n_term_shifts;
+      for (size_t i = 0; i < n_term_mod_ptrs.size(); i++) {
+        double shift = n_term_mod_ptrs[i]->getShift();
+        if (std::find(n_term_shifts.begin(), n_term_shifts.end(), shift) ==
+            n_term_shifts.end()) {
+          n_term_shifts.push_back(shift);
+        }
+      }
+      n_term_var_ptm_type_num = static_cast<int>(n_term_shifts.size());
     }
     arguments["varPtmTypeNum"] = std::to_string(var_ptm_type_num);
+    arguments["nTermVarPtmTypeNum"] = std::to_string(n_term_var_ptm_type_num);
     raw_prsm_ext = TopPIC_topmg_identify(arguments, "");
   } else {
     raw_prsm_ext = TopPIC_identify(arguments);

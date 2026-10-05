@@ -42,7 +42,11 @@ class SpecGraph {
   // Marks the distances d that are within tole of a distance of the graph
   // of at least min_dist: the only distances of a proteoform graph that an
   // alignment with this graph can pair (GraphAlign::getConsistentPairs).
-  void compDistCover(int min_dist, int tole);
+  // A proteoform N-terminal PTM of integer mass m also pairs the distances
+  // of the zero vertex (the N-terminus) with proteoform distances m shorter,
+  // which are marked too.
+  void compDistCover(int min_dist, int tole,
+                     const std::vector<int>& n_term_masses = {});
 
   const std::vector<char>& getDistCover() { return dist_cover_; }
 
