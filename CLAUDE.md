@@ -1056,6 +1056,26 @@ not a variable PTM. Facts to keep straight:
   random sequences (`n_term_shift_`); the candidate counts already have
   the forms (`CountTestNum`). TDGF (toppic `--topmg`) handles the forms as
   for toppic's own PrSMs.
+- **Truncation N-terminal modifications** (proteoform N-terminal variable
+  PTMs, Position `N-term` of the PTM file; toppic's since experiment 100,
+  "Truncation N-terminal modifications" below). The graph has no edge for
+  them: `GraphAlign::getConsistentPairs` also matches each distance of the
+  spectrum's zero vertex (the N-terminus) with proteoform distances m
+  shorter (m: each N-term mass, `GraphAlignMng::n_term_int_masses_`, filled
+  by `GraphAlignProcessor::process`) from the vertices where the mod is
+  allowed (`GraphAlign::n_term_starts_`: protein residue 3 or later, an
+  amino acid of the line), one variable PTM layer more; the spectrum's
+  distance cover marks those distances (`SpecGraph::compDistCover`).
+  `chooseNTermForm` reads the mod back from the variable shift that begins
+  at the first residue of a proteoform starting at residue 3 or later (the
+  same rule as the protein forms) and sets it with
+  `Proteoform::setTruncNTermModPtr`. Variable shifts are named only with the
+  side-chain PTMs (`readModTxt` list 2), in the post-processing and in the
+  MCMC's combinations (an N-term line used to name side-chain shifts, and
+  one name on an N-term and a side-chain line made `readPtmTxt` throw); the
+  MCMC candidate number of a PrSM with the mod sums over the N-term masses;
+  `toppic --topmg topmg-only` sets `nTermVarPtmTypeNum` (the TopMG stage's
+  and the cluster correction's generating function multiply by T_N + 1).
 - **Results** (toppic_test experiment 115, report 0115; 480_F3_02, topmg
   `-f C57 -d -t FDR -T FDR`, oxidation M, acetyl K, phospho STY): on the
   spectra topmg and toppic both identify with the same protein and toppic

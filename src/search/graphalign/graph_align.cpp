@@ -88,6 +88,26 @@ GraphAlign::GraphAlign(const GraphAlignMngPtr& mng_ptr,
   spec_ver_num_ = num_vertices(*sg_.get());
   shift_layer_num_ = mng_ptr_->n_unknown_shift_ + 1;
   mod_layer_num_ = mng_ptr_->max_known_mods_ + 1;
+
+  // As toppic's Proteoform::setTruncNTermModPtr allows a truncation
+  // N-terminal modification: on a proteoform starting at protein residue 3
+  // or later (0-based 2; the first two are the protein N-terminal forms')
+  // whose first amino acid is one the modification allows.
+  ProteoformPtr db_form_ptr = proteo_graph_ptr_->getProteoformPtr();
+  int seq_start = db_form_ptr->getStartPos();
+  ResSeqPtr res_seq_ptr = db_form_ptr->getResSeqPtr();
+  n_term_starts_.assign(mng_ptr_->n_term_int_masses_.size(),
+                        std::vector<char>(proteo_ver_num_, 0));
+  for (size_t t = 0; t < n_term_starts_.size(); t++) {
+    const std::vector<AminoAcidPtr>& acid_ptrs = mng_ptr_->n_term_acid_ptrs_[t];
+    for (int i = std::max(0, 2 - seq_start); i < res_seq_ptr->getLen(); i++) {
+      AminoAcidPtr acid_ptr = res_seq_ptr->getResiduePtr(i)->getAminoAcidPtr();
+      if (std::find(acid_ptrs.begin(), acid_ptrs.end(), acid_ptr) !=
+          acid_ptrs.end()) {
+        n_term_starts_[t][i] = 1;
+      }
+    }
+  }
   LOG_DEBUG("Graph constructor end");
 }
 
@@ -149,6 +169,45 @@ void GraphAlign::getConsistentPairs() {
               } else {
                 cons_prev_cells_[cursors[key]++] = static_cast<int>(
                     getCellIdx(pg_pair.first, sp_pair.first));
+              }
+            }
+          }
+        }
+      }
+    }
+    // Proteoform N-terminal variable PTMs: a distance of the spectrum's zero
+    // vertex (the N-terminus) also matches a proteoform distance m shorter
+    // from a vertex where the modification of mass m is allowed. The
+    // alignment then starts at that vertex with the modification, which
+    // takes one variable PTM layer more, as the protein N-terminal forms'
+    // edges do; GraphPostProcessor reads it back from the variable shift
+    // that begins at the first residue.
+    for (size_t t = 0; t < n_term_starts_.size(); t++) {
+      int n_term_mass = mng_ptr_->n_term_int_masses_[t];
+      const std::vector<char>& starts = n_term_starts_[t];
+      for (size_t m = 0; m + 1 < prot_lists.size(); m++) {
+        const DistList& prot_list = prot_lists[m];
+        if (prot_list.size() == 0) continue;
+        for (int sp = 1; sp < spec_ver_num_; sp++) {
+          int dist = spec_graph_ptr_->getPeakDist(0, sp) - n_term_mass;
+          if (dist < min_dist) continue;
+          size_t t_idx = std::lower_bound(prot_list.dists_.begin(),
+                                          prot_list.dists_.end(), dist - tole) -
+                         prot_list.dists_.begin();
+          for (; t_idx < prot_list.size() &&
+                 prot_list.dists_[t_idx] <= dist + tole;
+               t_idx++) {
+            for (int k = prot_list.begins_[t_idx];
+                 k < prot_list.begins_[t_idx + 1]; k++) {
+              const std::pair<int, int>& pg_pair = prot_list.pairs_[k];
+              if (!starts[pg_pair.first]) continue;
+              size_t key =
+                  getCellIdx(pg_pair.second, sp) * mod_layer_num_ + m + 1;
+              if (pass == 0) {
+                cursors[key + 1]++;
+              } else {
+                cons_prev_cells_[cursors[key]++] =
+                    static_cast<int>(getCellIdx(pg_pair.first, 0));
               }
             }
           }

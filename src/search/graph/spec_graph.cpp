@@ -67,7 +67,8 @@ void SpecGraph::compSpecDistances(double convert_ratio) {
   addToDistList(entries, dist_list_);
 }
 
-void SpecGraph::compDistCover(int min_dist, int tole) {
+void SpecGraph::compDistCover(int min_dist, int tole,
+                              const std::vector<int>& n_term_masses) {
   dist_cover_.clear();
   if (dist_list_.size() == 0) {
     return;
@@ -78,6 +79,17 @@ void SpecGraph::compDistCover(int min_dist, int tole) {
     if (d < min_dist) continue;
     int bgn = std::max(0, d - tole);
     std::fill(dist_cover_.begin() + bgn, dist_cover_.begin() + d + tole + 1, 1);
+  }
+  for (size_t t = 0; t < n_term_masses.size(); t++) {
+    for (int j = 1; j < node_num_; j++) {
+      int d = getPeakDist(0, j) - n_term_masses[t];
+      if (d < min_dist) continue;
+      int bgn = std::max(0, d - tole);
+      int end = std::min(static_cast<int>(dist_cover_.size()), d + tole + 1);
+      if (bgn < end) {
+        std::fill(dist_cover_.begin() + bgn, dist_cover_.begin() + end, 1);
+      }
+    }
   }
 }
 

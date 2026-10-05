@@ -61,6 +61,11 @@ class GraphAlign {
   // indexes of the spectrum graph's distance list, in increasing order
   std::vector<int> spec_dist_idxes_;
 
+  // for each proteoform N-terminal PTM mass of the manager, the proteoform
+  // vertices an alignment may start at with it: a truncated start (protein
+  // residue 3 or later) on an amino acid the modification allows
+  std::vector<std::vector<char>> n_term_starts_;
+
   // The DP table: a cell per pair of a proteoform graph vertex i and a
   // spectrum graph vertex j, cell index i * spec_ver_num_ + j, and in each
   // cell a layer per unexpected shift number s and variable modification

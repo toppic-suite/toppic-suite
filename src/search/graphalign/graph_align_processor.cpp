@@ -17,6 +17,7 @@
 
 #include <algorithm>
 #include <chrono>
+#include <cmath>
 #include <fstream>
 #include <iostream>
 #include <set>
@@ -117,6 +118,25 @@ void GraphAlignProcessor::process() {
   LOG_DEBUG("start reading " << var_mod_file_name);
   ModPtrVec var_mod_ptr_vec = mod_util::readModTxt(var_mod_file_name)[2];
   LOG_DEBUG("end reading " << var_mod_file_name);
+  // the proteoform N-terminal variable PTMs, grouped by mass as toppic's
+  // variable PTM filter groups them (VarPtmFilterMng)
+  mng_ptr_->n_term_int_masses_.clear();
+  mng_ptr_->n_term_acid_ptrs_.clear();
+  ModPtrVec n_term_mod_ptrs = mod_util::readNTermModTxt(var_mod_file_name);
+  std::vector<double> n_term_shifts;
+  for (size_t i = 0; i < n_term_mod_ptrs.size(); i++) {
+    double shift = n_term_mod_ptrs[i]->getShift();
+    size_t pos = std::find(n_term_shifts.begin(), n_term_shifts.end(), shift) -
+                 n_term_shifts.begin();
+    if (pos == n_term_shifts.size()) {
+      n_term_shifts.push_back(shift);
+      mng_ptr_->n_term_int_masses_.push_back(
+          static_cast<int>(std::lround(shift * mng_ptr_->convert_ratio_)));
+      mng_ptr_->n_term_acid_ptrs_.push_back(std::vector<AminoAcidPtr>());
+    }
+    mng_ptr_->n_term_acid_ptrs_[pos].push_back(
+        n_term_mod_ptrs[i]->getOriResiduePtr()->getAminoAcidPtr());
+  }
 
   int spectrum_num =
       msalign_util::getSpNum(prsm_para_ptr->getSpectrumFileName());
@@ -261,7 +281,7 @@ void GraphAlignProcessor::process() {
           for (size_t k = 0; k < spec_ptr_vec->size(); k++) {
             (*spec_ptr_vec)[k]->compDistCover(
                 mng_ptr_->getIntMinConsistentDist(),
-                mng_ptr_->getIntTolerance());
+                mng_ptr_->getIntTolerance(), mng_ptr_->n_term_int_masses_);
           }
           for (size_t c = next_cand; c < end_cand; c++) {
             // a short queue, so that only a few spectra are held
