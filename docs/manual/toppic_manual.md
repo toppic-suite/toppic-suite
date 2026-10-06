@@ -229,7 +229,7 @@ Cutoffs and output:
 | `-t`, `--spectrum-cutoff-type <EVALUE\|FDR>`, `-v`, `--spectrum-cutoff-value <number>` | EVALUE, 0.01 | Cutoff for PrSMs. |
 | `-T`, `--proteoform-cutoff-type <EVALUE\|FDR>`, `-V`, `--proteoform-cutoff-value <number>` | EVALUE, 0.01 | Cutoff for proteoforms. |
 | `-y`, `--protein-cutoff-type <EVALUE\|FDR>`, `-Y`, `--protein-cutoff-value <number>` | EVALUE, 0.01 | Cutoff for proteins; with `FDR` a protein is represented by its best proteoform. |
-| `-c`, `--combined-file-name <name>` | none | Combine several fractions: after the files are searched, their spectra and best PrSMs per spectrum are merged under `<name>_ms2`, and the clustering (by protein, precursor mass and sequence overlap), FDR computation, decoy removal, cutoffs and tables are repeated on the merged data. A relative `<name>` is placed in the directory of the first spectrum file and must differ from the input file names. See the note below. |
+| `-c`, `--combined-file-name <name>` | none | Combine several fractions: after the files are searched, their spectra and best PrSMs per spectrum are merged under `<name>_ms2`, and the clustering (by protein, precursor mass and sequence overlap), FDR computation, decoy removal, cutoffs and tables are repeated on the merged data; the files' results are then written with the proteoform ids of the combined results. A relative `<name>` is placed in the directory of the first spectrum file and must differ from the input file names. See the note below. |
 | `-u`, `--thread-number <int>` | 1 | Number of threads; must not exceed the number of hardware threads. Each protein filtering step may use fewer: it fits its thread number to the memory available when it starts (about 1.25 GiB per thread for zero-shift filtering, 1 GiB for variable-PTM and one-shift filtering, 0.5 GiB for multiple-shift filtering). The run starts with a warning listing the filtering steps that will use fewer threads and how many, and a step prints its number again if the memory available when it starts gives a different one. All other steps use the full number. |
 | `-k`, `--keep-temp-files` | off | Keep the intermediate files. |
 | `-K`, `--keep-decoy-ids` | off | Keep decoy identifications in the result tables. |
@@ -251,7 +251,15 @@ recount, post mass matching and PTM characterization of the fractions are
 kept. The combined results are always named `<name>_ms2_toppic_*`, the
 merged spectra `<name>_ms2.msalign` and the merged best PrSMs
 `<name>_ms2.toppic_record_prsm`. No SQLite database is written for the
-combined results.
+combined results. The fractions' own results (tables, XML files and SQLite
+databases) are written after the combined results, with the proteoform ids
+of the combined results: every PrSM of a fraction carries the
+`Proteoform ID` of its PrSM in the combined tables, so a proteoform has
+one id in the combined tables and in the tables of every fraction it is
+identified in, and the fractions' results can be compared by it. The
+fractions' FDRs and cutoffs are their own; a proteoform of the combined
+results may hold PrSMs that were two proteoforms in the fraction, or the
+other way round, and the fraction's proteoform table lists it accordingly.
 
 ## 5. Modification files
 
