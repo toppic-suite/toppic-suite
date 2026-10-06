@@ -12,7 +12,7 @@ supported.
 * CMake >= 3.16
 * Boost >= 1.74 (filesystem, iostreams, thread, chrono, serialization,
   program_options)
-* pugixml, SQLite3 and zlib development libraries
+* pugixml, SQLite3, zlib and zstd development libraries
 * ONNX Runtime from Homebrew (the vendored library under `ext/onnx/` is for
   Linux only)
 * Qt6 (Core, Gui, Widgets) for the GUI tools
@@ -43,7 +43,7 @@ source ~/.zshrc
 
 ```sh
 # build tools and libraries (Git LFS is needed for the model files under res/)
-brew install cmake git git-lfs boost pugixml sqlite zlib onnxruntime
+brew install cmake git git-lfs boost pugixml sqlite zlib zstd onnxruntime
 
 # Qt6 for the GUI tools
 brew install qt

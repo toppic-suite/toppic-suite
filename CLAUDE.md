@@ -207,13 +207,16 @@ path and linked into `toppic_common`:
   desktop executables (see the source-layout note). Only the GUI targets use it,
   via per-target `AUTOMOC`/`AUTOUIC`/`AUTORCC`; the `toppic_common` library has
   no Qt dependency.
-- **ProteoWizard (pwiz)** — a trimmed copy is vendored under `ext/pwiz` (only the
-  `utility/minimxml`, `utility/misc`, `data/common`, `data/msdata` source dirs
-  are compiled; the rest is headers), built as a static `pwiz` library against
-  Boost + zlib with `WITHOUT_MZ5` (so no HDF5). `ms/mzml/pw_ms_reader` uses it to
-  read mzML/mzMLb. pwiz uses its own `minimxml` parser, **not** Xerces. It needs
+- **ProteoWizard (pwiz)** — version 3.0.26278, vendored under `ext/pwiz` with
+  only the files `ms/mzml/pw_ms_reader` needs (the sources the linker takes and
+  the headers they reach; `ext/README.md` lists the rule, the local changes and
+  how to update). Every `.cpp` under `ext/pwiz` is compiled into a static
+  `pwiz` library against Boost, zlib and zstd (pwiz's binary data encoder
+  decodes zstd-compressed arrays) with `WITHOUT_MZ5` and `WITHOUT_MZMLB` (so no
+  HDF5; mz5 and mzMLb are not supported). `ms/mzml/pw_ms_reader` uses it to
+  read mzML/mzXML. pwiz uses its own `minimxml` parser, **not** Xerces. It needs
   a few Boost pieces the system package lacks (`boost/nowide`, the `boost::enums`
-  library, `foreach_field.hpp`); those are vendored under `ext/boost`, which
+  library, the singleton utility); those are vendored under `ext/boost`, which
   `ext/` (the include root) resolves ahead of the system Boost while everything
   else still comes from the system. The vendored nowide's `iostream.cpp` (the
   Windows UTF-8 console streams `boost::nowide::cerr` etc. that pwiz's

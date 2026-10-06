@@ -219,11 +219,13 @@ if(WIN32)
 endif()
 
 # A trimmed copy of ProteoWizard (pwiz) is vendored under ext/pwiz; ms/mzml's
-# pw_ms_reader uses it to read mzML/mzMLb files. Only the four source
-# directories below are compiled (the rest of the tree is headers). It is built
-# as a static library against Boost + zlib and linked into toppic_common. The
-# vendored sources include themselves as "pwiz/...", so ext/ is the include root.
-# WITHOUT_MZ5 drops the HDF5-backed mz5 format so no HDF5 dependency is needed.
+# pw_ms_reader uses it to read mzML and mzXML files. ext/pwiz holds only the
+# files TopPIC needs (ext/README.md): every .cpp in it is compiled. It is built
+# as a static library against Boost, zlib and zstd and linked into
+# toppic_common. The vendored sources include themselves as "pwiz/...", so ext/
+# is the include root. WITHOUT_MZ5 and WITHOUT_MZMLB drop the HDF5-backed mz5
+# and mzMLb formats, so no HDF5 dependency is needed (pwiz reports an mzMLb
+# file as not supported).
 #
 # Boost.System is deliberately not a component: it has been header-only since
 # Boost 1.69 (below our 1.74 minimum), and Boost >= 1.90 (Ubuntu 26.04) no
@@ -231,12 +233,16 @@ endif()
 # requesting it makes find_package fail there. Its symbols (error_code etc.,
 # used through Boost.Filesystem) come from the headers on every platform.
 find_package(Boost 1.74 REQUIRED COMPONENTS filesystem iostreams thread chrono serialization program_options)
-file(GLOB PWIZ_SRCS CONFIGURE_DEPENDS
-  ${CMAKE_CURRENT_SOURCE_DIR}/ext/pwiz/utility/minimxml/*.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/ext/pwiz/utility/misc/*.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/ext/pwiz/data/common/*.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/ext/pwiz/data/msdata/*.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/ext/pwiz/data/msdata/mzmlb/*.cpp)
+# pwiz's BinaryDataEncoder decodes zstd-compressed binary data arrays
+# (pwiz/utility/misc/mzd.hpp, since pwiz 3.0.26278), so pwiz links libzstd.
+find_path(ZSTD_INCLUDE_DIR zstd.h)
+find_library(ZSTD_LIBRARY NAMES zstd)
+if(NOT ZSTD_INCLUDE_DIR OR NOT ZSTD_LIBRARY)
+  message(FATAL_ERROR "zstd not found: install the zstd development package "
+    "(e.g. libzstd-dev, libzstd-devel, mingw-w64-ucrt-x86_64-zstd or brew zstd)")
+endif()
+file(GLOB_RECURSE PWIZ_SRCS CONFIGURE_DEPENDS
+  ${CMAKE_CURRENT_SOURCE_DIR}/ext/pwiz/*.cpp)
 # pwiz writes its diagnostics through boost::nowide::cerr/cout (utility/misc/
 # Stream.hpp). On Windows the vendored ext/boost/nowide headers declare those
 # as UTF-8 console streams defined in nowide's iostream.cpp, so that source is
@@ -246,10 +252,11 @@ file(GLOB PWIZ_SRCS CONFIGURE_DEPENDS
 list(APPEND PWIZ_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/ext/boost/nowide/iostream.cpp)
 add_library(pwiz STATIC ${PWIZ_SRCS})
 target_include_directories(pwiz SYSTEM PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/ext)
+target_include_directories(pwiz SYSTEM PRIVATE ${ZSTD_INCLUDE_DIR})
 target_link_libraries(pwiz PUBLIC
   Boost::filesystem Boost::iostreams Boost::thread Boost::chrono
-  ZLIB::ZLIB)
-target_compile_definitions(pwiz PUBLIC WITHOUT_MZ5)
+  ZLIB::ZLIB ${ZSTD_LIBRARY})
+target_compile_definitions(pwiz PUBLIC WITHOUT_MZ5 WITHOUT_MZMLB)
 # SpectrumList_mzML.cpp includes <boost/bind.hpp>, whose "#pragma message"
 # about the deprecated global _1/_2 placeholders is not a warning and so is
 # not silenced by -w below; this keeps the old behaviour and quiets it.

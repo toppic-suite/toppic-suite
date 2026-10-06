@@ -42,7 +42,7 @@ make -j$(nproc)          # macOS: make -j$(sysctl -n hw.ncpu)
   program_options. Not `system`: Boost.System is header-only since 1.69,
   and Boost >= 1.90 (Ubuntu 26.04) ships no `boost_system` library or CMake
   config, so listing it makes `find_package(Boost)` fail.
-- pugixml, SQLite3, zlib development packages.
+- pugixml, SQLite3, zlib, zstd development packages.
 - Qt6 (Core, Gui, Widgets) for the `*_gui` targets only.
 - Git LFS: the EnvCNN/ECScore model files and the isotope table under
   `res/` are LFS objects. Run `git lfs install` once per machine before
@@ -60,7 +60,7 @@ make -j$(nproc)          # macOS: make -j$(sysctl -n hw.ncpu)
 ```sh
 sudo apt-get update
 sudo apt-get install build-essential cmake clang git git-lfs \
-    zlib1g-dev libsqlite3-dev libpugixml-dev \
+    zlib1g-dev libzstd-dev libsqlite3-dev libpugixml-dev \
     libboost-filesystem-dev libboost-iostreams-dev libboost-thread-dev \
     libboost-chrono-dev libboost-serialization-dev \
     libboost-program-options-dev \
@@ -79,7 +79,7 @@ sudo subscription-manager repos --enable codeready-builder-for-rhel-10-$(arch)-r
 # Rocky/AlmaLinux instead: sudo dnf config-manager --set-enabled crb
 sudo dnf install https://dl.fedoraproject.org/pub/epel/epel-release-latest-10.noarch.rpm
 sudo dnf install cmake gcc-c++ make clang git git-lfs
-sudo dnf install zlib-ng-compat-devel sqlite-devel pugixml-devel boost-devel
+sudo dnf install zlib-ng-compat-devel libzstd-devel sqlite-devel pugixml-devel boost-devel
 sudo dnf install qt6-qtbase-devel
 ```
 
@@ -96,6 +96,7 @@ pacman -S git mingw-w64-ucrt-x86_64-git-lfs
 pacman -S mingw-w64-ucrt-x86_64-gcc mingw-w64-ucrt-x86_64-cmake mingw-w64-ucrt-x86_64-ninja
 pacman -S mingw-w64-ucrt-x86_64-boost mingw-w64-ucrt-x86_64-pugixml \
           mingw-w64-ucrt-x86_64-sqlite3 mingw-w64-ucrt-x86_64-zlib \
+          mingw-w64-ucrt-x86_64-zstd \
           mingw-w64-ucrt-x86_64-onnxruntime
 pacman -S mingw-w64-ucrt-x86_64-qt6-base
 mkdir -p build && cd build
@@ -127,7 +128,7 @@ ninja
 
 ```sh
 xcode-select --install
-brew install cmake git git-lfs boost pugixml sqlite zlib onnxruntime
+brew install cmake git git-lfs boost pugixml sqlite zlib zstd onnxruntime
 brew install qt            # Qt6
 mkdir -p build && cd build
 cmake ..

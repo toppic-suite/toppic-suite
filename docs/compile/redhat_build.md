@@ -12,7 +12,7 @@ instead of `subscription-manager` (see step 1).
 * CMake >= 3.16
 * Boost >= 1.74 (filesystem, iostreams, thread, chrono, serialization,
   program_options; Boost.System is header-only and not needed as a library)
-* pugixml, SQLite3 and zlib development libraries
+* pugixml, SQLite3, zlib and zstd development libraries
 * Qt6 (Core, Gui, Widgets) for the GUI tools
 * Git LFS, for the model files under `res/` and the vendored ONNX Runtime
   library under `ext/onnx/`; the vendored library is a Linux x86-64 binary,
@@ -45,7 +45,7 @@ sudo dnf install https://dl.fedoraproject.org/pub/epel/epel-release-latest-10.no
 sudo dnf install cmake gcc-c++ make clang git git-lfs
 
 # libraries (zlib-ng-compat-devel is RHEL 10's replacement for zlib-devel)
-sudo dnf install zlib-ng-compat-devel sqlite-devel pugixml-devel boost-devel
+sudo dnf install zlib-ng-compat-devel libzstd-devel sqlite-devel pugixml-devel boost-devel
 
 # Qt6 for the GUI tools
 sudo dnf install qt6-qtbase-devel
