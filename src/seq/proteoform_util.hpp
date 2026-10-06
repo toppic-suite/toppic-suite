@@ -76,7 +76,9 @@ std::vector<std::vector<double> > getNTermAcet2D(
 //   - A range that would overlap a range already written (ProForma does
 //     not allow it) is written as a set of positions instead, the first
 //     residue preferred: P[+12.3456#g1]E[#g1]P[#g1].
-//   - A modification without a residue (an empty range) is written as of
+//   - The residues of a modification are those of its alteration, or those
+//     of its mass shift when the alteration has none within them; a
+//     modification without a residue (an empty range) is written as of
 //     unknown position: [+12.3456]?SEQ.
 // Everything else is Level 1 ProForma.
 std::string getProFormaStr(const ProteoformPtr& form_ptr);

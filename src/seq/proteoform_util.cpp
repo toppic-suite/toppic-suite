@@ -310,8 +310,16 @@ std::string getProFormaStr(const ProteoformPtr& form_ptr) {
   std::stable_sort(shifts.begin(), shifts.end(), MassShift::cmpPosInc);
   for (const MassShiftPtr& shift_ptr : shifts) {
     for (const AlterPtr& alter_ptr : shift_ptr->getAlterPtrVec()) {
+      // the alteration's residues, or its mass shift's when the alteration
+      // has none within them (TopMG writes an unexpected shift on one
+      // residue with an empty alteration range)
       int left = alter_ptr->getLeftBpPos();
       int right = alter_ptr->getRightBpPos();
+      if (left >= right || left < shift_ptr->getLeftBpPos() ||
+          right > shift_ptr->getRightBpPos()) {
+        left = shift_ptr->getLeftBpPos();
+        right = shift_ptr->getRightBpPos();
+      }
       std::string tag = proFormaAlter(alter_ptr);
       // the protein N-terminal acetylations
       if (alter_ptr->getTypePtr() == AlterType::PROTEIN_VARIABLE &&
