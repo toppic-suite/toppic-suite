@@ -941,6 +941,11 @@ li.checked::marker { content: &quot;\2612&quot;; }
        </item>
        <item>
         <property name="text">
+         <string>ETHCD</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
          <string>HCD</string>
         </property>
        </item>
