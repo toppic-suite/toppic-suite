@@ -1607,7 +1607,10 @@ protein), `5` (unexpected shifts, several proteins). Facts to keep straight:
 - **What the rule leaves out.** Levels 2A-2C and 3 never occur. A variable
   PTM whose range spans several residues (an undecided site) is level 1; an
   unexpected shift is level 4 whatever its mass, also when it is a known PTM
-  on one residue (HMGN1 `(S)[+79.9669]`) or of isotope size. Several
+  on one residue (HMGN1 `(S)[+79.9669]`) or of isotope size. With `-B`, a
+  shift that the localization explains by a PTM becomes a `VARIABLE`
+  alteration (`stat/local/local_proteoform`), so its proteoform is level 1
+  or 2D (not run). Several
   proteins can be one gene (LAP2A / LAP2B, both TMPO), and that is still
   2D. The level is that of the PrSM's proteoform, so the PrSMs of one
   proteoform id can differ (one with an unexpected shift, one without), and
