@@ -90,12 +90,12 @@ void EValueProcessor::init() {
 }
 
 std::function<void()> geneTask(const SpectrumSetPtr& spec_set_ptr,
-                               const PrsmPtrVec& sele_prsm_ptrs, double ppo,
+                               const PrsmPtrVec& sele_prsm_ptrs,
                                bool is_separate, const TdgfMngPtr& mng_ptr,
                                const CountTestNumPtr& test_num_ptr,
                                const SimpleThreadPoolPtr& pool_ptr,
                                const PrsmXmlWriterPtrVec& writer_ptr_vec) {
-  return [spec_set_ptr, sele_prsm_ptrs, ppo, is_separate, mng_ptr, test_num_ptr,
+  return [spec_set_ptr, sele_prsm_ptrs, is_separate, mng_ptr, test_num_ptr,
           pool_ptr, writer_ptr_vec]() {
     PrsmPtrVec prsm_vec;  // copy sele_prsm_ptrs
     for (size_t i = 0; i < sele_prsm_ptrs.size(); i++) {
@@ -109,7 +109,7 @@ std::function<void()> geneTask(const SpectrumSetPtr& spec_set_ptr,
       comp_pvalue_ptr = std::make_shared<CompPValueArray>(test_num_ptr,
                                                           mng_ptr);
     }
-    comp_pvalue_ptr->process(spec_set_ptr, prsm_vec, ppo, is_separate);
+    comp_pvalue_ptr->process(spec_set_ptr, prsm_vec, is_separate);
 
     for (unsigned i = 0; i < prsm_vec.size(); i++) {
       if (std::round(prsm_vec[i]->getMatchTheoFragNum()) <=
@@ -151,7 +151,6 @@ void EValueProcessor::process(bool is_separate) {
   // init variables
   int spectrum_num = msalign_util::getSpNum(sp_file_name);
   SpParaPtr sp_para_ptr = prsm_para_ptr->getSpParaPtr();
-  double ppo = sp_para_ptr->getPrecTolerancePtr()->getPpo();
   int group_spec_num = prsm_para_ptr->getGroupSpecNum();
   MsAlignReaderPtr reader_ptr = std::make_shared<MsAlignReader>(
       sp_file_name, group_spec_num, sp_para_ptr->getActivationPtr(),
@@ -187,7 +186,7 @@ void EValueProcessor::process(bool is_separate) {
                  static_cast<std::size_t>(mng_ptr_->thread_num_) + 2) {
             std::this_thread::sleep_for(std::chrono::milliseconds(100));
           }
-          pool_ptr->enqueue(geneTask(spec_set_ptr, selected_prsm_ptrs, ppo,
+          pool_ptr->enqueue(geneTask(spec_set_ptr, selected_prsm_ptrs,
                                      is_separate, mng_ptr_, test_num_ptr_,
                                      pool_ptr, writer_ptr_vec));
         }
@@ -264,15 +263,15 @@ void EValueProcessor::fixupEvalues(PrsmPtrVec& sele_prsm_ptrs) {
 }
 
 void EValueProcessor::compEvalues(const SpectrumSetPtr& spec_set_ptr,
-                                  PrsmPtrVec& sele_prsm_ptrs, double ppo,
+                                  PrsmPtrVec& sele_prsm_ptrs,
                                   bool is_separate) {
-  comp_pvalue_ptr_->process(spec_set_ptr, sele_prsm_ptrs, ppo, is_separate);
+  comp_pvalue_ptr_->process(spec_set_ptr, sele_prsm_ptrs, is_separate);
   fixupEvalues(sele_prsm_ptrs);
 }
 
 void EValueProcessor::compEvaluesThreadLocal(const SpectrumSetPtr& spec_set_ptr,
                                              PrsmPtrVec& sele_prsm_ptrs,
-                                             double ppo, bool is_separate) {
+                                             bool is_separate) {
   // one CompPValueArray per worker thread, exactly as geneTask above: its
   // CompProbValue tables are large and not shareable between threads
   static thread_local CompPValueArrayPtr comp_pvalue_ptr;
@@ -283,7 +282,7 @@ void EValueProcessor::compEvaluesThreadLocal(const SpectrumSetPtr& spec_set_ptr,
                                                         mng_ptr_);
     comp_pvalue_built_for = test_num_ptr_.get();
   }
-  comp_pvalue_ptr->process(spec_set_ptr, sele_prsm_ptrs, ppo, is_separate);
+  comp_pvalue_ptr->process(spec_set_ptr, sele_prsm_ptrs, is_separate);
   fixupEvalues(sele_prsm_ptrs);
 }
 

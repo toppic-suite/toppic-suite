@@ -175,13 +175,9 @@ double MsHeader::getFirstPrecMonoMassMinusWater() const {
   return getFirstPrecPtr()->getMonoMassMinusWater();
 }
 
-double MsHeader::getFirstPrecErrorTolerance(double ppo) const {
-  return getFirstPrecPtr()->getErrorTolerance(ppo);
-}
-
 std::pair<int, int> MsHeader::getFirstPrecMonoMassMinusWaterError(
-    double ppo, double scale) const {
-  return getFirstPrecPtr()->getMonoMassMinusWaterError(ppo, scale);
+    double error_tolerance, double scale) const {
+  return getFirstPrecPtr()->getMonoMassMinusWaterError(error_tolerance, scale);
 }
 
 }  // namespace toppic

@@ -82,7 +82,8 @@ inline TheoPeakPtrVec getNTermTheoPeakPtrs(
 
 double refinePrecursorAndHeaderShift(const ProteoformPtr& proteo_ptr,
                                      const ExtendMsPtrVec& ms_three_ptr_vec,
-                                     DiagHeaderPtrVec& header_ptrs, double ppo,
+                                     DiagHeaderPtrVec& header_ptrs,
+                                     const PeakTolerancePtr& prec_tole_ptr,
                                      double min_mass,
                                      double refine_prec_step_width) {
   double prec_mass =
@@ -90,8 +91,7 @@ double refinePrecursorAndHeaderShift(const ProteoformPtr& proteo_ptr,
   if (header_ptrs.size() == 0) {
     return prec_mass;
   }
-  double tole =
-      ms_three_ptr_vec[0]->getMsHeaderPtr()->getFirstPrecErrorTolerance(ppo);
+  double tole = prec_tole_ptr->compPrecErrorTole(prec_mass);
 
   int one_side_step_num = 0;
   if (tole > 0) {

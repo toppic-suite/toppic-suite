@@ -274,12 +274,11 @@ std::function<void()> geneTask(
         deconv_ms_ptr_vec, mng_ptr->prsm_para_ptr_->getSpParaPtr(),
         prsm_ptr->getAdjustedPrecMass());
 
-    double ppo = mng_ptr->prsm_para_ptr_->getSpParaPtr()
-                     ->getPrecTolerancePtr()
-                     ->getPpo();
+    PeakTolerancePtr prec_tole_ptr =
+        mng_ptr->prsm_para_ptr_->getSpParaPtr()->getPrecTolerancePtr();
 
-    double tolerance =
-        refine_ms_ptr_vec[0]->getMsHeaderPtr()->getFirstPrecErrorTolerance(ppo);
+    double tolerance = prec_tole_ptr->compPrecErrorTole(
+        refine_ms_ptr_vec[0]->getMsHeaderPtr()->getFirstPrecMonoMass());
 
     std::vector<double> ms_masses =
         extend_ms_util::getExtendMassVec(refine_ms_ptr_vec[0]);

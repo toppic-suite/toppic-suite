@@ -210,8 +210,8 @@ void OnePtmFilter::computeBestMatch(const FilterSpecPtr& spec_ptr) {
 
   double prec_minus_water_mass =
       spec_ptr->getHeaderPtr()->getFirstPrecMonoMassMinusWater();
-  double prec_error_tole =
-      spec_ptr->getHeaderPtr()->getFirstPrecErrorTolerance(tole_ptr->getPpo());
+  double prec_error_tole = tole_ptr->compPrecErrorTole(
+      spec_ptr->getHeaderPtr()->getFirstPrecMonoMass());
   int group_spec_num = spec_ptr->getGroupSpecNum();
 
   // The candidates of a proteoform type (issue #348): with

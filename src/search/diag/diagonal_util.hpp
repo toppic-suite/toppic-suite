@@ -17,6 +17,7 @@
 #define TOPPIC_SEARCH_DIAG_DIAGONAL_UTIL_HPP_
 
 #include "ms/spec/extend_ms.hpp"
+#include "para/peak_tolerance.hpp"
 #include "prsm/peak_ion_pair.hpp"
 #include "search/diag/diag_header.hpp"
 
@@ -26,7 +27,8 @@ namespace diagonal_util {
 
 double refinePrecursorAndHeaderShift(const ProteoformPtr& proteo_ptr,
                                      const ExtendMsPtrVec& ms_three_ptr_vec,
-                                     DiagHeaderPtrVec& header_ptrs, double ppo,
+                                     DiagHeaderPtrVec& header_ptrs,
+                                     const PeakTolerancePtr& prec_tole_ptr,
                                      double min_mass,
                                      double refine_prec_step_width);
 

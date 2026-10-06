@@ -15,6 +15,8 @@
 
 #include "console/toppic_argument.hpp"
 
+#include <cmath>
+#include <cstddef>
 #include <exception>
 #include <filesystem>
 #include <iomanip>
@@ -94,6 +96,9 @@ std::map<std::string, std::string> ToppicArgument::initArguments() {
   arguments["numOfTopPrsms"] = "1";
   arguments["filteringResultNumber"] = "20";
   arguments["precErrorTolerance"] = "10";
+  // a precursor error tolerance in Dalton (hidden --prec-dalton-error) in
+  // place of precErrorTolerance's ppm; empty: the ppm tolerance
+  arguments["precDaltonError"] = "";
   arguments["fragErrorTolerance"] = "10";
   arguments["envCnnCutoff"] = "0.4";
   arguments["proteoformPpmError"] = "false";
@@ -262,9 +267,15 @@ void ToppicArgument::outputArguments(
   output << std::setw(gap) << std::left << "Protein-level cutoff value:" << sep
          << arguments["cutoffProteinValue"] << std::endl;
 
-  output << std::setw(gap) << std::left
-         << "Error tolerance for precursor masses:" << sep
-         << arguments["precErrorTolerance"] << " ppm" << std::endl;
+  if (arguments["precDaltonError"] != "") {
+    output << std::setw(gap) << std::left
+           << "Error tolerance for precursor masses:" << sep
+           << arguments["precDaltonError"] << " Da" << std::endl;
+  } else {
+    output << std::setw(gap) << std::left
+           << "Error tolerance for precursor masses:" << sep
+           << arguments["precErrorTolerance"] << " ppm" << std::endl;
+  }
   output << std::setw(gap) << std::left
          << "Error tolerance for fragment masses:" << sep
          << arguments["fragErrorTolerance"] << " ppm" << std::endl;
@@ -397,6 +408,7 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
   std::string top_prsm_number = "";
   std::string post_min_peak_num = "";
   std::string frag_extend_min_mass = "";
+  std::string prec_dalton_error = "";
   std::string multi_skip_evalue = "";
   std::string var_ptm_filter_cand_num = "";
 
@@ -561,6 +573,7 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
         "")("approximate-spectra,A", "")("decoy,d", "")(
         "frag-error-tolerance,e", po::value<std::string>(&frag_error_tole), "")(
         "prec-error-tolerance,E", po::value<std::string>(&prec_error_tole), "")(
+        "prec-dalton-error", po::value<std::string>(&prec_dalton_error), "")(
         "filter-by-env-cnn,F", po::value<std::string>(&env_cnn_cutoff), "")(
         "proteoform-ppm-error,P", "")("proteoform-error-tolerance,p",
                                       po::value<std::string>(&form_error_tole),
@@ -718,6 +731,13 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
 
     if (vm.count("prec-error-tolerance")) {
       arguments_["precErrorTolerance"] = prec_error_tole;
+    }
+
+    // hidden: a precursor error tolerance in Dalton, used for every
+    // precursor tolerance in place of -E's ppm (issue #563, toppic_test
+    // experiment 133)
+    if (vm.count("prec-dalton-error")) {
+      arguments_["precDaltonError"] = prec_dalton_error;
     }
 
     if (vm.count("filter-by-env-cnn")) {
@@ -1145,6 +1165,24 @@ bool ToppicArgument::validateArguments() {
       }
     } catch (const std::exception& ex) {
       LOG_ERROR(name << ": " << tole_value << " should be a number.");
+      return false;
+    }
+  }
+
+  std::string prec_dalton_error = arguments_["precDaltonError"];
+  if (prec_dalton_error != "") {
+    bool valid = false;
+    try {
+      std::size_t end = 0;
+      double tole = std::stod(prec_dalton_error, &end);
+      valid = end == prec_dalton_error.size() && std::isfinite(tole) &&
+              tole > 0;
+    } catch (const std::exception& ex) {
+      valid = false;
+    }
+    if (!valid) {
+      LOG_ERROR("Precursor error tolerance in Dalton (--prec-dalton-error) "
+                << prec_dalton_error << " should be a positive number.");
       return false;
     }
   }

@@ -89,11 +89,11 @@ PrsmPtrVec ZeroPtmSearchProcessor::zeroPtmSearchOneSpec(
       }
     }
   }
-  double ppo =
-      mng_ptr->prsm_para_ptr_->getSpParaPtr()->getPrecTolerancePtr()->getPpo();
+  PeakTolerancePtr prec_tole_ptr =
+      mng_ptr->prsm_para_ptr_->getSpParaPtr()->getPrecTolerancePtr();
   ZpFastMatchPtrVec fast_matches = zero_ptm_fast_search::filterRanges(
       type_ptr, ms_three_vec, proteoform_ptr_vec, ranges,
-      mng_ptr->zero_ptm_filter_result_num_, ppo);
+      mng_ptr->zero_ptm_filter_result_num_, prec_tole_ptr);
   DeconvMsPtrVec deconv_ms_vec = spec_set_ptr->getDeconvMsPtrVec();
   SpParaPtr sp_para_ptr = mng_ptr_->prsm_para_ptr_->getSpParaPtr();
 

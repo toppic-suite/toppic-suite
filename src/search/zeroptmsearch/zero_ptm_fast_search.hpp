@@ -20,6 +20,7 @@
 #include <vector>
 
 #include "ms/spec/extend_ms.hpp"
+#include "para/peak_tolerance.hpp"
 #include "search/zeroptmsearch/zero_ptm_fast_match.hpp"
 #include "seq/proteoform.hpp"
 
@@ -30,7 +31,7 @@ namespace zero_ptm_fast_search {
 ZpFastMatchPtrVec filter(const ProteoformTypePtr& align_type_ptr,
                          const ExtendMsPtrVec& ms_ptr_ptr,
                          const ProteoformPtrVec& proteo_ptrs, int report_num,
-                         double ppo);
+                         const PeakTolerancePtr& prec_tole_ptr);
 
 // The same, with the sequence range of each proteoform given (issue #348):
 // ranges[i] is the first and the last residue of the range, 0-based in the
@@ -40,7 +41,8 @@ ZpFastMatchPtrVec filterRanges(const ProteoformTypePtr& align_type_ptr,
                                const ExtendMsPtrVec& ms_ptr_vec,
                                const ProteoformPtrVec& proteo_ptrs,
                                const std::vector<std::pair<int, int>>& ranges,
-                               int report_num, double ppo);
+                               int report_num,
+                               const PeakTolerancePtr& prec_tole_ptr);
 
 }
 

@@ -50,9 +50,9 @@ class Precursor {
 
   double getMonoMassMinusWater() const;
 
-  double getErrorTolerance(double ppo) const { return getMonoMass() * ppo; }
-
-  std::pair<int, int> getMonoMassMinusWaterError(double ppo,
+  // the mass minus water and the error tolerance (Da, the precursor
+  // tolerance of PeakTolerance::compPrecErrorTole) as integers of scale
+  std::pair<int, int> getMonoMassMinusWaterError(double error_tolerance,
                                                  double scale) const;
 
   void setPrecId(int prec_id) { prec_id_ = prec_id; }
