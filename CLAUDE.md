@@ -360,7 +360,7 @@ column: it is built by `Proteoform::getProteoformMatchSeq` (`seq/
 proteoform.cpp`, labels from `MassShift::getAnnoStr`), and modification
 names/masses resolve through `PtmBase::getPtmPtr`, which prefers the
 `res/base_data/ptm_base.xml` entry over a modification file's mass when the
-abbreviation matches. Update it when that code or the table columns change.
+abbreviation (or one of its aliases) matches. Update it when that code or the table columns change.
 
 `res/README.md` describes the runtime resource files (which class loads
 each `base_data` file, the two ONNX models, the Git LFS-tracked files);
@@ -1014,15 +1014,32 @@ acid` (PrSM, proteoform and protein tables of toppic and topmg) and
 describes it in `docs/manual/proteoform.md` section 6. Facts to keep
 straight (toppic_test experiment 128):
 
-- **PTMs are Unimod accessions**, `[UNIMOD:<id>]` (`Ptm::getUnimodId`), or
-  the PTM mass without an id. ProForma names must be the CV's names
-  exactly, and 9 of the 55 `ptm_base.xml` abbreviations are not Unimod
-  names (Carbamidomethylation, carboxylation, Oxoalanine, Allysine,
-  Thiocarboxy, Cholinephosphoryl, ...), nor are a modification file's
-  names checked, so names are never written. The ids therefore matter:
-  Carbamidomethylation (C57) is Unimod 4 and TPQ Unimod 392 since then;
-  Decarboxy and Citrullination have none (Citrullination is Deamidated's
-  composition, but the deamidation selector keys on id 7).
+- **PTMs are Unimod name and accession**, `[Oxidation|UNIMOD:35]` (joined
+  with `|` as synonyms, ProForma 2.1 section 7.5, a Level 2 feature). The
+  name is `PtmBase::getUnimodName(id)`, the abbreviation of the
+  `ptm_base.xml` entry with that Unimod id, never a modification file's
+  name (unchecked: `Phosphorylation,...,21` gives `[Phospho|UNIMOD:21]`).
+  An id `ptm_base.xml` lacks gives `[UNIMOD:<id>|INFO:<name>]`, a PTM
+  without an id its mass with the name as an `INFO` tag (section 6.6),
+  `[-43.9898|INFO:Decarboxy]`; a name with brackets, `|` or `#` is left
+  out. A label (`#s1(0.900)`, `#g1`) goes after the tag's first part
+  (`labelTag`): after an `INFO` part it would be read as part of the
+  information. ProForma names must be the CV's names exactly, so **every
+  `ptm_base.xml` abbreviation of an entry with a Unimod id is the Unimod
+  (PSI-MS) name of that id** (unimod.obo's `name`; toppic_test experiment
+  128 renamed Carbamidomethylation -> Carbamidomethyl, Oxoalanine ->
+  Cys->Oxoalanine, Allysine -> Lys->Allysine, Thiocarboxy ->
+  Carboxy->Thiocarboxy, Cholinephosphoryl -> Phosphocholine, TPQ ->
+  Quinone, and removed carboxylation and Citrullination, which were the
+  same Unimod PTMs as Carboxy and Deamidated). Keep it so when adding an
+  entry; Decarboxy (-CO2) has no Unimod entry (id -1). The old names are
+  `<alias>` elements that `PtmBase::initBase` puts in the abbreviation map,
+  so `getPtmPtrByAbbrName` and `getPtmPtr` (FASTA sequences such as
+  `C[Carbamidomethylation]`, modification files, result XML of earlier
+  runs) resolve them to the entry, whose present name the results show.
+  The C57 PTM is found by `getC57AbbrName()` ("Carbamidomethyl").
+  `SearchFastaMatch` compares the FASTA's PTM names as written, so a
+  database must not mix an old and a new name of one PTM.
 - **Where each mass shift goes**, per alteration (`Alter`), on the
   alteration's residues, or its mass shift's when the alteration has none
   within them (TopMG writes an unexpected shift on one residue with an
@@ -1271,12 +1288,13 @@ not a variable PTM. Facts to keep straight:
 
 A FASTA sequence can carry PTMs in the extended format, a residue followed
 by the PTM's abbreviation of `res/base_data/ptm_base.xml` in brackets
-(`M[Oxidation]`, `C[Carbamidomethylation]`). `FastaSeq` reads them into
-residue/PTM pairs (`getAcidPtmPairVec`), and `proteoform_factory::
-geneDbProteoformPtr` builds the modified residues with an `INPUT` mass shift
-on each (shown in the Proteoform column as `(M)[Oxidation]` and in the
-Database protein sequence; not in the Fixed PTMs column or the variable PTM
-counts). Since branch `topmg_fasta_ptm` TopMG's graph alignment (topmg and
+(`M[Oxidation]`, `C[Carbamidomethyl]`; the names of earlier versions, such
+as `C[Carbamidomethylation]`, are aliases, see "ProForma strings").
+`FastaSeq` reads them into residue/PTM pairs (`getAcidPtmPairVec`), and
+`proteoform_factory::geneDbProteoformPtr` builds the modified residues with
+an `INPUT` mass shift on each (shown in the Proteoform column as
+`(M)[Oxidation]` and in the Database protein sequence; not in the Fixed
+PTMs column or the variable PTM counts). Since branch `topmg_fasta_ptm` TopMG's graph alignment (topmg and
 toppic `--topmg`) treats them as fixed modifications. Facts to keep
 straight:
 

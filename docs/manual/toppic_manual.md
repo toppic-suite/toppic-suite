@@ -171,7 +171,7 @@ columns are:
 | `Feature ID`, `Feature intensity`, `Feature score`, `Feature apex time` | The TopFD proteoform feature of the spectrum: id, abundance, ECScore and apex retention time (minutes). |
 | `# Protein hits`, `Protein accession`, `Protein description` | Number of proteins containing the proteoform, and the reported protein. |
 | `First residue`, `Last residue`, `Special amino acids`, `Database protein sequence`, `Previous amino acid`, `Proteoform`, `Next amino acid` | Position of the proteoform in the protein, the protein sequence, and the proteoform with its modifications (the annotation is explained in [Proteoform annotation](proteoform.md)). |
-| `ProForma` | The proteoform in the ProForma 2.1 notation of the HUPO-PSI (https://github.com/HUPO-PSI/ProForma), with the PTMs as Unimod accessions, for example `[UNIMOD:1]-SGREGM[UNIMOD:35]DEE...` (see [Proteoform annotation](proteoform.md), section 6). |
+| `ProForma` | The proteoform in the ProForma 2.1 notation of the HUPO-PSI (https://github.com/HUPO-PSI/ProForma), with the PTMs as Unimod names and accessions, for example `[Acetyl|UNIMOD:1]-SGREGM[Oxidation|UNIMOD:35]DEE...` (see [Proteoform annotation](proteoform.md), section 6). |
 | `Proteoform mass` | The monoisotopic mass of the proteoform. |
 | `Protein N-terminal form`, `Fixed PTMs`, `# Unexpected modifications`, `Unexpected modifications`, `# Variable PTMs`, `Variable PTMs`, `MIScore` | The N-terminal form, the modifications of the proteoform as `name:[position]` lists (see [Proteoform annotation](proteoform.md)), and the modification identification score of the PTM characterization. |
 | `# Matched exp fragments`, `# Matched theo fragments`, `E-value` | The match statistics and the E-value. |
@@ -281,6 +281,10 @@ modification, or `*` for any residue; `Position` is `any`, `N-term` or
 accession, or `-1` when unknown. Lines starting with `#` are comments. A
 name that is not one of the built-in PTMs of `res/base_data/ptm_base.xml`
 (such as `Acetyl`, `Phospho`, `Oxidation`) may be used on one line only.
+A line whose name is a built-in PTM uses the built-in entry; the built-in
+names are the Unimod (PSI-MS) names, and the names of earlier versions
+(such as `Carbamidomethylation`, now `Carbamidomethyl`) still stand for
+them (see [Proteoform annotation](proteoform.md), section 3).
 
 In the variable PTM file (`-b`), `N-term` is the N-terminus of the
 proteoform, the alpha-amine of its first residue: a truncation N-terminal

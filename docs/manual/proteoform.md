@@ -4,7 +4,7 @@ TopPIC and TopMG report every identified proteoform as an annotated
 sequence string, for example
 
 ```text
-MKVRASVK(KL(C)[Carbamidomethylation]RN(C)[Carbamidomethylation]K)[-116.0905]IVKRDGVIRVI(C)[Carbamidomethylation]SAEPKHKQRQG
+MKVRASVK(KL(C)[Carbamidomethyl]RN(C)[Carbamidomethyl]K)[-116.0905]IVKRDGVIRVI(C)[Carbamidomethyl]SAEPKHKQRQG
 ```
 
 This page explains how to read the string: what the parentheses, brackets,
@@ -54,7 +54,7 @@ shift's parentheses enclose it, giving nested parentheses. In the example
 above,
 
 ```text
-(KL(C)[Carbamidomethylation]RN(C)[Carbamidomethylation]K)[-116.0905]
+(KL(C)[Carbamidomethyl]RN(C)[Carbamidomethyl]K)[-116.0905]
 ```
 
 means: both cysteines are carbamidomethylated (a fixed modification), and an
@@ -75,7 +75,7 @@ as a mass when it did not:
 
 | Kind | Given by | In the string | Columns |
 |---|---|---|---|
-| Fixed modification | TopPIC/TopMG `-f` (`C57`, `C58` or a modification file) | `(C)[Carbamidomethylation]` on every modified residue | `Fixed PTMs` |
+| Fixed modification | TopPIC/TopMG `-f` (`C57`, `C58` or a modification file) | `(C)[Carbamidomethyl]` on every modified residue | `Fixed PTMs` |
 | Protein N-terminal form | `-n` (`NME`, `NME_ACETYLATION`, `M_ACETYLATION`) | Acetylation as the prefix `[Acetyl]-`; methionine excision is not annotated, the proteoform simply starts at residue 2 | `Protein N-terminal form` |
 | Variable modification | TopPIC `-b`, TopMG `-i` (a modification file) | `(S)[Phospho]` on the modified residue | `# Variable PTMs`, `Variable PTMs` |
 | Truncation N-terminal modification | TopPIC `-b`, Position `N-term` (a variable PTM of the proteoform N-terminus, on a proteoform starting at residue 3 of the protein or later without a protein N-terminal form) | The prefix `[Gln->pyro-Glu]-QAEV...`, before any annotation of the first residue: `[Acetyl]-(K)[Acetyl]...` has an N-terminal and a side-chain acetylation on K | `# Variable PTMs`, `Variable PTMs` (`Acetyl:[N-term]`, first) |
@@ -94,7 +94,7 @@ its position is `N-term`: `Acetyl:[N-term];Acetyl:[1]` for
 modification's abbreviation, and its mass is what TopPIC/TopMG add to the
 residue mass:
 
-- `C57` and `C58` are the built-in modifications `Carbamidomethylation`
+- `C57` and `C58` are the built-in modifications `Carbamidomethyl`
   (57.021464 Da) and `Carboxymethyl` (58.005479 Da) on cysteine, and
   N-terminal acetylation is the built-in `Acetyl` (42.010565 Da). Their
   definitions are in the resource files `res/base_data/ptm_base.xml`,
@@ -104,13 +104,21 @@ residue mass:
   manual, section 5). The file is **not** the only source of the values,
   though: when the name is one of the abbreviations in
   `res/base_data/ptm_base.xml` (`Phospho`, `Acetyl`, `Oxidation`, `Methyl`,
-  `Dimethyl`, `Trimethyl`, `Carbamidomethylation`, ...), the built-in entry
+  `Dimethyl`, `Trimethyl`, `Carbamidomethyl`, ...), the built-in entry
   is used and the mass in the file is ignored. Only a name that is not in
   that list is created from the file with the file's mass.
   So a line `Phospho,79.97,STY,any,21` in `common_mods.txt` still uses
   79.966331 Da, and a differently spelled name, say `Phosphorylation`,
   would use the mass from the file. To give a modification a different
   mass, use a name that is not in `ptm_base.xml`.
+- The abbreviations of `ptm_base.xml` are the Unimod (PSI-MS) names of
+  their Unimod ids (`Carbamidomethyl`, `Cys->Oxoalanine`, `Quinone`, ...);
+  only `Decarboxy` (-CO2) has no Unimod entry. The names of earlier
+  versions (`Carbamidomethylation`, `Oxoalanine`, `Allysine`,
+  `Thiocarboxy`, `Cholinephosphoryl`, `TPQ`, and `carboxylation` and
+  `Citrullination`, which are Unimod's `Carboxy` and `Deamidated`) are
+  still accepted in modification files, FASTA sequences and earlier result
+  files, and stand for the entry: the results show its present name.
 
 ## 4. The mass in brackets
 
@@ -163,15 +171,15 @@ Methionine excision followed by N-terminal acetylation
 (`Protein N-terminal form` = `NME_ACETYLATION`).
 
 ```text
-K | (C)[Carbamidomethylation]SAEPKHKQ(S)[Phospho]RQG | -
+K | (C)[Carbamidomethyl]SAEPKHKQ(S)[Phospho]RQG | -
 ```
 A C-terminal fragment of a protein searched with `-f C57` and a variable
 modification file containing `Phospho`: the cysteine is carbamidomethylated
-(`Fixed PTMs` = `Carbamidomethylation:[1]`) and the serine phosphorylated
+(`Fixed PTMs` = `Carbamidomethyl:[1]`) and the serine phosphorylated
 (`Variable PTMs` = `Phospho:[10]`).
 
 ```text
-MKVRASVK(KL(C)[Carbamidomethylation]RN(C)[Carbamidomethylation]K)[-116.0905]IVKRDGVIRVI(C)[Carbamidomethylation]SAEPKHKQRQG
+MKVRASVK(KL(C)[Carbamidomethyl]RN(C)[Carbamidomethyl]K)[-116.0905]IVKRDGVIRVI(C)[Carbamidomethyl]SAEPKHKQRQG
 ```
 Three carbamidomethylated cysteines (fixed, `-f C57`) and one unexpected
 shift of -116.0905 Da somewhere on `KLCRNCK`; the shift's parentheses
@@ -188,36 +196,49 @@ The string is built from the proteoform itself
 
 - The residues are the proteoform's, from its first to its last residue,
   without the flanking residues.
-- A PTM is written as its Unimod accession, `[UNIMOD:35]`, when it has a
-  Unimod id (the `ptm_base.xml` entry, or the UnimodID column of a
-  modification file), and as its monoisotopic mass otherwise,
-  `[+57.0215]`. TopPIC's PTM names are not all Unimod names (e.g.
-  `Carbamidomethylation` is Unimod's `Carbamidomethyl`), so they are not
-  used; a reader looks the accession up in Unimod.
+- A PTM with a Unimod id (the `ptm_base.xml` entry, or the UnimodID column
+  of a modification file) is written as its Unimod name and its Unimod
+  accession, joined by `|` as synonyms: `[Oxidation|UNIMOD:35]`. The name
+  is the abbreviation of the `ptm_base.xml` entry with that id, which is
+  the Unimod name; a modification file's own name is not checked and not
+  used for it (a line `Phosphorylation,79.966331,STY,any,21` gives
+  `[Phospho|UNIMOD:21]`).
+- A Unimod id that `ptm_base.xml` does not have is written as the
+  accession with the PTM's name as information, `[UNIMOD:737|INFO:TMT6plex]`,
+  and a PTM without a Unimod id as its monoisotopic mass with its name as
+  information, `[-43.9898|INFO:Decarboxy]` (ProForma's `INFO` tag, which
+  readers do not interpret). A name with square brackets, `|` or `#` is
+  left out.
 - The protein N-terminal acetylations (`M_ACETYLATION`, `NME_ACETYLATION`)
   and a truncation N-terminal modification are N-terminal modifications,
-  `[UNIMOD:1]-SEQ`.
+  `[Acetyl|UNIMOD:1]-SEQ`.
 - Fixed PTMs (`-f`), the PTMs written in the FASTA sequence and variable
-  PTMs localized to one residue follow that residue: `C[UNIMOD:4]`,
-  `M[UNIMOD:35]`.
+  PTMs localized to one residue follow that residue:
+  `C[Carbamidomethyl|UNIMOD:4]`, `M[Oxidation|UNIMOD:35]`.
 - An unexpected shift is its mass with 4 decimals and a sign, on its
   residue (`L[+97.9219]`) or on its range of residues in parentheses
   (`(TLRL...NIM)[-236.9788]`); a variable PTM not localized to one residue
   is written on its range in the same way, with all the PTMs of the range,
-  `(MAM)[UNIMOD:35][UNIMOD:35]`. Modifications of single residues can stand
-  inside a range: `(MKAYC[UNIMOD:4]ERQGLSM)[UNIMOD:35]`.
+  `(MAM)[Oxidation|UNIMOD:35][Oxidation|UNIMOD:35]`. Modifications of
+  single residues can stand inside a range:
+  `(MKAYC[Carbamidomethyl|UNIMOD:4]ERQGLSM)[Oxidation|UNIMOD:35]`.
 - A PTM characterized by MIScore (`-B`) on several sites is written at its
   best site, with the score of every site with a positive score (ProForma's
-  localisation scores): `K[UNIMOD:1#s1(0.850)]...K[#s1(0.150)]`.
+  localisation scores); the label follows the first part of the tag:
+  `K[Acetyl#s1(0.850)|UNIMOD:1]...K[#s1(0.150)]`.
 - ProForma does not allow overlapping ranges: a range that would overlap
   one written before (from the left) is written as a set of positions, its
   first residue preferred, `P[+12.3456#g1]E[#g1]P[#g1]`, and a
   modification without a residue as one of unknown position,
   `[+12.3456]?SEQ`.
 
-Everything except the localisation scores, the sets of positions, the
-ranges and the unknown positions is ProForma's base level (Level 1); those
-four belong to its Level 2.
+Everything except the joined name and accession, the localisation
+scores, the sets of positions, the ranges and the unknown positions is
+ProForma's base level (Level 1); those five belong to its Level 2 (a name
+and an accession joined by `|` is its "joint representation", section 7.5;
+a mass with an `INFO` tag is Level 1). A string with a PTM of Unimod is
+therefore Level 2; `[Oxidation]` alone would be Level 1, but the
+accession keeps the string exact if Unimod renames a modification.
 
 A reader computes the mass of the proteoform from the string. For TopPIC
 it is the `Proteoform mass` column, up to the rounding of the written
@@ -228,12 +249,12 @@ modifications; its mass is then the theoretical one. Examples (`Proteoform` | `P
 
 ```text
 [Acetyl]-SGREGGKKKPLKQPKKQAKE(M)[Oxidation]DEEDKAFKQKQ...
-[UNIMOD:1]-SGREGGKKKPLKQPKKQAKEM[UNIMOD:35]DEEDKAFKQKQ...
+[Acetyl|UNIMOD:1]-SGREGGKKKPLKQPKKQAKEM[Oxidation|UNIMOD:35]DEEDKAFKQKQ...
 
 ([Acetyl]-MPKGGR)[+365.1300]KGGH(KGR)[+167.0338]ARQYTSPEEIDAQ...
-[UNIMOD:1]-(MPKGGR)[+365.1300]KGGH(KGR)[+167.0338]ARQYTSPEEIDAQ...
+[Acetyl|UNIMOD:1]-(MPKGGR)[+365.1300]KGGH(KGR)[+167.0338]ARQYTSPEEIDAQ...
 
-...KL(MKAY(C)[Carbamidomethylation]ERQGLSM)[Oxidation]RQIRFRFDGQ...
-...KL(MKAYC[UNIMOD:4]ERQGLSM)[UNIMOD:35]RQIRFRFDGQ...
+...KL(MKAY(C)[Carbamidomethyl]ERQGLSM)[Oxidation]RQIRFRFDGQ...
+...KL(MKAYC[Carbamidomethyl|UNIMOD:4]ERQGLSM)[Oxidation|UNIMOD:35]RQIRFRFDGQ...
 ```
 
