@@ -1079,7 +1079,7 @@ precursor, through `getActivationName` (branch `ethcd_activation`, issue
   spectra in 12 activation cases (msconvert's and ThermoRawFileParser's
   EThcD and ETciD, the two terms alone, EThcD with HCD first, ETD, HCD,
   CID, CID with HCD, MPD) all get the expected activation and ion types;
-  the other 15 mzML files of toppic_test's `data/` (42,602 MS/MS spectra,
+  the other 15 mzML files of toppic_test's `data/` (34,143 MS/MS spectra,
   HCD or CID) keep theirs.
 
 ## Precursor and fragment mass tolerances (`para/sp_para`)
