@@ -37,6 +37,11 @@ class CompProbValue {
                const PrmPeakPtrVec2D& peak_ptr_2d, int thresh, int shift_num,
                bool strict, double prob_prec_mass,
                const PeakTolerancePtr& tole_ptr);
+  // the residues of the computations that follow, in place of those of the
+  // constructor: the tables are allocated once and serve both residue lists
+  // of CompPValueArray (toppic_test experiment 129)
+  void setResidues(const ResFreqPtrVec& residue_ptrs, int residue_avg_len);
+
   // main function to get probabilities
   double getCondProb(int shift, int thresh);
   double getCondProbOneValue(int shift, int value);

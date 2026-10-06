@@ -23,6 +23,7 @@
 #include "common/util/logger.hpp"
 #include "ms/factory/prm_ms_factory.hpp"
 #include "ms/spec/deconv_ms_util.hpp"
+#include "stat/count/count_util.hpp"
 #include "stat/tdgf/comp_prob_value_array.hpp"
 
 namespace toppic {
@@ -34,16 +35,37 @@ CompPValueArray::CompPValueArray(const CountTestNumPtr& test_num_ptr,
   residue_ptrs_ = test_num_ptr->getResFreqPtrVec();
   pep_n_term_residue_ptrs_ = residue_ptrs_;
   prot_n_term_residue_ptrs_ = test_num_ptr->getNTermResFreqPtrVec();
+  residue_avg_len_ = static_cast<int>(test_num_ptr->getResidueAvgLen());
   comp_prob_ptr_ = std::make_shared<CompProbValue>(
       mng_ptr_->convert_ratio_, residue_ptrs_, test_num_ptr->getResidueAvgLen(),
       mng_ptr_->unexpected_shift_num_ + 1, mng_ptr_->max_table_height_,
       mng_ptr_->max_prec_mass_);
+  // the variable PTM PrSMs' residues: the residues and their modified forms,
+  // which share the residue's frequency (toppic_test experiment 129)
+  if (!mng_ptr_->var_ptm_mod_ptr_vec_.empty()) {
+    var_residue_ptrs_ = count_util::geneModResFreqs(
+        residue_ptrs_, mng_ptr_->var_ptm_mod_ptr_vec_);
+    var_prot_n_term_residue_ptrs_ = count_util::geneModResFreqs(
+        prot_n_term_residue_ptrs_, mng_ptr_->var_ptm_mod_ptr_vec_);
+    var_residue_avg_len_ = count_util::computeAvgLength(
+        var_residue_ptrs_, mng_ptr_->convert_ratio_);
+  }
+}
+
+bool CompPValueArray::useModResidues(const PrsmPtr& prsm_ptr) {
+  if (var_residue_ptrs_.empty()) {
+    return false;
+  }
+  ProteoformPtr proteo_ptr = prsm_ptr->getProteoformPtr();
+  return proteo_ptr->getAlterNum(AlterType::UNEXPECTED) == 0 &&
+         (proteo_ptr->getAlterNum(AlterType::VARIABLE) > 0 ||
+          proteo_ptr->hasTruncNTermMod());
 }
 
 // set alignment
 void CompPValueArray::compMultiExpectedValues(const PrmMsPtrVec& ms_six_ptr_vec,
                                               PrsmPtrVec& prsm_ptrs, double ppo,
-                                              bool strict) {
+                                              bool strict, bool mod_residues) {
   PrmPeakPtrVec2D prm_ptr_2d;
   for (size_t i = 0; i < ms_six_ptr_vec.size(); i++) {
     PrmPeakPtrVec prm_peak_ptrs = ms_six_ptr_vec[i]->getPeakPtrVec();
@@ -79,16 +101,28 @@ void CompPValueArray::compMultiExpectedValues(const PrmMsPtrVec& ms_six_ptr_vec,
       pep_needed = true;
     }
   }
+  // the residues of the generating function: the variable PTM PrSMs' with
+  // mod_residues, otherwise the residues without variable PTMs; a table
+  // serves both, so it is told which before every computation
+  if (!var_residue_ptrs_.empty()) {
+    comp_prob_ptr_->setResidues(
+        mod_residues ? var_residue_ptrs_ : residue_ptrs_,
+        mod_residues ? var_residue_avg_len_ : residue_avg_len_);
+  }
+  const ResFreqPtrVec& prot_n_term_residue_ptrs =
+      mod_residues ? var_prot_n_term_residue_ptrs_ : prot_n_term_residue_ptrs_;
+  const ResFreqPtrVec& pep_n_term_residue_ptrs =
+      mod_residues ? var_residue_ptrs_ : pep_n_term_residue_ptrs_;
   std::vector<double> prot_probs;
   if (prot_needed) {
     comp_prob_value_array::compProbArray(
-        comp_prob_ptr_, prot_n_term_residue_ptrs_, prm_ptr_2d, prsm_ptrs,
+        comp_prob_ptr_, prot_n_term_residue_ptrs, prm_ptr_2d, prsm_ptrs,
         strict, prob_prec_mass, tole_ptr, prot_probs);
   }
   std::vector<double> pep_probs;
   if (pep_needed) {
     comp_prob_value_array::compProbArray(
-        comp_prob_ptr_, pep_n_term_residue_ptrs_, prm_ptr_2d, prsm_ptrs,
+        comp_prob_ptr_, pep_n_term_residue_ptrs, prm_ptr_2d, prsm_ptrs,
         strict, prob_prec_mass, tole_ptr, pep_probs);
   }
 
@@ -185,7 +219,8 @@ void CompPValueArray::compSingleExpectedValue(const DeconvMsPtrVec& ms_ptr_vec,
 
   PrsmPtrVec prsm_ptrs;
   prsm_ptrs.push_back(prsm_ptr);
-  compMultiExpectedValues(prm_ms_ptr_vec, prsm_ptrs, ppo, true);
+  compMultiExpectedValues(prm_ms_ptr_vec, prsm_ptrs, ppo, true,
+                          useModResidues(prsm_ptr));
 }
 
 int CompPValueArray::getIsotopeOffset(const SpectrumSetPtr& spec_set_ptr,
@@ -236,8 +271,27 @@ void CompPValueArray::process(const SpectrumSetPtr& spec_set_ptr,
   for (auto& offset_prsm : offset_prsms) {
     int offset = offset_prsm.first;
     if (offset == 0) {
-      compMultiExpectedValues(spec_set_ptr->getMsSixPtrVec(),
-                              offset_prsm.second, ppo, false);
+      // with the variable PTMs of var_ptm_mod_ptr_vec_, the variable PTM
+      // PrSMs (all of offset 0) get the generating function of the
+      // residues with their modified forms, the others main's (toppic_test
+      // experiment 129)
+      PrsmPtrVec var_prsm_ptrs;
+      PrsmPtrVec other_prsm_ptrs;
+      for (size_t i = 0; i < offset_prsm.second.size(); i++) {
+        if (useModResidues(offset_prsm.second[i])) {
+          var_prsm_ptrs.push_back(offset_prsm.second[i]);
+        } else {
+          other_prsm_ptrs.push_back(offset_prsm.second[i]);
+        }
+      }
+      if (!other_prsm_ptrs.empty()) {
+        compMultiExpectedValues(spec_set_ptr->getMsSixPtrVec(),
+                                other_prsm_ptrs, ppo, false);
+      }
+      if (!var_prsm_ptrs.empty()) {
+        compMultiExpectedValues(spec_set_ptr->getMsSixPtrVec(), var_prsm_ptrs,
+                                ppo, false, true);
+      }
       continue;
     }
     // the PRM spectra of spectrum_set_factory::geneSpectrumSetPtr for the

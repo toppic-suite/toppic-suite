@@ -127,6 +127,7 @@ std::map<std::string, std::string> ToppicArgument::initArguments() {
   arguments["fragExtendMinMass"] = "5000";
   arguments["varPtmFilterCandNum"] = "";
   arguments["deamidSelector"] = "false";
+  arguments["varPtmEvalueModResidues"] = "true";
   arguments["fragMassDedup"] = "false";
   arguments["multiSkipEvalue"] = "";
   arguments["multiTypeAlign"] = "true";
@@ -216,6 +217,11 @@ void ToppicArgument::outputArguments(
     if (arguments["deamidSelector"] == "true") {
       output << std::setw(gap) << std::left
              << "Deamidation PrSM selection:" << sep << "true" << std::endl;
+    }
+    if (arguments["varPtmEvalueModResidues"] == "false") {
+      output << std::setw(gap) << std::left
+             << "Variable PTM E-values with modified residues:" << sep
+             << "false" << std::endl;
     }
     output << std::setw(gap) << std::left
            << "Variable modifications file name:" << sep
@@ -589,7 +595,7 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
         "frag-extend-min-mass", po::value<std::string>(&frag_extend_min_mass),
         "")("var-ptm-filter-cand-num",
             po::value<std::string>(&var_ptm_filter_cand_num), "")(
-        "deamid-selector", "")(
+        "deamid-selector", "")("disable-var-ptm-evalue-mod-residues", "")(
         "multi-skip-evalue", po::value<std::string>(&multi_skip_evalue),
             "")("disable-multi-type-align", "")(
         "topmg", po::value<std::string>(&topmg_mode), "")(
@@ -876,6 +882,14 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
     // toppic_test experiment 123)
     if (vm.count("deamid-selector")) {
       arguments_["deamidSelector"] = "true";
+    }
+    // hidden: by default the variable PTM PrSMs' E-values come from a
+    // generating function whose residues are the residues and their forms
+    // with the variable PTMs, a residue's frequency shared equally by its
+    // forms (toppic_test experiment 129); this option gives them the
+    // residues without variable PTMs, as every other PrSM
+    if (vm.count("disable-var-ptm-evalue-mod-residues")) {
+      arguments_["varPtmEvalueModResidues"] = "false";
     }
     if (vm.count("multi-skip-evalue")) {
       arguments_["multiSkipEvalue"] = multi_skip_evalue;
