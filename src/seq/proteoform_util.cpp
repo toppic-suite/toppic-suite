@@ -19,6 +19,7 @@
 #include <cmath>
 #include <cstddef>
 #include <functional>
+#include <string>
 #include <vector>
 
 #include "common/base/mod_base.hpp"
@@ -27,6 +28,10 @@
 #include "common/base/ptm_base.hpp"
 #include "common/base/residue_base.hpp"
 #include "common/base/residue_util.hpp"
+#include "common/util/str_util.hpp"
+#include "seq/alter_type.hpp"
+#include "seq/local_anno.hpp"
+#include "seq/mass_shift.hpp"
 
 namespace toppic {
 namespace proteoform_util {
@@ -234,6 +239,211 @@ std::vector<std::vector<double> > getNTermAcet2D(
     shifts_2d.push_back(shifts);
   }
   return shifts_2d;
+}
+
+namespace {
+
+// A delta mass in ProForma: sign always written, 4 decimals.
+std::string proFormaMass(double mass) {
+  std::string str = str_util::fixedToString(mass, 4);
+  if (str[0] != '-') {
+    str = "+" + str;
+  }
+  return str;
+}
+
+// A PTM in ProForma: its Unimod accession, or its mass without one.
+std::string proFormaPtm(const PtmPtr& ptm_ptr) {
+  if (ptm_ptr->getUnimodId() > 0) {
+    return "UNIMOD:" + std::to_string(ptm_ptr->getUnimodId());
+  }
+  return proFormaMass(ptm_ptr->getMonoMass());
+}
+
+// The modification of an alteration in ProForma: the PTM of the local
+// annotation or of the mod, the mass of an unexpected shift.
+std::string proFormaAlter(const AlterPtr& alter_ptr) {
+  if (alter_ptr->getLocalAnno() != nullptr &&
+      alter_ptr->getLocalAnno()->getPtmPtr() != nullptr) {
+    return proFormaPtm(alter_ptr->getLocalAnno()->getPtmPtr());
+  }
+  if (alter_ptr->getTypePtr() == AlterType::UNEXPECTED ||
+      alter_ptr->getModPtr() == nullptr) {
+    return proFormaMass(alter_ptr->getMass());
+  }
+  PtmPtr ptm_ptr = alter_ptr->getModPtr()->getModResiduePtr()->getPtmPtr();
+  if (ptm_ptr == nullptr || ptm_ptr->getUnimodId() <= 0) {
+    // the mass of the alteration (the PTM's, or a residue change)
+    return proFormaMass(alter_ptr->getMass());
+  }
+  return proFormaPtm(ptm_ptr);
+}
+
+std::string scoreStr(double score) { return str_util::fixedToString(score, 3); }
+
+// The modifications whose position is a range of residues [left, right).
+struct ProFormaRange {
+  int left;
+  int right;
+  std::vector<std::string> tags;
+};
+
+}  // namespace
+
+std::string getProFormaStr(const ProteoformPtr& form_ptr) {
+  std::string acids = form_ptr->getResSeqPtr()->toAcidString();
+  int len = acids.size();
+  // the modifications after each residue, the N-terminal ones and those of
+  // unknown position
+  std::vector<std::vector<std::string>> res_tags(len);
+  std::vector<std::string> n_term_tags;
+  std::vector<std::string> unknown_tags;
+  std::vector<ProFormaRange> ranges;
+  int group_num = 0;
+
+  if (form_ptr->hasTruncNTermMod()) {
+    n_term_tags.push_back(proFormaPtm(
+        form_ptr->getTruncNTermModPtr()->getModResiduePtr()->getPtmPtr()));
+  }
+
+  MassShiftPtrVec shifts = form_ptr->getMassShiftPtrVec();
+  std::stable_sort(shifts.begin(), shifts.end(), MassShift::cmpPosInc);
+  for (const MassShiftPtr& shift_ptr : shifts) {
+    for (const AlterPtr& alter_ptr : shift_ptr->getAlterPtrVec()) {
+      int left = alter_ptr->getLeftBpPos();
+      int right = alter_ptr->getRightBpPos();
+      std::string tag = proFormaAlter(alter_ptr);
+      // the protein N-terminal acetylations
+      if (alter_ptr->getTypePtr() == AlterType::PROTEIN_VARIABLE &&
+          left == 0 && right == 1 && alter_ptr->getModPtr() != nullptr &&
+          alter_ptr->getModPtr()->getModResiduePtr()->getPtmPtr() ==
+              PtmBase::getPtmPtr_Acetylation()) {
+        n_term_tags.push_back(tag);
+        continue;
+      }
+      if (left < 0 || right > len || left >= right) {
+        unknown_tags.push_back(tag);
+        continue;
+      }
+      LocalAnnoPtr anno_ptr = alter_ptr->getLocalAnno();
+      if (anno_ptr != nullptr && right - left > 1) {
+        // MIScore: the site scores of the residues, indexed by the residue
+        // position in the proteoform (or from the left end of the range)
+        const std::vector<double>& scr_vec = anno_ptr->getScrVec();
+        int offset = static_cast<int>(scr_vec.size()) == len ? 0 : left;
+        std::vector<int> sites;
+        int best = -1;
+        for (int p = left; p < right; p++) {
+          int idx = p - offset;
+          if (idx < 0 || idx >= static_cast<int>(scr_vec.size()) ||
+              scr_vec[idx] <= 0) {
+            continue;
+          }
+          sites.push_back(p);
+          if (best < 0 || scr_vec[idx] > scr_vec[best - offset]) {
+            best = p;
+          }
+        }
+        if (sites.size() == 1) {
+          res_tags[best].push_back(tag);
+          continue;
+        }
+        if (sites.size() > 1) {
+          std::string label = "#s" + std::to_string(++group_num);
+          for (int p : sites) {
+            std::string score = "(" + scoreStr(scr_vec[p - offset]) + ")";
+            res_tags[p].push_back(p == best ? tag + label + score
+                                            : label + score);
+          }
+          continue;
+        }
+      }
+      if (right - left == 1) {
+        res_tags[left].push_back(tag);
+        continue;
+      }
+      // a range: the modifications of one range are written together
+      bool added = false;
+      for (ProFormaRange& range : ranges) {
+        if (range.left == left && range.right == right) {
+          range.tags.push_back(tag);
+          added = true;
+          break;
+        }
+      }
+      if (!added) {
+        ranges.push_back(ProFormaRange{left, right, {tag}});
+      }
+    }
+  }
+
+  // ranges may not overlap: the first of overlapping ranges (from the left,
+  // the wider one first) stays a range, the others become sets of positions
+  std::stable_sort(ranges.begin(), ranges.end(),
+                   [](const ProFormaRange& a, const ProFormaRange& b) {
+                     if (a.left != b.left) {
+                       return a.left < b.left;
+                     }
+                     return a.right > b.right;
+                   });
+  std::vector<int> range_begin(len, -1);
+  std::vector<int> range_end(len + 1, -1);
+  std::vector<bool> covered(len, false);
+  for (size_t r = 0; r < ranges.size(); r++) {
+    const ProFormaRange& range = ranges[r];
+    bool overlap = false;
+    for (int p = range.left; p < range.right; p++) {
+      if (covered[p]) {
+        overlap = true;
+        break;
+      }
+    }
+    if (!overlap) {
+      for (int p = range.left; p < range.right; p++) {
+        covered[p] = true;
+      }
+      range_begin[range.left] = r;
+      range_end[range.right] = r;
+      continue;
+    }
+    for (const std::string& tag : range.tags) {
+      std::string label = "#g" + std::to_string(++group_num);
+      res_tags[range.left].push_back(tag + label);
+      for (int p = range.left + 1; p < range.right; p++) {
+        res_tags[p].push_back(label);
+      }
+    }
+  }
+
+  std::string result;
+  for (const std::string& tag : unknown_tags) {
+    result += "[" + tag + "]";
+  }
+  if (!unknown_tags.empty()) {
+    result += "?";
+  }
+  for (const std::string& tag : n_term_tags) {
+    result += "[" + tag + "]";
+  }
+  if (!n_term_tags.empty()) {
+    result += "-";
+  }
+  for (int i = 0; i < len; i++) {
+    if (range_begin[i] >= 0) {
+      result += "(";
+    }
+    result += acids[i];
+    for (const std::string& tag : res_tags[i]) {
+      result += "[" + tag + "]";
+    }
+    if (range_end[i + 1] >= 0) {
+      result += ")";
+      for (const std::string& tag : ranges[range_end[i + 1]].tags) {
+        result += "[" + tag + "]";
+      }
+    }
+  }
+  return result;
 }
 
 }  // namespace proteoform_util

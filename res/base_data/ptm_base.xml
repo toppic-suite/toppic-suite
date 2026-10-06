@@ -74,7 +74,7 @@
 <ptm>
   <name>Carbamidomethylation</name>
   <abbreviation>Carbamidomethylation</abbreviation>
-  <unimod>-1</unimod>
+  <unimod>4</unimod>
   <mono_mass>57.021463719204</mono_mass>
 </ptm>
 <ptm>
@@ -218,7 +218,7 @@
 <ptm>
   <name>Topaquinone</name>
   <abbreviation>TPQ</abbreviation>
-  <unimod>-1</unimod>
+  <unimod>392</unimod>
   <mono_mass>29.974179174724</mono_mass>
 </ptm>
 <ptm>

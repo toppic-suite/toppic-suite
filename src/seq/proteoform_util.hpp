@@ -16,6 +16,7 @@
 #ifndef TOPPIC_SEQ_PROTEOFORM_UTIL_HPP_
 #define TOPPIC_SEQ_PROTEOFORM_UTIL_HPP_
 
+#include <string>
 #include <vector>
 
 #include "seq/proteoform.hpp"
@@ -53,6 +54,32 @@ std::vector<double> getNTermAcets(const ProteoformPtr& db_form_ptr,
 std::vector<std::vector<double> > getNTermAcet2D(
     const ProteoformPtrVec& db_form_ptr_vec,
     const ProtModPtrVec& prot_mod_ptrs);
+
+// The ProForma string of a proteoform (HUPO-PSI ProForma 2.1,
+// https://github.com/HUPO-PSI/ProForma): its residues (first to last
+// residue, no flanking residues) with the modifications in square brackets.
+//   - A PTM is written as its Unimod accession, [UNIMOD:35], when it has a
+//     Unimod id, otherwise as its mass, [+57.0215] (TopPIC's PTM names are
+//     not all Unimod names, so they are not written as names).
+//   - The protein N-terminal acetylations (M_ACETYLATION, NME_ACETYLATION)
+//     and the truncation N-terminal modification are N-terminal
+//     modifications: [UNIMOD:1]-SEQ.
+//   - Fixed PTMs, the PTMs written in the FASTA sequence and the variable
+//     PTMs follow their residue when they are localized to one: C[UNIMOD:4].
+//   - Unexpected mass shifts are masses with 4 decimals (sign included) on
+//     their residue, or on their range of residues in parentheses,
+//     (PEP)[+12.3456]; variable PTMs not localized to one residue likewise,
+//     with all the PTMs of the range: (MAM)[UNIMOD:35][UNIMOD:35].
+//   - A PTM localized by MIScore (-l) is written at its best site with the
+//     site scores of the positive sites (Level 2): S[UNIMOD:21#s1(0.900)]
+//     T[#s1(0.100)].
+//   - A range that would overlap a range already written (ProForma does
+//     not allow it) is written as a set of positions instead, the first
+//     residue preferred: P[+12.3456#g1]E[#g1]P[#g1].
+//   - A modification without a residue (an empty range) is written as of
+//     unknown position: [+12.3456]?SEQ.
+// Everything else is Level 1 ProForma.
+std::string getProFormaStr(const ProteoformPtr& form_ptr);
 
 }  // namespace proteoform_util
 

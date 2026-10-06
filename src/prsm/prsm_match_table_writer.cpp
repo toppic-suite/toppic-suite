@@ -23,6 +23,7 @@
 #include "common/util/file_util.hpp"
 #include "common/util/logger.hpp"
 #include "prsm/prsm_reader_util.hpp"
+#include "seq/proteoform_util.hpp"
 
 namespace toppic {
 
@@ -51,8 +52,8 @@ void PrsmMatchTableWriter::writeHeader(std::ofstream& file) {
        << "Protein description" << delim << "First residue" << delim
        << "Last residue" << delim << "Special amino acids" << delim
        << "Database protein sequence" << delim << "Previous amino acid" << delim
-       << "Proteoform" << delim << "Next amino acid" << delim
-       << "Proteoform mass" << delim << "Protein N-terminal form" << delim
+       << "Proteoform" << delim << "Next amino acid" << delim << "ProForma"
+       << delim << "Proteoform mass" << delim << "Protein N-terminal form" << delim
        << "Fixed PTMs" << delim << "# Unexpected modifications" << delim
        << "Unexpected modifications" << delim << "# Variable PTMs" << delim
        << "Variable PTMs" << delim << "MIScore" << delim
@@ -200,7 +201,9 @@ void PrsmMatchTableWriter::writePrsmStandardFormat(
            << delim << form_ptr->getFastaSeqPtr()->getSubSeq(start_pos, end_pos)
            << delim << form_ptr->getPrevAminoAcid() << delim
            << form_ptr->getProteoformMatchSeq() << delim
-           << form_ptr->getNextAminoAcid() << delim << form_ptr->getMass()
+           << form_ptr->getNextAminoAcid() << delim
+           << proteoform_util::getProFormaStr(form_ptr) << delim
+           << form_ptr->getMass()
            << delim << form_ptr->getProtModPtr()->getType() << delim
            << form_ptr->getAlterStr(AlterType::FIXED) << delim
            << form_ptr->getAlterNum(AlterType::UNEXPECTED) << delim
