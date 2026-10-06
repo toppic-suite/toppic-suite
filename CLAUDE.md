@@ -1306,8 +1306,8 @@ merged into main on 2026-10-05). Facts to keep straight:
 
 ## Deamidation or the -1 isotope offset (`prsm/prsm_deamid_selector`)
 
-Branch `deamid_prec_error` (toppic_test experiment 123, report 0123; not
-merged). **Off by default**; the hidden toppic option `--deamid-selector`
+Branch `deamid_prec_error` (toppic_test experiment 123, report 0123;
+merged into main on 2026-10-05). **Off by default**; the hidden toppic option `--deamid-selector`
 (key `deamidSelector`, default `"false"`; printed in the parameter block
 only when set) turns it on. Then, with a deamidation in the variable PTM
 file (a PTM with Unimod id 7 or a monoisotopic mass within 0.001 Da of
