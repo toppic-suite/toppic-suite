@@ -18,6 +18,7 @@
 
 #include <vector>
 
+#include "common/base/mod.hpp"
 #include "common/base/residue_freq.hpp"
 #include "seq/proteoform.hpp"
 
@@ -37,6 +38,13 @@ ResFreqPtrVec compResidueFreq(const ResiduePtrVec& residue_list,
                               const std::vector<double>& counts);
 
 int computeAvgLength(const ResFreqPtrVec& residue_ptrs, double convert_ratio);
+
+// The residues of the generating function of the variable PTM PrSMs: a
+// residue that k - 1 of the modifications can modify (it is their original
+// residue) becomes k residues, itself and its k - 1 modified forms, which
+// share its frequency x, x / k each (toppic_test experiment 129).
+ResFreqPtrVec geneModResFreqs(const ResFreqPtrVec& residue_ptrs,
+                              const ModPtrVec& mod_ptr_vec);
 
 }  // namespace count_util
 

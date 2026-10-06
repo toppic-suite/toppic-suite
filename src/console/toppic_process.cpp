@@ -239,6 +239,20 @@ bool TopPIC_init(std::map<std::string, std::string>& arguments) {
   }
   return true;
 }
+
+// The hidden --var-ptm-evalue-mod-residues: the generating function of the
+// variable PTM PrSMs takes the residues and their forms with the variable
+// PTMs of the file (toppic_test experiment 129); toppic's E-value passes
+// call this for their TdgfMng.
+void setVarPtmModResidues(std::map<std::string, std::string>& arguments,
+                          const TdgfMngPtr& tdgf_mng_ptr) {
+  std::string var_ptm_file_name = arguments["variablePtmFileName"];
+  if (arguments["varPtmEvalueModResidues"] == "true" &&
+      var_ptm_file_name != "" && std::stoi(arguments["variablePtmNum"]) >= 1) {
+    tdgf_mng_ptr->var_ptm_mod_ptr_vec_ =
+        mod_util::readAnywhereModTxt(var_ptm_file_name);
+  }
+}
 }  // namespace
 
 // protein filtering + database searching + E-value computation
@@ -419,6 +433,7 @@ std::string TopPIC_identify(std::map<std::string, std::string>& arguments) {
         std::max(std::abs(max_shift_mass), std::abs(min_shift_mass)),
         var_ptm_type_num, thread_num, "toppic_combined", "toppic_evalue");
     tdgf_mng_ptr->n_term_var_ptm_type_num_ = n_term_var_ptm_type_num;
+    setVarPtmModResidues(arguments, tdgf_mng_ptr);
     EValueProcessorPtr processor =
         std::make_shared<EValueProcessor>(tdgf_mng_ptr);
     processor->init();
@@ -884,6 +899,7 @@ std::string TopPIC_multi_ptm_search(
         std::max(std::abs(max_shift_mass), std::abs(min_shift_mass)),
         var_ptm_type_num, thread_num, "toppic_multi_combined",
         "toppic_multi_evalue");
+    setVarPtmModResidues(arguments, tdgf_mng_ptr);
     EValueProcessorPtr processor =
         std::make_shared<EValueProcessor>(tdgf_mng_ptr);
     processor->init();
@@ -1017,6 +1033,7 @@ int TopPIC_postprocess(std::map<std::string, std::string>& arguments,
           arguments["nTermVarPtmTypeNum"] == ""
               ? 0
               : std::stoi(arguments["nTermVarPtmTypeNum"]);
+      setVarPtmModResidues(arguments, tdgf_mng_ptr);
       int removed_num = 0;
       int corrected_num = cluster_prot_corrector::process(
           prsm_para_ptr, tdgf_mng_ptr, cur_suffix, "toppic_cluster_prot",

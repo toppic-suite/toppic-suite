@@ -89,6 +89,35 @@ int computeAvgLength(const ResFreqPtrVec& residue_ptrs, double convert_ratio) {
   return static_cast<int>(std::round(mass_sum / freq_sum * convert_ratio));
 }
 
+ResFreqPtrVec geneModResFreqs(const ResFreqPtrVec& residue_ptrs,
+                              const ModPtrVec& mod_ptr_vec) {
+  ResFreqPtrVec res_freq_list;
+  for (size_t i = 0; i < residue_ptrs.size(); i++) {
+    // the modified residues of this residue, each once: a residue is
+    // modified as the variable PTM search modifies it, when it is the
+    // modification's original residue (the same amino acid without a PTM),
+    // so the residue of a fixed modification (C57) is not
+    ResiduePtrVec mod_res_ptrs;
+    for (size_t j = 0; j < mod_ptr_vec.size(); j++) {
+      const ResiduePtr& mod_res_ptr = mod_ptr_vec[j]->getModResiduePtr();
+      if (mod_ptr_vec[j]->getOriResiduePtr()->isSame(residue_ptrs[i]) &&
+          residue_util::findResidue(mod_res_ptrs, mod_res_ptr) < 0) {
+        mod_res_ptrs.push_back(mod_res_ptr);
+      }
+    }
+    double freq = residue_ptrs[i]->getFreq() / (mod_res_ptrs.size() + 1);
+    res_freq_list.push_back(std::make_shared<ResidueFreq>(
+        residue_ptrs[i]->getAminoAcidPtr(), residue_ptrs[i]->getPtmPtr(),
+        freq));
+    for (size_t j = 0; j < mod_res_ptrs.size(); j++) {
+      res_freq_list.push_back(std::make_shared<ResidueFreq>(
+          mod_res_ptrs[j]->getAminoAcidPtr(), mod_res_ptrs[j]->getPtmPtr(),
+          freq));
+    }
+  }
+  return res_freq_list;
+}
+
 }  // namespace count_util
 
 }  // namespace toppic

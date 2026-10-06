@@ -27,14 +27,7 @@ CompProbValue::CompProbValue(double convert_ratio,
                              double residue_avg_len, int max_layer_num,
                              int max_table_height, double max_sp_prec_mass) {
   convert_ratio_ = convert_ratio;
-  residue_avg_len_ = residue_avg_len;
-
-  for (size_t i = 0; i < residue_ptrs.size(); i++) {
-    int int_mass = static_cast<int>(
-        std::round(residue_ptrs[i]->getMass() * convert_ratio));
-    residue_masses_.push_back(int_mass);
-    residue_frequencies_.push_back(residue_ptrs[i]->getFreq());
-  }
+  setResidues(residue_ptrs, static_cast<int>(residue_avg_len));
 
   max_layer_num_ = max_layer_num;
   max_table_height_ = max_table_height;
@@ -47,6 +40,19 @@ CompProbValue::CompProbValue(double convert_ratio,
   pos_scores_ = new short[max_sp_len_ + block_len_];
   tmp_pos_scores_ = new short[max_sp_len_ + block_len_];
   setFactors();
+}
+
+void CompProbValue::setResidues(const ResFreqPtrVec& residue_ptrs,
+                                int residue_avg_len) {
+  residue_avg_len_ = residue_avg_len;
+  residue_masses_.clear();
+  residue_frequencies_.clear();
+  for (size_t i = 0; i < residue_ptrs.size(); i++) {
+    int int_mass = static_cast<int>(
+        std::round(residue_ptrs[i]->getMass() * convert_ratio_));
+    residue_masses_.push_back(int_mass);
+    residue_frequencies_.push_back(residue_ptrs[i]->getFreq());
+  }
 }
 
 CompProbValue::~CompProbValue() {
