@@ -16,6 +16,9 @@
 #include "common/base/ptm_base.hpp"
 
 #include <algorithm>
+#include <cmath>
+#include <iostream>
+#include <set>
 #include <stdexcept>
 #include <string>
 
@@ -68,8 +71,9 @@ void PtmBase::initBase(const std::string& base_dir) {
       unimod_name_map_.emplace(ptm_ptr->getUnimodId(),
                                ptm_ptr->getAbbrName());
     }
-    // check empty ptr
-    if (ptm_ptr->getMonoMass() == 0.0) {
+    // the empty PTM is found by its name: since ptm_base.xml holds every
+    // Unimod modification, a mass of 0 does not identify it
+    if (ptm_ptr->getAbbrName() == PtmBase::getEmptyPtmAbbrName()) {
       empty_ptm_ptr_ = ptm_ptr;
     }
     // check acetylation
@@ -114,6 +118,18 @@ std::string PtmBase::getUnimodName(int unimod_id) {
 PtmPtr PtmBase::getPtmPtr(const PtmPtr& p) {
   auto it = ptm_abbr_name_map_.find(p->getAbbrName());
   if (it != ptm_abbr_name_map_.end()) {
+    // a modification file's PTM with a name of ptm_base.xml (every Unimod
+    // name) takes that entry; say so once when the file's mass differs
+    static std::set<std::string> warned_names;
+    if (std::abs(it->second->getMonoMass() - p->getMonoMass()) > 0.001 &&
+        warned_names.insert(p->getAbbrName()).second) {
+      std::cout << "WARNING: The modification " << p->getAbbrName()
+                << " (mass " << p->getMonoMass()
+                << ") is the built-in modification of that name (Unimod id "
+                << it->second->getUnimodId() << "), whose mass "
+                << it->second->getMonoMass()
+                << " is used. Rename it to use its own mass." << std::endl;
+    }
     return it->second;
   }
   ptm_ptr_vec_.push_back(p);

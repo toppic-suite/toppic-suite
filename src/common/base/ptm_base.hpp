@@ -46,10 +46,11 @@ class PtmBase {
   static const PtmPtr& getPtmPtrByAbbrName(const std::string& abbr_name);
 
   /**
-   * The abbreviation of the ptm_base.xml PTM with this Unimod id, which is
-   * its Unimod (PSI-MS) name; empty when ptm_base.xml has no PTM with the
-   * id. PTMs added from modification files are not looked up: their names
-   * are not checked.
+   * The Unimod (PSI-MS) name of a Unimod id: the abbreviation of the
+   * ptm_base.xml entry with that id (ptm_base.xml holds every Unimod
+   * modification). Empty when there is none (an id newer than the file, or
+   * not Unimod's). PTMs added from modification files are not looked up:
+   * their names are not checked.
    */
   static std::string getUnimodName(int unimod_id);
 
@@ -73,6 +74,7 @@ class PtmBase {
   static PtmPtr c57_ptr_;
   static PtmPtr c58_ptr_;
 
+  static std::string getEmptyPtmAbbrName() { return "No PTM"; }
   static std::string getAcetylationAbbrName() { return "Acetyl"; }
   static std::string getC57AbbrName() { return "Carbamidomethyl"; }
   static std::string getC58AbbrName() { return "Carboxymethyl"; }

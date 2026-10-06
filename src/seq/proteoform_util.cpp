@@ -252,28 +252,44 @@ std::string proFormaMass(double mass) {
   return str;
 }
 
+// Whether a name can stand in a ProForma tag: no "|" or "#" (the spec
+// requires the accession for such CV names) and paired square brackets
+// (Cation:Mg[II]).
+bool isProFormaName(const std::string& name) {
+  if (name.empty() || name.find_first_of("|#") != std::string::npos) {
+    return false;
+  }
+  int depth = 0;
+  for (char c : name) {
+    if (c == '[') {
+      depth++;
+    } else if (c == ']' && --depth < 0) {
+      return false;
+    }
+  }
+  return depth == 0;
+}
+
 // A PTM in ProForma: with a Unimod id, its Unimod name and accession,
-// joined with "|" as synonyms, [Oxidation|UNIMOD:35] (the abbreviations of
-// ptm_base.xml are Unimod names), or the accession alone when ptm_base.xml
-// has no PTM with the id; without one, the mass (the PTM's, or the
+// joined with "|" as synonyms, [Oxidation|UNIMOD:35] (the name from
+// ptm_base.xml, which holds every Unimod modification, whatever the
+// modification file calls the PTM), or the accession alone when the id has
+// no name there; without a Unimod id, the mass (the PTM's, or the
 // alteration's) with the PTM's name as information,
-// [-43.9898|INFO:Decarboxy]. A name that ProForma cannot hold in a tag
-// (brackets, "|" or "#") is left out.
+// [-43.9898|INFO:Decarboxy].
 std::string proFormaPtm(const PtmPtr& ptm_ptr, double mass) {
-  std::string name = ptm_ptr->getAbbrName();
-  bool info = !name.empty() &&
-              name.find_first_of("[]|#") == std::string::npos;
   int unimod_id = ptm_ptr->getUnimodId();
   if (unimod_id > 0) {
     std::string accession = "UNIMOD:" + std::to_string(unimod_id);
     std::string unimod_name = PtmBase::getUnimodName(unimod_id);
-    if (!unimod_name.empty()) {
+    if (isProFormaName(unimod_name)) {
       return unimod_name + "|" + accession;
     }
-    return info ? accession + "|INFO:" + name : accession;
+    return accession;
   }
   std::string str = proFormaMass(mass);
-  return info ? str + "|INFO:" + name : str;
+  const std::string& name = ptm_ptr->getAbbrName();
+  return isProFormaName(name) ? str + "|INFO:" + name : str;
 }
 
 std::string proFormaPtm(const PtmPtr& ptm_ptr) {

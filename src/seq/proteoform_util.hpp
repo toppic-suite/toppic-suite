@@ -59,14 +59,14 @@ std::vector<std::vector<double> > getNTermAcet2D(
 // https://github.com/HUPO-PSI/ProForma): its residues (first to last
 // residue, no flanking residues) with the modifications in square brackets.
 //   - A PTM with a Unimod id is written as its Unimod name and accession,
-//     joined with "|" as synonyms (Level 2), [Oxidation|UNIMOD:35]: the
-//     name is the abbreviation of the ptm_base.xml PTM with that id, all of
-//     which are Unimod names (PtmBase::getUnimodName). An id that
-//     ptm_base.xml does not have gives the accession, with the PTM's name
-//     as information: [UNIMOD:737|INFO:TMT6plex]. A PTM without a
-//     Unimod id is written as its mass with its name as information,
-//     [-43.9898|INFO:Decarboxy]. A name with brackets, "|" or "#" is left
-//     out.
+//     joined with "|" as synonyms (Level 2), [Oxidation|UNIMOD:35],
+//     [Cation:Na|UNIMOD:30]: the name of the id in ptm_base.xml, which
+//     holds every Unimod modification (PtmBase::getUnimodName), whatever a
+//     modification file calls the PTM. An id without a name there (newer
+//     than the file) gives the accession alone. A PTM without a Unimod id
+//     is written as its mass with its name as information,
+//     [-43.9898|INFO:Decarboxy]. A name with "|", "#" or unpaired
+//     brackets is left out.
 //   - The protein N-terminal acetylations (M_ACETYLATION, NME_ACETYLATION)
 //     and the truncation N-terminal modification are N-terminal
 //     modifications: [Acetyl|UNIMOD:1]-SEQ.
