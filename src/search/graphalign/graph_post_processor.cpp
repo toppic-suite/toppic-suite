@@ -332,11 +332,17 @@ GraphNTermForm GraphPostProcessor::chooseNTermForm(
   PrsmParaPtr prsm_para_ptr = mng_ptr_->prsm_para_ptr_;
   ProtModPtrVec prot_mod_ptrs;
   ResiduePtrVec residues;
+  // a first residue with a PTM (written in the FASTA sequence) has no
+  // M_ACETYLATION edge in the graph (ProteoAnno::anno); NME and
+  // NME_ACETYLATION, which remove it, stay
+  bool first_fixed = false;
   if (start <= 1) {
     prot_mod_ptrs = prsm_para_ptr->getProtModPtrVec();
     ProteoformPtr db_form_ptr = proteoform_factory::geneDbProteoformPtr(
         form_ptr->getFastaSeqPtr(), prsm_para_ptr->getFixModPtrVec());
     residues = db_form_ptr->getResSeqPtr()->getResidues();
+    first_fixed = !residues.empty() &&
+                  !PtmBase::isEmptyPtmPtr(residues[0]->getPtmPtr());
   }
   for (size_t i = 0; i < prot_mod_ptrs.size(); i++) {
     const ProtModPtr& mod_ptr = prot_mod_ptrs[i];
@@ -351,6 +357,9 @@ GraphNTermForm GraphPostProcessor::chooseNTermForm(
       continue;
     }
     if (first_shift_ptr == nullptr) {
+      continue;
+    }
+    if (first_fixed && type == ProtModBase::getType_M_ACETYLATION()) {
       continue;
     }
     double acetyl_mass = mod_ptr->getModPtr()->getShift();
@@ -576,9 +585,16 @@ void GraphPostProcessor::process() {
 
           std::sort(shift_vec.begin(), shift_vec.end(), MassShift::cmpPosInc);
 
+          // the fixed modifications and the PTMs written in the FASTA
+          // sequence (INPUT), the only edges of their residues
           MassShiftPtrVec fix_shift_vec =
               prsm_ptr->getProteoformPtr()->getMassShiftPtrVec(
                   AlterType::FIXED);
+          MassShiftPtrVec input_shift_vec =
+              prsm_ptr->getProteoformPtr()->getMassShiftPtrVec(
+                  AlterType::INPUT);
+          fix_shift_vec.insert(fix_shift_vec.end(), input_shift_vec.begin(),
+                               input_shift_vec.end());
 
           fix_shift_vec.insert(fix_shift_vec.end(), shift_vec.begin(),
                                shift_vec.end());
@@ -593,9 +609,19 @@ void GraphPostProcessor::process() {
           ModPtr n_term_mod_ptr = prot_mod->getModPtr();
           bool acetylated = !ModBase::isNTermNoneModPtr(n_term_mod_ptr);
           if (offset > 0) {
+            // a PTM of the FASTA sequence (or a fixed modification) on a
+            // removed residue goes with it
+            MassShiftPtrVec moved_shift_vec;
             for (size_t k = 0; k < fix_shift_vec.size(); k++) {
-              fix_shift_vec[k] = moveShift(fix_shift_vec[k], offset);
+              AlterTypePtr type_ptr = fix_shift_vec[k]->getTypePtr();
+              if ((type_ptr == AlterType::INPUT ||
+                   type_ptr == AlterType::FIXED) &&
+                  fix_shift_vec[k]->getRightBpPos() <= offset) {
+                continue;
+              }
+              moved_shift_vec.push_back(moveShift(fix_shift_vec[k], offset));
             }
+            fix_shift_vec = moved_shift_vec;
           }
           if (offset > 0 || acetylated) {
             const ResiduePtrVec& residues = res_seq_ptr->getResidues();

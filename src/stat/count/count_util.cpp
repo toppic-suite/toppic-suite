@@ -23,7 +23,10 @@ namespace toppic {
 
 namespace count_util {
 
-void updateResidueCounts(const ResiduePtrVec& residue_list,
+// A residue not in the list, one with a PTM written in the FASTA sequence
+// (M[Oxidation]), is added to it, as the residue of a fixed modification is
+// in it; it used to be left out of the frequencies.
+void updateResidueCounts(ResiduePtrVec& residue_list,
                          std::vector<double>& counts,
                          const ProteoformPtr& prot_ptr) {
   ResSeqPtr seq_ptr = prot_ptr->getResSeqPtr();
@@ -33,6 +36,9 @@ void updateResidueCounts(const ResiduePtrVec& residue_list,
     if (pos >= 0) {
       // found
       counts[pos] = counts[pos] + 1;
+    } else {
+      residue_list.push_back(res_ptr);
+      counts.push_back(1);
     }
   }
 }

@@ -28,6 +28,7 @@
 #include <string>
 
 #include "common/base/ptm_base.hpp"
+#include "common/base/residue_util.hpp"
 #include "common/util/file_util.hpp"
 #include "common/util/logger.hpp"
 #include "htslib/faidx.h"
@@ -261,6 +262,36 @@ void dbPreprocess(const std::string& ori_db_file_name,
     fai_build(new_db_file_name.c_str());
     checkDuplicate(new_db_file_name, idx_folder_name);
   }
+
+  // before any search thread starts
+  addPtmResidues(new_db_file_name);
+}
+
+void addPtmResidues(const std::string& fasta_file) {
+  // most databases have no PTM: look for a bracket first
+  std::ifstream input(fasta_file);
+  std::string line;
+  bool has_ptm = false;
+  while (std::getline(input, line)) {
+    if (!line.empty() && line[0] != '>' &&
+        line.find('[') != std::string::npos) {
+      has_ptm = true;
+      break;
+    }
+  }
+  input.close();
+  if (!has_ptm) {
+    return;
+  }
+  FastaReader reader(fasta_file);
+  FastaSeqPtr seq_ptr = reader.getNextSeq();
+  while (seq_ptr != nullptr) {
+    if (seq_ptr->getRawSeq().find('[') != std::string::npos) {
+      residue_util::convertStrToResiduePtrVec(seq_ptr->getAcidPtmPairVec());
+    }
+    seq_ptr = reader.getNextSeq();
+  }
+  reader.close();
 }
 
 int countProteinNum(const std::string& fasta_file) {

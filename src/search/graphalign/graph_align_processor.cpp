@@ -63,7 +63,7 @@ void alignCandidate(const GraphAlignMngPtr& mng_ptr,
 
   for (size_t j = 0; j < seq_ptr_vec.size(); j++) {
     for (size_t k = 0; k < spec_ptr_vec.size(); k++) {
-      proteo_anno_ptr->anno(seq_ptr_vec[j]->getRawSeq(),
+      proteo_anno_ptr->anno(seq_ptr_vec[j]->getAcidPtmPairVec(),
                             seq_ptr_vec[j]->isNTerm());
       MassGraphPtr graph_ptr =
           getMassGraphPtr(proteo_anno_ptr, mng_ptr->convert_ratio_);
