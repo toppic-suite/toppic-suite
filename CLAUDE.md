@@ -1198,14 +1198,20 @@ straight:
   alignment (toppic_test experiment 122).
 - **One edge per modified residue.** A residue with a PTM, of the FASTA or
   of `-f`, is marked `FIXED`, and `getMassGraphPtr` gives a position with a
-  `FIXED` residue that edge alone: no variable PTM edge and, on residue 0,
-  no protein N-terminal form edge (`M_ACETYLATION`, `NME_ACETYLATION`).
-  `GraphPostProcessor::chooseNTermForm` takes no acetylated form for a
-  protein whose first residue has a FASTA PTM. NME (a start, not an edge)
-  and the truncation N-terminal modifications (not edges either) stay open,
-  as for a fixed modification's residue. A `-f` modification is not
-  applied to a residue with a FASTA PTM (`applyFixedMod` compares with the
-  unmodified residue).
+  `FIXED` residue that edge alone (and `PROTEIN_VARIABLE` edges, below): no
+  variable PTM edge. A first residue with a FASTA PTM gets no
+  `M_ACETYLATION` edge, which would modify it, and
+  `GraphPostProcessor::chooseNTermForm` does not take that form for it. The
+  forms that remove it stay: NME (a start, not an edge) and
+  `NME_ACETYLATION`, whose edge in place of the M is the position's
+  `PROTEIN_VARIABLE` edge; the post-processing drops the FASTA PTM of the
+  removed M (an `INPUT` or `FIXED` shift on residues before the form's
+  start). A first version took every acetylated form away from such a
+  residue: with M1 written oxidized, YBOX3, FUBP2 and H1.5 lost their
+  NME_ACETYLATION PrSMs on 480_F3_02 (experiment 122). The truncation
+  N-terminal modifications (not edges either) stay open, as for a fixed
+  modification's residue. A `-f` modification is not applied to a residue
+  with a FASTA PTM (`applyFixedMod` compares with the unmodified residue).
 - **The post-processing keeps the `INPUT` shifts** (it rebuilds each
   proteoform from its `FIXED`, `VARIABLE` and `UNEXPECTED` shifts, which
   dropped them from the reported proteoforms).

@@ -87,8 +87,10 @@ void ProteoAnno::anno(const StringPairVec& acid_ptm_pairs, bool is_complete) {
   // use them; GraphPostProcessor reads the form back from the first
   // variable shift and the start. NME is the start at vertex 1, and is_nme_
   // tells whether that start is the protein N-terminus.
-  // A first residue with a PTM has no form edge (its edge is FIXED): the
-  // acetylated forms are not open to it, NME (a start, not an edge) is.
+  // A first residue with a PTM keeps its one edge, so M_ACETYLATION, which
+  // would modify it, is not open to it. The forms that remove it are: NME (a
+  // start, not an edge) and NME_ACETYLATION, whose edge in place of the M is
+  // kept by getMassGraphPtr as a PROTEIN_VARIABLE edge.
   is_nme_ = false;
   bool first_fixed = !residue_ptr_vec.empty() &&
                      !PtmBase::isEmptyPtmPtr(residue_ptr_vec[0]->getPtmPtr());
@@ -100,9 +102,10 @@ void ProteoAnno::anno(const StringPairVec& acid_ptm_pairs, bool is_complete) {
     LOG_DEBUG("i " << i << " mod " << mod_ptr);
     if (mod_ptr->getType() == ProtModBase::getType_NME()) {
       is_nme_ = true;
-    } else if (first_fixed) {
-      continue;
     } else if (mod_ptr->getType() == ProtModBase::getType_M_ACETYLATION()) {
+      if (first_fixed) {
+        continue;
+      }
       // the acetylated M
       ResiduePtr mut_residue_ptr = mod_ptr->getModPtr()->getModResiduePtr();
       res_vec_2d_[0].push_back(mut_residue_ptr);
