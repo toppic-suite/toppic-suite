@@ -21,6 +21,7 @@
 #include "prsm/prsm.hpp"
 #include "prsm/prsm_reader_util.hpp"
 #include "prsm/prsm_xml_writer.hpp"
+#include "prsm/search_fasta_match.hpp"
 #include "seq/fasta_index_reader.hpp"
 
 namespace toppic {
@@ -78,6 +79,24 @@ void process(const std::string& db_file_name, const std::string& base_name,
       selected_prsms.push_back(prsms[i]);
       id++;
     }
+  }
+
+  // the classification of the proteoform of every selected PrSM, from its
+  // protein hits in the database the tables search (# Protein hits); the
+  // proteoform and protein cutoffs read the PrSMs of the PrSM cutoff, which
+  // have it
+  SearchFastaMatchPtr search_match_ptr = nullptr;
+  for (size_t i = 0; i < selected_prsms.size(); i++) {
+    ProteoformPtr form_ptr = selected_prsms[i]->getProteoformPtr();
+    if (form_ptr->getClassification() != "") {
+      continue;
+    }
+    if (search_match_ptr == nullptr) {
+      search_match_ptr = std::make_shared<SearchFastaMatch>(db_file_name);
+    }
+    int hit_num =
+        static_cast<int>(search_match_ptr->process(selected_prsms[i]).size());
+    form_ptr->setClassification(form_ptr->getClassification(hit_num));
   }
 
   // output

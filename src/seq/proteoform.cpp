@@ -122,6 +122,12 @@ void Proteoform::parseXml(XmlDOMElement element,
     }
   }
 
+  // the classification, in the PrSM files of the report stage only
+  if (xml_dom_util::getChildCount(element, "classification") > 0) {
+    classification_ =
+        xml_dom_util::getChildValue(element, "classification", 0);
+  }
+
   // Parse mass shifts
   std::string shift_name = MassShift::getXmlElementName();
   std::string shift_list_name = shift_name + "_list";
@@ -446,6 +452,11 @@ void Proteoform::appendXml(XmlDOMDocument* xml_doc, XmlDOMElement parent) {
     XmlDOMElement trunc_element =
         xml_doc->addElement(element, "trunc_n_term_mod");
     trunc_n_term_mod_ptr_->appendToXml(xml_doc, trunc_element);
+  }
+  // written only when set (the report stage), so that the PrSM files before
+  // it stay the same
+  if (classification_ != "") {
+    xml_doc->addElement(element, "classification", classification_.c_str());
   }
 
   element_name = MassShift::getXmlElementName() + "_list";

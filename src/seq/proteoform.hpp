@@ -155,6 +155,15 @@ class Proteoform {
   // is; 0 hits count as one protein.
   std::string getClassification(int prot_hit_num);
 
+  // The level stored by setClassification, "" until set: the report stage
+  // sets it from the protein hits (prsm_cutoff_selector), and the XML has it
+  // as <classification>.
+  const std::string& getClassification() const { return classification_; }
+
+  void setClassification(const std::string& classification) {
+    classification_ = classification;
+  }
+
   void setStartPos(int start_pos) { start_pos_ = start_pos; }
 
   void setEndPos(int end_pos) { end_pos_ = end_pos; }
@@ -190,6 +199,9 @@ class Proteoform {
   int prot_cluster_id_ = -1;
 
   double proteo_inte_ = -1;
+
+  // the stored level of the proteoform classification, "" until set
+  std::string classification_;
 
   MassShiftPtrVec mass_shift_list_;
 };
