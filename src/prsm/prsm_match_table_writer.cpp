@@ -258,6 +258,8 @@ void PrsmMatchTableWriter::writePrsmStandardFormat(
                                              form_ptr->getEndPos())
                << delim << delim << delim << delim << delim << delim << delim
                << delim << delim << delim << delim << delim;
+      // ProForma
+      line_str << delim;
 
       // fdr
       line_str << delim << delim << std::endl;
