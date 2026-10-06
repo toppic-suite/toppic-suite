@@ -1235,11 +1235,25 @@ straight:
   letter each, and a hit must have the same FASTA PTMs. The raw string was
   indexed and cut at the proteoform's residue positions: with brackets
   before the start the cut was a piece of a PTM name and the next residues,
-  which matched thousands of proteins (350,183 extra rows in topmg's PrSM
-  table of 480_F3_02 with every C written as `C[Carbamidomethylation]`).
-  A database without PTMs is indexed and searched as before.
+  which matched thousands of proteins (350,183 rows of other proteins in
+  topmg's PrSM table of 480_F3_02 with every C written as
+  `C[Carbamidomethylation]`, against 269 with `-f C57`). A database
+  without PTMs is indexed and searched as before.
 - The PTM localization of toppic (`-l`, `stat/local/local_proteoform`)
   still reads the raw string (`getRawSeq`); topmg has no such stage.
+- Results (toppic_test experiment 122, report 0122; 480_F3_02, `-d -t FDR
+  -T FDR`, oxidation M, phospho STY, `Acetyl,*,N-term`): every C written
+  as `C[Carbamidomethylation]` without `-f` gives `-f C57`'s filter,
+  alignment and post-processing files (topmg) and all of `--topmg`'s files
+  with its E-values and tables (but the Fixed PTMs and Database protein
+  sequence columns), with the same index (built in memory; the shared
+  index files of toppic_test's `data/`, built on 2026-09-28, give 70 of
+  60,135 one-PTM filter candidates differently). Without FASTA PTMs the
+  files are main's. With the 249 methionines main reports oxidized written
+  as `M[Oxidation]`, 86-90% of the PrSMs that had the oxidation are the
+  same proteoform with it from the FASTA (`--topmg` E-values a median
+  10^-0.48 smaller), and the unoxidized forms over those sites take an
+  unexpected shift or are lost (`--topmg` 2,841 PrSMs against 2,959).
 
 ## Precursor +-1 Da error per identification stage (`para/sp_para`)
 
