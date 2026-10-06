@@ -1014,32 +1014,46 @@ acid` (PrSM, proteoform and protein tables of toppic and topmg) and
 describes it in `docs/manual/proteoform.md` section 6. Facts to keep
 straight (toppic_test experiment 128):
 
-- **PTMs are Unimod name and accession**, `[Oxidation|UNIMOD:35]` (joined
-  with `|` as synonyms, ProForma 2.1 section 7.5, a Level 2 feature). The
-  name is `PtmBase::getUnimodName(id)`, the abbreviation of the
-  `ptm_base.xml` entry with that Unimod id, never a modification file's
-  name (unchecked: `Phosphorylation,...,21` gives `[Phospho|UNIMOD:21]`).
-  An id `ptm_base.xml` lacks gives `[UNIMOD:<id>|INFO:<name>]`, a PTM
-  without an id its mass with the name as an `INFO` tag (section 6.6),
-  `[-43.9898|INFO:Decarboxy]`; a name with brackets, `|` or `#` is left
-  out. A label (`#s1(0.900)`, `#g1`) goes after the tag's first part
+- **PTMs are Unimod name and accession**, `[Oxidation|UNIMOD:35]`,
+  `[Cation:Na|UNIMOD:30]` (joined with `|` as synonyms, ProForma 2.1
+  section 7.5, a Level 2 feature). The name is `PtmBase::getUnimodName(id)`,
+  the abbreviation of the `ptm_base.xml` entry with that Unimod id, never a
+  modification file's name (unchecked: `Sodium,...,30` gives
+  `[Cation:Na|UNIMOD:30]`); an id without an entry (newer than the file)
+  gives the accession alone. A PTM without a Unimod id (a modification
+  file's line with UnimodID -1) is its mass with the name as an `INFO` tag
+  (section 6.6), `[+12.3457|INFO:MyPTM]`. A name with `|`, `#` or
+  unpaired brackets is left out (`isProFormaName`; `Cation:Mg[II]` is
+  written). A label (`#s1(0.900)`, `#g1`) goes after the tag's first part
   (`labelTag`): after an `INFO` part it would be read as part of the
-  information. ProForma names must be the CV's names exactly, so **every
-  `ptm_base.xml` abbreviation of an entry with a Unimod id is the Unimod
-  (PSI-MS) name of that id** (unimod.obo's `name`; toppic_test experiment
-  128 renamed Carbamidomethylation -> Carbamidomethyl, Oxoalanine ->
-  Cys->Oxoalanine, Allysine -> Lys->Allysine, Thiocarboxy ->
+  information.
+- **`ptm_base.xml` is Unimod**: `No PTM` (TopPIC's only own entry; the
+  empty PTM is found by that name, not by mass 0) and every Unimod
+  modification (1,560, unimod.obo of 17 Feb 2026) in id order, written by
+  toppic_test's `tests/202610/scripts/proforma_output/gen_ptm_base.py`:
+  abbreviation = the Unimod (PSI-MS) name, name = the Unimod full name,
+  mass = the exact sum of the AME2020 nuclide masses over the Unimod
+  composition (bricks expanded). Regenerate it for a new Unimod release;
+  do not edit it by hand. Experiment 128 renamed the earlier entries to
+  their Unimod names (Carbamidomethylation -> Carbamidomethyl, Oxoalanine
+  -> Cys->Oxoalanine, Allysine -> Lys->Allysine, Thiocarboxy ->
   Carboxy->Thiocarboxy, Cholinephosphoryl -> Phosphocholine, TPQ ->
-  Quinone, and removed carboxylation and Citrullination, which were the
-  same Unimod PTMs as Carboxy and Deamidated). Keep it so when adding an
-  entry; Decarboxy (-CO2) has no Unimod entry (id -1). The old names are
-  `<alias>` elements that `PtmBase::initBase` puts in the abbreviation map,
-  so `getPtmPtrByAbbrName` and `getPtmPtr` (FASTA sequences such as
+  Quinone; carboxylation and Citrullination were the same Unimod PTMs as
+  Carboxy and Deamidated) and removed Decarboxy, which has no Unimod
+  entry. The old names are `<alias>` elements that
+  `PtmBase::initBase` puts in the abbreviation map, so
+  `getPtmPtrByAbbrName` and `getPtmPtr` (FASTA sequences such as
   `C[Carbamidomethylation]`, modification files, result XML of earlier
   runs) resolve them to the entry, whose present name the results show.
   The C57 PTM is found by `getC57AbbrName()` ("Carbamidomethyl").
   `SearchFastaMatch` compares the FASTA's PTM names as written, so a
   database must not mix an old and a new name of one PTM.
+- **Every Unimod name is built in**, so a modification file's line whose
+  name is a Unimod name takes the Unimod entry (`PtmBase::getPtmPtr`,
+  documented in `docs/manual/proteoform.md` section 3); when the file's
+  mass differs by more than 0.01 Da, a `WARNING:` line is printed once per
+  name (on `std::cout`: toppic and topmg set the log level to errors, so
+  `LOG_WARN` would not show).
 - **Where each mass shift goes**, per alteration (`Alter`), on the
   alteration's residues, or its mass shift's when the alteration has none
   within them (TopMG writes an unexpected shift on one residue with an

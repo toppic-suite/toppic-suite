@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- TopPIC's PTMs: "No PTM", every Unimod modification (unimod.obo of
-     17:02:2026 11:36; abbreviation = the Unimod name, name = the Unimod full name),
-     then the PTMs without a Unimod entry. Masses: exact sums of the AME2020
-     nuclide masses over the Unimod compositions. <alias>: names of earlier
-     versions. Written by toppic_test tests/202610/scripts/proforma_output/
-     gen_ptm_base.py (experiment 128). -->
+     17:02:2026 11:36; abbreviation = the Unimod name, name = the Unimod full name).
+     Masses: exact sums of the AME2020 nuclide masses over the Unimod
+     compositions. <alias>: names of earlier versions. Written by
+     toppic_test tests/202610/scripts/proforma_output/gen_ptm_base.py
+     (experiment 128); rerun it for a new Unimod release. -->
 <ptm_list>
 <ptm>
   <name>No PTM</name>
@@ -9379,11 +9379,5 @@
   <abbreviation>imidazolone</abbreviation>
   <unimod>2147</unimod>
   <mono_mass>144.042258732224</mono_mass>
-</ptm>
-<ptm>
-  <name>Decarboxylation</name>
-  <abbreviation>Decarboxy</abbreviation>
-  <unimod>-1</unimod>
-  <mono_mass>-43.98982923852</mono_mass>
 </ptm>
 </ptm_list>

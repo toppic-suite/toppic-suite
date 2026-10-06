@@ -65,7 +65,7 @@ std::vector<std::vector<double> > getNTermAcet2D(
 //     modification file calls the PTM. An id without a name there (newer
 //     than the file) gives the accession alone. A PTM without a Unimod id
 //     is written as its mass with its name as information,
-//     [-43.9898|INFO:Decarboxy]. A name with "|", "#" or unpaired
+//     [+12.3457|INFO:MyPTM]. A name with "|", "#" or unpaired
 //     brackets is left out.
 //   - The protein N-terminal acetylations (M_ACETYLATION, NME_ACETYLATION)
 //     and the truncation N-terminal modification are N-terminal

@@ -275,8 +275,7 @@ bool isProFormaName(const std::string& name) {
 // ptm_base.xml, which holds every Unimod modification, whatever the
 // modification file calls the PTM), or the accession alone when the id has
 // no name there; without a Unimod id, the mass (the PTM's, or the
-// alteration's) with the PTM's name as information,
-// [-43.9898|INFO:Decarboxy].
+// alteration's) with the PTM's name as information, [+12.3457|INFO:MyPTM].
 std::string proFormaPtm(const PtmPtr& ptm_ptr, double mass) {
   int unimod_id = ptm_ptr->getUnimodId();
   if (unimod_id > 0) {

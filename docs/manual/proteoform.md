@@ -103,17 +103,21 @@ residue mass:
   mass per line (`Name,Mass,Residues,Position,UnimodID`, see the TopPIC
   manual, section 5). The file is **not** the only source of the values,
   though: when the name is one of the abbreviations in
-  `res/base_data/ptm_base.xml` (`Phospho`, `Acetyl`, `Oxidation`, `Methyl`,
-  `Dimethyl`, `Trimethyl`, `Carbamidomethyl`, ...), the built-in entry
-  is used and the mass in the file is ignored. Only a name that is not in
-  that list is created from the file with the file's mass.
+  `res/base_data/ptm_base.xml`, which are every Unimod (PSI-MS) name
+  (`Phospho`, `Acetyl`, `Oxidation`, `Methyl`, `Carbamidomethyl`,
+  `Cation:Na`, ...), the built-in entry is used and the mass in the file
+  is ignored; when the two masses differ by more than 0.01 Da, TopPIC and
+  TopMG print a WARNING saying so. Only a name that is not in that list is
+  created from the file with the file's mass.
   So a line `Phospho,79.97,STY,any,21` in `common_mods.txt` still uses
   79.966331 Da, and a differently spelled name, say `Phosphorylation`,
   would use the mass from the file. To give a modification a different
   mass, use a name that is not in `ptm_base.xml`.
-- The abbreviations of `ptm_base.xml` are the Unimod (PSI-MS) names of
-  their Unimod ids (`Carbamidomethyl`, `Cys->Oxoalanine`, `Quinone`, ...);
-  only `Decarboxy` (-CO2) has no Unimod entry. The names of earlier
+- `ptm_base.xml` holds every Unimod modification (1,560 in the Unimod
+  release of 17 February 2026): the abbreviation is the Unimod name, the
+  name the Unimod full name and the mass the sum of the AME2020 nuclide
+  masses over the Unimod composition. Its only other entry is the empty
+  `No PTM`. The names of earlier
   versions (`Carbamidomethylation`, `Oxoalanine`, `Allysine`,
   `Thiocarboxy`, `Cholinephosphoryl`, `TPQ`, and `carboxylation` and
   `Citrullination`, which are Unimod's `Carboxy` and `Deamidated`) are
@@ -198,17 +202,18 @@ The string is built from the proteoform itself
   without the flanking residues.
 - A PTM with a Unimod id (the `ptm_base.xml` entry, or the UnimodID column
   of a modification file) is written as its Unimod name and its Unimod
-  accession, joined by `|` as synonyms: `[Oxidation|UNIMOD:35]`. The name
-  is the abbreviation of the `ptm_base.xml` entry with that id, which is
-  the Unimod name; a modification file's own name is not checked and not
-  used for it (a line `Phosphorylation,79.966331,STY,any,21` gives
-  `[Phospho|UNIMOD:21]`).
-- A Unimod id that `ptm_base.xml` does not have is written as the
-  accession with the PTM's name as information, `[UNIMOD:737|INFO:TMT6plex]`,
-  and a PTM without a Unimod id as its monoisotopic mass with its name as
-  information, `[-43.9898|INFO:Decarboxy]` (ProForma's `INFO` tag, which
-  readers do not interpret). A name with square brackets, `|` or `#` is
-  left out.
+  accession, joined by `|` as synonyms: `[Oxidation|UNIMOD:35]`,
+  `[Cation:Na|UNIMOD:30]`. The name is the abbreviation of the
+  `ptm_base.xml` entry with that id, which is the Unimod name; a
+  modification file's own name is not checked and not used for it (a line
+  `Sodium,21.981943,DE,any,30` gives `[Cation:Na|UNIMOD:30]`). An id that
+  `ptm_base.xml` does not have (one newer than its Unimod release) is
+  written as the accession alone, `[UNIMOD:2200]`.
+- A PTM without a Unimod id (a modification file's line with UnimodID -1,
+  e.g. `MyPTM,12.345678,K,any,-1`) is written as its monoisotopic mass
+  with its name as information, `[+12.3457|INFO:MyPTM]` (ProForma's
+  `INFO` tag, which readers do not interpret). A name with `|`, `#` or unpaired square
+  brackets is left out (`Cation:Mg[II]` is written).
 - The protein N-terminal acetylations (`M_ACETYLATION`, `NME_ACETYLATION`)
   and a truncation N-terminal modification are N-terminal modifications,
   `[Acetyl|UNIMOD:1]-SEQ`.

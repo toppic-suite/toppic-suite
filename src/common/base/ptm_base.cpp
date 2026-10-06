@@ -121,7 +121,7 @@ PtmPtr PtmBase::getPtmPtr(const PtmPtr& p) {
     // a modification file's PTM with a name of ptm_base.xml (every Unimod
     // name) takes that entry; say so once when the file's mass differs
     static std::set<std::string> warned_names;
-    if (std::abs(it->second->getMonoMass() - p->getMonoMass()) > 0.001 &&
+    if (std::abs(it->second->getMonoMass() - p->getMonoMass()) > 0.01 &&
         warned_names.insert(p->getAbbrName()).second) {
       std::cout << "WARNING: The modification " << p->getAbbrName()
                 << " (mass " << p->getMonoMass()
