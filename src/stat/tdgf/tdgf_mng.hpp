@@ -46,12 +46,13 @@ class TdgfMng {
   // each of its other variable PTMs by var_ptm_type_num_ plus 1
   int n_term_var_ptm_type_num_ = 0;
 
-  // the variable PTMs (the "any" lines of the variable PTM file) of the
-  // hidden --var-ptm-evalue-mod-residues: when not empty, the PrSMs of the
-  // variable PTM search get a generating function whose residues are the
-  // residues and their forms with these PTMs, a residue's frequency shared
-  // equally by its forms (count_util::geneModResFreqs, toppic_test
-  // experiment 129); empty, every PrSM gets the residues without them
+  // the variable PTMs (the "any" lines of the variable PTM file), set by
+  // toppic unless --disable-var-ptm-evalue-mod-residues: when not empty,
+  // the PrSMs of the variable PTM search get a generating function whose
+  // residues are the residues and their forms with these PTMs, a residue's
+  // frequency shared equally by its forms (count_util::geneModResFreqs,
+  // toppic_test experiment 129); empty, every PrSM gets the residues
+  // without them
   ModPtrVec var_ptm_mod_ptr_vec_;
 
   // Max ptm mass is used in the function for counting sequence numbers

@@ -240,10 +240,10 @@ bool TopPIC_init(std::map<std::string, std::string>& arguments) {
   return true;
 }
 
-// The hidden --var-ptm-evalue-mod-residues: the generating function of the
-// variable PTM PrSMs takes the residues and their forms with the variable
-// PTMs of the file (toppic_test experiment 129); toppic's E-value passes
-// call this for their TdgfMng.
+// By default the generating function of the variable PTM PrSMs takes the
+// residues and their forms with the variable PTMs of the file (toppic_test
+// experiment 129), unless the hidden --disable-var-ptm-evalue-mod-residues
+// is given; toppic's E-value passes call this for their TdgfMng.
 void setVarPtmModResidues(std::map<std::string, std::string>& arguments,
                           const TdgfMngPtr& tdgf_mng_ptr) {
   std::string var_ptm_file_name = arguments["variablePtmFileName"];

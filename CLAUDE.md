@@ -1374,19 +1374,23 @@ spectrum by isotope offset. Facts to keep straight:
       mass + 1 isotope. Not implemented: choosing by precursor error between
       a PrSM at P and an offset PrSM of the same protein and positions.
 
-## E-values of the variable PTM PrSMs with modified residues (`stat/tdgf/comp_pvalue_array`, `--var-ptm-evalue-mod-residues`)
+## E-values of the variable PTM PrSMs with modified residues (`stat/tdgf/comp_pvalue_array`, `--disable-var-ptm-evalue-mod-residues`)
 
 Branch `var_ptm_evalue_mod_residues` (toppic_test experiment 129, issue
-#334; not merged). The hidden toppic option `--var-ptm-evalue-mod-residues`
-(argument key `varPtmEvalueModResidues`, default `"false"` = main, printed
-in the parameter block only when set) gives the PrSMs of the variable PTM
-search their own generating function. Facts to keep straight:
+#334), merged into main on 2026-10-06 with the method on by default. The
+PrSMs of the variable PTM search get their own generating function; the
+hidden toppic option `--disable-var-ptm-evalue-mod-residues` (argument key
+`varPtmEvalueModResidues`, default `"true"`; the parameter block prints
+"Variable PTM E-values with modified residues: false" only when it is set)
+gives them the residues without variable PTMs, as before the merge. Facts
+to keep straight:
 
-- **The residues.** Main's generating function draws random sequences from
+- **The residues.** Without the method (the other PrSMs, and every PrSM
+  before the merge) the generating function draws random sequences from
   the 20 residues with the fixed modifications (C57), each with its
   frequency in the search database (`CountTestNum`), and, for COMPLETE and
   PREFIX PrSMs, the first residues of the protein N-terminal forms. With
-  the option, a residue that k - 1 variable PTMs can modify becomes k
+  the method, a residue that k - 1 variable PTMs can modify becomes k
   residues, itself and its modified forms, which share its frequency x,
   x / k each (`count_util::geneModResFreqs`): with oxidation on M, M ->
   M and M[Oxidation] at x / 2; with oxidation M, acetyl K, methyl KR and
@@ -1423,12 +1427,13 @@ search their own generating function. Facts to keep straight:
   cluster protein correction get the PTMs; TopMG hosted in toppic
   (`--topmg`) does not (its PrSMs come from the graph alignment), and
   neither does topmg.
-- **With the option off** the branch gives main's files byte for byte (56 of
-  56 files of a 480 run).
+- **With `--disable-var-ptm-evalue-mod-residues`** toppic gives the files of
+  main before the merge (4ecb19ea) byte for byte (56 of 56 files of a 480
+  run).
 - **Results on 480_F3_02** (`-s 2`, TopFD of main 4ecb19ea, toppic_test
   report 0129):
-    - Oxidation only (`var_mods.txt`): 3,337 / 2,001 / 437 against main's
-      3,342 / 2,000 / 437, one decoy oxidation PrSM crossing the cutoff. The
+    - Oxidation only (`var_mods.txt`): 3,337 / 2,001 / 437 against
+      4ecb19ea's 3,342 / 2,000 / 437, one decoy oxidation PrSM crossing the cutoff. The
       variable PTM PrSMs' E-values move little (median -0.004 log10 at 5-9
       matched fragments, up to +2.5 for ACBP with 48 fragments).
     - Four PTMs (oxidation M, acetyl K, methyl KR, phospho STY): 3,377 /
@@ -1438,7 +1443,7 @@ search their own generating function. Facts to keep straight:
       splitting S, T, Y, K, R and M moves 16% of the residue probability away
       from the unmodified residues. The PrSMs with variable PTMs then win ties
       and near-ties against the zero-shift PrSMs of the same spectrum, which
-      keep main's residues. In 19 scans a protein N-terminal acetylation
+      keep the residues without PTMs. In 19 scans a protein N-terminal acetylation
       becomes an acetylated lysine near the N-terminus, with fewer (12) or
       equal (7) matched fragments. One H2B cluster flips from H2B2F to H2B1C
       + methyl (same mass; the cluster protein correction relabels 18
