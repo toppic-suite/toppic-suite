@@ -1579,6 +1579,48 @@ from the side-chain PTMs of that residue. Facts to keep straight:
   (`TdgfMng::n_term_var_ptm_type_num_`, argument `nTermVarPtmTypeNum`); the
   candidate count uses the sequence mass without the N-terminal mod.
 
+## Proteoform classification (`seq/proteoform`, the PrSM tables)
+
+Branch `proteoform_classification` (issue #611; toppic_test experiment 129,
+report 0129). `Proteoform::getClassification(prot_hit_num)` gives the level
+of the proteoform in the five-level classification of proteoform
+identifications (Smith et al., Nat. Methods 16:939-940, 2019), by the rule
+the user gave for TopPIC's results: `1` (no unexpected shift, one protein),
+`2D` (no unexpected shift, several proteins), `4` (unexpected shifts, one
+protein), `5` (unexpected shifts, several proteins). Facts to keep straight:
+
+- **The two properties.** An unexpected shift is an alteration of type
+  `UNEXPECTED` (`getAlterNum`); protein N-terminal forms, fixed and
+  variable PTMs (the truncation N-terminal modification included) and
+  TopMG's FASTA PTMs (`INPUT`) do not count. The protein hits are
+  `SearchFastaMatch::process`'s matches, the `# Protein hits` column: the
+  proteoform does not know the database, so the writers pass the number; 0
+  counts as one protein.
+- **Where it is written.** The last column, `Proteoform classification`, of
+  every table of `PrsmMatchTableWriter` (PrSM, proteoform and protein,
+  single and with the other matches; toppic, its combined `-c` tables and
+  topmg), and `proteoform_classification`, the last column of the SQLite
+  tables `prsm`, `proteoform` and `protein` (`PrsmSqlWriter`). Last, so that
+  no existing column moves. The rows of a PrSM's other protein matches have
+  no field for it: they already ended before the q-values (37 of the 41
+  fields before this column). Not in the XML outputs.
+- **What the rule leaves out.** Levels 2A-2C and 3 never occur. A variable
+  PTM whose range spans several residues (an undecided site) is level 1; an
+  unexpected shift is level 4 whatever its mass, also when it is a known PTM
+  on one residue (HMGN1 `(S)[+79.9669]`) or of isotope size. Several
+  proteins can be one gene (LAP2A / LAP2B, both TMPO), and that is still
+  2D. The level is that of the PrSM's proteoform, so the PrSMs of one
+  proteoform id can differ (one with an unexpected shift, one without), and
+  the proteoform table shows the level of its best PrSM.
+- **Results** (toppic_test experiment 129, 480_F3_02, `-f C57 -d -t FDR
+  -T FDR`, oxidation): toppic (`-y FDR -s 2`) writes main 4ecb19ea's files
+  but the new column (the six tables row for row without it, the SQLite
+  tables without it, every other file byte for byte), in the same time
+  (16:44 against 16:42); the column agrees with the rule in every PrSM row
+  of toppic's and topmg's tables. Proteoforms of levels 1 / 2D / 4 / 5 at
+  1% FDR: toppic 1,066 / 70 / 812 / 50, topmg (one unexpected shift by
+  default) 1,031 / 70 / 36 / 1.
+
 ## toplib_build (`src/toplib`, `console/toplib_build`)
 
 toplib_build is a C++ port of TopLib's `src/ms_library_building.py`
