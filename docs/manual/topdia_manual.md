@@ -112,7 +112,7 @@ Deconvolution:
 
 | Option | Default | Meaning |
 |---|---|---|
-| `-a`, `--activation <CID\|ETD\|ETHCD\|HCD\|MPD\|UVPD\|FILE>` | FILE | Fragmentation method; `FILE` takes it from the file. ETHCD (EThcD) has the ion types of ETD (c, z-dot). |
+| `-a`, `--activation <CID\|ETD\|ETCID\|ETHCD\|HCD\|MPD\|UVPD\|FILE>` | FILE | Fragmentation method; `FILE` takes it from the file. ETCID (ETciD) and ETHCD (EThcD) have the ion types of ETD (c, z-dot). |
 | `-c`, `--max-charge <int>` | 30 | Maximum charge state of precursor and fragment ions. |
 | `-m`, `--max-mass <number>` | 50000 | Maximum monoisotopic mass (Da) of precursor and fragment ions. |
 | `-e`, `--mz-error <number>` | 0.02 | Error tolerance of peak m/z values. |

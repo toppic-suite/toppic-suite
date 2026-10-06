@@ -97,10 +97,10 @@ bool Argument::parse(int argc, char* argv[]) {
     po::options_description visible_desc("Options");
     visible_desc.add_options()("help,h", "Print this help message.")(
         "activation,a", po::value<std::string>(&activation),
-        "<CID|ETD|ETHCD|HCD|MPD|UVPD|FILE>. Fragmentation method of MS/MS "
-        "spectra. When FILE is used, the fragmentation methods of spectra are "
-        "given in the input spectral data file. ETHCD (EThcD) has the ion "
-        "types of ETD. The default value is FILE.")(
+        "<CID|ETD|ETCID|ETHCD|HCD|MPD|UVPD|FILE>. Fragmentation method of "
+        "MS/MS spectra. When FILE is used, the fragmentation methods of "
+        "spectra are given in the input spectral data file. ETCID (ETciD) and "
+        "ETHCD (EThcD) have the ion types of ETD. The default value is FILE.")(
         "max-charge,c", po::value<std::string>(&max_charge),
         "<a positive integer>. Set the maximum charge state of precursor and "
         "fragment ions. The default value is 30.")(
@@ -562,12 +562,12 @@ bool Argument::validateArguments() {
   // validate activation method
   std::string activation = topfd_para_ptr_->getActivation();
   if (activation != "FILE" && activation != "CID" && activation != "ETD" &&
-      activation != "ETHCD" && activation != "MPD" && activation != "HCD" &&
-      activation != "UVPD") {
+      activation != "ETCID" && activation != "ETHCD" && activation != "MPD" &&
+      activation != "HCD" && activation != "UVPD") {
     // throw InvalidActivation();
     LOG_ERROR(
         "Activation method should be one out of "
-        "|FILE|CID|ETD|ETHCD|HCD|MPD|UVPD.");
+        "|FILE|CID|ETD|ETCID|ETHCD|HCD|MPD|UVPD.");
     return false;
   }
 

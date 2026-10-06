@@ -47,8 +47,10 @@ namespace {
 // - EThcD (MS:1002631), or ETD (MS:1000598) with beam-type CID (MS:1000422)
 //   or supplemental beam-type CID (MS:1002678): ETHCD.
 // - ETciD (MS:1003182), or ETD with CID (MS:1000133) or supplemental CID
-//   (MS:1002679): ETD, whose c and z-dot ions dominate.
-// - Otherwise HCD (beam-type CID, a kind of CID), CID, then MPD (MS:1000435).
+//   (MS:1002679): ETCID. EThcD is tested first, so ETD with both kinds of
+//   CID is ETHCD.
+// - Otherwise ETD, HCD (beam-type CID, a kind of CID), CID, then MPD
+//   (MS:1000435).
 std::string getActivationName(const std::vector<pwiz::data::CVParam>& cv_list) {
   bool cid = false;
   bool hcd = false;
@@ -78,7 +80,10 @@ std::string getActivationName(const std::vector<pwiz::data::CVParam>& cv_list) {
   if (ethcd || (etd && (hcd || supp_hcd))) {
     return "ETHCD";
   }
-  if (etcid || etd) {
+  if (etcid || (etd && (cid || supp_cid))) {
+    return "ETCID";
+  }
+  if (etd) {
     return "ETD";
   }
   if (hcd) {

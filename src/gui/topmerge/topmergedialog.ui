@@ -666,6 +666,11 @@ p, li { white-space: pre-wrap; }
          </item>
          <item>
           <property name="text">
+           <string>ETCID</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
            <string>ETHCD</string>
           </property>
          </item>

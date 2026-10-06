@@ -294,10 +294,11 @@ bool TopmgArgument::parse(int argc, char* argv[]) {
 
     display_desc.add_options()("help,h", "Print the help message.")(
         "activation,a", po::value<std::string>(&activation),
-        "<CID|ETD|ETHCD|HCD|UVPD|FILE>. Fragmentation method of MS/MS spectra. "
-        "When FILE is used, fragmentation methods of spectra are given in the "
-        "input spectral data file. ETHCD (EThcD) is searched with the ion "
-        "types of ETD (c and z-dot). Default value: FILE.")(
+        "<CID|ETD|ETCID|ETHCD|HCD|UVPD|FILE>. Fragmentation method of MS/MS "
+        "spectra. When FILE is used, fragmentation methods of spectra are "
+        "given in the input spectral data file. ETCID (ETciD) and ETHCD "
+        "(EThcD) are searched with the ion types of ETD (c and z-dot). Default "
+        "value: FILE.")(
         "fixed-mod,f", po::value<std::string>(&fixed_mod),
         "<C57|C58|a fixed modification file>. Fixed modifications. Three "
         "available options: C57, C58, or the name of a text file containing "
@@ -708,12 +709,12 @@ bool TopmgArgument::validateArguments() {
 
   std::string activation = arguments_["activation"];
   if (activation != "CID" && activation != "HCD" && activation != "MPD" &&
-      activation != "ETD" && activation != "ETHCD" && activation != "FILE" &&
-      activation != "UVPD") {
-    LOG_ERROR(
-        "Activation type "
-        << activation
-        << " error! The value should be CID|ETD|ETHCD|HCD|MPD|UVPD|FILE!");
+      activation != "ETD" && activation != "ETCID" && activation != "ETHCD" &&
+      activation != "FILE" && activation != "UVPD") {
+    LOG_ERROR("Activation type "
+              << activation
+              << " error! The value should be "
+                 "CID|ETD|ETCID|ETHCD|HCD|MPD|UVPD|FILE!");
     return false;
   }
 
