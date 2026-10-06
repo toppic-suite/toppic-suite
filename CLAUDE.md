@@ -1003,6 +1003,60 @@ of the same protein within `--error-tolerance` and 0.3 aligned apex time
   feature of another sample (the commented-out "Match without MS/MS ID"
   path) - the `_ms1.feature` files are not read.
 
+## ProForma strings (`seq/proteoform_util`, issue #610)
+
+`proteoform_util::getProFormaStr` writes a proteoform in ProForma 2.1
+(HUPO-PSI, https://github.com/HUPO-PSI/ProForma; the spec and its compliance
+levels are in that repository's `SpecDocument/ProForma_v2.1_Final.pdf`).
+`PrsmMatchTableWriter` puts it in the `ProForma` column after `Next amino
+acid` (PrSM, proteoform and protein tables of toppic and topmg) and
+`PrsmSqlWriter` in the `proforma` column of the SQLite tables; the manual
+describes it in `docs/manual/proteoform.md` section 6. Facts to keep
+straight (toppic_test experiment 128):
+
+- **PTMs are Unimod accessions**, `[UNIMOD:<id>]` (`Ptm::getUnimodId`), or
+  the PTM mass without an id. ProForma names must be the CV's names
+  exactly, and 9 of the 55 `ptm_base.xml` abbreviations are not Unimod
+  names (Carbamidomethylation, carboxylation, Oxoalanine, Allysine,
+  Thiocarboxy, Cholinephosphoryl, ...), nor are a modification file's
+  names checked, so names are never written. The ids therefore matter:
+  Carbamidomethylation (C57) is Unimod 4 and TPQ Unimod 392 since then;
+  Decarboxy and Citrullination have none (Citrullination is Deamidated's
+  composition, but the deamidation selector keys on id 7).
+- **Where each mass shift goes**, per alteration (`Alter`), on the
+  alteration's residues, or its mass shift's when the alteration has none
+  within them (TopMG writes an unexpected shift on one residue with an
+  empty alteration range; TopPIC's alterations all have their shift's
+  range): a protein
+  N-terminal acetylation (PROTEIN_VARIABLE, residue 0, the Acetylation PTM)
+  and the truncation N-terminal modification are N-terminal modifications
+  `[...]-`; an alteration on one residue follows it (fixed, input, variable,
+  or an unexpected shift on one residue); an alteration on several residues
+  is a range `(...)[...]`, alterations with the same range sharing it (a
+  variable shift's unlocalized PTMs); a local annotation (MIScore, `-B`)
+  over several residues is written at its best site with `#s<n>(score)` on
+  every site with a positive score (`LocalAnno::getScrVec` is indexed by
+  the residue position in the proteoform when its length is the
+  proteoform's); an empty or out-of-range alteration is an unknown
+  position `[...]?`.
+- **Ranges may not overlap or nest** in ProForma (TopPIC's `Proteoform`
+  string nests them): the ranges are taken from the left, wider first, and
+  one overlapping a taken range becomes a set of positions `#g<n>` with
+  its first residue preferred.
+- Delta masses: 4 decimals with a sign always (`+0.0000` too).
+- **TopMG's variable shifts carry the aligned mass** (an `Oxidation` range
+  of 16.2826 Da, a `Phospho;Acetyl;Acetyl;Acetyl` range of 206.0429 Da
+  against 206.0980), and its `Proteoform mass` column includes it; the
+  ProForma accessions stand for the PTMs' exact masses, so a reader's mass
+  of a TopMG string is the theoretical one and differs from that column
+  (by up to 0.42 Da on 480_F3_02). TopPIC's variable shifts have the PTM
+  masses.
+- Checked with pyteomics.proforma (5.0.1) on 480_F3_02 (toppic default
+  setting, -B, an N-term variable PTM, topmg, PTMs in the FASTA): every
+  string parses, has the proteoform's residues and, for toppic, the
+  Proteoform mass within the rounding of the written masses (topmg: after
+  the aligned masses above).
+
 ## Average masses in msalign files (`ms/env/avg_mass_util`)
 
 `topfd --average-mass` (`-A`, `TopfdPara::output_avg_mass_`) writes the

@@ -9,7 +9,9 @@ MKVRASVK(KL(C)[Carbamidomethylation]RN(C)[Carbamidomethylation]K)[-116.0905]IVKR
 
 This page explains how to read the string: what the parentheses, brackets,
 nesting and leading `[...]-` mean, which modifications are shown by name
-and which as a mass, and where the names and masses come from.
+and which as a mass, and where the names and masses come from. Section 6
+describes the `ProForma` column, the same proteoform in the ProForma
+notation of the HUPO-PSI.
 
 ## 1. Where the annotation appears
 
@@ -174,3 +176,64 @@ MKVRASVK(KL(C)[Carbamidomethylation]RN(C)[Carbamidomethylation]K)[-116.0905]IVKR
 Three carbamidomethylated cysteines (fixed, `-f C57`) and one unexpected
 shift of -116.0905 Da somewhere on `KLCRNCK`; the shift's parentheses
 enclose two of the fixed modifications.
+
+## 6. The ProForma column
+
+The `ProForma` column of the same tables (and the `proforma` column of the
+SQLite tables) writes the proteoform in ProForma 2.1, the notation of the
+HUPO Proteomics Standards Initiative
+(https://github.com/HUPO-PSI/ProForma), which other software can read.
+The string is built from the proteoform itself
+(`proteoform_util::getProFormaStr`), not from the `Proteoform` string:
+
+- The residues are the proteoform's, from its first to its last residue,
+  without the flanking residues.
+- A PTM is written as its Unimod accession, `[UNIMOD:35]`, when it has a
+  Unimod id (the `ptm_base.xml` entry, or the UnimodID column of a
+  modification file), and as its monoisotopic mass otherwise,
+  `[+57.0215]`. TopPIC's PTM names are not all Unimod names (e.g.
+  `Carbamidomethylation` is Unimod's `Carbamidomethyl`), so they are not
+  used; a reader looks the accession up in Unimod.
+- The protein N-terminal acetylations (`M_ACETYLATION`, `NME_ACETYLATION`)
+  and a truncation N-terminal modification are N-terminal modifications,
+  `[UNIMOD:1]-SEQ`.
+- Fixed PTMs (`-f`), the PTMs written in the FASTA sequence and variable
+  PTMs localized to one residue follow that residue: `C[UNIMOD:4]`,
+  `M[UNIMOD:35]`.
+- An unexpected shift is its mass with 4 decimals and a sign, on its
+  residue (`L[+97.9219]`) or on its range of residues in parentheses
+  (`(TLRL...NIM)[-236.9788]`); a variable PTM not localized to one residue
+  is written on its range in the same way, with all the PTMs of the range,
+  `(MAM)[UNIMOD:35][UNIMOD:35]`. Modifications of single residues can stand
+  inside a range: `(MKAYC[UNIMOD:4]ERQGLSM)[UNIMOD:35]`.
+- A PTM characterized by MIScore (`-B`) on several sites is written at its
+  best site, with the score of every site with a positive score (ProForma's
+  localisation scores): `K[UNIMOD:1#s1(0.850)]...K[#s1(0.150)]`.
+- ProForma does not allow overlapping ranges: a range that would overlap
+  one written before (from the left) is written as a set of positions, its
+  first residue preferred, `P[+12.3456#g1]E[#g1]P[#g1]`, and a
+  modification without a residue as one of unknown position,
+  `[+12.3456]?SEQ`.
+
+Everything except the localisation scores, the sets of positions, the
+ranges and the unknown positions is ProForma's base level (Level 1); those
+four belong to its Level 2.
+
+A reader computes the mass of the proteoform from the string. For TopPIC
+it is the `Proteoform mass` column, up to the rounding of the written
+masses. TopMG's variable modifications keep the mass of the aligned gap
+(an oxidation over a range may weigh 16.28 Da), which its `Proteoform
+mass` column includes, while the ProForma string names the
+modifications; its mass is then the theoretical one. Examples (`Proteoform` | `ProForma`):
+
+```text
+[Acetyl]-SGREGGKKKPLKQPKKQAKE(M)[Oxidation]DEEDKAFKQKQ...
+[UNIMOD:1]-SGREGGKKKPLKQPKKQAKEM[UNIMOD:35]DEEDKAFKQKQ...
+
+([Acetyl]-MPKGGR)[+365.1300]KGGH(KGR)[+167.0338]ARQYTSPEEIDAQ...
+[UNIMOD:1]-(MPKGGR)[+365.1300]KGGH(KGR)[+167.0338]ARQYTSPEEIDAQ...
+
+...KL(MKAY(C)[Carbamidomethylation]ERQGLSM)[Oxidation]RQIRFRFDGQ...
+...KL(MKAYC[UNIMOD:4]ERQGLSM)[UNIMOD:35]RQIRFRFDGQ...
+```
+
