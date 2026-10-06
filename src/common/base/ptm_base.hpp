@@ -16,6 +16,7 @@
 #ifndef TOPPIC_COMMON_BASE_PTM_BASE_HPP_
 #define TOPPIC_COMMON_BASE_PTM_BASE_HPP_
 
+#include <string>
 #include <unordered_map>
 
 #include "common/base/ptm.hpp"
@@ -38,10 +39,19 @@ class PtmBase {
   static PtmPtr getPtmPtr_C57() { return c57_ptr_; }
   static PtmPtr getPtmPtr_C58() { return c58_ptr_; }
   /**
-   * Returns a PTM based on the abbreviation name. Returns null if the
-   * abbreviation name does not exist.
+   * Returns a PTM based on the abbreviation name, or an alias of it (an
+   * abbreviation of an earlier ptm_base.xml, such as Carbamidomethylation).
+   * Returns null if the abbreviation name does not exist.
    */
   static const PtmPtr& getPtmPtrByAbbrName(const std::string& abbr_name);
+
+  /**
+   * The abbreviation of the ptm_base.xml PTM with this Unimod id, which is
+   * its Unimod (PSI-MS) name; empty when ptm_base.xml has no PTM with the
+   * id. PTMs added from modification files are not looked up: their names
+   * are not checked.
+   */
+  static std::string getUnimodName(int unimod_id);
 
   static PtmPtr getPtmPtr(const PtmPtr& p);
 
@@ -54,14 +64,17 @@ class PtmBase {
 
  private:
   static PtmPtrVec ptm_ptr_vec_;
+  // abbreviations and aliases -> PTMs
   static std::unordered_map<std::string, PtmPtr> ptm_abbr_name_map_;
+  // Unimod ids of the ptm_base.xml PTMs -> their abbreviations
+  static std::unordered_map<int, std::string> unimod_name_map_;
   static PtmPtr empty_ptm_ptr_;
   static PtmPtr acetylation_ptr_;
   static PtmPtr c57_ptr_;
   static PtmPtr c58_ptr_;
 
   static std::string getAcetylationAbbrName() { return "Acetyl"; }
-  static std::string getC57AbbrName() { return "Carbamidomethylation"; }
+  static std::string getC57AbbrName() { return "Carbamidomethyl"; }
   static std::string getC58AbbrName() { return "Carboxymethyl"; }
 };
 

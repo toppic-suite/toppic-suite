@@ -58,21 +58,29 @@ std::vector<std::vector<double> > getNTermAcet2D(
 // The ProForma string of a proteoform (HUPO-PSI ProForma 2.1,
 // https://github.com/HUPO-PSI/ProForma): its residues (first to last
 // residue, no flanking residues) with the modifications in square brackets.
-//   - A PTM is written as its Unimod accession, [UNIMOD:35], when it has a
-//     Unimod id, otherwise as its mass, [+57.0215] (TopPIC's PTM names are
-//     not all Unimod names, so they are not written as names).
+//   - A PTM with a Unimod id is written as its Unimod name and accession,
+//     joined with "|" as synonyms (Level 2), [Oxidation|UNIMOD:35]: the
+//     name is the abbreviation of the ptm_base.xml PTM with that id, all of
+//     which are Unimod names (PtmBase::getUnimodName). An id that
+//     ptm_base.xml does not have gives the accession, with the PTM's name
+//     as information: [UNIMOD:737|INFO:TMT6plex]. A PTM without a
+//     Unimod id is written as its mass with its name as information,
+//     [-43.9898|INFO:Decarboxy]. A name with brackets, "|" or "#" is left
+//     out.
 //   - The protein N-terminal acetylations (M_ACETYLATION, NME_ACETYLATION)
 //     and the truncation N-terminal modification are N-terminal
-//     modifications: [UNIMOD:1]-SEQ.
+//     modifications: [Acetyl|UNIMOD:1]-SEQ.
 //   - Fixed PTMs, the PTMs written in the FASTA sequence and the variable
-//     PTMs follow their residue when they are localized to one: C[UNIMOD:4].
+//     PTMs follow their residue when they are localized to one:
+//     C[Carbamidomethyl|UNIMOD:4].
 //   - Unexpected mass shifts are masses with 4 decimals (sign included) on
 //     their residue, or on their range of residues in parentheses,
 //     (PEP)[+12.3456]; variable PTMs not localized to one residue likewise,
-//     with all the PTMs of the range: (MAM)[UNIMOD:35][UNIMOD:35].
+//     with all the PTMs of the range:
+//     (MAM)[Oxidation|UNIMOD:35][Oxidation|UNIMOD:35].
 //   - A PTM localized by MIScore (-l) is written at its best site with the
-//     site scores of the positive sites (Level 2): S[UNIMOD:21#s1(0.900)]
-//     T[#s1(0.100)].
+//     site scores of the positive sites (Level 2), the label after the
+//     tag's first part: S[Phospho#s1(0.900)|UNIMOD:21] T[#s1(0.100)].
 //   - A range that would overlap a range already written (ProForma does
 //     not allow it) is written as a set of positions instead, the first
 //     residue preferred: P[+12.3456#g1]E[#g1]P[#g1].

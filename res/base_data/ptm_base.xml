@@ -66,14 +66,9 @@
   <mono_mass>42.046950191388</mono_mass>
 </ptm>
 <ptm>
-  <name>Gamma-carboxyglutamic acid</name>
-  <abbreviation>carboxylation</abbreviation>
-  <unimod>299</unimod>
-  <mono_mass>43.98982923852</mono_mass>
-</ptm>
-<ptm>
   <name>Carbamidomethylation</name>
-  <abbreviation>Carbamidomethylation</abbreviation>
+  <abbreviation>Carbamidomethyl</abbreviation>
+  <alias>Carbamidomethylation</alias>
   <unimod>4</unimod>
   <mono_mass>57.021463719204</mono_mass>
 </ptm>
@@ -103,7 +98,8 @@
 </ptm>
 <ptm>
   <name>Oxoalanine</name>
-  <abbreviation>Oxoalanine</abbreviation>
+  <abbreviation>Cys-&gt;Oxoalanine</abbreviation>
+  <alias>Oxoalanine</alias>
   <unimod>402</unimod>
   <mono_mass>-17.992806618076</mono_mass>
 </ptm>
@@ -116,6 +112,7 @@
 <ptm>
   <name>Carboxylation</name>
   <abbreviation>Carboxy</abbreviation>
+  <alias>carboxylation</alias>
   <unimod>299</unimod>
   <mono_mass>43.98982923852</mono_mass>
 </ptm>
@@ -128,6 +125,7 @@
 <ptm>
   <name>Deamidation</name>
   <abbreviation>Deamidated</abbreviation>
+  <alias>Citrullination</alias>
   <unimod>7</unimod>
   <mono_mass>0.984015583112</mono_mass>
 </ptm>
@@ -151,7 +149,8 @@
 </ptm>
 <ptm>
   <name>Allysine</name>
-  <abbreviation>Allysine</abbreviation>
+  <abbreviation>Lys-&gt;Allysine</abbreviation>
+  <alias>Allysine</alias>
   <unimod>352</unimod>
   <mono_mass>-1.031634480684</mono_mass>
 </ptm>
@@ -166,12 +165,6 @@
   <abbreviation>PyridoxalPhosphate</abbreviation>
   <unimod>46</unimod>
   <mono_mass>229.014009353414</mono_mass>
-</ptm>
-<ptm>
-  <name>Citrullination</name>
-  <abbreviation>Citrullination</abbreviation>
-  <unimod>-1</unimod>
-  <mono_mass>0.984015583112</mono_mass>
 </ptm>
 <ptm>
   <name>Diphthamide</name>
@@ -217,7 +210,8 @@
 </ptm>
 <ptm>
   <name>Topaquinone</name>
-  <abbreviation>TPQ</abbreviation>
+  <abbreviation>Quinone</abbreviation>
+  <alias>TPQ</alias>
   <unimod>392</unimod>
   <mono_mass>29.974179174724</mono_mass>
 </ptm>
@@ -235,7 +229,8 @@
 </ptm>
 <ptm>
   <name>Cholinephosphoryl</name>
-  <abbreviation>Cholinephosphoryl</abbreviation>
+  <abbreviation>Phosphocholine</abbreviation>
+  <alias>Cholinephosphoryl</alias>
   <unimod>2139</unimod>
   <mono_mass>165.055480242486</mono_mass>
 </ptm>
@@ -259,7 +254,8 @@
 </ptm>
 <ptm>
   <name>Thiocarboxylic acid</name>
-  <abbreviation>Thiocarboxy</abbreviation>
+  <abbreviation>Carboxy-&gt;Thiocarboxy</abbreviation>
+  <alias>Thiocarboxy</alias>
   <unimod>420</unimod>
   <mono_mass>15.97715655428</mono_mass>
 </ptm>

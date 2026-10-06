@@ -252,12 +252,32 @@ std::string proFormaMass(double mass) {
   return str;
 }
 
-// A PTM in ProForma: its Unimod accession, or its mass without one.
-std::string proFormaPtm(const PtmPtr& ptm_ptr) {
-  if (ptm_ptr->getUnimodId() > 0) {
-    return "UNIMOD:" + std::to_string(ptm_ptr->getUnimodId());
+// A PTM in ProForma: with a Unimod id, its Unimod name and accession,
+// joined with "|" as synonyms, [Oxidation|UNIMOD:35] (the abbreviations of
+// ptm_base.xml are Unimod names), or the accession alone when ptm_base.xml
+// has no PTM with the id; without one, the mass (the PTM's, or the
+// alteration's) with the PTM's name as information,
+// [-43.9898|INFO:Decarboxy]. A name that ProForma cannot hold in a tag
+// (brackets, "|" or "#") is left out.
+std::string proFormaPtm(const PtmPtr& ptm_ptr, double mass) {
+  std::string name = ptm_ptr->getAbbrName();
+  bool info = !name.empty() &&
+              name.find_first_of("[]|#") == std::string::npos;
+  int unimod_id = ptm_ptr->getUnimodId();
+  if (unimod_id > 0) {
+    std::string accession = "UNIMOD:" + std::to_string(unimod_id);
+    std::string unimod_name = PtmBase::getUnimodName(unimod_id);
+    if (!unimod_name.empty()) {
+      return unimod_name + "|" + accession;
+    }
+    return info ? accession + "|INFO:" + name : accession;
   }
-  return proFormaMass(ptm_ptr->getMonoMass());
+  std::string str = proFormaMass(mass);
+  return info ? str + "|INFO:" + name : str;
+}
+
+std::string proFormaPtm(const PtmPtr& ptm_ptr) {
+  return proFormaPtm(ptm_ptr, ptm_ptr->getMonoMass());
 }
 
 // The modification of an alteration in ProForma: the PTM of the local
@@ -272,11 +292,22 @@ std::string proFormaAlter(const AlterPtr& alter_ptr) {
     return proFormaMass(alter_ptr->getMass());
   }
   PtmPtr ptm_ptr = alter_ptr->getModPtr()->getModResiduePtr()->getPtmPtr();
-  if (ptm_ptr == nullptr || ptm_ptr->getUnimodId() <= 0) {
-    // the mass of the alteration (the PTM's, or a residue change)
+  if (ptm_ptr == nullptr) {
     return proFormaMass(alter_ptr->getMass());
   }
-  return proFormaPtm(ptm_ptr);
+  // without a Unimod id, the mass of the alteration (the PTM's, or a
+  // residue change)
+  return proFormaPtm(ptm_ptr, alter_ptr->getMass());
+}
+
+// A tag with a label (#s1(0.900), #g1): the label goes after the tag's
+// first part, before an INFO part, which would take it in.
+std::string labelTag(const std::string& tag, const std::string& label) {
+  size_t pos = tag.find('|');
+  if (pos == std::string::npos) {
+    return tag + label;
+  }
+  return tag.substr(0, pos) + label + tag.substr(pos);
 }
 
 std::string scoreStr(double score) { return str_util::fixedToString(score, 3); }
@@ -360,7 +391,7 @@ std::string getProFormaStr(const ProteoformPtr& form_ptr) {
           std::string label = "#s" + std::to_string(++group_num);
           for (int p : sites) {
             std::string score = "(" + scoreStr(scr_vec[p - offset]) + ")";
-            res_tags[p].push_back(p == best ? tag + label + score
+            res_tags[p].push_back(p == best ? labelTag(tag, label + score)
                                             : label + score);
           }
           continue;
@@ -416,7 +447,7 @@ std::string getProFormaStr(const ProteoformPtr& form_ptr) {
     }
     for (const std::string& tag : range.tags) {
       std::string label = "#g" + std::to_string(++group_num);
-      res_tags[range.left].push_back(tag + label);
+      res_tags[range.left].push_back(labelTag(tag, label));
       for (int p = range.left + 1; p < range.right; p++) {
         res_tags[p].push_back(label);
       }
