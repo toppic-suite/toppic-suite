@@ -31,7 +31,7 @@ namespace prsm_cutoff_selector {
 void process(const std::string& db_file_name, const std::string& base_name,
              const std::string& input_file_ext,
              const std::string& output_file_ext, const std::string& cutoff_type,
-             double cutoff_value) {
+             double cutoff_value, const ModPtrVec& var_mod_ptrs) {
   std::string input_file_name = base_name + "." + input_file_ext;
 
   ModPtrVec fix_mod_list;
@@ -82,9 +82,9 @@ void process(const std::string& db_file_name, const std::string& base_name,
   }
 
   // the classification of the proteoform of every selected PrSM, from its
-  // protein hits in the database the tables search (# Protein hits); the
-  // proteoform and protein cutoffs read the PrSMs of the PrSM cutoff, which
-  // have it
+  // protein hits in the database the tables search (# Protein hits) and its
+  // variable PTM sites; the proteoform and protein cutoffs read the PrSMs of
+  // the PrSM cutoff, which have it
   SearchFastaMatchPtr search_match_ptr = nullptr;
   for (size_t i = 0; i < selected_prsms.size(); i++) {
     ProteoformPtr form_ptr = selected_prsms[i]->getProteoformPtr();
@@ -96,7 +96,8 @@ void process(const std::string& db_file_name, const std::string& base_name,
     }
     int hit_num =
         static_cast<int>(search_match_ptr->process(selected_prsms[i]).size());
-    form_ptr->setClassification(form_ptr->getClassification(hit_num));
+    form_ptr->setClassification(
+        form_ptr->getClassification(hit_num, var_mod_ptrs));
   }
 
   // output

@@ -1182,6 +1182,17 @@ int TopPIC_report(std::map<std::string, std::string>& arguments) {
         file_util::filenameFromEntirePath(arguments["databaseFileName"]);
     PrsmParaPtr prsm_para_ptr = std::make_shared<PrsmPara>(arguments);
     std::string cur_suffix = "toppic_record_prsm";
+    // the variable modifications (-b, and the localization's -B), whose
+    // residues decide the variable PTM sites of the proteoform
+    // classification
+    ModPtrVec var_mod_ptrs;
+    for (const char* key : {"variablePtmFileName", "localPtmFileName"}) {
+      if (arguments[key] != "") {
+        ModPtrVec mod_ptrs = mod_util::readAnywhereModTxt(arguments[key]);
+        var_mod_ptrs.insert(var_mod_ptrs.end(), mod_ptrs.begin(),
+                            mod_ptrs.end());
+      }
+    }
 
     if (arguments["searchType"] == "TARGET+DECOY" &&
         arguments["keepDecoyResults"] != "true") {
@@ -1198,7 +1209,7 @@ int TopPIC_report(std::map<std::string, std::string>& arguments) {
               << std::endl;
     prsm_cutoff_selector::process(db_file_name, base_name, cur_suffix,
                                   "toppic_prsm_cutoff", spectra_cutoff_type,
-                                  spectra_cutoff_value);
+                                  spectra_cutoff_value, var_mod_ptrs);
     std::cout << "PrSM filtering by " << spectra_cutoff_type << " - finished."
               << std::endl;
 
@@ -1211,7 +1222,8 @@ int TopPIC_report(std::map<std::string, std::string>& arguments) {
       std::istringstream(arguments["cutoffProteoformValue"]) >> cutoff_value;
       prsm_cutoff_selector::process(db_file_name, base_name,
                                     "toppic_prsm_cutoff", "toppic_form_cutoff",
-                                    form_cutoff_type, cutoff_value);
+                                    form_cutoff_type, cutoff_value,
+                                    var_mod_ptrs);
       std::cout << "Proteoform filtering by " << form_cutoff_type
                 << " - finished." << std::endl;
       std::cout << "Selecting top PrSMs for proteoforms - started."
@@ -1228,7 +1240,8 @@ int TopPIC_report(std::map<std::string, std::string>& arguments) {
       std::istringstream(arguments["cutoffProteinValue"]) >> cutoff_value;
       prsm_cutoff_selector::process(db_file_name, base_name,
                                     "toppic_form_cutoff", "toppic_prot_cutoff",
-                                    prot_cutoff_type, cutoff_value);
+                                    prot_cutoff_type, cutoff_value,
+                                    var_mod_ptrs);
       std::cout << "Protein filtering by " << prot_cutoff_type << " - finished."
                 << std::endl;
       std::cout << "Selecting top PrSMs for proteins - started." << std::endl;

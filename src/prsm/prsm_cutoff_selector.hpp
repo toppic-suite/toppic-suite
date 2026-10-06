@@ -18,6 +18,8 @@
 
 #include <string>
 
+#include "common/base/mod.hpp"
+
 namespace toppic {
 
 namespace prsm_cutoff_selector {
@@ -26,11 +28,14 @@ namespace prsm_cutoff_selector {
 // <base_name>.<output_file_ext>; base_name is the spectrum file name without
 // its extension. cutoff_type: EVALUE (E-value), FDR (spectrum-level FDR),
 // FORMFDR (spectrum- and proteoform-level FDR), PROTFDR (protein-level FDR)
-// or FRAG (number of matched fragments, kept as the score).
+// or FRAG (number of matched fragments, kept as the score). The proteoform
+// of every written PrSM gets its classification (Proteoform::
+// getClassification with its protein hits in db_file_name and var_mod_ptrs,
+// the variable modifications of the search), unless it has one.
 void process(const std::string& db_file_name, const std::string& base_name,
              const std::string& input_file_ext,
              const std::string& output_file_ext, const std::string& cutoff_type,
-             double cutoff_value);
+             double cutoff_value, const ModPtrVec& var_mod_ptrs);
 }
 
 } /* namespace toppic */

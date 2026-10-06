@@ -515,12 +515,76 @@ std::string Proteoform::getMIScore() {
   return mi_score;
 }
 
-std::string Proteoform::getClassification(int prot_hit_num) {
+std::string Proteoform::getClassification(int prot_hit_num,
+                                          const ModPtrVec& var_mod_ptrs) {
   bool multiple_prots = prot_hit_num > 1;
-  if (getAlterNum(AlterType::UNEXPECTED) == 0) {
-    return multiple_prots ? "2D" : "1";
+  if (getAlterNum(AlterType::UNEXPECTED) > 0) {
+    return multiple_prots ? "5" : "4";
   }
-  return multiple_prots ? "5" : "4";
+  if (hasUndecidedVarPtmSite(var_mod_ptrs)) {
+    return multiple_prots ? "3" : "2A";
+  }
+  return multiple_prots ? "2D" : "1";
+}
+
+bool Proteoform::hasUndecidedVarPtmSite(const ModPtrVec& var_mod_ptrs) {
+  MassShiftPtrVec shift_ptrs = getMassShiftPtrVec(AlterType::VARIABLE);
+  for (size_t i = 0; i < shift_ptrs.size(); i++) {
+    int left = shift_ptrs[i]->getLeftBpPos();
+    int right = shift_ptrs[i]->getRightBpPos();
+    if (right - left <= 1) {
+      continue;
+    }
+    // the PTMs of the shift and their numbers of alterations
+    PtmPtrVec ptm_ptrs;
+    std::vector<int> alter_nums;
+    const AlterPtrVec& alter_ptrs = shift_ptrs[i]->getAlterPtrVec();
+    for (size_t j = 0; j < alter_ptrs.size(); j++) {
+      if (alter_ptrs[j]->getModPtr() == nullptr) {
+        return true;
+      }
+      const PtmPtr& ptm_ptr =
+          alter_ptrs[j]->getModPtr()->getModResiduePtr()->getPtmPtr();
+      size_t k = 0;
+      while (k < ptm_ptrs.size() && !ptm_ptrs[k]->isSame(ptm_ptr)) {
+        k++;
+      }
+      if (k == ptm_ptrs.size()) {
+        ptm_ptrs.push_back(ptm_ptr);
+        alter_nums.push_back(0);
+      }
+      alter_nums[k]++;
+    }
+    // the candidate residues of each PTM, none a candidate of two
+    std::vector<bool> used(right - left, false);
+    for (size_t k = 0; k < ptm_ptrs.size(); k++) {
+      int cand_num = 0;
+      for (int pos = left; pos < right; pos++) {
+        const ResiduePtr& res_ptr = residue_seq_ptr_->getResiduePtr(pos);
+        bool modifiable = false;
+        for (size_t m = 0; m < var_mod_ptrs.size(); m++) {
+          if (var_mod_ptrs[m]->getModResiduePtr()->getPtmPtr()->isSame(
+                  ptm_ptrs[k]) &&
+              res_ptr->isSame(var_mod_ptrs[m]->getOriResiduePtr())) {
+            modifiable = true;
+            break;
+          }
+        }
+        if (!modifiable) {
+          continue;
+        }
+        if (used[pos - left]) {
+          return true;
+        }
+        used[pos - left] = true;
+        cand_num++;
+      }
+      if (cand_num != alter_nums[k]) {
+        return true;
+      }
+    }
+  }
+  return false;
 }
 
 }  // namespace toppic

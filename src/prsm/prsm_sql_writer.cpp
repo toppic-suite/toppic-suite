@@ -229,8 +229,10 @@ void PrsmSqlWriter::writePrsm(sqlite3_stmt* stmt, const PrsmPtr& prsm_ptr) {
   bindFdr(stmt, idx++, prsm_ptr->getFdr());
   bindFdr(stmt, idx++, prsm_ptr->getProteoformFdr());
   bindFdr(stmt, idx++, prsm_ptr->getProteinFdr());
-  bindText(stmt, idx++,
-           form_ptr->getClassification(static_cast<int>(matches.size())));
+  // set by the cutoff selection (prsm_cutoff_selector), whose files the
+  // tables read
+  const std::string& classification = form_ptr->getClassification();
+  bindText(stmt, idx++, classification == "" ? "-" : classification);
   sql_util::stepAndReset(sql_db_, stmt);
 }
 

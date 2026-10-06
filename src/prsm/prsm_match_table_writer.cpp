@@ -233,7 +233,10 @@ void PrsmMatchTableWriter::writePrsmStandardFormat(
     line_str << empty_str << delim;
   }
 
-  line_str << form_ptr->getClassification(static_cast<int>(matches.size()))
+  // set by the cutoff selection (prsm_cutoff_selector), whose files the
+  // tables read
+  const std::string& classification = form_ptr->getClassification();
+  line_str << (classification == "" ? empty_str : classification)
            << std::endl;
 
   if (write_multiple_matches) {
