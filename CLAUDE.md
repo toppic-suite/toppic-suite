@@ -1029,6 +1029,59 @@ box; the keep-decoy row moved up to make room), read into
 `arguments_["averageMass"]`, and `gui/util/command.cpp` emits `-g` when it
 is checked.
 
+## Activation of MS/MS spectra (`ms/mzml/pw_ms_reader`, `res/base_data/activation_base.xml`)
+
+With `-a FILE` (the default) `PwMsReader::parseActivation` takes each
+MS/MS spectrum's activation from the activation cvParams of its first
+precursor, through `getActivationName` (branch `ethcd_activation`, issue
+#530, toppic_test experiment 132). Facts to keep straight:
+
+- **The set of terms decides, not their order.** MS:1002631 (EThcD), or ETD
+  (MS:1000598) with beam-type CID (MS:1000422, pwiz `MS_HCD`) or
+  supplemental beam-type CID (MS:1002678) -> `ETHCD`; MS:1003182 (ETciD), or
+  ETD with CID (MS:1000133) or supplemental CID (MS:1002679) -> `ETD`;
+  otherwise `HCD`, `CID`, `MPD` (MS:1000435) in that order; no known term ->
+  the "Unable to read the activation method" error, as before. The reader
+  used to keep the first of CID/HCD/ETD/MPD in file order, and the
+  converters order the terms differently: msconvert writes CID, ETD, ECD,
+  PQD, HCD, then the supplemental term (EThcD: ETD, beam-type CID,
+  supplemental beam-type CID, read as ETD; ETciD: CID, ETD, supplemental
+  CID, read as CID), ThermoRawFileParser the first reaction, then the
+  supplemental one (EThcD: ETD, supplemental beam-type CID). Neither writes
+  MS:1002631 or MS:1003182, so do not wait for those terms alone. The
+  vendored pwiz (CV 4.1.182) knows all of them; updating it changes nothing
+  here.
+- **`ETHCD` has the ion types of ETD** (C / Z_DOT in
+  `activation_base.xml`): TopFD writes `ACTIVATION=ETHCD` in the msalign
+  file and C / Z_DOT in the SQLite table `ms2_spectrum`, and toppic and
+  topmg read the name back (`ActivationBase::getActivationPtrByName`) and
+  search EThcD spectra as ETD ones. Searching b, c, y and z-dot together
+  would need several ion types per `Activation` (one N- and one C-terminal
+  ion type now; used by `prsm/theo_peak_util`, the PRM spectra's
+  `getN_BYShift`/`getC_BYShift`, the zero-shift fast search and the MCMC
+  E-values). ETciD has no type of its own; its c / z-dot ions dominate.
+- **An activation name is listed in several places**:
+  `activation_base.xml`, the `-a` help text and validation of
+  `topfd_argument.cpp`, `topdia_argument.cpp`, `toppic_argument.cpp` and
+  `topmg_argument.cpp`, the `activationComboBox` items of the five GUI forms
+  (`topfddialog.ui`, `topdiadialog.ui`, `toppicwindow.ui`, `topmgwindow.ui`,
+  `topmergedialog.ui`; the item text is the option value), the `-a` rows of
+  the four manuals and `res/README.md`. Change them together.
+- **Results** (toppic_test experiment 132, amendment 1): on
+  PXD019792_191018_Mmazei_R2_3_ETHCD_5sec (Orbitrap Fusion Lumos, msconvert
+  3.0.24284) all 2,190 MS/MS spectra are ETHCD (main: ETD); the MS/MS
+  masses, charges and headers and the feature files equal main's (the MS1
+  msalign differs in 7 of 1,590 spectra, main against a second main run in
+  9: EnvCNN and the greedy search are not exactly repeatable). toppic on
+  main's TopFD output gives main's files; with `ACTIVATION=ETHCD`, or `-a
+  ETHCD`, the same but the Fragmentation column (346 PrSMs, 206
+  proteoforms, 66 proteins at 1% FDR against the M. mazei proteome). Test
+  spectra in 12 activation cases (msconvert's and ThermoRawFileParser's
+  EThcD and ETciD, the two terms alone, EThcD with HCD first, ETD, HCD,
+  CID, CID with HCD, MPD) all get the expected activation and ion types;
+  the other 15 mzML files of toppic_test's `data/` (42,602 MS/MS spectra,
+  HCD or CID) keep theirs.
+
 ## Precursor and fragment mass tolerances (`para/sp_para`)
 
 `SpPara` holds two `PeakTolerance` objects, `prec_tolerance_ptr_` and
