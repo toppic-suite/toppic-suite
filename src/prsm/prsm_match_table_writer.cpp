@@ -59,7 +59,8 @@ void PrsmMatchTableWriter::writeHeader(std::ofstream& file) {
        << "# Matched exp fragments" << delim << "# Matched theo fragments"
        << delim << "E-value" << delim
        << "Spectrum-level Q-value" << delim << "Proteoform-level Q-value"
-       << delim << "Protein-level Q-value" << std::endl;
+       << delim << "Protein-level Q-value" << delim
+       << "Proteoform classification" << std::endl;
 }
 
 void PrsmMatchTableWriter::write(const std::string& output_file_ext,
@@ -227,10 +228,16 @@ void PrsmMatchTableWriter::writePrsmStandardFormat(
 
   double protein_fdr = prsm_ptr->getProteinFdr();
   if (protein_fdr >= 0) {
-    line_str << protein_fdr << std::endl;
+    line_str << protein_fdr << delim;
   } else {
-    line_str << empty_str << std::endl;
+    line_str << empty_str << delim;
   }
+
+  // set by the cutoff selection (prsm_cutoff_selector), whose files the
+  // tables read
+  const std::string& classification = form_ptr->getClassification();
+  line_str << (classification == "" ? empty_str : classification)
+           << std::endl;
 
   if (write_multiple_matches) {
     // print out other matches

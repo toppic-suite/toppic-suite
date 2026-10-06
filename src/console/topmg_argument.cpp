@@ -379,7 +379,7 @@ bool TopmgArgument::parse(int argc, char* argv[]) {
         "<a positive number>. Maximum number of variable PTMs. Default value: "
         "5.")("num-shift,s", po::value<std::string>(&shift_num),
               "<0|1|2>. Maximum number of unexpected modifications in a "
-              "proteoform spectrum-match. Default value: 0.")(
+              "proteoform spectrum-match. Default value: 1.")(
         "whole-protein-only,w",
         "Report only proteoforms from whole proteins, that is, allow the "
         "proteoform type COMPLETE alone.")(

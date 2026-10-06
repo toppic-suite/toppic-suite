@@ -309,6 +309,12 @@ int TopMG_post(std::map<std::string, std::string>& arguments) {
     std::string sp_file_name = arguments["spectrumFileName"];
     std::string base_name = file_util::basename(sp_file_name);
     std::string var_mod_file_name = arguments["varModFileName"];
+    // the variable modifications, whose residues decide the variable PTM
+    // sites of the proteoform classification
+    ModPtrVec var_mod_ptrs;
+    if (var_mod_file_name != "") {
+      var_mod_ptrs = mod_util::readAnywhereModTxt(var_mod_file_name);
+    }
 
     PrsmParaPtr prsm_para_ptr = std::make_shared<PrsmPara>(arguments);
     msalign_util::geneSpIndex(sp_file_name);
@@ -374,7 +380,7 @@ int TopMG_post(std::map<std::string, std::string>& arguments) {
     double cutoff_value = std::stod(arguments["cutoffSpectralValue"]);
     prsm_cutoff_selector::process(db_file_name, base_name, cur_suffix,
                                   "topmg_prsm_cutoff", cutoff_type,
-                                  cutoff_value);
+                                  cutoff_value, var_mod_ptrs);
     std::cout << "PrSM filtering by " << cutoff_type << " - finished."
               << std::endl;
     cur_suffix = "topmg_prsm_cutoff";
@@ -401,7 +407,7 @@ int TopMG_post(std::map<std::string, std::string>& arguments) {
     std::istringstream(arguments["cutoffProteoformValue"]) >> cutoff_value;
     prsm_cutoff_selector::process(db_file_name, base_name, cur_suffix,
                                   "topmg_form_cutoff", cutoff_type,
-                                  cutoff_value);
+                                  cutoff_value, var_mod_ptrs);
     std::cout << "Proteoform filtering by " << cutoff_type << " - finished."
               << std::endl;
 
@@ -424,7 +430,7 @@ int TopMG_post(std::map<std::string, std::string>& arguments) {
     std::istringstream(arguments["cutoffProteinValue"]) >> cutoff_value;
     prsm_cutoff_selector::process(db_file_name, base_name,
                                   "topmg_form_cutoff", "topmg_prot_cutoff",
-                                  cutoff_type, cutoff_value);
+                                  cutoff_type, cutoff_value, var_mod_ptrs);
     std::cout << "Protein filtering by " << cutoff_type << " - finished."
               << std::endl;
 

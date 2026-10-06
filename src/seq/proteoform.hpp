@@ -144,6 +144,39 @@ class Proteoform {
 
   std::string getMIScore();
 
+  // The level of the proteoform in the five-level classification of
+  // proteoform identifications (Smith et al., Nat. Methods 16:939-940, 2019),
+  // from its unexpected mass shifts, prot_hit_num, the number of database
+  // proteins containing its sequence (the # Protein hits column), and its
+  // variable PTM sites (hasUndecidedVarPtmSite with var_mod_ptrs):
+  //                                           one protein   several proteins
+  //   no unexpected shift, sites decided      "1"           "2D"
+  //   no unexpected shift, a site undecided   "2A"          "3"
+  //   unexpected shift(s)                     "4"           "5"
+  // Protein N-terminal forms and fixed PTMs leave the level as it is; 0 hits
+  // count as one protein.
+  std::string getClassification(int prot_hit_num,
+                                const ModPtrVec& var_mod_ptrs);
+
+  // Whether the site of a variable PTM is undecided: a variable mass shift
+  // covers more than one residue, and for one of its PTMs the residues of
+  // its range that a modification of the PTM in var_mod_ptrs modifies are
+  // not as many as the shift's alterations of the PTM, or one residue could
+  // carry two of its PTMs. A shift on one residue is decided. toppic writes
+  // a shift whose sites are decided one PTM per residue
+  // (VarPtmAlign::splitDeterminedShift); TopMG's shifts span the gaps
+  // between matched fragments, which may hold one candidate residue.
+  bool hasUndecidedVarPtmSite(const ModPtrVec& var_mod_ptrs);
+
+  // The level stored by setClassification, "" until set: the report stage
+  // sets it from the protein hits (prsm_cutoff_selector), and the XML has it
+  // as <classification>.
+  const std::string& getClassification() const { return classification_; }
+
+  void setClassification(const std::string& classification) {
+    classification_ = classification;
+  }
+
   void setStartPos(int start_pos) { start_pos_ = start_pos; }
 
   void setEndPos(int end_pos) { end_pos_ = end_pos; }
@@ -179,6 +212,9 @@ class Proteoform {
   int prot_cluster_id_ = -1;
 
   double proteo_inte_ = -1;
+
+  // the stored level of the proteoform classification, "" until set
+  std::string classification_;
 
   MassShiftPtrVec mass_shift_list_;
 };

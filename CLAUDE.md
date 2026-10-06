@@ -1579,6 +1579,84 @@ from the side-chain PTMs of that residue. Facts to keep straight:
   (`TdgfMng::n_term_var_ptm_type_num_`, argument `nTermVarPtmTypeNum`); the
   candidate count uses the sequence mass without the N-terminal mod.
 
+## Proteoform classification (`seq/proteoform`, the PrSM tables)
+
+Branch `proteoform_classification` (issue #611; toppic_test experiment 129
+and its amendment 1, report 0129; merged into main on 2026-10-06). `Proteoform::getClassification(
+prot_hit_num, var_mod_ptrs)` gives the level of the proteoform in the
+five-level classification of proteoform identifications (Smith et al., Nat.
+Methods 16:939-940, 2019), by the rule the user gave:
+
+|  | one protein | several proteins |
+|---|---|---|
+| no unexpected shift, variable PTM sites decided | `1` | `2D` |
+| no unexpected shift, a variable PTM site undecided | `2A` | `3` |
+| unexpected shift(s) | `4` | `5` |
+
+Facts to keep straight:
+
+- **The properties.** An unexpected shift is an alteration of type
+  `UNEXPECTED` (`getAlterNum`); protein N-terminal forms, fixed PTMs, the
+  truncation N-terminal modification and TopMG's FASTA PTMs (`INPUT`) do
+  not count. The protein hits are `SearchFastaMatch::process`'s matches,
+  the `# Protein hits` column; 0 counts as one protein. A variable PTM site
+  is undecided (`hasUndecidedVarPtmSite`) when a variable mass shift covers
+  more than one residue and one of its PTMs does not have exactly as many
+  candidate residues as alterations, or two PTMs share one: the candidates
+  of a PTM are the residues of the range that one of its modifications in
+  `var_mod_ptrs` modifies (Deamidated on N and Q, Phospho on S, T and Y),
+  the test of `VarPtmAlign::splitDeterminedShift`. toppic splits a shift
+  whose sites are decided (one PTM per residue), so in toppic every
+  multi-residue variable shift is undecided; TopMG's shifts span the gaps
+  between matched fragments, and most of its ranges hold one candidate
+  residue (decided). The proteoform knows neither the database nor the PTM
+  file, so both come from the caller.
+- **One place computes it.** `prsm_cutoff_selector::process(...,
+  var_mod_ptrs)` sets it for every selected PrSM without one, from
+  `SearchFastaMatch` on the database file the tables search (built only
+  when a PrSM needs it); `TopPIC_report` passes the "anywhere"
+  modifications (`mod_util::readAnywhereModTxt`) of `-b` and `-B`,
+  `TopMG_post` those of `-i`. The proteoform stores it (`setClassification`,
+  `getClassification()` without arguments; "" until set). The proteoform
+  and protein cutoffs and the top PrSM filters read the PrSM cutoff's PrSMs
+  and keep it, and the tables and the SQLite writer, which read the cutoff
+  files, write the stored level (`-` if none).
+- **Where it is written.** The last column, `Proteoform classification`, of
+  every table of `PrsmMatchTableWriter` (PrSM, proteoform and protein,
+  single and with the other matches; toppic, its combined `-c` tables and
+  topmg), `proteoform_classification`, the last column of the SQLite tables
+  `prsm`, `proteoform` and `protein`, and `<classification>` in the
+  `<proteoform>` element of the XML outputs (`_prsm.xml`, `_proteoform.xml`,
+  `_protein.xml`), after `<proteo_db_seq>` and the truncation N-terminal
+  modification. The column is last so that no existing column moves; the
+  rows of a PrSM's other protein matches have no field for it (they end
+  before the q-values, 37 of the 41 fields before it). The element is
+  written and read only when set, so the PrSM files before the report are
+  unchanged.
+- **What the rule leaves out.** Levels 2B and 2C never occur. An unexpected
+  shift is level 4 whatever its mass, also when it is a known PTM on one
+  residue (HMGN1 `(S)[+79.9669]`) or of isotope size. With `-B`, a shift
+  that the localization explains by a PTM becomes a `VARIABLE` alteration
+  (`stat/local/local_proteoform`), so its proteoform is level 1, 2A, 2D or
+  3 (not run). Several proteins can be one gene (LAP2A / LAP2B, both TMPO),
+  and that is still 2D. The level is that of the PrSM's proteoform, so the
+  PrSMs of one proteoform id can differ (one with an unexpected shift, one
+  without), and the proteoform table shows the level of its best PrSM.
+- **Results** (toppic_test experiment 129, 480_F3_02, `-f C57 -d -t FDR
+  -T FDR`, oxidation): toppic (`-y FDR -s 2`) writes main 4ecb19ea's files
+  but the column, the element and the SQLite column (1de20d8b, levels 1 /
+  2D / 4 / 5, against main; a2a84e16 against 1de20d8b: the report stage's
+  PrSM files equal without `<classification>`, the tables and SQLite
+  tables equal but 29 PrSMs, 16 proteoforms and 1 protein moved from 1 to
+  2A), in the same time (16:48 against 16:42; the PrSM cutoff 1.4 s
+  against 0.3 s, the protein hit index). The level agrees with a Python
+  copy of the rule in every PrSM row of toppic's and topmg's tables, and
+  the XML element and the SQLite column with the tables. Proteoforms of
+  levels 1 / 2A / 2D / 3 / 4 / 5 at 1% FDR: toppic 1,050 / 16 / 70 / 0 /
+  812 / 50; topmg (one unexpected shift by default) 1,007 / 15 / 68 / 1 /
+  21 / 1, where 210 of its 228 range shifts hold as many candidate
+  residues as PTMs (decided).
+
 ## toplib_build (`src/toplib`, `console/toplib_build`)
 
 toplib_build is a C++ port of TopLib's `src/ms_library_building.py`
