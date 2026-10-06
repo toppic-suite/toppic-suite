@@ -1041,8 +1041,10 @@ say an index is reused when `-f`, `-n`, `-e` and `-d` match. topmg's hidden
 `--proteoform-ppm-error` moved from `-E` to `-Q` to free the letter. The
 rule for choosing between the two tolerances: the
 precursor tolerance covers anything sized on the precursor mass — the
-`getFirstPrecErrorTolerance(ppo)` checks in the filters/searches/E-value
-code, `refinePrecursorAndHeaderShift`, the localization shift checks
+`PeakTolerance::compPrecErrorTole(prec_mass)` checks in the
+filters/searches/E-value code (`MsHeader::getFirstPrecErrorTolerance(ppo)`
+until the Dalton option below), `refinePrecursorAndHeaderShift`, the
+localization shift checks
 (`LocalMng::prec_tole_ptr_`), **and** the tolerance handed to
 `prm_ms_util::getIntMassErrorList` / `getPrmPeakPtrs` and
 `comp_prob_value`, which use it only to build the synthetic zero and
@@ -1054,6 +1056,52 @@ localization M tables (`LocalMng::frag_tole_ptr_`). Neither `SpPara` nor
 `PeakTolerance` has XML (de)serialization any more: their `appendXml` and
 `XmlDOMElement` constructors were never called and were removed; `SpPara`
 is built only from the toppic/topmg arguments in `PrsmPara`.
+
+## Precursor error tolerance in Dalton (`para/peak_tolerance`, `--prec-dalton-error`)
+
+Branch `prec_dalton_error` (toppic_test experiment 133, report 0133, issue
+#563; not merged). toppic's hidden `--prec-dalton-error <Da>` (argument
+`precDaltonError`, empty by default; checked to be a positive number) sets
+`PeakTolerance::setDaltonTolerance` on the precursor tolerance in
+`PrsmPara`, and every precursor tolerance is then that value instead of
+the precursor mass x the ppm of `-E`. The parameter block prints it in Da.
+Facts to keep straight:
+
+- **One rule for a precursor tolerance.** `compPrecErrorTole(prec_mass)` is
+  prec_mass x ppo (no minimum) or the Dalton value; it serves the filters'
+  and searches' precursor tests, `refinePrecursorAndHeaderShift`, the
+  E-values' candidate window and isotope offset (`CompPValueArray` keeps the
+  tolerance as a member; its functions and `EValueProcessor`'s lost the ppo
+  parameter) and the MCMC tolerance. `compStrictErrorTole(mass)` returns the
+  Dalton value for every mass but 0: the zero PRM peak keeps the minimum
+  tolerance (0.01 Da), which no ppm value ever changed.
+  `MsHeader::getFirstPrecErrorTolerance(ppo)` and
+  `Precursor::getErrorTolerance(ppo)` are gone, and
+  `getFirstPrecMonoMassMinusWaterError` takes the tolerance in Da.
+- **Unchanged:** the +-1 Da precursor offsets of the stages, `-e`, `-p` and
+  the index. Without the option the 480 run is main's byte for byte (60
+  files).
+- **The refinement range is 2 x the tolerance.**
+  `refinePrecursorAndHeaderShift` steps over +-2 x tole and pairs fragments
+  within +-tole. With fewer than two pairs its median index is 0, so the
+  first bin wins and the precursor moves by +2 x tole (main too: 264 of
+  1,315 one-shift PrSMs of 480 at +2 x 10 ppm). With 0.5 Da that is +1.0
+  Da. Not fixed on the branch.
+- **Shift E-values depend on the precursor peak width.**
+  `CompProbValue::compPrecProbs` multiplies the one-shift precursor
+  probability by the precursor peak's width and the i-shift one by the
+  width again, so a wider tolerance lowers the E-values of PrSMs with
+  unexpected shifts (median log10 change at 0.5 Da: -0.59 one shift, -1.16
+  two shifts) and of the decoys among them; zero-shift E-values rise
+  (+0.31), from the candidate window.
+- **Results on 480** (setting d, 1% FDR; main 3,337 / 2,001 / 437):
+  0.05 Da 3,334 / 1,997 / 439, 0.2 Da 3,322 / 1,985 / 443, 0.5 Da 3,316 /
+  1,980 / 443; the E-value cutoff falls from 2.86 to 0.80 at 0.5 Da (shift
+  decoys). 0.2 and 0.5 Da take 7% longer (zero-shift and variable PTM
+  filters). With precursors moved by up to +-0.3 Da, 10 ppm reports 3,174
+  PrSMs but only 295 equal to main's (the errors become unexpected
+  shifts); 0.5 Da reports 3,057, of them 1,417 equal to main's (1,140 of its
+  1,471 zero-shift PrSMs), with an E-value cutoff of 0.042.
 
 ## Graph alignment tolerance (`search/graphalign`, TopMG)
 
