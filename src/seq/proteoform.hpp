@@ -144,6 +144,17 @@ class Proteoform {
 
   std::string getMIScore();
 
+  // The level of the proteoform in the five-level classification of
+  // proteoform identifications (Smith et al., Nat. Methods 16:939-940, 2019),
+  // from its unexpected mass shifts and prot_hit_num, the number of database
+  // proteins containing its sequence (the # Protein hits column):
+  //                            one protein   several proteins
+  //   no unexpected shift      "1"           "2D"
+  //   unexpected shift(s)      "4"           "5"
+  // Protein N-terminal forms, fixed and variable PTMs leave the level as it
+  // is; 0 hits count as one protein.
+  std::string getClassification(int prot_hit_num);
+
   void setStartPos(int start_pos) { start_pos_ = start_pos; }
 
   void setEndPos(int end_pos) { end_pos_ = end_pos; }

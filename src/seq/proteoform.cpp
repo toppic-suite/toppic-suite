@@ -504,4 +504,12 @@ std::string Proteoform::getMIScore() {
   return mi_score;
 }
 
+std::string Proteoform::getClassification(int prot_hit_num) {
+  bool multiple_prots = prot_hit_num > 1;
+  if (getAlterNum(AlterType::UNEXPECTED) == 0) {
+    return multiple_prots ? "2D" : "1";
+  }
+  return multiple_prots ? "5" : "4";
+}
+
 }  // namespace toppic

@@ -174,6 +174,7 @@ columns are:
 | `Protein N-terminal form`, `Fixed PTMs`, `# Unexpected modifications`, `Unexpected modifications`, `# Variable PTMs`, `Variable PTMs`, `MIScore` | The N-terminal form, the modifications of the proteoform as `name:[position]` lists (see [Proteoform annotation](proteoform.md)), and the modification identification score of the PTM characterization. |
 | `# Matched exp fragments`, `# Matched theo fragments`, `E-value` | The match statistics and the E-value. |
 | `Spectrum-level Q-value`, `Proteoform-level Q-value`, `Protein-level Q-value` | The FDR-based q-values (only with `--decoy`; `-` otherwise). |
+| `Proteoform classification` | The level of the proteoform in the five-level classification of proteoform identifications (Smith et al., Nat. Methods 16:939-940, 2019), from the unexpected modifications and the protein hits: `1` without unexpected modifications in one protein (`# Protein hits` 1), `2D` without them in several proteins, `4` with unexpected modifications in one protein, `5` with them in several. Protein N-terminal forms, fixed and variable PTMs do not change the level. |
 
 A `-` marks a value that does not apply.
 
