@@ -1374,6 +1374,78 @@ spectrum by isotope offset. Facts to keep straight:
       mass + 1 isotope. Not implemented: choosing by precursor error between
       a PrSM at P and an offset PrSM of the same protein and positions.
 
+## E-values of the variable PTM PrSMs with modified residues (`stat/tdgf/comp_pvalue_array`, `--var-ptm-evalue-mod-residues`)
+
+Branch `var_ptm_evalue_mod_residues` (toppic_test experiment 129, issue
+#334; not merged). The hidden toppic option `--var-ptm-evalue-mod-residues`
+(argument key `varPtmEvalueModResidues`, default `"false"` = main, printed
+in the parameter block only when set) gives the PrSMs of the variable PTM
+search their own generating function. Facts to keep straight:
+
+- **The residues.** Main's generating function draws random sequences from
+  the 20 residues with the fixed modifications (C57), each with its
+  frequency in the search database (`CountTestNum`), and, for COMPLETE and
+  PREFIX PrSMs, the first residues of the protein N-terminal forms. With
+  the option, a residue that k - 1 variable PTMs can modify becomes k
+  residues, itself and its modified forms, which share its frequency x,
+  x / k each (`count_util::geneModResFreqs`): with oxidation on M, M ->
+  M and M[Oxidation] at x / 2; with oxidation M, acetyl K, methyl KR and
+  phospho STY, K -> K, K[Acetyl], K[Methyl] at x / 3. The PTMs are the
+  "any" lines of the `-b` file (`mod_util::readAnywhereModTxt`, set in
+  `TdgfMng::var_ptm_mod_ptr_vec_` by `setVarPtmModResidues` in
+  `toppic_process.cpp`); N-term lines are not used.
+- **Which residue a PTM modifies** follows the variable PTM search
+  (`VarPtmAlign::initAllowShiftTable`): the residue must equal the
+  modification's original residue (`Residue::isSame`, the amino acid
+  without a PTM). A C57 residue takes no variable PTM. The N-terminal
+  residue list is split the same way; its residues carry no protein
+  N-terminal acetylation (that is an alteration of the proteoform, not of
+  the residue), so an acetylated first M splits too, as the search lets it
+  be oxidized.
+- **Which PrSMs.** `CompPValueArray::useModResidues`: no unexpected shift,
+  and variable PTMs or a truncation N-terminal modification, the PrSMs
+  whose candidate number already takes the residue sequence mass.
+  `process` splits the offset-0 PrSMs of a spectrum into these and the
+  others (the +-1 offset PrSMs never are variable PTM PrSMs) and computes
+  the generating function once for each group, so a spectrum with both
+  computes it twice; the variable PTM group has no unexpected shift and
+  needs only layer 0. The other PrSMs' E-values are unchanged: their group
+  has a smaller or equal maximum score, which only lowers the saturated
+  table height (as in the offset groups above).
+- **One table.** `CompProbValue::setResidues` replaces the residue masses,
+  frequencies and average residue length before a computation, so one
+  CompProbValue (138 MB page table per thread) serves both lists. The
+  average residue length of the new list (`count_util::computeAvgLength`)
+  is used with it.
+- **The candidate number is unchanged**, including the factor
+  (variable PTM types + 1) per variable PTM.
+- **Passes.** toppic's first E-value pass, the multiple-shift pass and the
+  cluster protein correction get the PTMs; TopMG hosted in toppic
+  (`--topmg`) does not (its PrSMs come from the graph alignment), and
+  neither does topmg.
+- **With the option off** the branch gives main's files byte for byte (56 of
+  56 files of a 480 run).
+- **Results on 480_F3_02** (`-s 2`, TopFD of main 4ecb19ea, toppic_test
+  report 0129):
+    - Oxidation only (`var_mods.txt`): 3,337 / 2,001 / 437 against main's
+      3,342 / 2,000 / 437, one decoy oxidation PrSM crossing the cutoff. The
+      variable PTM PrSMs' E-values move little (median -0.004 log10 at 5-9
+      matched fragments, up to +2.5 for ACBP with 48 fragments).
+    - Four PTMs (oxidation M, acetyl K, methyl KR, phospho STY): 3,377 /
+      2,013 / 442 against 3,371 / 2,012 / 442, but variable PTM PrSMs 731 ->
+      800 and zero-shift PrSMs 1,469 -> 1,425. Their E-values fall (median
+      -0.27 log10 at 5-9 fragments, -1.2 at 30 or more, decoys alike), because
+      splitting S, T, Y, K, R and M moves 16% of the residue probability away
+      from the unmodified residues. The PrSMs with variable PTMs then win ties
+      and near-ties against the zero-shift PrSMs of the same spectrum, which
+      keep main's residues. In 19 scans a protein N-terminal acetylation
+      becomes an acetylated lysine near the N-terminus, with fewer (12) or
+      equal (7) matched fragments. One H2B cluster flips from H2B2F to H2B1C
+      + methyl (same mass; the cluster protein correction relabels 18
+      scans).
+    - The first E-value pass takes +6% (oxidation) and +18% (four PTMs), the
+      whole run +1.0% and +1.6%; memory is unchanged.
+
 ## Precursor refinement of the variable PTM search (`search/diag/diagonal_util`, `search/varptmsearch/var_ptm_align`)
 
 Branch `var_ptm_refine_prec` (toppic_test experiment 121, report 0121;
