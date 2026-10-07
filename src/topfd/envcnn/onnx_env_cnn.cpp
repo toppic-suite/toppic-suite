@@ -20,7 +20,6 @@
 #include <cmath>
 #include <cstddef>
 #include <cstdint>
-#include <cstdlib>
 #include <iterator>
 #include <limits>
 #include <string>
@@ -202,16 +201,16 @@ void extractFeature(const std::vector<double>& theo_masses,
     mass_diff = t_peak_mass - exp_peak;
     inte_diff = t_peak_inte - exp_inte;
   }
-  // if mass difference is larger than 0.02, set it to
-  // 0.02 or -0.02
+  // if mass difference is larger than 0.02 (an unmatched theoretical peak),
+  // set it to -0.02 or 0.02, alternating over the theoretical peaks (k even
+  // -0.02, odd 0.02): the two values stay balanced, as with the random sign
+  // they replace, and an envelope's input no longer depends on the
+  // envelopes built before it (std::rand(), one stream for the process,
+  // made it depend on them and, with several threads, on their scheduling;
+  // toppic_test experiment 139)
   md = mass_diff;
   if (std::abs(md) > 0.02) {
-    int r = std::rand() % 2;
-    if (r == 0) {
-      md = -0.02;
-    } else {
-      md = 0.02;
-    }
+    md = (k % 2 == 0) ? -0.02 : 0.02;
   }
 }
 

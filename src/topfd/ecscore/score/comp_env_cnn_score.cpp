@@ -91,12 +91,10 @@ std::vector<std::vector<float>> getEnvcnnInputMatrix(
     double mass_diff = std::abs(theo_mz[idx] - exp_dist[idx]);
     double md = mass_diff;
     if (std::abs(md) > mass_tole) {
-      int r = std::rand() % 2;
-      if (r == 0) {
-        md = -mass_tole;
-      } else {
-        md = mass_tole;
-      }
+      // -mass_tole or mass_tole, alternating over the peaks instead of a
+      // random sign, so that the input does not depend on the envelopes
+      // built before (onnx_env_cnn::extractFeature)
+      md = (idx % 2 == 0) ? -mass_tole : mass_tole;
     }
     int p_idx = getIndex(std::round(theo_mz[idx] * 1000.0) / 1000.0, theo_mz[0],
                          bin_size) +
