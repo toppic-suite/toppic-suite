@@ -101,7 +101,7 @@ FAIMS data `sample_<voltage>` per voltage level, e.g. `sample_-40`).
 | `sample_ms1.msalign` | Deconvoluted MS1 spectra (monoisotopic masses). |
 | `sample_ms2.msalign` | Deconvoluted MS/MS spectra with precursor information (monoisotopic masses; average masses with `-A`). **This is the input of TopPIC and TopMG.** |
 | `sample_ptcr.msalign` | Only when the file has PTCR spectra (see below): their deconvoluted species, one line per species, in the `msalign` format with `ACTIVATION=PTCR`. Not read by TopPIC or TopMG. |
-| `sample_ptcr.tsv` | The same species with their charge ladders: one line per species with its spectrum, monoisotopic mass, intensity, charges, the charges at which it could have been isolated, the intensity and EnvCNN score per charge, and whether it is the precursor. |
+| `sample_ptcr.tsv` | The same species with their charge ladders: one line per species with its spectrum, monoisotopic mass, intensity, charges, the charges at which it could have been isolated, the intensity and EnvCNN score per charge, whether it is the precursor, and the MS1 feature it matches (`Feature ID`, `Feature mass`; -1 and empty without one). |
 | `sample_ms1.feature` | Proteoform features detected in the LC-MS map: one line per feature with its mass, intensity, retention-time and scan range, charge range, apex and ECScore. |
 | `sample_ms2.feature` | The features assigned to each MS/MS spectrum (precursor mass, m/z, charge and intensity), one line per spectrum and feature. |
 | `sample_feature.xml` | The proteoform features in XML, with their per-charge envelope information; read by TopPIC and TopMG when they combine fractions (`-c`). |
@@ -147,9 +147,35 @@ isolation window, reports one mass per species (its charges merged, the
 mass refined from all its isotope peaks), and takes the precursor from the
 species at the selected ion's charge and m/z. They are written to
 `sample_ptcr.msalign` and `sample_ptcr.tsv`, not to `sample_ms2.msalign` or
-the SQLite database. With `-a` set to a fragmentation method they are
-deconvoluted as MS/MS spectra of that method instead. They are also read
-from files without MS1 spectra (`-o`).
+the SQLite database. They are also read from files without MS1 spectra
+(`-o`). In a run with MS1 spectra, a species whose mass matches an MS1
+feature of the spectrum's precursor window (within 10 ppm, or one isotope
+apart) is linked to it in `sample_ptcr.tsv`, and a precursor species with a
+feature gets the feature's id and intensity. With `-a` set to a
+fragmentation method the spectra are fragment PTCR spectra of that method
+(next paragraph).
+
+**Fragment PTCR spectra.** A spectrum with a dissociation and a proton
+transfer stage, such as the Thermo MS3 scan `ms3 1402.50@cid60.00
+1100.00@ptr10.00` (collision-induced dissociation of the precursor, then
+proton transfer charge reduction of its fragments), is a fragment PTCR
+spectrum. Its activation is the dissociation's (the activation terms of all
+its precursors count; msconvert writes one precursor per stage, the
+dissociation first). TopFD deconvolutes it as an MS/MS spectrum of that
+activation and writes it to `sample_ms2.msalign` (`LEVEL=3` for an MS3
+scan), so TopPIC and TopMG search it with that activation's ion types; the
+console reports the number of such spectra. A fragment has no more charges
+or mass than its precursor, so the fragments are bounded by the charge of
+the selected ion and the mass it has at the upper end of the precursor
+window, not by `-c` and `-m` (with MS1 features of the window, by the
+larger of these and the features' bounds). Without an MS1 feature in the
+precursor window, the selected ion (its m/z and charge as the file gives
+them) is the precursor. An MSn scan (n > 2) is grouped with the last MS1
+scan before it. MSn scans without a proton transfer stage (a dissociation
+of fragments) are not read. ThermoRawFileParser writes only the proton
+transfer stage of an MS3 scan as its precursor; TopFD then takes the first
+stage's isolation target and dissociation from the scan's filter string,
+with the default precursor window (`-w`).
 
 ### 1.4 Options
 
