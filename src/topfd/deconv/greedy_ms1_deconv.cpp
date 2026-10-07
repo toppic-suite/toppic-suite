@@ -275,8 +275,13 @@ struct WinFit {
 // One spectrum's search.
 class GreedySearch {
  public:
+  // sn_ratio: the signal-to-noise ratio of the seed threshold; max_mass,
+  // max_charge: the bounds of the masses and charges; bound (may be empty):
+  // the charges a mass may have (deconvSeries)
   GreedySearch(const PeakPtrVec& peak_list, const TopfdParaPtr& topfd_para_ptr,
-               const EnvParaPtr& env_para_ptr, std::ostream* debug_os);
+               const EnvParaPtr& env_para_ptr, double sn_ratio,
+               double max_mass, int max_charge, ChargeBound bound,
+               std::ostream* debug_os);
 
   // the charge series of the masses found, in the order they were found
   std::vector<FitVec> run();
@@ -288,6 +293,7 @@ class GreedySearch {
  private:
   const GreedyPara& para_;
   EnvParaPtr env_para_ptr_;
+  ChargeBound bound_;
   std::ostream* debug_os_;
   int max_charge_;
   double max_mass_;
@@ -323,13 +329,15 @@ class GreedySearch {
 
 GreedySearch::GreedySearch(const PeakPtrVec& peak_list,
                            const TopfdParaPtr& topfd_para_ptr,
-                           const EnvParaPtr& env_para_ptr,
+                           const EnvParaPtr& env_para_ptr, double sn_ratio,
+                           double max_mass, int max_charge, ChargeBound bound,
                            std::ostream* debug_os)
     : para_(getPara()),
       env_para_ptr_(env_para_ptr),
+      bound_(std::move(bound)),
       debug_os_(debug_os),
-      max_charge_(topfd_para_ptr->getMaxCharge()),
-      max_mass_(topfd_para_ptr->getMaxMass()) {
+      max_charge_(max_charge),
+      max_mass_(max_mass) {
   mzs_.reserve(peak_list.size());
   intes_.reserve(peak_list.size());
   for (const PeakPtr& peak : peak_list) {
@@ -340,7 +348,6 @@ GreedySearch::GreedySearch(const PeakPtrVec& peak_list,
   found_masses_.resize(max_charge_ + 1);
   // the noise level and the thresholds of DeconvData::initMinInte
   double noise_inte = baseline_util::getBaseLine(intes_);
-  double sn_ratio = topfd_para_ptr->getMsOneSnRatio();
   min_ref_inte_ = noise_inte * sn_ratio;
   min_inte_ = sn_ratio < 1.0 ? noise_inte * sn_ratio : noise_inte;
 }
@@ -401,6 +408,10 @@ Fit GreedySearch::fitEnv(double mono_mass, int charge) {
   fit.mono_mass = mono_mass;
   fit.charge = charge;
   if (mono_mass < env_para_ptr_->min_mass_ || mono_mass >= max_mass_) {
+    return fit;
+  }
+  // the charges the bound excludes (seeds, series and offsets alike)
+  if (bound_ && !bound_(mono_mass, charge)) {
     return fit;
   }
   const Distr& distr = getDistr(mono_mass);
@@ -1043,8 +1054,10 @@ void addPrecWinEnvs(const PeakPtrVec& peak_list,
       continue;
     }
     if (search == nullptr) {
-      search = std::make_unique<GreedySearch>(peak_list, topfd_para_ptr,
-                                              env_para_ptr, nullptr);
+      search = std::make_unique<GreedySearch>(
+          peak_list, topfd_para_ptr, env_para_ptr,
+          topfd_para_ptr->getMsOneSnRatio(), topfd_para_ptr->getMaxMass(),
+          topfd_para_ptr->getMaxCharge(), ChargeBound(), nullptr);
     }
     WinFit win_fit = search->fitWindow(win.begin, win.end);
     if (win_fit.seed < 0) {
@@ -1126,6 +1139,9 @@ MatchEnvPtrVec deconv(const PeakPtrVec& peak_list,
     debug_os = std::make_unique<std::ofstream>(debug_name);
   }
   GreedySearch search(peak_list, topfd_para_ptr, env_para_ptr,
+                      topfd_para_ptr->getMsOneSnRatio(),
+                      topfd_para_ptr->getMaxMass(),
+                      topfd_para_ptr->getMaxCharge(), ChargeBound(),
                       debug_os.get());
   std::vector<FitVec> masses = search.run();
 
@@ -1171,6 +1187,72 @@ MatchEnvPtrVec deconv(const PeakPtrVec& peak_list,
   }
   match_env_util::assignIntensity(peaks, envs);
   return envs;
+}
+
+std::vector<MatchEnvPtrVec> deconvSeries(const PeakPtrVec& peak_list,
+                                         const TopfdParaPtr& topfd_para_ptr,
+                                         double sn_ratio, double max_mass,
+                                         int max_charge,
+                                         const ChargeBound& bound,
+                                         double min_envcnn,
+                                         const std::string& debug_name) {
+  std::vector<MatchEnvPtrVec> result;
+  if (peak_list.empty()) {
+    return result;
+  }
+  EnvParaPtr env_para_ptr = std::make_shared<EnvPara>(
+      topfd_para_ptr->getMzError(), topfd_para_ptr->getMaxMissPeakNum(),
+      topfd_para_ptr->isRunFilterByMz(),
+      topfd_para_ptr->getMassGroupBoundary());
+  std::unique_ptr<std::ofstream> debug_os;
+  if (!debug_name.empty()) {
+    debug_os = std::make_unique<std::ofstream>(debug_name);
+  }
+  GreedySearch search(peak_list, topfd_para_ptr, env_para_ptr, sn_ratio,
+                      max_mass, max_charge, bound, debug_os.get());
+  std::vector<FitVec> masses = search.run();
+
+  std::vector<double> intes;
+  intes.reserve(peak_list.size());
+  for (const PeakPtr& peak : peak_list) {
+    intes.push_back(peak->getIntensity());
+  }
+  double noise_inte = baseline_util::getBaseLine(intes);
+  double min_inte = sn_ratio < 1.0 ? noise_inte * sn_ratio : noise_inte;
+  // the envelopes of all masses, with the mass each belongs to
+  MatchEnvPtrVec envs;
+  std::vector<int> owners;
+  for (std::size_t k = 0; k < masses.size(); k++) {
+    for (const Fit& fit : masses[k]) {
+      MatchEnvPtr env = getMatchEnv(peak_list, fit, env_para_ptr, min_inte);
+      if (env != nullptr) {
+        envs.push_back(env);
+        owners.push_back(static_cast<int>(k));
+      }
+    }
+  }
+  // the intensities shared between envelopes and the EnvCNN scores, as in
+  // deconv; the envelopes below min_envcnn are dropped and the intensities
+  // assigned again among the kept ones
+  PeakPtrVec peaks = peak_list;
+  match_env_util::assignIntensity(peaks, envs);
+  if (getPara().envcnn != 0) {
+    onnx_env_cnn::computeEnvScores(peak_list, envs);
+  }
+  MatchEnvPtrVec kept;
+  result.resize(masses.size());
+  for (std::size_t i = 0; i < envs.size(); i++) {
+    if (envs[i]->getEnvcnnScore() >= min_envcnn) {
+      kept.push_back(envs[i]);
+      result[owners[i]].push_back(envs[i]);
+    }
+  }
+  peaks = peak_list;
+  match_env_util::assignIntensity(peaks, kept);
+  result.erase(std::remove_if(result.begin(), result.end(),
+                              [](const MatchEnvPtrVec& v) { return v.empty(); }),
+               result.end());
+  return result;
 }
 
 }  // namespace greedy_ms1_deconv

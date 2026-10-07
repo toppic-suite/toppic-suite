@@ -794,6 +794,165 @@ molecule that was fragmented. Facts to keep straight:
   half of them histone H2B at 13.8 kDa (one isotope light). The pairs cannot
   reach those: complementary pairs are missing or flat there.
 
+## PTCR spectra (`topfd/deconv/ptcr_ms2_deconv`)
+
+Branch `ptcr_ms2_deconv` (toppic_test experiment 136, report 0136). A PTCR
+spectrum is an MS/MS spectrum of proton transfer charge reduction of the
+isolated ions without dissociation: no fragments, only the isolated intact
+species at lower charges. Facts to keep straight:
+
+- **Reading.** `PwMsReader::parseActivation` decides on the activation
+  terms of all precursors of a spectrum (an MSn scan has one per stage;
+  msconvert writes the first stage first). `getActivationName` names the
+  dissociation (proton transfer is none); `hasPtcrTerm` finds MS:1003249
+  (proton transfer charge reduction) or MS:1003248 (proton transfer
+  reaction). A proton transfer term without a dissociation: a PTCR
+  spectrum (`MsHeader::isPtcr`, an activation object of its own,
+  `getPtcrActivationPtr`, placeholder ion types B / Y). `PTCR` is
+  deliberately not in `activation_base.xml`, the `-a` lists or the GUIs: no
+  search reads these spectra. A dissociation (of the file or of `-a`) and a
+  proton transfer term: a fragment PTCR spectrum (`isFragPtcr`, below), of
+  the dissociation's activation; so `-a HCD` on a PTCR scan now makes a
+  fragment PTCR spectrum, not main's fragment spectrum. The hidden `topfd
+  --ptcr` sets the activation to `PTCR` for every MS/MS spectrum
+  (`TopfdPara::isPtcrForced`, which the activation check accepts), for
+  files whose converter wrote no proton transfer term. `parsePrecursor`
+  keeps the selected ion's m/z and charge of the first precursor
+  (`MsHeader::getSelectedMz` / `getSelectedCharge`, -1 / 0 without) and the
+  isolation window of the proton transfer stage (`getPtcrWinBegin` /
+  `getPtcrWinEnd`: the last precursor with a proton transfer term, else the
+  precursor window).
+- **MSn scans** (n > 2) with a proton transfer stage are MS/MS spectra
+  (`MzmlMsGroupReader`'s `isMsTwo`, in `-o` and with MS1 spectra, and the
+  count of `readProfile`): grouped with the last MS1 scan before them
+  (`parsePrecursor` ignores their precursor reference, the MS(n-1) scan).
+  Other MSn scans (a dissociation of fragments, whose precursor is not the
+  window's proteoform) are skipped, as main skipped every MSn scan.
+  **Missing stages** (`getMissingStages`): ThermoRawFileParser 2.0 writes
+  one precursor for the MS3 scan "ms3 1402.5000@cid60.00
+  1100.0000@ptr10.00", the proton transfer stage (window 1100 +- 900, the
+  PTR term, the scan's charge state), and loses the CID. When a scan has
+  fewer precursors than stages and its filter string (MS:1000512) lists
+  them, the stages' terms (cid, hcd, etd, ptr) join the activation terms,
+  and when the file's precursor is not the first stage, the precursor
+  window and the selected ion m/z are the first stage's target with the
+  default window (`-w`); the charge stays the file's.
+- **Where it runs.** `deconv_ms2_process::deconvMsTwo` sends a PTCR
+  spectrum to `ptcr_ms2_deconv::deconv` and buffers the result
+  (`PtcrBuffer`, under a lock); `DeconvMs2Process::process` writes
+  `<base>_ptcr.msalign` (msalign format, `ACTIVATION=PTCR`, one line per
+  species: mass, intensity, highest charge, best EnvCNN score; `-A` average
+  masses) and `<base>_ptcr.tsv` (one line per species with its charges, the
+  intensity and EnvCNN score per charge, the isolation charges, the
+  precursor flag) after the pool, sorted by spectrum id, only when there are
+  PTCR spectra. They are not in `_ms2.msalign` or the SQLite database. In a
+  run with MS1 spectra, a species whose mass matches an MS1 feature of the
+  spectrum's window (`feature_ppm` 10 ppm, also one isotope apart) gets its
+  id and mass (the TSV columns `Feature ID`, `Feature mass`), and the
+  precursor species' feature gives the precursor its id and intensity.
+  Not in `FlashDeconvMs2Process` (`--deconv-ms2 flashdeconv`) or `-T`.
+- **The search** is the greedy MS1 search through
+  `greedy_ms1_deconv::deconvSeries`, a second entry point of
+  `greedy_ms1_deconv` (no precursor-window step) that takes a seed S/N
+  (the MS/MS ratio `-s`) and a `ChargeBound` (`fitEnv` rejects an excluded
+  (mass, charge): seeds, series and offsets) and returns the envelopes
+  grouped by mass (EnvCNN scored, below 0.2 dropped, intensities shared
+  among the kept ones). The PTCR bound: charge z of mass M only when some
+  z0 >= z puts the envelope of M (its isotopes >= 10% of the apex in
+  TopFD's averagine table) in the isolation window, since proton transfer
+  only lowers charges. Without an isolation window there is no bound.
+- **A species** is one mass's envelopes merged: the summed intensity, the
+  charges, the mass refined from the matched isotope peaks of all charges
+  (the intensity-weighted median of (observed - theoretical m/z) x z; the
+  envelope's own mass rests on the seed peak). **The precursor** is the
+  most intense species with an envelope at the selected ion's charge whose
+  isotopes (>= 10%) cover the selected ion's m/z, else the most intense one
+  that could have been isolated at that charge, else the most intense one,
+  else the selected ion itself.
+- **Fragment PTCR spectra** (`isFragPtcr`: a dissociation, then proton
+  transfer charge reduction of the fragments) are deconvoluted as other
+  MS/MS spectra of their activation (`deconvMsTwo`, `--deconv-ms2`) and
+  written to `_ms2.msalign` and the SQLite database, so TopPIC searches
+  them with the dissociation's ion types. The selected ion bounds the
+  fragments (`ptcr_ms2_deconv::getSelectedIonPrec`: its charge, and its
+  mass at the upper end of the precursor window; not capped by `-c` /
+  `-m`), with MS1 features the larger of these and the features' bounds (a
+  feature of the window need not be the isolated ion: the AAV2 MS1 scans
+  are not isotope-resolved and their features are noise, which as the only
+  bound left 470 masses per spectrum instead of 4,100-5,500). Without MS1
+  features of the window the selected ion (its m/z and charge as the file
+  gives them, not monoisotopic) is the precursor. The console counts them
+  ("Fragment PTCR spectra: N"). Switch `frag`: 1 this (default), 0 as other
+  MS/MS spectra (`-o`: the dummy precursor of `-c` / `-m`), 2
+  `deconvFragments`, the charge-series search of the intact spectra with
+  the PTCR bound, z0 <= the selected charge and masses below the
+  precursor's (also its surviving precursor ladder as the precursor), one
+  mass per fragment species, `<base>_ptcr_fragment.tsv`. The MS/MS search
+  matched more theoretical fragments of AAV2's capsid proteins than the
+  series search (below): with the wide PTCR windows of these data
+  (1100 +- 900, 650 +- 255 m/z) the band bound excludes almost nothing
+  above 1 kDa, and the MS/MS search's fragment-specific choices (5 ppm,
+  per-charge isotope offsets, no harmonic test, the single-charge cosine
+  0.7) find more low-charge fragments.
+- **Research switches** in `TOPFD_PTCR_PARA` ("name=value,..."): `band`
+  (1), `win_margin` (0 m/z, added to both window ends), `iso_min_rel`
+  (0.1), `min_envcnn` (0.2), `sn_ratio` (0 = `-s`), `refine` (1), `frag`
+  (1, above), `frag_min_envcnn` (0, frag 2), `frag_prec_margin` (20 Da,
+  frag 2: species this close to the precursor mass or above are not
+  fragments), `feature_ppm` (10). The greedy search's own switches
+  (`TOPFD_GREEDY_PARA`) apply too.
+  `TOPFD_PTCR_DEBUG_SCAN=<scan>` writes one scan's decisions to
+  `ptcr_scan<scan>.txt`.
+- **`-o` lost the first MS/MS spectrum of every file without MS1
+  spectra**: `MzmlMsGroupReader`'s constructor reads one spectrum to check
+  that the file is not empty and rewound only when MS1 spectra are present
+  (fixed in this branch). TopDIA's MS/MS step runs in that mode on files
+  that start with an MS1 spectrum, which the skip consumed harmlessly.
+- **Results** (toppic_test experiment 136; data/ptcr_ms2, two single PTCR
+  scans of an Orbitrap Eclipse, isolated at 16+ and 17+ with +-5 m/z, of a
+  16.94 kDa proteoform and its co-isolated variants; ThermoRawFileParser
+  drops the precursor of these scans, cut out of longer runs, and the
+  experiment's add_precursor.py writes it back): the dominant proteoform at
+  16,936.657 / 16,936.663 Da in the two scans (0.3 ppm; 0.9 ppm without the
+  refinement), 11+-16+ and 11+-17+, as their precursor; 77 / 95 species,
+  no 1-isotope twins; species with 75% / 72% of the intensity found in both
+  scans at the same mass (median 0.47 ppm apart), 17% / 16% at an isotope
+  shift. The co-isolated variants lie a near-whole number of Daltons apart,
+  so their isotope peaks merge into one centroid (5 ppm at every charge),
+  and a minor species' monoisotopic mass is not determined to the isotope
+  (a joint least-squares fit of all species does not decide it either).
+  Without the bound 81 / 102 more species (9% / 10% of the intensity),
+  2 of them at the same mass in the other scan. One species whose envelope
+  ends 0.8 and 0.5 m/z below the two windows is reproducible (16,835.55 Da,
+  1% of the intensity): the window edges are not sharp, but margins of
+  0.5-3 m/z added mostly irreproducible species, so the margin stays 0. main 38ba67dc writes 420 /
+  487 envelope lines (one per charge state) with a dummy precursor (`-o`:
+  charge 30, mass 50,000 Da), 21 / 33 masses above 10 kDa with a
+  1-isotope twin, 72% / 77% of the lines (15% / 19% of the intensity) of
+  masses outside every band, charges up to 30. On 480_F3_02 (no PTCR
+  spectra) the branch's TopFD output equals main's within the variation of
+  two main runs (MS/MS spectra identical; 702 against 727 MS1 spectra with
+  a differing mass; same time and memory).
+- **Results of fragment PTCR and LC-MS runs** (toppic_test experiment 136,
+  amendment 1; MassIVE MSV000095045, AAV2 capsid on an Orbitrap Ascend: 36
+  MS3 scans "ms3 1288|1300|1402.5@cid60 1100@ptr10" and 36 "825|830@etd3
+  650@ptr10|8", matched against the b/y or c/z-dot ions of VP1, VP2 and VP3
+  at 10 ppm with reversed-sequence decoys): the MS/MS search (frag 1) 1,125
+  CID and 334 ETD target matches above the decoys' (sums over the
+  spectra), the series search (frag 2) 937 and 206, frag 0 with `-o`'s
+  bounds 1,113 / 320 and with `-c 64 -m 90000` 1,122 / 335. Main reads no
+  MS3 scan (0 MS/MS scans). ThermoRawFileParser's own files (first stage
+  from the filter string) give the masses of the files with a precursor per
+  stage in 69 of 72 spectra (3 ETD spectra differ near the bound: the
+  default window of 3 m/z against +-2.5). A synthetic LC-MS run (the
+  AAV2_MS1 run's 2,882 MS1 scans with the 72 MS3 scans and 3 MS1 scans
+  copied as intact PTCR scans): every MS3 scan in the group of the MS1 scan
+  before it, the masses of the `-o` runs in all 72; 62 precursors from
+  features (noise: 43 of charge 1), 10 the selected ion; an intact copy's
+  species linked to its window's feature. The intact PTCR outputs of
+  data/ptcr_ms2 are unchanged (but the two TSV columns); 480_F3_02 within
+  the variation of two main runs.
+
 ## Post mass matching (`prsm/prsm_post_mass_match`, toppic only)
 
 After the search, the clustering, the cluster protein correction and the

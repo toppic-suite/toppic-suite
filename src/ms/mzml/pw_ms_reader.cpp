@@ -16,6 +16,8 @@
 #include "ms/mzml/pw_ms_reader.hpp"
 
 #include <algorithm>
+#include <cctype>
+#include <cmath>
 #include <cstddef>
 #include <cstdlib>
 #include <exception>
@@ -23,11 +25,13 @@
 #include <limits>
 #include <map>
 #include <memory>
+#include <sstream>
 #include <string>
 #include <utility>
 #include <vector>
 
 #include "common/base/activation_base.hpp"
+#include "common/base/ion_type_base.hpp"
 #include "common/util/logger.hpp"
 #include "common/util/str_util.hpp"
 #include "pwiz/data/common/ParamTypes.hpp"
@@ -37,6 +41,11 @@
 namespace toppic {
 
 namespace {
+
+const std::string& getPtcrName() {
+  static const std::string name = "PTCR";
+  return name;
+}
 
 // The activation of an MS/MS spectrum from the activation cvParams of its
 // precursor, or "" when it has no known one. The set of terms decides, not
@@ -51,6 +60,7 @@ namespace {
 //   CID is ETHCD.
 // - Otherwise ETD, HCD (beam-type CID, a kind of CID), CID, then MPD
 //   (MS:1000435).
+// The proton transfer terms are not dissociations (hasPtcrTerm).
 std::string getActivationName(const std::vector<pwiz::data::CVParam>& cv_list) {
   bool cid = false;
   bool hcd = false;
@@ -96,6 +106,100 @@ std::string getActivationName(const std::vector<pwiz::data::CVParam>& cv_list) {
     return "MPD";
   }
   return "";
+}
+
+// Whether activation terms have proton transfer charge reduction
+// (MS:1003249) or proton transfer reaction (MS:1003248)
+bool hasPtcrTerm(const std::vector<pwiz::data::CVParam>& cv_list) {
+  for (const pwiz::data::CVParam& cv : cv_list) {
+    if (cv.cvid == pwiz::cv::MS_proton_transfer_charge_reduction ||
+        cv.cvid == pwiz::cv::MS_proton_transfer_reaction) {
+      return true;
+    }
+  }
+  return false;
+}
+
+// One stage of an MSn scan in its Thermo filter string: the isolation target
+// and the activation terms
+struct FilterStage {
+  double target = 0;
+  std::vector<pwiz::data::CVParam> terms;
+};
+
+// The stages of an MSn scan (n > 2) whose converter wrote fewer precursors
+// than stages: ThermoRawFileParser 2.0 writes one precursor for the MS3 scan
+// "FTMS + p ESI Full ms3 1402.5000@cid60.00 1100.0000@ptr10.00 [...]", the
+// last stage (its isolation window, the proton transfer term and the scan's
+// charge state), and loses the dissociation of the first stage. Then the
+// stages of the filter string (MS:1000512), in order, each with its target
+// and the terms of its activations (cid, hcd, etd, ptr; others have none);
+// none when the scan has a precursor per stage or the filter string does
+// not list ms_level - 1 stages.
+std::vector<FilterStage> getMissingStages(
+    const pwiz::msdata::SpectrumPtr& spec, int ms_level) {
+  std::vector<FilterStage> stages;
+  if (ms_level < 3 ||
+      static_cast<int>(spec->precursors.size()) >= ms_level - 1 ||
+      spec->scanList.scans.empty()) {
+    return stages;
+  }
+  std::string filter =
+      spec->scanList.scans[0].cvParam(pwiz::cv::MS_filter_string).value;
+  std::string key = "ms" + std::to_string(ms_level) + " ";
+  std::size_t pos = filter.find(key);
+  std::size_t end =
+      pos == std::string::npos ? std::string::npos : filter.find('[', pos);
+  if (end == std::string::npos) {
+    return stages;
+  }
+  std::stringstream ss(
+      filter.substr(pos + key.size(), end - pos - key.size()));
+  std::string item;
+  while (ss >> item) {
+    // <target>@<type><energy>[@<type><energy>...]
+    std::vector<std::string> parts = str_util::split(item, "@");
+    FilterStage stage;
+    try {
+      stage.target = std::stod(parts[0]);
+    } catch (const std::exception&) {
+      return std::vector<FilterStage>();
+    }
+    for (std::size_t i = 1; i < parts.size(); i++) {
+      std::string type;
+      for (char c : parts[i]) {
+        if (!std::isalpha(static_cast<unsigned char>(c))) {
+          break;
+        }
+        type += c;
+      }
+      if (type == "cid") {
+        stage.terms.emplace_back(pwiz::cv::MS_CID);
+      } else if (type == "hcd") {
+        stage.terms.emplace_back(pwiz::cv::MS_HCD);
+      } else if (type == "etd") {
+        stage.terms.emplace_back(pwiz::cv::MS_ETD);
+      } else if (type == "ptr") {
+        stage.terms.emplace_back(
+            pwiz::cv::MS_proton_transfer_charge_reduction);
+      }
+    }
+    stages.push_back(stage);
+  }
+  if (static_cast<int>(stages.size()) != ms_level - 1) {
+    stages.clear();
+  }
+  return stages;
+}
+
+// The activation of PTCR spectra. It is not in activation_base.xml: a PTCR
+// spectrum has no fragments, TopFD writes it to its own msalign file and no
+// search reads it. The ion types are placeholders.
+ActivationPtr getPtcrActivationPtr() {
+  static const ActivationPtr ptcr_ptr = std::make_shared<Activation>(
+      getPtcrName(), IonTypeBase::getIonTypePtrByName("B"),
+      IonTypeBase::getIonTypePtrByName("Y"));
+  return ptcr_ptr;
 }
 
 }  // namespace
@@ -256,17 +360,90 @@ void PwMsReader::parsePrecursor(const MsHeaderPtr& header_ptr,
       }
     }
   }
+  // an MSn scan with fewer precursors than stages (getMissingStages): the
+  // file's precursor is a later stage when its target is not the first
+  // stage's, and the precursor window is then the first stage's target with
+  // the default window (-w)
+  std::vector<FilterStage> stages =
+      getMissingStages(cur_spec_ptr, spec_info.msLevel);
+  bool first_stage_missing =
+      !stages.empty() && std::abs(prec_target_mz - stages[0].target) > 0.01;
+  if (first_stage_missing) {
+    prec_target_mz = stages[0].target;
+    isolation_lower_offset = isolation_window_ / 2;
+    isolation_upper_offset = isolation_window_ / 2;
+  }
   LOG_DEBUG("Precursor target mz " << prec_target_mz << " lower offset "
                                    << isolation_lower_offset << " upper offset "
                                    << isolation_upper_offset);
   header_ptr->setPrecTargetMz(prec_target_mz);
   header_ptr->setPrecWinBegin(prec_target_mz - isolation_lower_offset);
   header_ptr->setPrecWinEnd(prec_target_mz + isolation_upper_offset);
+  // the selected ion as the file gives it (used for PTCR spectra)
+  if (cur_spec_ptr->precursors.size() > 0 &&
+      !cur_spec_ptr->precursors[0].selectedIons.empty()) {
+    const pwiz::msdata::SelectedIon& ion =
+        cur_spec_ptr->precursors[0].selectedIons[0];
+    for (const pwiz::data::CVParam& cv : ion.cvParams) {
+      if (cv.value.empty()) {
+        continue;
+      }
+      if (cv.cvid == pwiz::cv::MS_selected_ion_m_z) {
+        header_ptr->setSelectedMz(std::stod(cv.value));
+      } else if (cv.cvid == pwiz::cv::MS_charge_state) {
+        header_ptr->setSelectedCharge(std::stoi(cv.value));
+      }
+    }
+  }
+  if (first_stage_missing) {
+    // the first stage's target; the charge state stays the file's (the
+    // scan's, ThermoRawFileParser)
+    header_ptr->setSelectedMz(stages[0].target);
+  }
+  // the isolation window of the proton transfer stage: that of the last
+  // precursor with a proton transfer term (the second precursor of an MS3
+  // scan "X@cid Y@ptr"), else the precursor window
+  header_ptr->setPtcrWin(header_ptr->getPrecWinBegin(),
+                         header_ptr->getPrecWinEnd());
+  // missing stages: the target of the last proton transfer stage of the
+  // filter string with the default window, unless a precursor of the file
+  // is that stage (below)
+  for (const FilterStage& stage : stages) {
+    if (hasPtcrTerm(stage.terms)) {
+      header_ptr->setPtcrWin(stage.target - isolation_window_ / 2,
+                             stage.target + isolation_window_ / 2);
+    }
+  }
+  for (const pwiz::msdata::Precursor& prec : cur_spec_ptr->precursors) {
+    if (!hasPtcrTerm(prec.activation.cvParams)) {
+      continue;
+    }
+    double target = 0;
+    double lower = isolation_window_ / 2;
+    double upper = isolation_window_ / 2;
+    for (const pwiz::data::CVParam& cv : prec.isolationWindow.cvParams) {
+      if (cv.cvid == pwiz::cv::MS_isolation_window_target_m_z) {
+        target = std::stod(cv.value);
+      } else if (cv.cvid == pwiz::cv::MS_isolation_window_lower_offset) {
+        lower = std::stod(cv.value);
+      } else if (cv.cvid == pwiz::cv::MS_isolation_window_upper_offset) {
+        upper = std::stod(cv.value);
+      }
+    }
+    if (target > 0) {
+      header_ptr->setPtcrWin(target - lower, target + upper);
+    }
+  }
   double prec_scan_num = -1;
   if (spec_info.precursors.size() > 0) {
     // get precursor scan ID from mzML
     prec_scan_num =
         parseNum(cur_spec_ptr->precursors[0].spectrumID, prev_ms1_scan_id_);
+  }
+  if (spec_info.msLevel > 2) {
+    // an MSn scan belongs to the MS1 scan of its cycle; its precursor
+    // reference is the MS(n-1) scan
+    prec_scan_num = prev_ms1_scan_id_;
   }
   header_ptr->setMsOneScan(prec_scan_num);
 }
@@ -274,12 +451,35 @@ void PwMsReader::parsePrecursor(const MsHeaderPtr& header_ptr,
 void PwMsReader::parseActivation(const MsHeaderPtr& header_ptr,
                                  pwiz::msdata::SpectrumInfo& spec_info,
                                  pwiz::msdata::SpectrumPtr cur_spec_ptr) {
+  // the activation terms of all precursors: an MSn scan has one precursor
+  // per stage (msconvert writes the MS2 stage first), e.g. CID of the
+  // precursor, then proton transfer charge reduction of its fragments
+  std::vector<pwiz::data::CVParam> terms;
+  for (const pwiz::msdata::Precursor& prec : cur_spec_ptr->precursors) {
+    terms.insert(terms.end(), prec.activation.cvParams.begin(),
+                 prec.activation.cvParams.end());
+  }
+  // and those of the stages the converter did not write (getMissingStages)
+  for (const FilterStage& stage :
+       getMissingStages(cur_spec_ptr, spec_info.msLevel)) {
+    terms.insert(terms.end(), stage.terms.begin(), stage.terms.end());
+  }
+  bool ptcr = hasPtcrTerm(terms);
   std::string ac_name = activation_;
+  if (ac_name == getPtcrName()) {
+    // topfd --ptcr: every MS/MS spectrum is a PTCR spectrum
+    header_ptr->setPtcr(true);
+    header_ptr->setActivationPtr(getPtcrActivationPtr());
+    return;
+  }
   if (ac_name == "" || ac_name == "FILE") {
-    ac_name = "";
-    if (cur_spec_ptr->precursors.size() > 0) {
-      ac_name =
-          getActivationName(cur_spec_ptr->precursors[0].activation.cvParams);
+    ac_name = getActivationName(terms);
+    if (ac_name == "" && ptcr) {
+      // proton transfer without dissociation: a PTCR spectrum of the
+      // isolated ions
+      header_ptr->setPtcr(true);
+      header_ptr->setActivationPtr(getPtcrActivationPtr());
+      return;
     }
   }
   if (ac_name == "") {
@@ -296,6 +496,9 @@ void PwMsReader::parseActivation(const MsHeaderPtr& header_ptr,
   ActivationPtr activation_ptr =
       ActivationBase::getActivationPtrByName(ac_name);
   header_ptr->setActivationPtr(activation_ptr);
+  // a dissociation (from the file or -a) and a proton transfer term: the
+  // fragments, charge-reduced
+  header_ptr->setFragPtcr(ptcr);
 }
 
 double PwMsReader::parseFaims(pwiz::msdata::SpectrumPtr cur_spec_ptr) {
@@ -416,6 +619,34 @@ bool specHasPrecWindow(const pwiz::msdata::SpectrumPtr& spec) {
   return false;
 }
 
+// Whether a spectrum is an MS/MS spectrum TopFD reads
+// (MzmlMsGroupReader): an MS2 scan, or an MSn scan (n > 2) with a proton
+// transfer term, of a precursor or of a stage the converter did not write
+// (all of them with topfd --ptcr)
+bool isReadMsTwo(const pwiz::msdata::SpectrumPtr& spec, int ms_level,
+                 bool ptcr_forced) {
+  if (ms_level == 2) {
+    return true;
+  }
+  if (ms_level < 2) {
+    return false;
+  }
+  if (ptcr_forced) {
+    return true;
+  }
+  for (const pwiz::msdata::Precursor& prec : spec->precursors) {
+    if (hasPtcrTerm(prec.activation.cvParams)) {
+      return true;
+    }
+  }
+  for (const FilterStage& stage : getMissingStages(spec, ms_level)) {
+    if (hasPtcrTerm(stage.terms)) {
+      return true;
+    }
+  }
+  return false;
+}
+
 }  // namespace
 
 MzmlProfilePtr PwMsReader::readProfile() {
@@ -432,10 +663,16 @@ MzmlProfilePtr PwMsReader::readProfile() {
     }
     pwiz::msdata::SpectrumInfo spec_info(*cur_spec_ptr);
     int ms_level = spec_info.msLevel;
+    // the MS/MS spectra TopFD reads (MS3 scans with a proton transfer stage
+    // too); other MSn scans are not counted
+    if (ms_level > 2 &&
+        !isReadMsTwo(cur_spec_ptr, ms_level, activation_ == getPtcrName())) {
+      continue;
+    }
     double voltage = parseFaims(cur_spec_ptr);
     if (ms_level == 1) {
       ms_1_cnt++;
-    } else if (ms_level == 2) {
+    } else if (ms_level >= 2) {
       ms_2_cnt++;
       if (all_ms2_have_prec_window && !specHasPrecWindow(cur_spec_ptr)) {
         all_ms2_have_prec_window = false;
@@ -449,7 +686,7 @@ MzmlProfilePtr PwMsReader::readProfile() {
           std::pair<int, int> cnt(1, 0);
           std::pair<double, std::pair<int, int>> new_volt(voltage, cnt);
           volt_map.insert(new_volt);
-        } else if (ms_level == 2) {
+        } else if (ms_level >= 2) {
           std::pair<int, int> cnt(0, 1);
           std::pair<double, std::pair<int, int>> new_volt(voltage, cnt);
           volt_map.insert(new_volt);
@@ -459,7 +696,7 @@ MzmlProfilePtr PwMsReader::readProfile() {
       else {
         if (ms_level == 1) {
           volt_map[voltage].first++;
-        } else if (ms_level == 2) {
+        } else if (ms_level >= 2) {
           volt_map[voltage].second++;
         }
       }
