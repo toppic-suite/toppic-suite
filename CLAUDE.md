@@ -2131,10 +2131,22 @@ is on). Facts to keep straight:
   graph alignment are untouched; `--second-align disabled` runs main's
   code path (the development subset gives main's 41 stage files byte for
   byte).
-- **The second refinement is not clamped to the observed precursor**: the
-  refinement at P' searches [-T, T] around P', so the final precursor can
-  lie up to 2T from P (on the development subset 7% of the one-shift
-  calls end beyond T from P, 4% after the first pass alone).
+- **The second refinement is clamped only with `--second-align-clamp`**
+  (argument key `secondAlignClamp`, `PrsmPara::useSecondAlignClamp`; the
+  parameter block prints ", clamped"): the refinement at P' searches
+  [-T, T] around P', so without the clamp the final precursor can lie up
+  to 2T from P (14% of the one-shift and 16% of the multiple-shift calls
+  of 480_F3_02 end beyond T from P, none after the first pass; 68 of the
+  1,506 reported shift PrSMs, base 3). With the clamp
+  `second_align_util::genePrsm` passes `refinePrecursorByMatchedIons` the
+  delta range [P - T - P', P + T - P'] (its optional `delta_min` /
+  `delta_max`, infinite by default), so P'' stays within T of P.
+- **The large-shift penalty differs between the two dynamic programs**
+  (found with the log): `PsAlign::dp` takes the penalty (3 per shift above
+  300 Da) off a predecessor's score only to choose the predecessor and
+  stores the score without it; `PsAlignMultiType::dp` stores the score
+  with the penalty subtracted. The paths chosen are mostly the same; the
+  scores are not comparable between the two. Not changed on this branch.
 - **Research log.** `TOPPIC_SECOND_ALIGN_LOG=<file>` appends one
   tab-separated line per `geneResult` call with a first alignment: stage
   (`one` / `multi`), spectrum id, type, shift number, protein, P, the
@@ -2145,7 +2157,26 @@ is on). Facts to keep straight:
   scores (one per spectrum and ion type per matched cleavage) with the
   zero and precursor peaks counted with the group's spectrum number each,
   so score - 2 against the PrSM's matched fragments measures the agreement.
-- **Results on 480_F3_02** (toppic_test experiment 144): see report 0144.
+- **Results on 480_F3_02** (toppic_test experiment 144, report 0144;
+  setting d, experiment 131's TopFD output, against main 7b5112c2):
+    - The second alignment's score is within 1 of the PrSM's matched
+      fragments for 98.0% of the 265,195 one-shift and 97.8% of the
+      41,712 multiple-shift candidate alignments (the first alignment:
+      81.9% and 69.3%; `relax` 83.7% and 71.3%, so the tolerance is the
+      gap, not the precursor). It changes the positions or shifts of 27%
+      and 33% of the candidate PrSMs (14% and 19% with the clamp), mostly
+      the shift mass through the precursor; 747 one-shift candidates gain
+      fragments (mostly +1) and 321 lose (mostly -1).
+    - 1% FDR: strict 3,359 PrSMs / 2,001 proteoforms / 438 proteins, relax
+      3,367 / 1,999 / 438, strict with the clamp 3,358 / 1,997 / 439,
+      against main's 3,355 / 1,997 / 438, the same E-value cutoff (2.49;
+      2.69 clamped) and decoys: within the data set's noise. Without the
+      clamp 68 of 1,506 reported shift PrSMs (main 3) have an adjusted
+      precursor beyond 10 ppm of the observed one, and one such move made
+      a STMN1 one-shift PrSM the best of a chimeric feature's cluster, so
+      the cluster protein correction dropped two ATIF1 oxidation PrSMs.
+    - The one-shift search takes 38.6 s instead of 22.7 s; the
+      multiple-shift search's 256 s are unchanged.
 
 ## Range of a variable PTM shift (`seq/mass_shift`, `search/varptmsearch/var_ptm_align`)
 
