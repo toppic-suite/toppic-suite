@@ -418,6 +418,16 @@ by TopPIC's post mass matching (EnvCNN).
   another proteoform than in a float run (1-3 between float runs). The int8
   speed-up depends on the CPU's int8 dot-product instructions; it was not
   timed on CPUs without AVX-512 VNNI or on ARM.
+- **In the tree** (branch `quantized_onnx_models` on main 72534ded,
+  toppic_test experiment 131, amendment 1; one run each): TopFD 278.6 s
+  against 402.8 s with the float `*_full` models; its outputs are as close to
+  the experiment's arm B as two runs of B are to each other. toppic: 3,347
+  PrSMs, 1,997 proteoforms, 437 proteins against main's 3,338 / 2,001 / 436.
+  TopPIC's post mass matching with the int8 EnvCNN (5.7 s of EnvCNN against
+  16.9 s) gives the same tables and XML files as with the float model on the
+  same TopFD output; only 3,772 of the 724,767 EnvCNN scores in
+  `_post_ms2.msalign` change (up to 0.12, 41 across 0.4). TopDIA was not
+  tested.
 
 ## Envelope refinement and the core-peak intensity fit (`ms/env/match_env_refine`)
 
