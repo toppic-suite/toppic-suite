@@ -72,6 +72,13 @@ class PrsmPara {
   // pass per type. Default true; toppic hidden --disable-multi-type-align
   // falls back to the original one-pass-per-type PsAlign.
   bool useMultiTypeAlign() const { return use_multi_type_align_; }
+  // The second alignment of the one-shift and multiple-shift searches at the
+  // refined precursor of the first alignment's result (toppic hidden
+  // --second-align, search/diag/second_align_util): "disabled" (default),
+  // "strict" (the fragment tolerance on every PRM peak) or "relax" (the
+  // first alignment's tolerances).
+  const std::string& getSecondAlignMode() const { return second_align_mode_; }
+  bool useSecondAlign() const { return second_align_mode_ != "disabled"; }
 
   // The number of unexpected mass shifts of TopMG's proteoform-graph
   // alignment, separate from toppic's --num-shift, which governs toppic's own
@@ -105,6 +112,7 @@ class PrsmPara {
   SpParaPtr sp_para_ptr_;
 
   bool use_multi_type_align_ = true;
+  std::string second_align_mode_ = "disabled";
 
   int topmg_shift_num_ = 1;
 };

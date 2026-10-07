@@ -136,6 +136,10 @@ std::map<std::string, std::string> ToppicArgument::initArguments() {
   arguments["fragMassDedup"] = "false";
   arguments["multiSkipEvalue"] = "";
   arguments["multiTypeAlign"] = "true";
+  // the second alignment of the shift searches at the refined precursor
+  // (hidden --second-align): disabled, strict (the fragment tolerance on
+  // every peak) or relax (the first alignment's tolerances)
+  arguments["secondAlign"] = "disabled";
 
   arguments["version"] = "";
   return arguments;
@@ -267,6 +271,11 @@ void ToppicArgument::outputArguments(
   output << std::setw(gap) << std::left << "Protein-level cutoff value:" << sep
          << arguments["cutoffProteinValue"] << std::endl;
 
+  if (arguments["secondAlign"] != "disabled") {
+    output << std::setw(gap) << std::left
+           << "Second alignment at the refined precursor:" << sep
+           << arguments["secondAlign"] << std::endl;
+  }
   if (arguments["precDaltonError"] != "") {
     output << std::setw(gap) << std::left
            << "Error tolerance for precursor masses:" << sep
@@ -409,6 +418,7 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
   std::string post_min_peak_num = "";
   std::string frag_extend_min_mass = "";
   std::string prec_dalton_error = "";
+  std::string second_align = "";
   std::string multi_skip_evalue = "";
   std::string var_ptm_filter_cand_num = "";
 
@@ -613,6 +623,7 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
         "deamid-selector", "")("disable-var-ptm-evalue-mod-residues", "")(
         "multi-skip-evalue", po::value<std::string>(&multi_skip_evalue),
             "")("disable-multi-type-align", "")(
+        "second-align", po::value<std::string>(&second_align), "")(
         "topmg", po::value<std::string>(&topmg_mode), "")(
         "topmg-use-mcmc", "")(
         "topmg-num-shift", po::value<std::string>(&topmg_shift_num), "")(
@@ -822,6 +833,15 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
     // PsAlign search.
     if (vm.count("disable-multi-type-align")) {
       arguments_["multiTypeAlign"] = "false";
+    }
+
+    // hidden: the second alignment of the one-shift and multiple-shift
+    // searches at the refined precursor of the first alignment's result
+    // (search/diag/second_align_util, issue #614): "strict" with the
+    // fragment tolerance on every peak, "relax" with the first alignment's
+    // tolerances, "disabled" (the default) for the first alignment alone.
+    if (vm.count("second-align")) {
+      arguments_["secondAlign"] = second_align;
     }
 
     // hidden: TopMG's identification - the ASF filtering with the variable
@@ -1189,6 +1209,15 @@ bool ToppicArgument::validateArguments() {
                 << prec_dalton_error << " should be a positive number.");
       return false;
     }
+  }
+
+  std::string second_align_mode = arguments_["secondAlign"];
+  if (second_align_mode != "disabled" && second_align_mode != "strict" &&
+      second_align_mode != "relax") {
+    LOG_ERROR("Second alignment mode (--second-align) "
+              << second_align_mode
+              << " should be disabled, strict or relax.");
+    return false;
   }
 
   std::string env_cnn_cutoff_value = arguments_["envCnnCutoff"];
