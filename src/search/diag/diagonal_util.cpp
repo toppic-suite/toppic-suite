@@ -91,11 +91,6 @@ double refinePrecursorAndHeaderShift(const ProteoformPtr& proteo_ptr,
   if (header_ptrs.size() == 0) {
     return prec_mass;
   }
-  // with a precursor tolerance in Dalton (--prec-dalton-error) the precursor
-  // is not refined: the shifts keep the observed precursor mass
-  if (prec_tole_ptr->isUseDaltonTolerance()) {
-    return prec_mass;
-  }
   double tole = prec_tole_ptr->compPrecErrorTole(prec_mass);
 
   int one_side_step_num = 0;
@@ -145,14 +140,6 @@ double refinePrecursorAndHeaderShift(const ProteoformPtr& proteo_ptr,
                              pair_ptrs.end());
   }
 
-  // With fewer than two pairs the precursor is kept. The median index below
-  // was 0 for them, so the first bin won and the precursor moved by +2 x
-  // tole: 264 of the 1,315 one-shift PrSMs of 480_F3_02 (toppic_test
-  // experiment 133).
-  if (matched_pair_ptrs.size() < 2) {
-    return prec_mass;
-  }
-
   for (size_t i = 0; i < matched_pair_ptrs.size(); i++) {
     double diff = matched_pair_ptrs[i]->getTheoPeakPtr()->getPosition() -
                   matched_pair_ptrs[i]->getRealPeakPtr()->getPosition();
@@ -162,19 +149,17 @@ double refinePrecursorAndHeaderShift(const ProteoformPtr& proteo_ptr,
       counts[idx]++;
     }
   }
-  // The bin of the median pair, index (size - 1) / 2 of the sorted
-  // differences (the lower one of an even number). The bin where the
-  // count first reached size / 2 was one pair below the median for an odd
-  // number of pairs (the smallest difference of three).
-  int median = (static_cast<int>(matched_pair_ptrs.size()) - 1) / 2;
+  /* get median position */
+  int median = matched_pair_ptrs.size() / 2;
   int sum = 0;
   int best_pos = one_side_step_num;
   for (size_t i = 0; i < counts.size(); i++) {
-    sum += counts[i];
-    if (sum > median) {
+    int next_sum = sum + counts[i];
+    if (sum <= median && median <= next_sum) {
       best_pos = i;
       break;
     }
+    sum = next_sum;
   }
 
   double best_delta = -(best_pos - one_side_step_num) * refine_prec_step_width;

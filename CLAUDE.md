@@ -1081,29 +1081,12 @@ Facts to keep straight:
 - **Unchanged:** the +-1 Da precursor offsets of the stages, `-e`, `-p` and
   the index. Without the option the 480 run is main's byte for byte (60
   files).
-- **The refinement of the shift searches** (`refinePrecursorAndHeaderShift`)
-  pairs fragments within tole + the fragment's own tolerance, bins the
-  differences over +-2 x tole and moves the precursor to the median pair.
-  Amendment 1 (bfa89f11, 8a5a4582, 75c7ae13):
-    - **Fewer than two pairs: the precursor is kept.** The median index
-      size / 2 was 0, so the first bin won and the precursor moved by +2 x
-      tole: 264 of main's 1,315 one-shift PrSMs of 480, +1.0 Da at 0.5 Da.
-      Fixed: 3,346 / 1,999 / 439 at 10 ppm.
-    - **The median pair is index (size - 1) / 2.** The old rank test took
-      the pair one below the median for an odd number of pairs. Fixed:
-      3,350 / 2,006 / 439.
-    - **With `--prec-dalton-error` there is no refinement**: the observed
-      precursor and the headers' shifts are kept.
-        - On 480 this costs PrSMs (3,276 against 3,316 at 0.5 Da), mostly
-          two-shift ones. The refinement corrects errors of a few
-          hundredths of a Da that small fragments cannot absorb.
-        - On precursors moved by up to +-0.3 Da it gains: 1,828 / 448
-          proteoforms / proteins against 1,798 / 399, the cutoff 0.41
-          against 0.042. The shift PrSMs keep the error.
-- **The multiple-shift stage searches only the spectra whose first-pass
-  E-value is not below the smallest first-pass decoy E-value**
-  (`toppic_process.cpp`). One decoy sets the threshold (0.085 on main,
-  0.20 at 0.05 Da without refinement, 54 more spectra skipped).
+- **The refinement range is 2 x the tolerance.**
+  `refinePrecursorAndHeaderShift` steps over +-2 x tole and pairs fragments
+  within +-tole. With fewer than two pairs its median index is 0, so the
+  first bin wins and the precursor moves by +2 x tole (main too: 264 of
+  1,315 one-shift PrSMs of 480 at +2 x 10 ppm). With 0.5 Da that is +1.0
+  Da. Not fixed on the branch.
 - **Shift E-values depend on the precursor peak width.**
   `CompProbValue::compPrecProbs` multiplies the one-shift precursor
   probability by the precursor peak's width and the i-shift one by the

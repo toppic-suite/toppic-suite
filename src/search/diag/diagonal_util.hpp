@@ -25,14 +25,6 @@ namespace toppic {
 
 namespace diagonal_util {
 
-// The precursor refinement of the shift searches (PSAlign, PSAlignMultiType,
-// TopMG's graph alignment): the C-terminal ions of the diagonals before the
-// last shift and the N-terminal ions of the last one are paired with peaks
-// within the precursor tolerance tole, and the precursor moves to the
-// median pair's difference (bins of refine_prec_step_width over +-2 x tole),
-// with the headers' shifts. The precursor is kept with fewer than two pairs,
-// and with a precursor tolerance in Dalton (--prec-dalton-error), which
-// skips the refinement. Returns the refined precursor mass.
 double refinePrecursorAndHeaderShift(const ProteoformPtr& proteo_ptr,
                                      const ExtendMsPtrVec& ms_three_ptr_vec,
                                      DiagHeaderPtrVec& header_ptrs,
