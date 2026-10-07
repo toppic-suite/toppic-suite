@@ -83,14 +83,16 @@ namespace {
 
 // The MS/MS spectra TopFD deconvolutes: MS2 scans, and MSn scans (n > 2)
 // with a proton transfer stage, such as the MS3 scan "X@cid60 Y@ptr10" (the
-// fragments of X, charge-reduced; MsHeader::isFragPtcr) or PTCR of a PTCR
-// product (isPtcr). Other MSn scans, a dissociation of fragments, are
+// fragments of X, charge-reduced; MsHeader::isFragPtcr), "X@ptr5 Y@hcd80"
+// (the dissociation of a charge-reduced precursor; isReducedPrec) or PTCR of
+// a PTCR product (isPtcr). Other MSn scans, a dissociation of fragments, are
 // skipped as before: their precursor is a fragment, not the window's
 // proteoform.
 bool isMsTwo(const MsHeaderPtr& header_ptr) {
   int level = header_ptr->getMsLevel();
   return level == 2 ||
-         (level > 2 && (header_ptr->isFragPtcr() || header_ptr->isPtcr()));
+         (level > 2 && (header_ptr->isFragPtcr() || header_ptr->isPtcr() ||
+                        header_ptr->isReducedPrec()));
 }
 
 }  // namespace
