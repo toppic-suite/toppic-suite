@@ -288,6 +288,14 @@ ProteoformPtr createProteoformPtr(const ProteoformPtr& base_form_ptr,
     LOG_ERROR("ERROR in localization!");
     exit(EXIT_FAILURE);
   }
+  // The alterations below run from bgn_1 to the break point and from the
+  // break point to end_2, while scrFilter cut the score vectors to
+  // [bgn_1, end_1] and [bgn_2, end_2]. Proteoform::getMIScore and the
+  // ProForma writer index a score vector from the alteration's left
+  // position over its whole range, so the vectors are padded with zeros to
+  // the alterations' ranges (toppic_test experiment 140, amendment 2).
+  scr_vec_1.resize(break_pos + 1 - bgn_1, 0.0);
+  scr_vec_2.insert(scr_vec_2.begin(), bgn_2 - (break_pos + 1), 0.0);
 
   LocalAnnoPtr anno_1 = std::make_shared<LocalAnno>(
       bgn_1, end_1, conf_1, scr_vec_1, match_score, ptm_ptr_1);

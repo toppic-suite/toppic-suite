@@ -2275,10 +2275,16 @@ main's. What the alternative does, and how it differs from `stat/local`:
   probabilities summed directly). The two VARIABLE shifts take the tight
   ranges of their sites above the threshold, `[bgn_1, end_1]` and
   `[bgn_2, end_2]`, not `local_proteoform::createProteoformPtr`'s ranges
-  extended to the break point: there the `LocalAnno` score vector is cut
-  to the sites above the threshold while the alteration's range runs to
-  the break point, and `Proteoform::getMIScore` indexes the vector over
-  the whole range (reads past its end when `end_1 < break_pos`).
+  extended to the break point. There the `LocalAnno` score vectors were
+  cut by `scrFilter` to the sites above the threshold while the
+  alterations' ranges run to the break point, and `Proteoform::getMIScore`
+  and the ProForma writer index a vector from the alteration's left
+  position over its whole range (past the first vector's end when
+  `end_1 < break_pos`, and misaligned for the second when
+  `bgn_2 > break_pos + 1`). Fixed in this branch (experiment 140,
+  amendment 2): `createProteoformPtr` pads the vectors with zeros to the
+  alterations' ranges, so the ranges and the printed sites are as before
+  and the reads are in bounds.
 - **Two unexpected shifts.** `stat/local` explains the sum of the two
   shifts by one ordered pair over the whole proteoform; `local_align`
   splits the proteoform at a cleavage site b between the shifts (first
