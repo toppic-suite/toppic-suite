@@ -52,6 +52,10 @@ struct Para {
   bool term = true;
   int term_range = 5;
   int term_max_matched = 3;
+  // several explanations are reduced by the tie-break rules of breakTies
+  // before the one-explanation rule (0 = the pure rule: several
+  // explanations always stop the localization)
+  bool tie = true;
 };
 
 // A shift of a piece: its cleavage-site range [left, right) in the piece's
@@ -100,7 +104,25 @@ struct Explanation {
   PtmPtr second;
 
   std::string getName() const;
+  int getPtmNum() const { return second == nullptr ? 1 : 2; }
+  // a PTM of the explanation has this abbreviation (the -B file's name)
+  bool hasPtm(const std::string& abbr) const;
 };
+
+// The tie-break rules for several explanations of one shift, applied in
+// this order while more than one is left: (1) fewer PTMs (Dimethyl over
+// Methyl+Methyl, Trimethyl over Methyl+Dimethyl, a PTM on the N-terminal
+// acetylation form over Acetyl + the PTM on the plain form); (2) the
+// N-terminal acetylation form over an Acetyl of -B on the plain form
+// (acetyl_forms[i]: the explanation's candidate proteoform carries the
+// acetylation); (3) Acetyl over Trimethyl (0.036 Da apart) - the
+// explanations with Trimethyl and without Acetyl are dropped when one with
+// Acetyl is left. Returns the indices of the explanations kept; rule names
+// the rules that reduced the set ("fewer_ptms", "acetyl_form",
+// "acetyl_over_trimethyl", joined by '+'; empty when none applied).
+std::vector<size_t> breakTies(const std::vector<Explanation>& expls,
+                              const std::vector<bool>& acetyl_forms,
+                              std::string& rule);
 
 // the shifts of the proteoform that count as known in the pieces
 bool isKnownShift(const MassShiftPtr& shift_ptr);

@@ -76,9 +76,12 @@ class LocalAlignProcessor {
                               const MassShiftPtrVec& kept_shifts,
                               const std::string& piece_name, int shift_idx);
 
+  // rule: the tie-break rules that chose the explanation (breakTies);
+  // all_names: the explanations before the tie-break when it applied
   void log(const PrsmPtr& prsm_ptr, int shift_idx, double shift_mass,
            const std::string& piece_name, const std::string& expl_names,
-           const std::string& decision, const std::string& sites);
+           const std::string& decision, const std::string& sites,
+           const std::string& rule = "", const std::string& all_names = "");
 
   LocalMngPtr mng_ptr_;
 

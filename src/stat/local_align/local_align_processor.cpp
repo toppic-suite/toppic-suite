@@ -23,6 +23,7 @@
 #include <sstream>
 
 #include "common/base/mod_util.hpp"
+#include "common/base/prot_mod_base.hpp"
 #include "common/base/ptm_util.hpp"
 #include "common/util/file_util.hpp"
 #include "common/util/logger.hpp"
@@ -55,7 +56,8 @@ void LocalAlignProcessor::init() {
   if (log_name != nullptr && log_name[0] != '\0') {
     log_file_.open(log_name);
     log_file_ << "spectrum_id\tprsm_id\tprotein\tshift_idx\tshift_mass\tpiece"
-              << "\texplanations\tdecision\tsites" << std::endl;
+              << "\texplanations\tdecision\tsites\trule\tall_explanations"
+              << std::endl;
   }
 }
 
@@ -81,6 +83,8 @@ void LocalAlignProcessor::readPara() {
       para_.term_range = static_cast<int>(value);
     } else if (name == "term_max_matched") {
       para_.term_max_matched = static_cast<int>(value);
+    } else if (name == "tie") {
+      para_.tie = value != 0;
     } else {
       LOG_ERROR("Unknown TOPPIC_LOCAL_ALIGN_PARA switch " << name);
     }
@@ -91,13 +95,16 @@ void LocalAlignProcessor::log(const PrsmPtr& prsm_ptr, int shift_idx,
                               double shift_mass, const std::string& piece_name,
                               const std::string& expl_names,
                               const std::string& decision,
-                              const std::string& sites) {
+                              const std::string& sites,
+                              const std::string& rule,
+                              const std::string& all_names) {
   if (!log_file_.is_open()) return;
   log_file_ << prsm_ptr->getSpectrumId() << "\t" << prsm_ptr->getPrsmId()
             << "\t" << prsm_ptr->getProteoformPtr()->getSeqName() << "\t"
             << shift_idx << "\t" << std::fixed << std::setprecision(4)
             << shift_mass << "\t" << piece_name << "\t" << expl_names << "\t"
-            << decision << "\t" << sites << std::endl;
+            << decision << "\t" << sites << "\t" << (rule.empty() ? "-" : rule)
+            << "\t" << (all_names.empty() ? "-" : all_names) << std::endl;
 }
 
 // LocalProcessor::process with this class's PrSM handling
@@ -198,27 +205,42 @@ LocalAlignProcessor::PieceResult LocalAlignProcessor::processPiece(
     log(prsm_ptr, shift_idx, piece.shift_mass, piece_name, "-", "none", "-");
     return result;
   }
+  // several explanations: the tie-break rules, then the one-explanation rule
+  std::string rule;
+  std::string all_names;
+  size_t chosen = 0;
   if (expls.size() > 1) {
-    result.decision = "ambiguous";
-    log(prsm_ptr, shift_idx, piece.shift_mass, piece_name, names, "ambiguous",
-        "-");
-    return result;
+    std::vector<size_t> kept;
+    if (para_.tie) {
+      std::vector<bool> acetyl_forms(expls.size(), false);
+      kept = local_align::breakTies(expls, acetyl_forms, rule);
+    }
+    if (kept.size() != 1) {
+      result.decision = "ambiguous";
+      log(prsm_ptr, shift_idx, piece.shift_mass, piece_name, names,
+          "ambiguous", "-", rule);
+      return result;
+    }
+    chosen = kept[0];
+    all_names = names;
+    names = expls[chosen].getName();
   }
   int best_score = 0;
-  result.shifts = local_align::localize(piece, expls[0],
+  result.shifts = local_align::localize(piece, expls[chosen],
                                         prsm_ptr->getRefineMsPtrVec(), para_,
                                         mng_ptr_, best_score);
   if (result.shifts.empty()) {
     result.decision = "no_sites";
     log(prsm_ptr, shift_idx, piece.shift_mass, piece_name, names, "no_sites",
-        "-");
+        "-", rule, all_names);
     return result;
   }
   result.ok = true;
   result.decision = "localized";
   log(prsm_ptr, shift_idx, piece.shift_mass, piece_name, names, "localized",
       shiftSites(result.shifts, prsm_ptr->getProteoformPtr()->getStartPos()) +
-          " score=" + std::to_string(best_score));
+          " score=" + std::to_string(best_score),
+      rule, all_names);
   return result;
 }
 
@@ -295,29 +317,53 @@ LocalAlignProcessor::PieceResult LocalAlignProcessor::processTerminal(
         "-", "term_none", "-");
     return result;
   }
+  // several candidates: the tie-break rules over all (candidate,
+  // explanation) pairs, then the one-explanation rule
+  std::string rule;
+  std::string all_names;
+  size_t chosen = 0;
   if (cands.size() > 1) {
-    result.decision = "term_ambiguous";
-    log(prsm_ptr, shift_idx, shift_ptr->getMassShift(), piece_name + "," + side,
-        names, "term_ambiguous", "-");
-    return result;
+    std::vector<size_t> kept;
+    if (para_.tie) {
+      std::vector<local_align::Explanation> expls;
+      std::vector<bool> acetyl_forms;
+      for (size_t k = 0; k < cands.size(); k++) {
+        expls.push_back(cands[k].expl);
+        std::string type = cands[k].form->getProtModPtr()->getType();
+        acetyl_forms.push_back(type == ProtModBase::getType_M_ACETYLATION() ||
+                               type == ProtModBase::getType_NME_ACETYLATION());
+      }
+      kept = local_align::breakTies(expls, acetyl_forms, rule);
+    }
+    if (kept.size() != 1) {
+      result.decision = "term_ambiguous";
+      log(prsm_ptr, shift_idx, shift_ptr->getMassShift(),
+          piece_name + "," + side, names, "term_ambiguous", "-", rule);
+      return result;
+    }
+    chosen = kept[0];
+    all_names = names;
+    names = str_util::split(names, ";")[chosen];
   }
+  const Cand& cand = cands[chosen];
   int best_score = 0;
-  result.shifts = local_align::localize(cands[0].piece, cands[0].expl,
+  result.shifts = local_align::localize(cand.piece, cand.expl,
                                         prsm_ptr->getRefineMsPtrVec(), para_,
                                         mng_ptr_, best_score);
   if (result.shifts.empty()) {
     result.decision = "term_no_sites";
     log(prsm_ptr, shift_idx, shift_ptr->getMassShift(), piece_name + "," + side,
-        names, "term_no_sites", "-");
+        names, "term_no_sites", "-", rule, all_names);
     return result;
   }
   result.ok = true;
-  result.cand_form = cands[0].form;
+  result.cand_form = cand.form;
   result.decision = "term_localized";
-  log(prsm_ptr, shift_idx, cands[0].piece.shift_mass, piece_name + "," + side,
+  log(prsm_ptr, shift_idx, cand.piece.shift_mass, piece_name + "," + side,
       names, "term_localized",
-      shiftSites(result.shifts, cands[0].form->getStartPos()) +
-          " score=" + std::to_string(best_score));
+      shiftSites(result.shifts, cand.form->getStartPos()) +
+          " score=" + std::to_string(best_score),
+      rule, all_names);
   return result;
 }
 

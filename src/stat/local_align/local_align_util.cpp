@@ -17,6 +17,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <functional>
 
 #include "common/base/amino_acid_base.hpp"
 #include "common/base/mass_constant.hpp"
@@ -371,6 +372,59 @@ std::string Explanation::getName() const {
     name += "+" + second->getAbbrName();
   }
   return name;
+}
+
+bool Explanation::hasPtm(const std::string& abbr) const {
+  if (first->getAbbrName() == abbr) return true;
+  return second != nullptr && second->getAbbrName() == abbr;
+}
+
+std::vector<size_t> breakTies(const std::vector<Explanation>& expls,
+                              const std::vector<bool>& acetyl_forms,
+                              std::string& rule) {
+  rule = "";
+  std::vector<size_t> kept;
+  for (size_t i = 0; i < expls.size(); i++) kept.push_back(i);
+  auto apply = [&](const std::string& name,
+                   const std::function<bool(size_t)>& drop) {
+    if (kept.size() <= 1) return;
+    std::vector<size_t> next;
+    for (size_t k = 0; k < kept.size(); k++) {
+      if (!drop(kept[k])) next.push_back(kept[k]);
+    }
+    if (next.size() < kept.size() && !next.empty()) {
+      kept = next;
+      rule += (rule.empty() ? "" : "+") + name;
+    }
+  };
+  // (1) fewer PTMs
+  int min_num = 2;
+  for (size_t k = 0; k < kept.size(); k++) {
+    min_num = std::min(min_num, expls[kept[k]].getPtmNum());
+  }
+  apply("fewer_ptms",
+        [&](size_t i) { return expls[i].getPtmNum() > min_num; });
+  // (2) the N-terminal acetylation form over an Acetyl on the plain form
+  bool any_acetyl_form = false;
+  for (size_t k = 0; k < kept.size(); k++) {
+    if (acetyl_forms[kept[k]]) any_acetyl_form = true;
+  }
+  if (any_acetyl_form) {
+    apply("acetyl_form", [&](size_t i) {
+      return !acetyl_forms[i] && expls[i].hasPtm("Acetyl");
+    });
+  }
+  // (3) Acetyl over Trimethyl
+  bool any_acetyl = false;
+  for (size_t k = 0; k < kept.size(); k++) {
+    if (expls[kept[k]].hasPtm("Acetyl")) any_acetyl = true;
+  }
+  if (any_acetyl) {
+    apply("acetyl_over_trimethyl", [&](size_t i) {
+      return expls[i].hasPtm("Trimethyl") && !expls[i].hasPtm("Acetyl");
+    });
+  }
+  return kept;
 }
 
 bool isKnownShift(const MassShiftPtr& shift_ptr) {

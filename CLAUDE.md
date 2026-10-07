@@ -2235,9 +2235,21 @@ main's. What the alternative does, and how it differs from `stat/local`:
   with a +1.00 Da second shift became a Methyl at -1 Da, i.e. a 1 Da
   precursor error turned into a PTM). The shift is replaced only when
   there is **exactly one** explanation; with none or several it stays
-  (logged "none" / "ambiguous"). Dimethyl is never chosen when Methyl is
-  listed too (Dimethyl vs Methyl+Methyl), nor Acetyl when Trimethyl is
-  (0.036 Da apart, within 10 ppm above 3.6 kDa).
+  (logged "none" / "ambiguous"). Several explanations are first reduced
+  by the **tie-break rules** of `local_align_util::breakTies` (switch
+  `tie`, 1; experiment 140's amendment 5), applied in this order while
+  more than one is left: (1) fewer PTMs (Dimethyl over Methyl+Methyl,
+  Trimethyl over Methyl+Dimethyl, a PTM on the N-terminal acetylation
+  form over Acetyl + the PTM on the plain form), (2) the N-terminal
+  acetylation form over an Acetyl of `-B` on the plain form of the same
+  start (terminal candidates), (3) Acetyl over Trimethyl (0.036 Da apart,
+  within 10 ppm above 3.6 kDa): the explanations with Trimethyl and
+  without Acetyl are dropped. What is left after the rules must be one
+  explanation. Without the rules (`tie=0`) Dimethyl is never chosen when
+  Methyl is listed too, nor Acetyl when Trimethyl is. The PTMs are
+  recognized by the abbreviations `Acetyl` and `Trimethyl` of the `-B`
+  file. The log's `rule` column names the rules that decided and
+  `all_explanations` the set before them.
 - **No filters.** `LocalProcessor` keeps a localization only when the
   matched fragment number stays above the original's minus 5 and above
   0.67 x the original (`DESC_MATCH_LIMIT_`, `desc_ratio_`), when a site
@@ -2331,7 +2343,7 @@ main's. What the alternative does, and how it differs from `stat/local`:
 - **Research aids.** `TOPPIC_LOCAL_ALIGN_PARA` ("name=value,..."): `iso`
   (0; 1 = the isotope match of `stat/local`), `max_ptm` (2; 1 = single
   PTMs only), `split` (1), `term` (1), `term_range` (5),
-  `term_max_matched` (3).
+  `term_max_matched` (3), `tie` (1; 0 = no tie-break rules).
   `TOPPIC_LOCAL_ALIGN_LOG=<file>`: one tab-separated line per shift
   handled (spectrum id, PrSM id, protein, shift index and mass, piece with
   the break site and the matched sites of the range, the explanations,
