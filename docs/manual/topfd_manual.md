@@ -145,7 +145,10 @@ the charge-state search of its MS1 deconvolution, allowing a mass only at
 charges at or below a charge at which its isotopic envelope falls in the
 isolation window, reports one mass per species (its charges merged, the
 mass refined from all its isotope peaks), and takes the precursor from the
-species at the selected ion's charge and m/z. They are written to
+species at the selected ion's charge and m/z: the species whose
+monoisotopic m/z is the selected ion's (Thermo converters write the
+instrument's monoisotopic m/z when it has one), else the most intense one
+whose isotopic envelope, from its monoisotopic peak on, covers it. They are written to
 `sample_ptcr.msalign` and `sample_ptcr.tsv`, not to `sample_ms2.msalign` or
 the SQLite database. They are also read from files without MS1 spectra
 (`-o`). In a run with MS1 spectra, a species whose mass matches an MS1
@@ -155,11 +158,11 @@ feature gets the feature's id and intensity. With `-a` set to a
 fragmentation method the spectra are fragment PTCR spectra of that method
 (next paragraph).
 
-**Fragment PTCR spectra.** A spectrum with a dissociation and a proton
-transfer stage, such as the Thermo MS3 scan `ms3 1402.50@cid60.00
-1100.00@ptr10.00` (collision-induced dissociation of the precursor, then
-proton transfer charge reduction of its fragments), is a fragment PTCR
-spectrum. Its activation is the dissociation's (the activation terms of all
+**Fragment PTCR spectra.** A spectrum with a dissociation and a later (or
+the same) proton transfer stage, such as the Thermo MS3 scan `ms3
+1402.50@cid60.00 1100.00@ptr10.00` (collision-induced dissociation of the
+precursor, then proton transfer charge reduction of its fragments), is a
+fragment PTCR spectrum. Its activation is the dissociation's (the activation terms of all
 its precursors count; msconvert writes one precursor per stage, the
 dissociation first). TopFD deconvolutes it as an MS/MS spectrum of that
 activation and writes it to `sample_ms2.msalign` (`LEVEL=3` for an MS3
@@ -175,7 +178,29 @@ scan before it. MSn scans without a proton transfer stage (a dissociation
 of fragments) are not read. ThermoRawFileParser writes only the proton
 transfer stage of an MS3 scan as its precursor; TopFD then takes the first
 stage's isolation target and dissociation from the scan's filter string,
-with the default precursor window (`-w`).
+with the default precursor window (`-w`). The same holds for a scan without
+any precursor (ThermoRawFileParser writes none when the scan's precursor
+scan is not in the file, e.g. a single scan exported from a run): the
+filter string gives its isolation target, default window and activation.
+
+**Dissociation of charge-reduced precursors.** A spectrum whose
+dissociation stage comes after its proton transfer stage, such as the
+Thermo MS3 scan `ms3 942.55@ptr5.00 997.93@hcd80.00` (proton transfer
+charge reduction of the ions isolated at m/z 942.55, then the isolation of
+one charge-reduced ion at m/z 997.93 and its higher-energy collisional
+dissociation), is not a fragment PTCR spectrum: it is an MS/MS spectrum of
+the dissociation's activation (`LEVEL=3`), written to `sample_ms2.msalign`,
+whose precursor window is the first stage's. The order of the stages comes
+from the scan's filter string, else from the order of its precursors in the
+file. Its precursor is the charge-reduced ion: TopFD deconvolutes the PTCR
+spectrum of the same isolation read before it (the scan the MS3 scan
+references, else the last PTCR scan with the same isolation target) and
+takes its most intense species with an isotopic envelope at the second
+stage's target, with the charge it has there. Without such a PTCR spectrum
+the precursors are the MS1 features of the window with an envelope at that
+target at a lower charge (all features of the window when none has one),
+and without MS1 spectra the selected ion when the file gives its charge.
+The console reports the number of these spectra.
 
 ### 1.4 Options
 

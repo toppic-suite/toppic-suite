@@ -90,6 +90,28 @@ class MsHeader {
 
   double getPtcrWinEnd() const { return ptcr_win_end_; }
 
+  // The dissociation of a charge-reduced precursor: an MSn scan whose
+  // dissociation stage comes after its proton transfer stage, e.g. the MS3
+  // scan "X@ptr5 Y@hcd80" (proton transfer charge reduction of the ions
+  // isolated at X, then the isolation of one charge-reduced ion at Y and its
+  // dissociation). Its activation is the dissociation's and its precursor
+  // window the first stage's (the MS1 window, as for other MS/MS spectra);
+  // its precursor is the species of the PTCR products at Y (see
+  // deconv_ms2_process::deconvMsTwo). Not a fragment PTCR spectrum.
+  bool isReducedPrec() const { return reduced_prec_; }
+
+  // The isolation of the dissociation stage of such a spectrum: its target
+  // m/z (the charge-reduced ion) and window. -1 when unknown.
+  double getReducedPrecTargetMz() const { return reduced_prec_target_mz_; }
+
+  double getReducedPrecWinBegin() const { return reduced_prec_win_begin_; }
+
+  double getReducedPrecWinEnd() const { return reduced_prec_win_end_; }
+
+  // The scan an MSn scan (n > 2) references as its precursor scan (the
+  // spectrumRef of its last precursor: the MS(n-1) scan), -1 without one
+  int getParentScan() const { return parent_scan_; }
+
   // The N-terminal label mass (toppic -N) of an extended spectrum: the
   // precursor mass of its header is then the label-free one, and its
   // N-terminal fragment masses still carry the label, which the matching of
@@ -175,6 +197,16 @@ class MsHeader {
 
   void setFragPtcr(bool frag_ptcr) { frag_ptcr_ = frag_ptcr; }
 
+  void setReducedPrec(bool reduced_prec) { reduced_prec_ = reduced_prec; }
+
+  void setReducedPrecWin(double target_mz, double begin, double end) {
+    reduced_prec_target_mz_ = target_mz;
+    reduced_prec_win_begin_ = begin;
+    reduced_prec_win_end_ = end;
+  }
+
+  void setParentScan(int parent_scan) { parent_scan_ = parent_scan; }
+
   void setPtcrWin(double begin, double end) {
     ptcr_win_begin_ = begin;
     ptcr_win_end_ = end;
@@ -246,6 +278,14 @@ class MsHeader {
   // the isolation window of the proton transfer stage (getPtcrWinBegin)
   double ptcr_win_begin_ = -1;
   double ptcr_win_end_ = -1;
+  // the dissociation of a charge-reduced precursor (isReducedPrec), the
+  // isolation of its dissociation stage (getReducedPrecTargetMz)
+  bool reduced_prec_ = false;
+  double reduced_prec_target_mz_ = -1;
+  double reduced_prec_win_begin_ = -1;
+  double reduced_prec_win_end_ = -1;
+  // the precursor scan an MSn scan references (getParentScan)
+  int parent_scan_ = -1;
   // N-terminal label mass of an extended spectrum (getNTermLabelMass)
   double n_term_label_mass_ = 0;
 

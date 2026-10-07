@@ -73,6 +73,11 @@ struct PtcrPara {
   // a species matches an MS1 feature within this tolerance (ppm), also one
   // isotope apart
   double feature_ppm = 10;
+  // the precursor of a PTCR spectrum: a species whose monoisotopic m/z at
+  // the selected charge is the selected ion's m/z within this tolerance
+  // (ppm; Thermo converters write the instrument's monoisotopic m/z as the
+  // selected ion when it has one)
+  double sel_ppm = 10;
 };
 
 PtcrPara readPara() {
@@ -110,6 +115,8 @@ PtcrPara readPara() {
       para.frag_prec_margin = value;
     } else if (name == "feature_ppm") {
       para.feature_ppm = value;
+    } else if (name == "sel_ppm") {
+      para.sel_ppm = value;
     } else {
       LOG_WARN("Unknown TOPFD_PTCR_PARA entry " << name);
     }
@@ -259,13 +266,15 @@ Species getSpecies(const MatchEnvPtrVec& envs, int refine) {
   return species;
 }
 
-// Whether the envelope of a species at charge z covers the m/z mz: the m/z
-// range of its isotopes of relative intensity >= iso_min_rel
-bool covers(const Species& species, int z, double mz,
+// Whether the envelope of a mass at charge z covers the m/z mz: the m/z
+// range from its monoisotopic peak to its last isotope of relative intensity
+// >= iso_min_rel (iso, from IsoRange). An isolation target, the apex and the
+// instrument's monoisotopic m/z of the ion all lie in it.
+bool covers(double mono_mass, int z, double mz,
             const std::pair<double, double>& iso) {
   double proton = mass_constant::getProtonMass();
-  double first_mz = (species.mono_mass + iso.first) / z + proton;
-  double last_mz = (species.mono_mass + iso.second) / z + proton;
+  double first_mz = mono_mass / z + proton;
+  double last_mz = (mono_mass + iso.second) / z + proton;
   return mz >= first_mz && mz <= last_mz;
 }
 
@@ -282,14 +291,25 @@ PrecursorPtr getPrecursor(std::vector<Species>& species_vec,
     sel_mz = header_ptr->getPrecTargetMz();
   }
   int sel_z = header_ptr->getSelectedCharge();
+  double proton = mass_constant::getProtonMass();
+  double sel_tol = sel_mz * getPara().sel_ppm * 1e-6;
   // species_vec is sorted by intensity, most intense first
   int best = -1;
   int best_z = 0;
   if (sel_z > 0) {
+    // the selected ion as a monoisotopic m/z
     for (std::size_t i = 0; i < species_vec.size() && best < 0; i++) {
       const Species& s = species_vec[i];
       if (hasCharge(s, sel_z) &&
-          covers(s, sel_z, sel_mz, iso_range.get(s.mono_mass))) {
+          std::abs(s.mono_mass / sel_z + proton - sel_mz) <= sel_tol) {
+        best = static_cast<int>(i);
+        best_z = sel_z;
+      }
+    }
+    for (std::size_t i = 0; i < species_vec.size() && best < 0; i++) {
+      const Species& s = species_vec[i];
+      if (hasCharge(s, sel_z) &&
+          covers(s.mono_mass, sel_z, sel_mz, iso_range.get(s.mono_mass))) {
         best = static_cast<int>(i);
         best_z = sel_z;
       }
@@ -314,7 +334,7 @@ PrecursorPtr getPrecursor(std::vector<Species>& species_vec,
   }
   Species& s = species_vec[best];
   s.is_prec = true;
-  double mono_mz = s.mono_mass / best_z + mass_constant::getProtonMass();
+  double mono_mz = s.mono_mass / best_z + proton;
   return std::make_shared<Precursor>(0, -1, mono_mz, best_z, s.inte);
 }
 
@@ -453,14 +473,20 @@ PrecursorPtr getSelectedIonPrec(const MsHeaderPtr& header_ptr,
   return std::make_shared<Precursor>(0, -1, sel_mz, sel_z, 0.0);
 }
 
-PtcrSpecPtr deconv(const MzmlMsPtr& ms_ptr, const TopfdParaPtr& topfd_para_ptr,
-                   const SpecFeaturePtrVec& feat_ptrs) {
+namespace {
+
+// The species of a PTCR spectrum, with the MS1 features they match; the
+// spectrum's header is read, not changed. debug: write the decisions of the
+// scan TOPFD_PTCR_DEBUG_SCAN.
+PtcrSpecPtr getPtcrSpec(const MzmlMsPtr& ms_ptr,
+                        const TopfdParaPtr& topfd_para_ptr,
+                        const SpecFeaturePtrVec& feat_ptrs,
+                        IsoRange& iso_range, bool debug) {
   const PtcrPara& para = getPara();
   MsHeaderPtr header_ptr = ms_ptr->getMsHeaderPtr();
   double lo = 0;
   double hi = 0;
   bool has_window = getPtcrWindow(header_ptr, para.win_margin, lo, hi);
-  IsoRange iso_range(para.iso_min_rel);
   // the charges up to -c, or the selected ion's when higher
   int max_charge = std::max(topfd_para_ptr->getMaxCharge(),
                             header_ptr->getSelectedCharge());
@@ -475,7 +501,7 @@ PtcrSpecPtr deconv(const MzmlMsPtr& ms_ptr, const TopfdParaPtr& topfd_para_ptr,
       para.sn_ratio > 0 ? para.sn_ratio : topfd_para_ptr->getMsTwoSnRatio();
   std::vector<MatchEnvPtrVec> masses = greedy_ms1_deconv::deconvSeries(
       ms_ptr->getPeakPtrVec(), topfd_para_ptr, sn_ratio, max_mass, max_charge,
-      bound, para.min_envcnn, getDebugName(header_ptr));
+      bound, para.min_envcnn, debug ? getDebugName(header_ptr) : "");
 
   PtcrSpecPtr spec_ptr = std::make_shared<PtcrSpec>();
   spec_ptr->header_ptr = header_ptr;
@@ -488,6 +514,30 @@ PtcrSpecPtr deconv(const MzmlMsPtr& ms_ptr, const TopfdParaPtr& topfd_para_ptr,
       s.feature_mass = feat->getPrecMonoMass();
     }
   }
+  return spec_ptr;
+}
+
+// The intensity of a species as a precursor: its MS1 feature's when it has
+// one among feat_ptrs, else its own
+double getPrecInte(const Species& s, const SpecFeaturePtrVec& feat_ptrs) {
+  if (s.feature_id >= 0) {
+    for (const SpecFeaturePtr& feat : feat_ptrs) {
+      if (feat->getFracFeatureId() == s.feature_id) {
+        return feat->getPrecInte();
+      }
+    }
+  }
+  return s.inte;
+}
+
+}  // namespace
+
+PtcrSpecPtr deconv(const MzmlMsPtr& ms_ptr, const TopfdParaPtr& topfd_para_ptr,
+                   const SpecFeaturePtrVec& feat_ptrs) {
+  MsHeaderPtr header_ptr = ms_ptr->getMsHeaderPtr();
+  IsoRange iso_range(getPara().iso_min_rel);
+  PtcrSpecPtr spec_ptr =
+      getPtcrSpec(ms_ptr, topfd_para_ptr, feat_ptrs, iso_range, true);
   PrecursorPtr prec_ptr = getPrecursor(spec_ptr->species, header_ptr,
                                        iso_range);
   // the precursor species' feature: its id and intensity
@@ -504,6 +554,74 @@ PtcrSpecPtr deconv(const MzmlMsPtr& ms_ptr, const TopfdParaPtr& topfd_para_ptr,
   }
   header_ptr->setPrecPtrVec(PrecursorPtrVec{prec_ptr});
   return spec_ptr;
+}
+
+PrecursorPtr getReducedPrec(const MzmlMsPtr& parent_ptr,
+                            const MsHeaderPtr& header_ptr,
+                            const TopfdParaPtr& topfd_para_ptr,
+                            const SpecFeaturePtrVec& feat_ptrs) {
+  double target = header_ptr->getReducedPrecTargetMz();
+  if (parent_ptr == nullptr || target <= 0) {
+    return nullptr;
+  }
+  IsoRange iso_range(getPara().iso_min_rel);
+  PtcrSpecPtr parent_spec =
+      getPtcrSpec(parent_ptr, topfd_para_ptr, feat_ptrs, iso_range, false);
+  const std::vector<Species>& species_vec = parent_spec->species;
+  // the species are sorted by intensity, most intense first
+  int best = -1;
+  int best_z = 0;
+  // an envelope of the species in the parent spectrum
+  for (std::size_t i = 0; i < species_vec.size() && best < 0; i++) {
+    const Species& s = species_vec[i];
+    for (int z : s.charges) {
+      if (covers(s.mono_mass, z, target, iso_range.get(s.mono_mass))) {
+        best = static_cast<int>(i);
+        best_z = z;
+        break;
+      }
+    }
+  }
+  // a charge the species can have after proton transfer: up to the charge at
+  // which it was isolated
+  for (std::size_t i = 0; i < species_vec.size() && best < 0; i++) {
+    const Species& s = species_vec[i];
+    int z_max = std::max(s.iso_charge_max, s.charges.back());
+    for (int z = z_max; z >= 1; z--) {
+      if (covers(s.mono_mass, z, target, iso_range.get(s.mono_mass))) {
+        best = static_cast<int>(i);
+        best_z = z;
+        break;
+      }
+    }
+  }
+  if (best < 0) {
+    return nullptr;
+  }
+  const Species& s = species_vec[best];
+  double mono_mz = s.mono_mass / best_z + mass_constant::getProtonMass();
+  return std::make_shared<Precursor>(0, s.feature_id, mono_mz, best_z,
+                                     getPrecInte(s, feat_ptrs));
+}
+
+SpecFeaturePtrVec getReducedPrecFeatures(const MsHeaderPtr& header_ptr,
+                                         const SpecFeaturePtrVec& feat_ptrs) {
+  SpecFeaturePtrVec result;
+  double target = header_ptr->getReducedPrecTargetMz();
+  if (target <= 0) {
+    return result;
+  }
+  IsoRange iso_range(getPara().iso_min_rel);
+  for (const SpecFeaturePtr& feat : feat_ptrs) {
+    double mass = feat->getPrecMonoMass();
+    for (int z = feat->getPrecCharge(); z >= 1; z--) {
+      if (covers(mass, z, target, iso_range.get(mass))) {
+        result.push_back(feat);
+        break;
+      }
+    }
+  }
+  return result;
 }
 
 PtcrSpecPtr deconvFragments(const MzmlMsPtr& ms_ptr,

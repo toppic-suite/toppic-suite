@@ -47,11 +47,15 @@ namespace toppic {
 //      the mass refined from the matched isotope peaks of all its charges
 //      (the intensity-weighted median of their mass errors), the summed
 //      intensity, the charges.
-//   3. The precursor: of the species with an envelope at the selected ion's
-//      charge whose isotopes cover the selected ion's m/z, the most intense;
-//      otherwise the most intense species that could have been isolated at
-//      that charge; otherwise the most intense species; with none, the
-//      selected ion itself.
+//   3. The precursor: a species with an envelope at the selected ion's
+//      charge whose monoisotopic m/z is the selected ion's (sel_ppm; Thermo
+//      converters write the instrument's monoisotopic m/z as the selected
+//      ion when it has one); otherwise of the species with an envelope at
+//      that charge whose m/z range (from the monoisotopic peak to the last
+//      isotope of at least iso_min_rel of the apex) covers the selected
+//      ion's m/z, the most intense; otherwise the most intense species that
+//      could have been isolated at that charge; otherwise the most intense
+//      species; with none, the selected ion itself.
 // With MS1 spectra, a species matching a feature of the spectrum's precursor
 // window (10 ppm, also one isotope apart) gets the feature's id, and the
 // precursor its id and intensity.
@@ -71,6 +75,14 @@ namespace toppic {
 // (deconvFragments; switch frag=2), matched fewer theoretical fragments of
 // AAV2 capsid proteins than the MS/MS search (toppic_test experiment 136,
 // amendment 1).
+//
+// The dissociation of a charge-reduced precursor (MsHeader::isReducedPrec:
+// proton transfer of the ions isolated at X, then the isolation of one
+// charge-reduced ion at Y and its dissociation, e.g. the MS3 scan "X@ptr5
+// Y@hcd80" after the PTCR MS2 scan of X) is an MS/MS spectrum of the
+// dissociation's activation whose precursor is the species of the PTCR
+// products at Y (getReducedPrec, from the parent PTCR spectrum; without it
+// getReducedPrecFeatures).
 // The research switches are in PtcrPara (cpp), set with the environment
 // variable TOPFD_PTCR_PARA ("name=value,...").
 namespace ptcr_ms2_deconv {
@@ -122,6 +134,28 @@ using PtcrSpecPtrVec = std::vector<PtcrSpecPtr>;
 // precursor window (none without MS1 spectra).
 PtcrSpecPtr deconv(const MzmlMsPtr& ms_ptr, const TopfdParaPtr& topfd_para_ptr,
                    const SpecFeaturePtrVec& feat_ptrs);
+
+// The precursor of the dissociation of a charge-reduced precursor
+// (MsHeader::isReducedPrec), from the PTCR spectrum parent_ptr of the same
+// isolation (the PTCR MS2 scan of the cycle): its species are deconvoluted
+// again (the parent's header is read, not changed; feat_ptrs, the MS1
+// features of the window, give them their feature ids), and the precursor
+// is the most intense species with an envelope in the parent spectrum
+// whose m/z range (monoisotopic peak to the last isotope of >= iso_min_rel)
+// contains the target of the dissociation stage, else the most intense one
+// whose envelope at a charge up to its isolation charge contains it: its
+// mass at that charge, its intensity (its feature's when it has one), its
+// feature id. nullptr without a parent or without such a species.
+PrecursorPtr getReducedPrec(const MzmlMsPtr& parent_ptr,
+                            const MsHeaderPtr& header_ptr,
+                            const TopfdParaPtr& topfd_para_ptr,
+                            const SpecFeaturePtrVec& feat_ptrs);
+
+// The MS1 features of the window of the dissociation of a charge-reduced
+// precursor (MsHeader::isReducedPrec) whose envelope at a charge up to
+// theirs contains the target of the dissociation stage, in their order
+SpecFeaturePtrVec getReducedPrecFeatures(const MsHeaderPtr& header_ptr,
+                                         const SpecFeaturePtrVec& feat_ptrs);
 
 // Deconvolute one fragment PTCR spectrum (MsHeader::isFragPtcr) with the
 // charge-series search (switch frag=2; not the default). max_mass

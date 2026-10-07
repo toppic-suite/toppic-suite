@@ -127,21 +127,14 @@ struct FilterStage {
   std::vector<pwiz::data::CVParam> terms;
 };
 
-// The stages of an MSn scan (n > 2) whose converter wrote fewer precursors
-// than stages: ThermoRawFileParser 2.0 writes one precursor for the MS3 scan
-// "FTMS + p ESI Full ms3 1402.5000@cid60.00 1100.0000@ptr10.00 [...]", the
-// last stage (its isolation window, the proton transfer term and the scan's
-// charge state), and loses the dissociation of the first stage. Then the
-// stages of the filter string (MS:1000512), in order, each with its target
-// and the terms of its activations (cid, hcd, etd, ptr; others have none);
-// none when the scan has a precursor per stage or the filter string does
-// not list ms_level - 1 stages.
-std::vector<FilterStage> getMissingStages(
+// The stages of an MS/MS scan in its Thermo filter string (MS:1000512), in
+// order, each with its target and the terms of its activations (cid, hcd,
+// etd, ptr; others have none); none when the filter string does not list
+// ms_level - 1 stages.
+std::vector<FilterStage> getFilterStages(
     const pwiz::msdata::SpectrumPtr& spec, int ms_level) {
   std::vector<FilterStage> stages;
-  if (ms_level < 3 ||
-      static_cast<int>(spec->precursors.size()) >= ms_level - 1 ||
-      spec->scanList.scans.empty()) {
+  if (ms_level < 2 || spec->scanList.scans.empty()) {
     return stages;
   }
   std::string filter =
@@ -190,6 +183,112 @@ std::vector<FilterStage> getMissingStages(
     stages.clear();
   }
   return stages;
+}
+
+// The stages of an MS/MS scan whose converter wrote fewer precursors than
+// stages (getFilterStages), none otherwise. ThermoRawFileParser 2.0 writes
+// one precursor for the MS3 scan "FTMS + p ESI Full ms3 1402.5000@cid60.00
+// 1100.0000@ptr10.00 [...]", the last stage (its isolation window, the
+// proton transfer term and the scan's charge state), and loses the
+// dissociation of the first stage; and none for a scan whose precursor scan
+// is not in the file (a scan cut out of a longer run), e.g. the MS2 scan
+// "... Full ms2 1060.1759@ptr5.00 [...]".
+std::vector<FilterStage> getMissingStages(
+    const pwiz::msdata::SpectrumPtr& spec, int ms_level) {
+  if (static_cast<int>(spec->precursors.size()) >= ms_level - 1) {
+    return std::vector<FilterStage>();
+  }
+  return getFilterStages(spec, ms_level);
+}
+
+// The isolation window of a precursor: target, lower and upper offset (-1
+// each when the precursor has none)
+void getIsolationWindow(const pwiz::msdata::Precursor& prec, double& target,
+                        double& lower, double& upper) {
+  target = -1;
+  lower = -1;
+  upper = -1;
+  for (const pwiz::data::CVParam& cv : prec.isolationWindow.cvParams) {
+    if (cv.cvid == pwiz::cv::MS_isolation_window_target_m_z) {
+      target = std::stod(cv.value);
+    } else if (cv.cvid == pwiz::cv::MS_isolation_window_lower_offset) {
+      lower = std::stod(cv.value);
+    } else if (cv.cvid == pwiz::cv::MS_isolation_window_upper_offset) {
+      upper = std::stod(cv.value);
+    }
+  }
+}
+
+// One stage of an MS/MS scan in acquisition order: its isolation target and
+// window (-1 when unknown) and its activation terms
+struct ScanStage {
+  double target = -1;
+  double lower = -1;
+  double upper = -1;
+  std::vector<pwiz::data::CVParam> terms;
+};
+
+// The stages of an MS/MS scan in acquisition order: the stages of the filter
+// string when it lists ms_level - 1 of them (getFilterStages), each with the
+// isolation window and activation terms of the file's precursor of the same
+// target too (msconvert writes one precursor per stage, ThermoRawFileParser
+// one for the last stage of an MS3 scan); else the file's precursors in file
+// order (msconvert writes the first stage first)
+std::vector<ScanStage> getScanStages(const pwiz::msdata::SpectrumPtr& spec,
+                                     int ms_level) {
+  std::vector<ScanStage> stages;
+  std::vector<FilterStage> filter_stages = getFilterStages(spec, ms_level);
+  if (filter_stages.empty()) {
+    for (const pwiz::msdata::Precursor& prec : spec->precursors) {
+      ScanStage stage;
+      getIsolationWindow(prec, stage.target, stage.lower, stage.upper);
+      stage.terms = prec.activation.cvParams;
+      stages.push_back(stage);
+    }
+    return stages;
+  }
+  for (const FilterStage& filter_stage : filter_stages) {
+    ScanStage stage;
+    stage.target = filter_stage.target;
+    stage.terms = filter_stage.terms;
+    for (const pwiz::msdata::Precursor& prec : spec->precursors) {
+      double target = 0;
+      double lower = 0;
+      double upper = 0;
+      getIsolationWindow(prec, target, lower, upper);
+      if (target > 0 && std::abs(target - filter_stage.target) <= 0.01) {
+        stage.lower = lower;
+        stage.upper = upper;
+        stage.terms.insert(stage.terms.end(), prec.activation.cvParams.begin(),
+                           prec.activation.cvParams.end());
+        break;
+      }
+    }
+    stages.push_back(stage);
+  }
+  return stages;
+}
+
+// The dissociation stage of an MS/MS scan that comes after its last proton
+// transfer stage (the dissociation of a charge-reduced precursor, e.g. the
+// MS3 scan "X@ptr5 Y@hcd80"), -1 when there is none: no proton transfer, no
+// dissociation, or the proton transfer after the last dissociation or in its
+// stage (a fragment PTCR spectrum, "X@cid60 Y@ptr10")
+int getReducedPrecStage(const std::vector<ScanStage>& stages) {
+  int last_ptcr = -1;
+  int last_diss = -1;
+  for (std::size_t i = 0; i < stages.size(); i++) {
+    if (hasPtcrTerm(stages[i].terms)) {
+      last_ptcr = static_cast<int>(i);
+    }
+    if (getActivationName(stages[i].terms) != "") {
+      last_diss = static_cast<int>(i);
+    }
+  }
+  if (last_ptcr < 0 || last_diss <= last_ptcr) {
+    return -1;
+  }
+  return last_diss;
 }
 
 // The activation of PTCR spectra. It is not in activation_base.xml: a PTCR
@@ -360,8 +459,8 @@ void PwMsReader::parsePrecursor(const MsHeaderPtr& header_ptr,
       }
     }
   }
-  // an MSn scan with fewer precursors than stages (getMissingStages): the
-  // file's precursor is a later stage when its target is not the first
+  // a scan with fewer precursors than stages (getMissingStages): the file's
+  // precursor, if any, is a later stage when its target is not the first
   // stage's, and the precursor window is then the first stage's target with
   // the default window (-w)
   std::vector<FilterStage> stages =
@@ -444,8 +543,25 @@ void PwMsReader::parsePrecursor(const MsHeaderPtr& header_ptr,
     // an MSn scan belongs to the MS1 scan of its cycle; its precursor
     // reference is the MS(n-1) scan
     prec_scan_num = prev_ms1_scan_id_;
+    if (!cur_spec_ptr->precursors.empty()) {
+      header_ptr->setParentScan(
+          parseNum(cur_spec_ptr->precursors.back().spectrumID, -1));
+    }
   }
   header_ptr->setMsOneScan(prec_scan_num);
+  // the dissociation stage of a charge-reduced precursor (an MSn scan "X@ptr
+  // Y@hcd"): its target and window, the default window (-w) when the file
+  // has none
+  std::vector<ScanStage> scan_stages =
+      getScanStages(cur_spec_ptr, spec_info.msLevel);
+  int reduced_stage = getReducedPrecStage(scan_stages);
+  if (reduced_stage >= 0) {
+    const ScanStage& stage = scan_stages[reduced_stage];
+    double lower = stage.lower >= 0 ? stage.lower : isolation_window_ / 2;
+    double upper = stage.upper >= 0 ? stage.upper : isolation_window_ / 2;
+    header_ptr->setReducedPrecWin(stage.target, stage.target - lower,
+                                  stage.target + upper);
+  }
 }
 
 void PwMsReader::parseActivation(const MsHeaderPtr& header_ptr,
@@ -497,8 +613,14 @@ void PwMsReader::parseActivation(const MsHeaderPtr& header_ptr,
       ActivationBase::getActivationPtrByName(ac_name);
   header_ptr->setActivationPtr(activation_ptr);
   // a dissociation (from the file or -a) and a proton transfer term: the
-  // fragments, charge-reduced
-  header_ptr->setFragPtcr(ptcr);
+  // fragments, charge-reduced (a fragment PTCR spectrum), unless the
+  // dissociation stage comes after the proton transfer stage: then the
+  // dissociation of a charge-reduced precursor (getReducedPrecStage)
+  bool reduced_prec =
+      ptcr && getReducedPrecStage(getScanStages(cur_spec_ptr,
+                                                spec_info.msLevel)) >= 0;
+  header_ptr->setReducedPrec(reduced_prec);
+  header_ptr->setFragPtcr(ptcr && !reduced_prec);
 }
 
 double PwMsReader::parseFaims(pwiz::msdata::SpectrumPtr cur_spec_ptr) {
