@@ -149,6 +149,8 @@ std::string prsmInfo(const PrsmPtr& prsm_ptr) {
   }
   ProteoformPtr form_ptr = prsm_ptr->getProteoformPtr();
   std::ostringstream out;
+  out.precision(4);
+  out << std::fixed;
   out << form_ptr->getStartPos() << "\t" << form_ptr->getEndPos() << "\t"
       << prsm_ptr->getMatchTheoFragNum() << "\t";
   MassShiftPtrVec shifts = form_ptr->getMassShiftPtrVec(AlterType::UNEXPECTED);

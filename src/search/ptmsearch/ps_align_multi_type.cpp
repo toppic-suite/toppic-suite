@@ -449,6 +449,8 @@ PrsmPtr PsAlignMultiType::geneResult(const ProteoformTypePtr& type_ptr,
   }
   if (second_align_util::logEnabled()) {
     std::ostringstream out;
+    out.precision(4);
+    out << std::fixed;
     out << "multi\t" << deconv_ms_ptr_vec[0]->getMsHeaderPtr()->getSpecId()
         << "\t" << type_ptr->getName() << "\t" << shift_num << "\t"
         << proteo_ptr->getSeqName() << "\t"

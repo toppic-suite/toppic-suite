@@ -386,6 +386,8 @@ PrsmPtr PsAlign::geneResult(int shift_num, const ProteoformPtr& proteo_ptr,
   }
   if (second_align_util::logEnabled()) {
     std::ostringstream out;
+    out.precision(4);
+    out << std::fixed;
     out << "one\t" << deconv_ms_ptr_vec[0]->getMsHeaderPtr()->getSpecId()
         << "\t" << align_type_ptr_->getName() << "\t" << shift_num << "\t"
         << proteo_ptr->getSeqName() << "\t" << prec_mass << "\t"
