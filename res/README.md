@@ -42,9 +42,34 @@ Data tables:
 
 `envcnn_two_block.onnx`: the EnvCNN neural network that scores isotopic
 envelopes in TopFD and TopDIA (and TopPIC's post mass matching), run through
-the ONNX Runtime. Stored with Git LFS.
+the ONNX Runtime; the file the tools load. It is the dynamically quantized
+form of `envcnn_two_block_full.onnx` (22 MB): the three fully connected
+layers have int8 weights with one scale per output channel, and their inputs
+are quantized to uint8 at run time with one scale per envelope (the row
+maximum / 255; the inputs are ReLU outputs, >= 0), so that an envelope's
+score does not depend on the other envelopes of its batch. ONNX Runtime's
+`quantize_dynamic` scales a whole batch by its largest value, which moved the
+deconvolution's scores by 0.06 on average; this model moves them by 0.002.
+The convolution layers stay float. Made by `quantize.py` of toppic_test
+experiment 131 (variant `fc_row`); with it TopFD takes 0.70 of the float
+model's time on 480_F3_02 (toppic_test report 0131). Stored with Git LFS.
+
+`envcnn_two_block_full.onnx`: the float EnvCNN model (PyTorch export, opset
+11, 87 MB), the source of the quantized model; not loaded by the tools.
+Stored with Git LFS.
 
 ## `ecscore_models/`
 
 `ecscore_seven_attr.onnx`: the ECScore neural network that scores proteoform
-features detected in the LC-MS map by TopFD and TopDIA. Stored with Git LFS.
+features detected in the LC-MS map by TopFD and TopDIA; the file the tools
+load. It is the dynamically quantized form of `ecscore_seven_attr_full.onnx`
+(ONNX Runtime's `quantize_dynamic` after each Gemm was rewritten as MatMul +
+Add: int8 weights with one scale per tensor, the inputs quantized to uint8
+at run time; 122 kB). Made by `quantize.py` of toppic_test experiment 131
+(variant `fc`). Its scores differ from the float model's by 0.027 on average
+(TopFD reported 6% fewer features on 480_F3_02, toppic_test report 0131).
+Stored with Git LFS.
+
+`ecscore_seven_attr_full.onnx`: the float ECScore model (PyTorch export,
+opset 11, 454 kB), the source of the quantized model; not loaded by the
+tools. Stored with Git LFS.
