@@ -91,6 +91,11 @@ double refinePrecursorAndHeaderShift(const ProteoformPtr& proteo_ptr,
   if (header_ptrs.size() == 0) {
     return prec_mass;
   }
+  // with a precursor tolerance in Dalton (--prec-dalton-error) the precursor
+  // is not refined: the shifts keep the observed precursor mass
+  if (prec_tole_ptr->isUseDaltonTolerance()) {
+    return prec_mass;
+  }
   double tole = prec_tole_ptr->compPrecErrorTole(prec_mass);
 
   int one_side_step_num = 0;
