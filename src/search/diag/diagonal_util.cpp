@@ -140,6 +140,14 @@ double refinePrecursorAndHeaderShift(const ProteoformPtr& proteo_ptr,
                              pair_ptrs.end());
   }
 
+  // With fewer than two pairs the precursor is kept. The median index below
+  // was 0 for them, so the first bin won and the precursor moved by +2 x
+  // tole: 264 of the 1,315 one-shift PrSMs of 480_F3_02 (toppic_test
+  // experiment 133).
+  if (matched_pair_ptrs.size() < 2) {
+    return prec_mass;
+  }
+
   for (size_t i = 0; i < matched_pair_ptrs.size(); i++) {
     double diff = matched_pair_ptrs[i]->getTheoPeakPtr()->getPosition() -
                   matched_pair_ptrs[i]->getRealPeakPtr()->getPosition();
