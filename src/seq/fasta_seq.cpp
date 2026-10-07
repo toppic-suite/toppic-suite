@@ -16,6 +16,7 @@
 #include "seq/fasta_seq.hpp"
 
 #include <cstddef>
+#include <stdexcept>
 #include <string>
 #include <utility>
 
@@ -57,6 +58,25 @@ FastaSeq::FastaSeq(const FastaSeqPtr& seq_ptr, int start, int len) {
   seq_ = fasta_util::getString(acid_ptm_pair_vec_);
 }
 
+namespace {
+
+// The position of the ']' that closes the '[' at open_pos, counting nested
+// pairs, so that a PTM name may hold brackets (Unimod's Cation:Mg[II]);
+// npos when there is none.
+size_t findClosingBracket(const std::string& seq, size_t open_pos) {
+  int depth = 0;
+  for (size_t i = open_pos; i < seq.length(); i++) {
+    if (seq[i] == '[') {
+      depth++;
+    } else if (seq[i] == ']' && --depth == 0) {
+      return i;
+    }
+  }
+  return std::string::npos;
+}
+
+}  // namespace
+
 // Read fasta sequence with PTMs
 void FastaSeq::compAcidPtmPairVec() {
   size_t pos = 0;
@@ -70,7 +90,12 @@ void FastaSeq::compAcidPtmPairVec() {
       ptm_str = empty_ptm_str;
       pos = pos + 1;
     } else {
-      size_t bracket_pos = seq_.find(']', pos + 1);
+      size_t bracket_pos = findClosingBracket(seq_, pos + 1);
+      if (bracket_pos == std::string::npos) {
+        throw std::runtime_error("Unpaired '[' after residue " +
+                                 std::to_string(count + 1) +
+                                 " in the sequence of " + name_);
+      }
       ptm_str = seq_.substr(pos + 2, bracket_pos - pos - 2);
       pos = bracket_pos + 1;
     }

@@ -1302,6 +1302,11 @@ A FASTA sequence can carry PTMs in the extended format, a residue followed
 by the PTM's abbreviation of `res/base_data/ptm_base.xml` in brackets
 (`M[Oxidation]`, `C[Carbamidomethyl]`; the names of earlier versions, such
 as `C[Carbamidomethylation]`, are no longer read, see "ProForma strings").
+`FastaSeq::compAcidPtmPairVec` takes a name up to the `]` that closes its
+`[`, counting nested pairs, so the 51 Unimod names with brackets can be
+written (`E[Cation:Mg[II]]`; it used to stop at the first `]`); an
+unpaired `[` stops with "Unpaired '[' after residue <n> in the sequence
+of <protein>".
 `FastaSeq` reads them into residue/PTM pairs (`getAcidPtmPairVec`), and
 `proteoform_factory::geneDbProteoformPtr` builds the modified residues with
 an `INPUT` mass shift on each (shown in the Proteoform column as
