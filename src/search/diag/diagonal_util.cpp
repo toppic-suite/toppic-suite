@@ -15,11 +15,14 @@
 
 #include "search/diag/diagonal_util.hpp"
 
+#include <algorithm>
 #include <cmath>
 #include <limits>
+#include <vector>
 
 #include "common/base/neutral_loss_base.hpp"
 #include "common/util/logger.hpp"
+#include "ms/factory/extend_ms_util.hpp"
 #include "prsm/peak_ion_pair_util.hpp"
 #include "prsm/theo_peak_util.hpp"
 
@@ -171,6 +174,182 @@ double refinePrecursorAndHeaderShift(const ProteoformPtr& proteo_ptr,
   last_header_ptr->changeOnlyNTermShift(best_delta);
 
   return prec_mass + best_delta;
+}
+
+namespace {
+
+// a precursor-dependent theoretical ion and an extended peak within the
+// peak's fragment tolerance plus the precursor tolerance: the difference
+// theoretical - observed and the peak's fragment tolerance
+struct DepIonPair {
+  int ion_id;
+  double diff;
+  double frag_tole;
+};
+
+// the precursor-dependent ions of the headers (the C-terminal ions of every
+// diagonal but the last and the N-terminal ions of the last: the ions whose
+// theoretical masses move with the precursor mass) paired with the peaks of
+// each spectrum. ion_num gets the number of dependent ions.
+std::vector<DepIonPair> getDepIonPairs(const ProteoformPtr& proteo_ptr,
+                                       const ExtendMsPtrVec& ms_three_ptr_vec,
+                                       const DiagHeaderPtrVec& header_ptrs,
+                                       double prec_tole, double min_mass,
+                                       int& ion_num) {
+  std::vector<DepIonPair> pairs;
+  ion_num = 0;
+  int first_res_pos = header_ptrs[0]->getTruncFirstResPos();
+  size_t last = header_ptrs.size() - 1;
+  for (size_t j = 0; j < ms_three_ptr_vec.size(); j++) {
+    const ExtendMsPtr& ms_ptr = ms_three_ptr_vec[j];
+    std::vector<double> ms_masses = extend_ms_util::getExtendMassVec(ms_ptr);
+    double max_frag_tole = 0;
+    for (size_t k = 0; k < ms_ptr->size(); k++) {
+      max_frag_tole =
+          std::max(max_frag_tole, ms_ptr->getPeakPtr(k)->getOrigTolerance());
+    }
+    for (size_t i = 0; i < header_ptrs.size(); i++) {
+      TheoPeakPtrVec theo_peak_ptrs = getDiagonalTheoPeak(
+          proteo_ptr, ms_ptr->getMsHeaderPtr(), header_ptrs, i, min_mass);
+      int bgn = header_ptrs[i]->getMatchFirstBpPos() - first_res_pos;
+      int end = header_ptrs[i]->getMatchLastBpPos() - first_res_pos;
+      for (size_t t = 0; t < theo_peak_ptrs.size(); t++) {
+        const IonPtr& ion_ptr = theo_peak_ptrs[t]->getIonPtr();
+        if (ion_ptr->getIonTypePtr()->isNTerm() != (i == last) ||
+            ion_ptr->getPos() < bgn || ion_ptr->getPos() > end) {
+          continue;
+        }
+        double theo_mass = theo_peak_ptrs[t]->getPosition();
+        auto it = std::lower_bound(ms_masses.begin(), ms_masses.end(),
+                                   theo_mass - max_frag_tole - prec_tole);
+        for (size_t k = it - ms_masses.begin(); k < ms_masses.size(); k++) {
+          if (ms_masses[k] > theo_mass + max_frag_tole + prec_tole) {
+            break;
+          }
+          double frag_tole = ms_ptr->getPeakPtr(k)->getOrigTolerance();
+          double diff = theo_mass - ms_masses[k];
+          if (std::abs(diff) <= frag_tole + prec_tole) {
+            pairs.push_back(DepIonPair{ion_num, diff, frag_tole});
+          }
+        }
+        ion_num++;
+      }
+    }
+  }
+  return pairs;
+}
+
+// the distance of [lo, hi] to 0
+double distToZero(double lo, double hi) {
+  if (lo <= 0 && 0 <= hi) {
+    return 0;
+  }
+  return std::min(std::abs(lo), std::abs(hi));
+}
+
+}  // namespace
+
+double refinePrecursorByMatchedIons(const ProteoformPtr& proteo_ptr,
+                                    const ExtendMsPtrVec& ms_three_ptr_vec,
+                                    DiagHeaderPtrVec& header_ptrs, double ppo,
+                                    double min_mass) {
+  double prec_mass =
+      ms_three_ptr_vec[0]->getMsHeaderPtr()->getFirstPrecMonoMass();
+  if (header_ptrs.size() == 0) {
+    return prec_mass;
+  }
+  double tole =
+      ms_three_ptr_vec[0]->getMsHeaderPtr()->getFirstPrecErrorTolerance(ppo);
+  int ion_num = 0;
+  std::vector<DepIonPair> pairs = getDepIonPairs(
+      proteo_ptr, ms_three_ptr_vec, header_ptrs, tole, min_mass, ion_num);
+
+  // After the refinement by delta, a pair matches within the fragment
+  // tolerance if |diff + delta| <= frag_tole. Sweep the intervals of delta
+  // in [-tole, tole] and find the segment covered by the most ions (each
+  // ion counted once); among equal segments the one closest to 0.
+  struct Event {
+    double pos;
+    int type;  // 0 start, 1 end
+    int ion_id;
+  };
+  std::vector<Event> events;
+  for (size_t p = 0; p < pairs.size(); p++) {
+    double lo = std::max(-pairs[p].diff - pairs[p].frag_tole, -tole);
+    double hi = std::min(-pairs[p].diff + pairs[p].frag_tole, tole);
+    if (lo <= hi) {
+      events.push_back(Event{lo, 0, pairs[p].ion_id});
+      events.push_back(Event{hi, 1, pairs[p].ion_id});
+    }
+  }
+  std::sort(events.begin(), events.end(), [](const Event& a, const Event& b) {
+    return a.pos < b.pos || (a.pos == b.pos && a.type < b.type);
+  });
+  std::vector<int> cover(ion_num, 0);
+  int count = 0;
+  int best_count = 0;
+  double best_lo = 0;
+  double best_hi = 0;
+  for (size_t e = 0; e + 1 < events.size(); e++) {
+    if (events[e].type == 0) {
+      if (cover[events[e].ion_id]++ == 0) {
+        count++;
+      }
+    } else if (--cover[events[e].ion_id] == 0) {
+      count--;
+    }
+    // the coverage of [events[e].pos, events[e + 1].pos]
+    double lo = events[e].pos;
+    double hi = events[e + 1].pos;
+    if (count > best_count ||
+        (count == best_count && count > 0 &&
+         distToZero(lo, hi) < distToZero(best_lo, best_hi))) {
+      best_count = count;
+      best_lo = lo;
+      best_hi = hi;
+    }
+  }
+  double delta = 0;
+  if (best_count > 0) {
+    // the ions matched in the segment, each with its pair closest to the
+    // segment's midpoint; delta is the median of their errors, clipped to
+    // the delta range that keeps all of them matched. (1e-9 Da: a segment
+    // of one point is the end of an interval.)
+    double mid = (best_lo + best_hi) / 2;
+    std::vector<int> best_pair(ion_num, -1);
+    for (size_t p = 0; p < pairs.size(); p++) {
+      if (std::abs(pairs[p].diff + mid) > pairs[p].frag_tole + 1e-9) {
+        continue;
+      }
+      int& b = best_pair[pairs[p].ion_id];
+      if (b < 0 || std::abs(pairs[p].diff + mid) <
+                       std::abs(pairs[b].diff + mid)) {
+        b = static_cast<int>(p);
+      }
+    }
+    double lo = -tole;
+    double hi = tole;
+    std::vector<double> errors;
+    for (int i = 0; i < ion_num; i++) {
+      if (best_pair[i] >= 0) {
+        const DepIonPair& pair = pairs[best_pair[i]];
+        lo = std::max(lo, -pair.diff - pair.frag_tole);
+        hi = std::min(hi, -pair.diff + pair.frag_tole);
+        errors.push_back(-pair.diff);
+      }
+    }
+    std::sort(errors.begin(), errors.end());
+    size_t n = errors.size();
+    double median = n % 2 == 1 ? errors[n / 2]
+                               : (errors[n / 2 - 1] + errors[n / 2]) / 2;
+    delta = std::min(std::max(median, lo), hi);
+  }
+
+  for (size_t i = 0; i < header_ptrs.size() - 1; i++) {
+    header_ptrs[i]->changeOnlyCTermShift(delta);
+  }
+  header_ptrs[header_ptrs.size() - 1]->changeOnlyNTermShift(delta);
+  return prec_mass + delta;
 }
 
 double refineVarPtmPrecursorAndHeaderShift(const ProteoformPtr& proteo_ptr,

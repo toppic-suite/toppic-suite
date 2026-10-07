@@ -40,8 +40,6 @@ class PsAlignPara {
   double align_large_shift_thresh_ = 300;
   // set panelty to 3
   double align_large_shift_panelty_ = 3;
-
-  double refine_prec_step_width_ = 0.005;
 };
 
 using PsAlignParaPtr = std::shared_ptr<PsAlignPara>;

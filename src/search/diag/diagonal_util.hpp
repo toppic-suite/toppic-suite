@@ -24,11 +24,31 @@ namespace toppic {
 
 namespace diagonal_util {
 
+// The precursor refinement of TopMG's graph alignment: the
+// precursor-dependent ions paired with peaks within the fragment tolerance
+// plus the precursor tolerance T, their errors binned over +-2T, the
+// precursor moved to the median bin (+2T with fewer than two pairs).
 double refinePrecursorAndHeaderShift(const ProteoformPtr& proteo_ptr,
                                      const ExtendMsPtrVec& ms_three_ptr_vec,
                                      DiagHeaderPtrVec& header_ptrs, double ppo,
                                      double min_mass,
                                      double refine_prec_step_width);
+
+// The precursor refinement of toppic's shift searches (PsAlign,
+// PsAlignMultiType). The alignment matched the precursor-dependent ions,
+// the C-terminal ions of every diagonal but the last and the N-terminal ions
+// of the last, with the fragment tolerance plus the precursor's error
+// (N-strict-C-relax and N-relax-C-strict PRM tolerances); the PrSM matches
+// them with the fragment tolerance alone. The precursor is moved by the
+// delta in [-T, T] (T the precursor tolerance, ppo x the precursor mass)
+// that matches the most dependent ions within the fragment tolerance: of
+// the best delta interval the one closest to 0, in it the median error of
+// its ions; 0 when no ion matches. The headers' shifts are moved as in
+// refinePrecursorAndHeaderShift. Returns the refined precursor mass.
+double refinePrecursorByMatchedIons(const ProteoformPtr& proteo_ptr,
+                                    const ExtendMsPtrVec& ms_three_ptr_vec,
+                                    DiagHeaderPtrVec& header_ptrs, double ppo,
+                                    double min_mass);
 
 // The precursor refinement of the variable PTM search. Once the alignment
 // has chosen the variable PTMs, the proteoform mass is exact: the refined

@@ -1707,6 +1707,53 @@ merged into main on 2026-10-05). Facts to keep straight:
   shift was still the gap between the refined diagonals, wider than the
   modifiable residues (5211's oxidation of M44 on P43-M44).
 
+## Precursor refinement of the shift searches (`search/diag/diagonal_util`, issue #514)
+
+Branch `c_term_prec_adjust` (toppic_test experiment 135, report 0135; not
+merged). Facts to keep straight:
+
+- **Why the refinement matters.** A C-terminal ion of mass m enters the
+  alignment as the PRM P - (m - C shift), P the observed precursor. In a
+  diagonal anchored at the N-terminus (`n_strict && !c_strict`) it is matched
+  with ppo x (m + P), the fragment tolerance plus the precursor's error
+  (`prm_ms_factory`, `compDiagPair`); a C-anchored diagonal does the same to
+  its N-terminal ions. The PrSM (`Prsm::initScores`) matches the proteoform's
+  ions with ppo x m. The refined precursor decides whether the ions the
+  alignment matched with the relaxed tolerance (the precursor-dependent
+  ions: the C-terminal ions of every diagonal but the last and the
+  N-terminal ions of the last) still match.
+- **`refinePrecursorByMatchedIons`** (PsAlign, PsAlignMultiType) moves the
+  precursor by the delta in [-T, T] (T = P x the precursor ppo) that matches
+  the most precursor-dependent ions within the fragment tolerance (each
+  theoretical ion once over the spectra of the group). Within the best
+  delta interval it takes the median error of its ions, clipped to the
+  interval; of equal intervals the one closest to 0; delta 0 when no ion is
+  in reach. The shifts move as before: the last diagonal's N-terminal shift
+  and the other diagonals' C-terminal shifts.
+- **`refinePrecursorAndHeaderShift`**, main's method, stays for TopMG's graph
+  alignment: the median of 0.005 Da bins over +-2T, which can leave the
+  precursor tolerance, and +floor(2T / 0.005) x 0.005 Da with fewer than two
+  pairs (report 0133).
+- **The variable PTM search needs neither:** its proteoform mass is exact
+  (`refineVarPtmPrecursorAndHeaderShift`).
+- **Results on 480_F3_02** (`-s 2`, TopFD main 38ba67dc output):
+    - First-pass target one-PTM PrSMs: 26,805 C-terminal ions matched with the
+      relaxed tolerance, 81.1% of them within the fragment tolerance at P;
+      the PrSM keeps 92.8% with main's refinement and 94.9% with this one
+      (multiple-PTM: 86.1% and 89.3%). Matched fragments on the same
+      alignments +0.9% (decoys +2.4%).
+    - Main's fallback hit 251 of 1,281 reported one-shift PrSMs (+2T, about
+      +20 ppm in the precursor and the shift mass); none now.
+    - With every precursor moved by up to +-5 ppm, 80.1% of 6,779 target
+      one-PTM PrSMs get exactly the unmoved run's adjusted precursor (main's
+      bins: 0.33 ppm median).
+    - 1% FDR: 3,354 PrSMs, 2,001 proteoforms, 438 proteins (main 3,337 / 2,001
+      / 437); E-value cutoff 2.49 (2.86); decoys at E <= 1: 26 (19). Same
+      running time.
+- **Unchanged:** the alignment (it still counts the ions only the relaxed
+  window matches), the E-value's generating function (relaxed tolerance on
+  the observed precursor), TopMG.
+
 ## Range of a variable PTM shift (`seq/mass_shift`, `search/varptmsearch/var_ptm_align`)
 
 Branch `var_ptm_narrow_range` (toppic_test experiment 122, report 0122;
