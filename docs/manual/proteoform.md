@@ -117,12 +117,15 @@ residue mass:
   release of 17 February 2026): the abbreviation is the Unimod name, the
   name the Unimod full name and the mass the sum of the AME2020 nuclide
   masses over the Unimod composition. Its only other entry is the empty
-  `No PTM`. The names of earlier
-  versions (`Carbamidomethylation`, `Oxoalanine`, `Allysine`,
-  `Thiocarboxy`, `Cholinephosphoryl`, `TPQ`, and `carboxylation` and
-  `Citrullination`, which are Unimod's `Carboxy` and `Deamidated`) are
-  still accepted in modification files, FASTA sequences and earlier result
-  files, and stand for the entry: the results show its present name.
+  `No PTM`. Earlier versions used other names for eight PTMs
+  (`Carbamidomethylation`, now `Carbamidomethyl`; `Oxoalanine`,
+  `Allysine`, `Thiocarboxy`, `Cholinephosphoryl`, `TPQ`, now
+  `Cys->Oxoalanine`, `Lys->Allysine`, `Carboxy->Thiocarboxy`,
+  `Phosphocholine`, `Quinone`; `carboxylation` and `Citrullination`, now
+  Unimod's `Carboxy` and `Deamidated`). These names are no longer built
+  in: a FASTA sequence must use the Unimod name, and a modification file
+  line with an old name defines a modification of its own with the file's
+  mass.
 
 ## 4. The mass in brackets
 

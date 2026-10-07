@@ -60,13 +60,6 @@ void PtmBase::initBase(const std::string& base_dir) {
     PtmPtr ptm_ptr = std::make_shared<Ptm>(element);
     ptm_ptr_vec_.push_back(ptm_ptr);
     ptm_abbr_name_map_[ptm_ptr->getAbbrName()] = ptm_ptr;
-    // the abbreviations of earlier versions (FASTA sequences, modification
-    // files and result files written with them)
-    int alias_num = xml_dom_util::getChildCount(element, "alias");
-    for (int j = 0; j < alias_num; j++) {
-      ptm_abbr_name_map_[xml_dom_util::getChildValue(element, "alias", j)] =
-          ptm_ptr;
-    }
     if (ptm_ptr->getUnimodId() > 0) {
       unimod_name_map_.emplace(ptm_ptr->getUnimodId(),
                                ptm_ptr->getAbbrName());
@@ -95,8 +88,8 @@ void PtmBase::initBase(const std::string& base_dir) {
   std::sort(ptm_ptr_vec_.begin(), ptm_ptr_vec_.end(), Ptm::cmpMassInc);
 }
 
-// Returns a PTM based on the abbreviation name or an alias. Returns null if
-// the abbreviation name does not exist.
+// Returns a PTM based on the abbreviation name. Returns null if the
+// abbreviation name does not exist.
 const PtmPtr& PtmBase::getPtmPtrByAbbrName(const std::string& abbr_name) {
   static const PtmPtr null_ptr;
   auto it = ptm_abbr_name_map_.find(abbr_name);

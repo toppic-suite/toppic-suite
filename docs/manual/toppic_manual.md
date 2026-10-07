@@ -284,8 +284,8 @@ name that is not one of the built-in PTMs of `res/base_data/ptm_base.xml`
 A line whose name is a built-in PTM uses the built-in entry and its mass
 (a WARNING is printed when the line's mass differs by more than 0.01 Da);
 the built-in PTMs are every Unimod modification under its Unimod (PSI-MS)
-name, and the names of earlier versions (such as `Carbamidomethylation`,
-now `Carbamidomethyl`) still stand for them (see
+name; the names of earlier versions, such as `Carbamidomethylation` (now
+`Carbamidomethyl`), are no longer built in (see
 [Proteoform annotation](proteoform.md), section 3).
 
 In the variable PTM file (`-b`), `N-term` is the N-terminus of the

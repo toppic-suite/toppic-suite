@@ -39,9 +39,8 @@ class PtmBase {
   static PtmPtr getPtmPtr_C57() { return c57_ptr_; }
   static PtmPtr getPtmPtr_C58() { return c58_ptr_; }
   /**
-   * Returns a PTM based on the abbreviation name, or an alias of it (an
-   * abbreviation of an earlier ptm_base.xml, such as Carbamidomethylation).
-   * Returns null if the abbreviation name does not exist.
+   * Returns a PTM based on the abbreviation name. Returns null if the
+   * abbreviation name does not exist.
    */
   static const PtmPtr& getPtmPtrByAbbrName(const std::string& abbr_name);
 
@@ -65,7 +64,7 @@ class PtmBase {
 
  private:
   static PtmPtrVec ptm_ptr_vec_;
-  // abbreviations and aliases -> PTMs
+  // abbreviations -> PTMs
   static std::unordered_map<std::string, PtmPtr> ptm_abbr_name_map_;
   // Unimod ids of the ptm_base.xml PTMs -> their abbreviations
   static std::unordered_map<int, std::string> unimod_name_map_;

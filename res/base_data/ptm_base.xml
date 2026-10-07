@@ -2,9 +2,9 @@
 <!-- TopPIC's PTMs: "No PTM", every Unimod modification (unimod.obo of
      17:02:2026 11:36; abbreviation = the Unimod name, name = the Unimod full name).
      Masses: exact sums of the AME2020 nuclide masses over the Unimod
-     compositions. <alias>: names of earlier versions. Written by
-     toppic_test tests/202610/scripts/proforma_output/gen_ptm_base.py
-     (experiment 128); rerun it for a new Unimod release. -->
+     compositions. Written by toppic_test
+     tests/202610/scripts/proforma_output/gen_ptm_base.py (experiment
+     128); rerun it for a new Unimod release. -->
 <ptm_list>
 <ptm>
   <name>No PTM</name>
@@ -33,7 +33,6 @@
 <ptm>
   <name>Iodoacetamide derivative</name>
   <abbreviation>Carbamidomethyl</abbreviation>
-  <alias>Carbamidomethylation</alias>
   <unimod>4</unimod>
   <mono_mass>57.021463719204</mono_mass>
 </ptm>
@@ -52,7 +51,6 @@
 <ptm>
   <name>Deamidation</name>
   <abbreviation>Deamidated</abbreviation>
-  <alias>Citrullination</alias>
   <unimod>7</unimod>
   <mono_mass>0.984015583112</mono_mass>
 </ptm>
@@ -1067,7 +1065,6 @@
 <ptm>
   <name>Carboxylation</name>
   <abbreviation>Carboxy</abbreviation>
-  <alias>carboxylation</alias>
   <unimod>299</unimod>
   <mono_mass>43.98982923852</mono_mass>
 </ptm>
@@ -1284,7 +1281,6 @@
 <ptm>
   <name>Lysine oxidation to aminoadipic semialdehyde</name>
   <abbreviation>Lys-&gt;Allysine</abbreviation>
-  <alias>Allysine</alias>
   <unimod>352</unimod>
   <mono_mass>-1.031634480684</mono_mass>
 </ptm>
@@ -1471,7 +1467,6 @@
 <ptm>
   <name>Quinone</name>
   <abbreviation>Quinone</abbreviation>
-  <alias>TPQ</alias>
   <unimod>392</unimod>
   <mono_mass>29.974179174724</mono_mass>
 </ptm>
@@ -1526,7 +1521,6 @@
 <ptm>
   <name>Oxoalanine</name>
   <abbreviation>Cys-&gt;Oxoalanine</abbreviation>
-  <alias>Oxoalanine</alias>
   <unimod>402</unimod>
   <mono_mass>-17.992806618076</mono_mass>
 </ptm>
@@ -1617,7 +1611,6 @@
 <ptm>
   <name>Thiocarboxylic acid</name>
   <abbreviation>Carboxy-&gt;Thiocarboxy</abbreviation>
-  <alias>Thiocarboxy</alias>
   <unimod>420</unimod>
   <mono_mass>15.97715655428</mono_mass>
 </ptm>
@@ -9334,7 +9327,6 @@
 <ptm>
   <name>Serine/Threonine/Tyrosine of a protein becomes posttranslationally modified with a phosphocholine moiety.</name>
   <abbreviation>Phosphocholine</abbreviation>
-  <alias>Cholinephosphoryl</alias>
   <unimod>2139</unimod>
   <mono_mass>165.055480242486</mono_mass>
 </ptm>

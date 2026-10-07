@@ -360,7 +360,7 @@ column: it is built by `Proteoform::getProteoformMatchSeq` (`seq/
 proteoform.cpp`, labels from `MassShift::getAnnoStr`), and modification
 names/masses resolve through `PtmBase::getPtmPtr`, which prefers the
 `res/base_data/ptm_base.xml` entry over a modification file's mass when the
-abbreviation (or one of its aliases) matches. Update it when that code or the table columns change.
+abbreviation matches. Update it when that code or the table columns change.
 
 `res/README.md` describes the runtime resource files (which class loads
 each `base_data` file, the two ONNX models, the Git LFS-tracked files);
@@ -1040,14 +1040,12 @@ straight (toppic_test experiment 128):
   Carboxy->Thiocarboxy, Cholinephosphoryl -> Phosphocholine, TPQ ->
   Quinone; carboxylation and Citrullination were the same Unimod PTMs as
   Carboxy and Deamidated) and removed Decarboxy, which has no Unimod
-  entry. The old names are `<alias>` elements that
-  `PtmBase::initBase` puts in the abbreviation map, so
-  `getPtmPtrByAbbrName` and `getPtmPtr` (FASTA sequences such as
-  `C[Carbamidomethylation]`, modification files, result XML of earlier
-  runs) resolve them to the entry, whose present name the results show.
-  The C57 PTM is found by `getC57AbbrName()` ("Carbamidomethyl").
-  `SearchFastaMatch` compares the FASTA's PTM names as written, so a
-  database must not mix an old and a new name of one PTM.
+  entry. The old names are not kept as aliases (the user's choice): a
+  FASTA sequence written `C[Carbamidomethylation]` stops with "Unknown
+  PTM", a modification file's old name defines a PTM of its own with the
+  file's mass, and result XML written with an old name cannot be read
+  (result files of other versions are refused anyway, see TopDiff). The
+  C57 PTM is found by `getC57AbbrName()` ("Carbamidomethyl").
 - **Every Unimod name is built in**, so a modification file's line whose
   name is a Unimod name takes the Unimod entry (`PtmBase::getPtmPtr`,
   documented in `docs/manual/proteoform.md` section 3); when the file's
@@ -1303,7 +1301,7 @@ not a variable PTM. Facts to keep straight:
 A FASTA sequence can carry PTMs in the extended format, a residue followed
 by the PTM's abbreviation of `res/base_data/ptm_base.xml` in brackets
 (`M[Oxidation]`, `C[Carbamidomethyl]`; the names of earlier versions, such
-as `C[Carbamidomethylation]`, are aliases, see "ProForma strings").
+as `C[Carbamidomethylation]`, are no longer read, see "ProForma strings").
 `FastaSeq` reads them into residue/PTM pairs (`getAcidPtmPairVec`), and
 `proteoform_factory::geneDbProteoformPtr` builds the modified residues with
 an `INPUT` mass shift on each (shown in the Proteoform column as
