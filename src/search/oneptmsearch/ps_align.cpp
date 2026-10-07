@@ -354,10 +354,11 @@ PrsmPtr PsAlign::geneResult(int shift_num, const ProteoformPtr& proteo_ptr,
       proteo_ptr, proteo_ptr->getFastaSeqPtr(), first_pos, last_pos);
 
   double min_mass = prsm_para_ptr->getSpParaPtr()->getMinMass();
-  double ppo = prsm_para_ptr->getSpParaPtr()->getPrecTolerancePtr()->getPpo();
+  PeakTolerancePtr prec_tole_ptr =
+      prsm_para_ptr->getSpParaPtr()->getPrecTolerancePtr();
 
   double refine_prec_mass = diagonal_util::refinePrecursorByMatchedIons(
-      proteo_ptr, ms_three_ptr_vec, header_ptrs, ppo, min_mass);
+      proteo_ptr, ms_three_ptr_vec, header_ptrs, prec_tole_ptr, min_mass);
 
   SpParaPtr sp_para_ptr = prsm_para_ptr->getSpParaPtr();
   ExtendMsPtrVec refine_ms_ptr_vec = extend_ms_factory::geneMsThreePtrVec(

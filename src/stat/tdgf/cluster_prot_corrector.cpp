@@ -94,7 +94,6 @@ int process(const PrsmParaPtr& prsm_para_ptr, const TdgfMngPtr& tdgf_mng_ptr,
         std::make_shared<EValueProcessor>(tdgf_mng_ptr);
     evalue_processor->init();
     SpParaPtr sp_para_ptr = prsm_para_ptr->getSpParaPtr();
-    double ppo = sp_para_ptr->getPrecTolerancePtr()->getPpo();
     // the spectra as the search and the E-value computation saw them: masses
     // below the EnvCNN cutoff removed, close masses combined with
     // --frag-mass-dedup
@@ -148,12 +147,11 @@ int process(const PrsmParaPtr& prsm_para_ptr, const TdgfMngPtr& tdgf_mng_ptr,
                  static_cast<std::size_t>(tdgf_mng_ptr->thread_num_) + 2) {
             std::this_thread::sleep_for(std::chrono::milliseconds(10));
           }
-          pool_ptr->enqueue([evalue_processor, spec_set_ptr, sele_prsm_ptrs,
-                             ppo]() mutable {
-            evalue_processor->compEvaluesThreadLocal(spec_set_ptr,
-                                                     sele_prsm_ptrs, ppo,
-                                                     false);
-          });
+          pool_ptr->enqueue(
+              [evalue_processor, spec_set_ptr, sele_prsm_ptrs]() mutable {
+                evalue_processor->compEvaluesThreadLocal(spec_set_ptr,
+                                                         sele_prsm_ptrs, false);
+              });
         }
       }
       deconv_ms_ptr_vec = ms_reader_ptr->getNextMsPtrVec();

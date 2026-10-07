@@ -152,9 +152,11 @@ FilterSpecPtr ZeroPtmFilter::geneFilterSpec(
   std::vector<std::pair<int, int> > suff_mass_errors =
       extend_ms_util::getExtendIntMassErrorList(ms_ptr_vec, pref,
                                                 mng_ptr->filter_scale_);
+  MsHeaderPtr header_ptr = ms_ptr_vec[0]->getMsHeaderPtr();
   std::pair<int, int> prec_minus_water_mass_error =
-      ms_ptr_vec[0]->getMsHeaderPtr()->getFirstPrecMonoMassMinusWaterError(
-          tole_ptr->getPpo(), mng_ptr->filter_scale_);
+      header_ptr->getFirstPrecMonoMassMinusWaterError(
+          tole_ptr->compPrecErrorTole(header_ptr->getFirstPrecMonoMass()),
+          mng_ptr->filter_scale_);
   return std::make_shared<FilterSpec>(
       ms_ptr_vec[0]->getMsHeaderPtr(), static_cast<int>(ms_ptr_vec.size()),
       std::move(pref_mass_errors), std::move(suff_mass_errors),
@@ -222,8 +224,8 @@ void ZeroPtmFilter::computeBestMatch(const FilterSpecPtr& spec_ptr) {
       mng_ptr_->prsm_para_ptr_->getSpParaPtr()->getPrecTolerancePtr();
   double prec_minus_water_mass =
       spec_ptr->getHeaderPtr()->getFirstPrecMonoMassMinusWater();
-  double prec_error_tole =
-      spec_ptr->getHeaderPtr()->getFirstPrecErrorTolerance(tole_ptr->getPpo());
+  double prec_error_tole = tole_ptr->compPrecErrorTole(
+      spec_ptr->getHeaderPtr()->getFirstPrecMonoMass());
   bool one_per_protein = !mng_ptr_->range_candidates_;
   LOG_DEBUG("allow complete prot"
             << mng_ptr_->prsm_para_ptr_->allowCompleteProt());

@@ -31,6 +31,8 @@ namespace toppic {
 CompPValueArray::CompPValueArray(const CountTestNumPtr& test_num_ptr,
                                  const TdgfMngPtr& mng_ptr) {
   mng_ptr_ = mng_ptr;
+  prec_tole_ptr_ =
+      mng_ptr_->prsm_para_ptr_->getSpParaPtr()->getPrecTolerancePtr();
   test_num_ptr_ = test_num_ptr;
   residue_ptrs_ = test_num_ptr->getResFreqPtrVec();
   pep_n_term_residue_ptrs_ = residue_ptrs_;
@@ -64,7 +66,7 @@ bool CompPValueArray::useModResidues(const PrsmPtr& prsm_ptr) {
 
 // set alignment
 void CompPValueArray::compMultiExpectedValues(const PrmMsPtrVec& ms_six_ptr_vec,
-                                              PrsmPtrVec& prsm_ptrs, double ppo,
+                                              PrsmPtrVec& prsm_ptrs,
                                               bool strict, bool mod_residues) {
   PrmPeakPtrVec2D prm_ptr_2d;
   for (size_t i = 0; i < ms_six_ptr_vec.size(); i++) {
@@ -83,8 +85,6 @@ void CompPValueArray::compMultiExpectedValues(const PrmMsPtrVec& ms_six_ptr_vec,
         ms_six_ptr_vec[0]->getMsHeaderPtr()->getFirstPrecMonoMass();
   }
 
-  PeakTolerancePtr tole_ptr =
-      mng_ptr_->prsm_para_ptr_->getSpParaPtr()->getPrecTolerancePtr();
   // the protein probabilities are used only by COMPLETE and PREFIX PrSMs
   // and the peptide ones only by SUFFIX and INTERNAL PrSMs, so a spectrum
   // whose PrSMs are all of one kind needs only one of the two generating
@@ -117,17 +117,17 @@ void CompPValueArray::compMultiExpectedValues(const PrmMsPtrVec& ms_six_ptr_vec,
   if (prot_needed) {
     comp_prob_value_array::compProbArray(
         comp_prob_ptr_, prot_n_term_residue_ptrs, prm_ptr_2d, prsm_ptrs,
-        strict, prob_prec_mass, tole_ptr, prot_probs);
+        strict, prob_prec_mass, prec_tole_ptr_, prot_probs);
   }
   std::vector<double> pep_probs;
   if (pep_needed) {
     comp_prob_value_array::compProbArray(
         comp_prob_ptr_, pep_n_term_residue_ptrs, prm_ptr_2d, prsm_ptrs,
-        strict, prob_prec_mass, tole_ptr, pep_probs);
+        strict, prob_prec_mass, prec_tole_ptr_, pep_probs);
   }
 
-  double tolerance =
-      ms_six_ptr_vec[0]->getMsHeaderPtr()->getFirstPrecErrorTolerance(ppo);
+  double tolerance = prec_tole_ptr_->compPrecErrorTole(
+      ms_six_ptr_vec[0]->getMsHeaderPtr()->getFirstPrecMonoMass());
   // the precursor mass of the PRM spectra (label-free): the original
   // precursor's, or the adjusted one for the PrSMs of a +-1 isotope offset
   // (process)
@@ -205,7 +205,6 @@ void CompPValueArray::compMultiExpectedValues(const PrmMsPtrVec& ms_six_ptr_vec,
 
 void CompPValueArray::compSingleExpectedValue(const DeconvMsPtrVec& ms_ptr_vec,
                                               const PrsmPtr& prsm_ptr,
-                                              double ppo,
                                               double n_term_label_mass) {
   // the adjusted precursor mass of a PrSM is label-free (toppic -N); the PRM
   // spectra are built from the observed one and subtract the label
@@ -219,12 +218,12 @@ void CompPValueArray::compSingleExpectedValue(const DeconvMsPtrVec& ms_ptr_vec,
 
   PrsmPtrVec prsm_ptrs;
   prsm_ptrs.push_back(prsm_ptr);
-  compMultiExpectedValues(prm_ms_ptr_vec, prsm_ptrs, ppo, true,
+  compMultiExpectedValues(prm_ms_ptr_vec, prsm_ptrs, true,
                           useModResidues(prsm_ptr));
 }
 
 int CompPValueArray::getIsotopeOffset(const SpectrumSetPtr& spec_set_ptr,
-                                      const PrsmPtr& prsm_ptr, double ppo) {
+                                      const PrsmPtr& prsm_ptr) {
   ProteoformPtr proteo_ptr = prsm_ptr->getProteoformPtr();
   if (proteo_ptr->getAlterNum(AlterType::UNEXPECTED) > 0 ||
       proteo_ptr->getAlterNum(AlterType::VARIABLE) > 0 ||
@@ -236,8 +235,8 @@ int CompPValueArray::getIsotopeOffset(const SpectrumSetPtr& spec_set_ptr,
   // (label-free) precursor mass by more than the precursor error tolerance
   // was matched at one isotope above or below it
   MsHeaderPtr header_ptr = spec_set_ptr->getMsSixPtrVec()[0]->getMsHeaderPtr();
-  double tolerance = header_ptr->getFirstPrecErrorTolerance(ppo);
   double prec_mass = header_ptr->getFirstPrecMonoMass();
+  double tolerance = prec_tole_ptr_->compPrecErrorTole(prec_mass);
   double adjusted_mass = prsm_ptr->getAdjustedPrecMass();
   if (std::abs(prec_mass - adjusted_mass) <= tolerance) {
     return 0;
@@ -246,13 +245,12 @@ int CompPValueArray::getIsotopeOffset(const SpectrumSetPtr& spec_set_ptr,
 }
 
 void CompPValueArray::process(const SpectrumSetPtr& spec_set_ptr,
-                              PrsmPtrVec& prsm_ptrs, double ppo,
-                              bool is_separate) {
+                              PrsmPtrVec& prsm_ptrs, bool is_separate) {
   if (is_separate) {
     double n_term_label_mass = spec_set_ptr->getNTermLabelMass();
     for (unsigned i = 0; i < prsm_ptrs.size(); i++) {
       compSingleExpectedValue(spec_set_ptr->getDeconvMsPtrVec(), prsm_ptrs[i],
-                              ppo, n_term_label_mass);
+                              n_term_label_mass);
     }
     return;
   }
@@ -265,7 +263,7 @@ void CompPValueArray::process(const SpectrumSetPtr& spec_set_ptr,
   // (toppic_test experiment 117).
   std::map<int, PrsmPtrVec> offset_prsms;
   for (size_t i = 0; i < prsm_ptrs.size(); i++) {
-    int offset = getIsotopeOffset(spec_set_ptr, prsm_ptrs[i], ppo);
+    int offset = getIsotopeOffset(spec_set_ptr, prsm_ptrs[i]);
     offset_prsms[offset].push_back(prsm_ptrs[i]);
   }
   for (auto& offset_prsm : offset_prsms) {
@@ -286,11 +284,11 @@ void CompPValueArray::process(const SpectrumSetPtr& spec_set_ptr,
       }
       if (!other_prsm_ptrs.empty()) {
         compMultiExpectedValues(spec_set_ptr->getMsSixPtrVec(),
-                                other_prsm_ptrs, ppo, false);
+                                other_prsm_ptrs, false);
       }
       if (!var_prsm_ptrs.empty()) {
         compMultiExpectedValues(spec_set_ptr->getMsSixPtrVec(), var_prsm_ptrs,
-                                ppo, false, true);
+                                false, true);
       }
       continue;
     }
@@ -302,7 +300,7 @@ void CompPValueArray::process(const SpectrumSetPtr& spec_set_ptr,
         spec_set_ptr->getDeconvMsPtrVec(),
         mng_ptr_->prsm_para_ptr_->getSpParaPtr(), prec_mono_mass,
         spec_set_ptr->getNTermLabelMass());
-    compMultiExpectedValues(ms_six_ptr_vec, offset_prsm.second, ppo, false);
+    compMultiExpectedValues(ms_six_ptr_vec, offset_prsm.second, false);
   }
 }
 

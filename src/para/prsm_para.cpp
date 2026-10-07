@@ -85,6 +85,13 @@ PrsmPara::PrsmPara(const std::map<std::string, std::string>& arguments) {
   }
   sp_para_ptr_ = std::make_shared<SpPara>(activation_name, n_term_label_mass,
                                           prec_ppm, frag_ppm);
+  // a precursor error tolerance in Dalton in place of the ppm of
+  // precErrorTolerance (toppic hidden --prec-dalton-error); an absent or
+  // empty key keeps the ppm tolerance
+  if (getArg(arguments, "precDaltonError") != "") {
+    sp_para_ptr_->getPrecTolerancePtr()->setDaltonTolerance(
+        std::stod(getArg(arguments, "precDaltonError")));
+  }
   if (getArg(arguments, "envCnnCutoff") != "") {
     sp_para_ptr_->setEnvCnnCutoff(std::stod(getArg(arguments, "envCnnCutoff")));
   }

@@ -77,10 +77,9 @@ double Precursor::getMonoMassMinusWater() const {
   }
 }
 
-std::pair<int, int> Precursor::getMonoMassMinusWaterError(double ppo,
-                                                          double scale) const {
+std::pair<int, int> Precursor::getMonoMassMinusWaterError(
+    double error_tolerance, double scale) const {
   int mass = static_cast<int>(std::round(getMonoMassMinusWater() * scale));
-  double error_tolerance = getErrorTolerance(ppo);
   int error = static_cast<int>(std::ceil(error_tolerance * scale));
   std::pair<int, int> result(mass, error);
   return result;

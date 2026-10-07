@@ -95,10 +95,10 @@ class MsHeader {
 
   double getFirstPrecMonoMassMinusWater() const;
 
-  double getFirstPrecErrorTolerance(double ppo) const;
-
-  std::pair<int, int> getFirstPrecMonoMassMinusWaterError(double ppo,
-                                                          double scale) const;
+  // error_tolerance: the precursor tolerance in Da
+  // (PeakTolerance::compPrecErrorTole)
+  std::pair<int, int> getFirstPrecMonoMassMinusWaterError(
+      double error_tolerance, double scale) const;
 
   // set functions for all spectra
   void setFileName(const std::string& file_name) { file_name_ = file_name; }

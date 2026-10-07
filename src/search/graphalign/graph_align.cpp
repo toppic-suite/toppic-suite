@@ -680,10 +680,10 @@ PrsmPtr GraphAlign::geneResult(int s, int m) {
   ExtendMsPtrVec ms_three_ptr_vec =
       spec_graph_ptr_->getSpectrumSetPtr()->getMsThreePtrVec();
   double min_mass = sp_para_ptr->getMinMass();
-  double ppo = sp_para_ptr->getPrecTolerancePtr()->getPpo();
   LOG_DEBUG("begin refine");
   double refine_prec_mass = diagonal_util::refinePrecursorAndHeaderShift(
-      proteo_ptr, ms_three_ptr_vec, diag_headers_, ppo, min_mass,
+      proteo_ptr, ms_three_ptr_vec, diag_headers_,
+      sp_para_ptr->getPrecTolerancePtr(), min_mass,
       mng_ptr_->refine_prec_step_width_);
   LOG_DEBUG("get reine prec mass" << refine_prec_mass);
 

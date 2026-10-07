@@ -17,6 +17,7 @@
 #define TOPPIC_SEARCH_DIAG_DIAGONAL_UTIL_HPP_
 
 #include "ms/spec/extend_ms.hpp"
+#include "para/peak_tolerance.hpp"
 #include "prsm/peak_ion_pair.hpp"
 #include "search/diag/diag_header.hpp"
 
@@ -30,7 +31,8 @@ namespace diagonal_util {
 // precursor moved to the median bin (+2T with fewer than two pairs).
 double refinePrecursorAndHeaderShift(const ProteoformPtr& proteo_ptr,
                                      const ExtendMsPtrVec& ms_three_ptr_vec,
-                                     DiagHeaderPtrVec& header_ptrs, double ppo,
+                                     DiagHeaderPtrVec& header_ptrs,
+                                     const PeakTolerancePtr& prec_tole_ptr,
                                      double min_mass,
                                      double refine_prec_step_width);
 
@@ -40,14 +42,16 @@ double refinePrecursorAndHeaderShift(const ProteoformPtr& proteo_ptr,
 // of the last, with the fragment tolerance plus the precursor's error
 // (N-strict-C-relax and N-relax-C-strict PRM tolerances); the PrSM matches
 // them with the fragment tolerance alone. The precursor is moved by the
-// delta in [-T, T] (T the precursor tolerance, ppo x the precursor mass)
-// that matches the most dependent ions within the fragment tolerance: of
+// delta in [-T, T] (T the precursor tolerance: ppo x the precursor mass, or
+// the Dalton tolerance of toppic's --prec-dalton-error) that matches the
+// most dependent ions within the fragment tolerance: of
 // the best delta interval the one closest to 0, in it the median error of
 // its ions; 0 when no ion matches. The headers' shifts are moved as in
 // refinePrecursorAndHeaderShift. Returns the refined precursor mass.
 double refinePrecursorByMatchedIons(const ProteoformPtr& proteo_ptr,
                                     const ExtendMsPtrVec& ms_three_ptr_vec,
-                                    DiagHeaderPtrVec& header_ptrs, double ppo,
+                                    DiagHeaderPtrVec& header_ptrs,
+                                    const PeakTolerancePtr& prec_tole_ptr,
                                     double min_mass);
 
 // The precursor refinement of the variable PTM search. Once the alignment

@@ -207,9 +207,11 @@ FilterSpecPtr VarPtmFilter::geneFilterSpec(
   std::vector<std::pair<int, int>> suff_mass_errors =
       prm_ms_util::getIntMassErrorList(srm_ms_ptr_vec, tole_ptr,
                                        mng_ptr->filter_scale_, false, true);
+  MsHeaderPtr header_ptr = prm_ms_ptr_vec[0]->getMsHeaderPtr();
   std::pair<int, int> prec_minus_water_mass_error =
-      prm_ms_ptr_vec[0]->getMsHeaderPtr()->getFirstPrecMonoMassMinusWaterError(
-          tole_ptr->getPpo(), mng_ptr->filter_scale_);
+      header_ptr->getFirstPrecMonoMassMinusWaterError(
+          tole_ptr->compPrecErrorTole(header_ptr->getFirstPrecMonoMass()),
+          mng_ptr->filter_scale_);
   return std::make_shared<FilterSpec>(
       prm_ms_ptr_vec[0]->getMsHeaderPtr(),
       static_cast<int>(prm_ms_ptr_vec.size()), std::move(pref_mass_errors),
@@ -272,8 +274,8 @@ std::array<ProtCandidatePtrVec, 4> VarPtmFilter::findTypeCands(
       mng_ptr_->prsm_para_ptr_->getSpParaPtr()->getPrecTolerancePtr();
   double prec_minus_water_mass =
       spec_ptr->getHeaderPtr()->getFirstPrecMonoMassMinusWater();
-  double prec_error_tole =
-      spec_ptr->getHeaderPtr()->getFirstPrecErrorTolerance(tole_ptr->getPpo());
+  double prec_error_tole = tole_ptr->compPrecErrorTole(
+      spec_ptr->getHeaderPtr()->getFirstPrecMonoMass());
 
   // The candidates of a proteoform type (issue #348): with
   // range_candidates_, the best ranges, a protein once for each of its
