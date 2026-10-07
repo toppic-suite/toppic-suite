@@ -2252,11 +2252,27 @@ main's. What the alternative does, and how it differs from `stat/local`:
   the spread, so it was replaced by the best site's score in experiment
   140's amendment 1 (a Methyl over 18 K/R of H2B at 5.5% each: 0.055, not
   1.0). The per-site scores are in the MIScore column either way.
-- **The proteoform is not truncated or extended**: `stat/local` also
-  scores the candidate forms of `local_proteoform::getAllCandidateForms`
-  (N- and C-terminal truncations by up to 5 residues, the N-terminal
-  acetylation forms) and takes the best; `local_align` explains the shift
-  value of the proteoform as it is.
+- **The proteoform's termini.** `stat/local` scores the candidate forms
+  of `local_proteoform::getAllCandidateForms` (N- and C-terminal
+  truncations by up to 5 residues, the N-terminal acetylation forms) and
+  takes the best; `local_align` first explains the shift value of the
+  proteoform as it is. When that gives no explanation and the shift has
+  at most `term_max_matched` (2) matched cleavage sites on its N-terminal
+  (C-terminal) side (`compMatchedSites` of the original proteoform), the
+  candidate proteoforms whose start (end) is moved by up to `term_range`
+  (5) residues are tried (`LocalAlignProcessor::processTerminal`, the
+  forms of `local_proteoform::getCandidateForm`, so a new start of 0 or 1
+  brings the N-terminal acetylation variants; the shift's residues and the
+  piece stay inside): each candidate's unexplained mass is the adjusted
+  precursor mass minus the candidate's mass, and the one-explanation rule
+  counts over all (candidate, explanation) pairs ("term_localized",
+  "term_none", "term_ambiguous" in the log, the explanations tagged
+  `@start<n>` / `@end<n>` and the N-terminal form). The result proteoform
+  takes the moved terminus (the base form from `getCandidateForm` with the
+  kept shifts, the new shifts moved with `shiftPositions`); a two-shift
+  PrSM can move its start for the first piece and its end for the second.
+  Switch `term` (1; 0 = the proteoform as it is only). Added in
+  experiment 140's amendment 3.
 - **The site tables** (`compOnePtmSTable`, `compTwoPtmMTable` in
   `local_align_util.cpp`) are `local_util`'s with the known shifts of the
   proteoform (the variable PTMs, and the other unexpected shift of a
