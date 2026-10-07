@@ -1081,12 +1081,23 @@ Facts to keep straight:
 - **Unchanged:** the +-1 Da precursor offsets of the stages, `-e`, `-p` and
   the index. Without the option the 480 run is main's byte for byte (60
   files).
-- **The refinement range is 2 x the tolerance.**
-  `refinePrecursorAndHeaderShift` steps over +-2 x tole and pairs fragments
-  within +-tole. With fewer than two pairs its median index is 0, so the
-  first bin wins and the precursor moves by +2 x tole (main too: 264 of
-  1,315 one-shift PrSMs of 480 at +2 x 10 ppm). With 0.5 Da that is +1.0
-  Da. Not fixed on the branch.
+- **The refinement of the shift searches.** `refinePrecursorAndHeaderShift`
+  steps over +-2 x tole and pairs fragments within tole + their own
+  tolerance. With fewer than two pairs its median index is 0, so the first
+  bin wins and the precursor moves by +2 x tole (main 03a0c37a: 264 of
+  1,315 one-shift PrSMs of 480 at +2 x 10 ppm; +1.0 Da at 0.5 Da).
+    - **Fixed on main by experiment 135** (e720aec2, issue #514): PsAlign and
+      PsAlignMultiType call `refinePrecursorByMatchedIons` (the delta in
+      [-T, T] that matches the most precursor-dependent ions within the
+      fragment tolerance, 0 when none matches). On 480: 3,354 / 1,996 / 440,
+      no shift PrSM at +2T. This branch's own fixes (amendment 1: bfa89f11,
+      8a5a4582, 75c7ae13) were reverted (3413086c, amendment 2).
+    - **TopMG's graph alignment** (topmg and toppic `--topmg`) keeps
+      `refinePrecursorAndHeaderShift` with the fallback.
+    - **Bringing this branch onto main:** `refinePrecursorByMatchedIons` takes
+      the ppo and calls `getFirstPrecErrorTolerance`, which this branch
+      removes. It must take the precursor tolerance (`compPrecErrorTole`) so
+      that `--prec-dalton-error` sets its T.
 - **Shift E-values depend on the precursor peak width.**
   `CompProbValue::compPrecProbs` multiplies the one-shift precursor
   probability by the precursor peak's width and the i-shift one by the
