@@ -45,8 +45,10 @@ MzmlMsGroupReader::MzmlMsGroupReader(const std::string& file_name,
 
   if (!missing_level_one_) {
     initMs2Ms1Map();
-    reader_ptr_->resetIndexes();
   }
+  // rewind after the probe read above (and initMs2Ms1Map): without it, a
+  // file without MS1 spectra (-o) lost its first MS/MS spectrum
+  reader_ptr_->resetIndexes();
   cur_ms_one_idx_ = 0;
   ms_one_cnt_ = 0;
   ms_two_cnt_ = 0;

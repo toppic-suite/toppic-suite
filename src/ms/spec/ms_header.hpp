@@ -65,6 +65,18 @@ class MsHeader {
 
   ActivationPtr getActivationPtr() const { return activation_ptr_; }
 
+  // The selected ion of the precursor as the input file gives it (m/z and
+  // charge; -1 and 0 when the file has none). TopFD reads them for PTCR
+  // spectra (ptcr_ms2_deconv); the precursors of other spectra come from the
+  // MS1 features.
+  double getSelectedMz() const { return selected_mz_; }
+
+  int getSelectedCharge() const { return selected_charge_; }
+
+  // A PTCR spectrum: proton transfer charge reduction of the isolated ions
+  // without dissociation (activation PTCR, TopFD only; ptcr_ms2_deconv)
+  bool isPtcr() const { return ptcr_; }
+
   // The N-terminal label mass (toppic -N) of an extended spectrum: the
   // precursor mass of its header is then the label-free one, and its
   // N-terminal fragment masses still carry the label, which the matching of
@@ -140,6 +152,14 @@ class MsHeader {
     activation_ptr_ = std::move(acti_ptr);
   }
 
+  void setSelectedMz(double selected_mz) { selected_mz_ = selected_mz; }
+
+  void setSelectedCharge(int selected_charge) {
+    selected_charge_ = selected_charge;
+  }
+
+  void setPtcr(bool ptcr) { ptcr_ = ptcr; }
+
   void setNTermLabelMass(double n_term_label_mass) {
     n_term_label_mass_ = n_term_label_mass;
   }
@@ -197,6 +217,11 @@ class MsHeader {
   double prec_target_mz_ = -1;
   // activation type
   ActivationPtr activation_ptr_;
+  // the selected ion of the input file (getSelectedMz, getSelectedCharge)
+  double selected_mz_ = -1;
+  int selected_charge_ = 0;
+  // a PTCR spectrum (isPtcr)
+  bool ptcr_ = false;
   // N-terminal label mass of an extended spectrum (getNTermLabelMass)
   double n_term_label_mass_ = 0;
 

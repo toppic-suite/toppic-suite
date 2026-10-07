@@ -20,6 +20,7 @@
 #include <cstddef>
 #include <cstdlib>
 #include <memory>
+#include <mutex>
 #include <string>
 #include <utility>
 #include <vector>
@@ -37,6 +38,7 @@
 #include "topfd/deconv/deconv_single_sp.hpp"
 #include "topfd/deconv/greedy_ms2_deconv.hpp"
 #include "topfd/deconv/prec_pair_refine.hpp"
+#include "topfd/deconv/ptcr_ms2_deconv.hpp"
 
 namespace toppic {
 
@@ -61,6 +63,15 @@ struct Ms2SqlBuffer {
   std::atomic<std::size_t> bytes{0};
 };
 using Ms2SqlBufferPtr = std::shared_ptr<Ms2SqlBuffer>;
+
+// The deconvoluted PTCR spectra (ptcr_ms2_deconv), collected from the worker
+// threads under a lock and written after the deconvolution; they go to their
+// own files, not to the MS/MS msalign file or the SQLite database.
+struct PtcrBuffer {
+  std::mutex mutex;
+  ptcr_ms2_deconv::PtcrSpecPtrVec specs;
+};
+using PtcrBufferPtr = std::shared_ptr<PtcrBuffer>;
 
 // Approximate bytes held per buffered peak (the Peak/EnvPeak object, its
 // shared_ptr control block, and the vector slot). Used only to bound the
@@ -104,7 +115,17 @@ void deconvMsTwo(const MzmlMsPtr& ms_ptr, SpecFeaturePtrVec sp_feat_ptr_vec,
                  const MzmlMsPtr& ms1_ptr, const TopfdParaPtr& topfd_para_ptr,
                  const MsAlignWriterPtrVec& ms2_writer_ptr_vec,
                  const SimpleThreadPoolPtr& pool_ptr,
-                 const Ms2SqlBufferPtr& sql_buffer_ptr) {
+                 const Ms2SqlBufferPtr& sql_buffer_ptr,
+                 const PtcrBufferPtr& ptcr_buffer_ptr) {
+  // 0. A PTCR spectrum: intact species at reduced charges, no fragments; its
+  // precursor comes from its own deconvolution, not from the MS1 features
+  if (ms_ptr->getMsHeaderPtr()->isPtcr()) {
+    ptcr_ms2_deconv::PtcrSpecPtr spec_ptr =
+        ptcr_ms2_deconv::deconv(ms_ptr, topfd_para_ptr);
+    std::lock_guard<std::mutex> lock(ptcr_buffer_ptr->mutex);
+    ptcr_buffer_ptr->specs.push_back(spec_ptr);
+    return;
+  }
   // 1. Find max_mass and max_charge
   double max_mass = 0;
   int max_charge = 1;
@@ -201,11 +222,12 @@ std::function<void()> geneMsTwoTask(
     const MzmlMsPtr& ms1_ptr, const TopfdParaPtr& topfd_para_ptr,
     const MsAlignWriterPtrVec& ms2_writer_ptr_vec,
     const SimpleThreadPoolPtr& pool_ptr,
-    const Ms2SqlBufferPtr& sql_buffer_ptr) {
+    const Ms2SqlBufferPtr& sql_buffer_ptr,
+    const PtcrBufferPtr& ptcr_buffer_ptr) {
   return [ms_ptr, feat_ptr_vec, ms1_ptr, topfd_para_ptr, ms2_writer_ptr_vec,
-          pool_ptr, sql_buffer_ptr]() {
+          pool_ptr, sql_buffer_ptr, ptcr_buffer_ptr]() {
     deconvMsTwo(ms_ptr, feat_ptr_vec, ms1_ptr, topfd_para_ptr,
-                ms2_writer_ptr_vec, pool_ptr, sql_buffer_ptr);
+                ms2_writer_ptr_vec, pool_ptr, sql_buffer_ptr, ptcr_buffer_ptr);
   };
 }
 
@@ -288,6 +310,9 @@ void DeconvMs2Process::process() {
     sql_buffer_ptr->bytes = 0;
   };
 
+  deconv_ms2_process::PtcrBufferPtr ptcr_buffer_ptr =
+      std::make_shared<deconv_ms2_process::PtcrBuffer>();
+
   // init msalign writer vector for multiple threads
   std::string output_base_name = topfd_para_ptr_->getOutputBaseName();
   std::string ms2_msalign_name = output_base_name + "_" + output_filename_ext_;
@@ -356,7 +381,7 @@ void DeconvMs2Process::process() {
                               : nullptr;
       pool_ptr->enqueue(deconv_ms2_process::geneMsTwoTask(
           ms_ptr, sp_feat_ptr_vec, ms1_ptr, topfd_para_ptr_,
-          ms2_writer_ptr_vec, pool_ptr, sql_buffer_ptr));
+          ms2_writer_ptr_vec, pool_ptr, sql_buffer_ptr, ptcr_buffer_ptr));
       std::string msg = deconv_ms2_process::updateMsTwoMsg(
           ms_ptr->getMsHeaderPtr(), spec_cnt, total_spec_num);
       std::cout << "\r" << msg << std::flush;
@@ -394,6 +419,28 @@ void DeconvMs2Process::process() {
   std::string ms2_prefix = file_util::absoluteName(output_base_name) + "_" +
                            output_filename_ext_ + "_";
   file_util::cleanPrefix(output_base_name, ms2_prefix);
+
+  // the PTCR spectra: <base>_ptcr.msalign and <base>_ptcr.tsv (FAIMS:
+  // <base>_<voltage>_ptcr.*), only when there are any
+  if (!ptcr_buffer_ptr->specs.empty()) {
+    std::string ptcr_ext = output_filename_ext_;
+    std::size_t pos = ptcr_ext.rfind("ms2.msalign");
+    if (pos != std::string::npos) {
+      ptcr_ext.replace(pos, std::string("ms2.msalign").size(), "ptcr.msalign");
+    } else {
+      ptcr_ext = "ptcr.msalign";
+    }
+    std::string ptcr_msalign = output_base_name + "_" + ptcr_ext;
+    std::string ptcr_tsv =
+        ptcr_msalign.substr(0, ptcr_msalign.size() - std::string(".msalign").size()) +
+        ".tsv";
+    ptcr_ms2_deconv::write(ptcr_buffer_ptr->specs, ptcr_msalign, ptcr_tsv,
+                           topfd_para_ptr_->getParaStr("#", "\t", ptcr_ext),
+                           topfd_para_ptr_->isOutputAvgMass());
+    std::cout << std::endl
+              << "PTCR spectra: " << ptcr_buffer_ptr->specs.size()
+              << " (written to " << ptcr_msalign << ")";
+  }
   std::cout << std::endl;
 }
 

@@ -223,6 +223,11 @@ bool Argument::parse(int argc, char* argv[]) {
         "keep,k",
         "Report monoisotopic masses extracted from low quality isotopic "
         "envelopes.")(
+        "ptcr",
+        "Treat every MS/MS spectrum as a PTCR spectrum (proton transfer charge "
+        "reduction of the isolated ions without dissociation), also when the "
+        "file gives no proton transfer term: its species are deconvoluted "
+        "and written to <base>_ptcr.msalign and <base>_ptcr.tsv.")(
         "output-batmass-feature,O",
         "Output a feature file in the BatMass CSV format.")(
         "spectrum-file-name",
@@ -274,6 +279,11 @@ bool Argument::parse(int argc, char* argv[]) {
 
     if (vm.count("activation")) {
       topfd_para_ptr_->setActivation(activation);
+    }
+    if (vm.count("ptcr")) {
+      // the readers mark every MS/MS spectrum PTCR (PwMsReader)
+      topfd_para_ptr_->setPtcrForced(true);
+      topfd_para_ptr_->setActivation("PTCR");
     }
 
     if (vm.count("max-charge")) {
@@ -561,9 +571,10 @@ bool Argument::validateArguments() {
 
   // validate activation method
   std::string activation = topfd_para_ptr_->getActivation();
-  if (activation != "FILE" && activation != "CID" && activation != "ETD" &&
-      activation != "ETCID" && activation != "ETHCD" && activation != "MPD" &&
-      activation != "HCD" && activation != "UVPD") {
+  bool ptcr = activation == "PTCR" && topfd_para_ptr_->isPtcrForced();
+  if (!ptcr && activation != "FILE" && activation != "CID" &&
+      activation != "ETD" && activation != "ETCID" && activation != "ETHCD" &&
+      activation != "MPD" && activation != "HCD" && activation != "UVPD") {
     // throw InvalidActivation();
     LOG_ERROR(
         "Activation method should be one out of "

@@ -28,6 +28,7 @@
 #include <vector>
 
 #include "common/base/activation_base.hpp"
+#include "common/base/ion_type_base.hpp"
 #include "common/util/logger.hpp"
 #include "common/util/str_util.hpp"
 #include "pwiz/data/common/ParamTypes.hpp"
@@ -37,6 +38,11 @@
 namespace toppic {
 
 namespace {
+
+const std::string& getPtcrName() {
+  static const std::string name = "PTCR";
+  return name;
+}
 
 // The activation of an MS/MS spectrum from the activation cvParams of its
 // precursor, or "" when it has no known one. The set of terms decides, not
@@ -51,6 +57,11 @@ namespace {
 //   CID is ETHCD.
 // - Otherwise ETD, HCD (beam-type CID, a kind of CID), CID, then MPD
 //   (MS:1000435).
+// - Proton transfer charge reduction (MS:1003249) or proton transfer
+//   reaction (MS:1003248) without any of the dissociation terms: PTCR, a
+//   PTCR spectrum of the isolated ions (TopFD only, see
+//   getPtcrActivationPtr). With a dissociation term the name is the
+//   dissociation's.
 std::string getActivationName(const std::vector<pwiz::data::CVParam>& cv_list) {
   bool cid = false;
   bool hcd = false;
@@ -60,6 +71,7 @@ std::string getActivationName(const std::vector<pwiz::data::CVParam>& cv_list) {
   bool supp_hcd = false;
   bool ethcd = false;
   bool etcid = false;
+  bool ptcr = false;
   for (size_t i = 0; i < cv_list.size(); i++) {
     LOG_DEBUG("cv list " << i << " " << cv_list[i].cvid << " "
                          << cv_list[i].value);
@@ -76,6 +88,8 @@ std::string getActivationName(const std::vector<pwiz::data::CVParam>& cv_list) {
             pwiz::cv::MS_supplemental_beam_type_collision_induced_dissociation;
     ethcd = ethcd || cvid == pwiz::cv::MS_EThcD;
     etcid = etcid || cvid == pwiz::cv::MS_ETciD;
+    ptcr = ptcr || cvid == pwiz::cv::MS_proton_transfer_charge_reduction ||
+           cvid == pwiz::cv::MS_proton_transfer_reaction;
   }
   if (ethcd || (etd && (hcd || supp_hcd))) {
     return "ETHCD";
@@ -95,7 +109,20 @@ std::string getActivationName(const std::vector<pwiz::data::CVParam>& cv_list) {
   if (mpd) {
     return "MPD";
   }
+  if (ptcr) {
+    return getPtcrName();
+  }
   return "";
+}
+
+// The activation of PTCR spectra. It is not in activation_base.xml: a PTCR
+// spectrum has no fragments, TopFD writes it to its own msalign file and no
+// search reads it. The ion types are placeholders.
+ActivationPtr getPtcrActivationPtr() {
+  static const ActivationPtr ptcr_ptr = std::make_shared<Activation>(
+      getPtcrName(), IonTypeBase::getIonTypePtrByName("B"),
+      IonTypeBase::getIonTypePtrByName("Y"));
+  return ptcr_ptr;
 }
 
 }  // namespace
@@ -262,6 +289,22 @@ void PwMsReader::parsePrecursor(const MsHeaderPtr& header_ptr,
   header_ptr->setPrecTargetMz(prec_target_mz);
   header_ptr->setPrecWinBegin(prec_target_mz - isolation_lower_offset);
   header_ptr->setPrecWinEnd(prec_target_mz + isolation_upper_offset);
+  // the selected ion as the file gives it (used for PTCR spectra)
+  if (cur_spec_ptr->precursors.size() > 0 &&
+      !cur_spec_ptr->precursors[0].selectedIons.empty()) {
+    const pwiz::msdata::SelectedIon& ion =
+        cur_spec_ptr->precursors[0].selectedIons[0];
+    for (const pwiz::data::CVParam& cv : ion.cvParams) {
+      if (cv.value.empty()) {
+        continue;
+      }
+      if (cv.cvid == pwiz::cv::MS_selected_ion_m_z) {
+        header_ptr->setSelectedMz(std::stod(cv.value));
+      } else if (cv.cvid == pwiz::cv::MS_charge_state) {
+        header_ptr->setSelectedCharge(std::stoi(cv.value));
+      }
+    }
+  }
   double prec_scan_num = -1;
   if (spec_info.precursors.size() > 0) {
     // get precursor scan ID from mzML
@@ -293,6 +336,12 @@ void PwMsReader::parseActivation(const MsHeaderPtr& header_ptr,
     exit(EXIT_FAILURE);
   }
   LOG_DEBUG("ac name " << ac_name);
+  if (ac_name == getPtcrName()) {
+    // a PTCR spectrum, from the file's terms or topfd --ptcr
+    header_ptr->setPtcr(true);
+    header_ptr->setActivationPtr(getPtcrActivationPtr());
+    return;
+  }
   ActivationPtr activation_ptr =
       ActivationBase::getActivationPtrByName(ac_name);
   header_ptr->setActivationPtr(activation_ptr);

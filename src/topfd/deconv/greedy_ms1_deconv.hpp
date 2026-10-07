@@ -16,6 +16,7 @@
 #ifndef TOPPIC_TOPFD_DECONV_GREEDY_MS1_DECONV_HPP_
 #define TOPPIC_TOPFD_DECONV_GREEDY_MS1_DECONV_HPP_
 
+#include <functional>
 #include <string>
 #include <vector>
 
@@ -77,6 +78,26 @@ MatchEnvPtrVec deconv(const PeakPtrVec& peak_list,
 // Whether main's precursor-window step runs before the greedy search
 // (research switch prec_win of TOPFD_GREEDY_PARA)
 bool isPrecWinFirst();
+
+// The charges a mass may have in the search: bound(mono_mass, charge) false
+// excludes the charge for that mass (its seeds, its charge series and its
+// isotope offsets alike). An empty bound allows every charge.
+using ChargeBound = std::function<bool(double mono_mass, int charge)>;
+
+// The search of deconv with a charge bound, for PTCR spectra
+// (ptcr_ms2_deconv): sn_ratio is the signal-to-noise ratio of the seed
+// threshold (deconv uses the MS1 one). Returns the masses found, in the
+// order found, each as its envelopes at its charges (all at one
+// monoisotopic mass), matched to peak_list, with the intensities shared
+// between envelopes assigned and the EnvCNN scores; envelopes below
+// min_envcnn are dropped and a mass without envelopes left is not returned.
+// No precursor-window step.
+std::vector<MatchEnvPtrVec> deconvSeries(const PeakPtrVec& peak_list,
+                                         const TopfdParaPtr& topfd_para_ptr,
+                                         double sn_ratio,
+                                         const ChargeBound& bound,
+                                         double min_envcnn,
+                                         const std::string& debug_name = "");
 
 }  // namespace greedy_ms1_deconv
 
