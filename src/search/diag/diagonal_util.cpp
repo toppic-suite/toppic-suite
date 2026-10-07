@@ -157,17 +157,19 @@ double refinePrecursorAndHeaderShift(const ProteoformPtr& proteo_ptr,
       counts[idx]++;
     }
   }
-  /* get median position */
-  int median = matched_pair_ptrs.size() / 2;
+  // The bin of the median pair, index (size - 1) / 2 of the sorted
+  // differences (the lower one of an even number). The bin where the
+  // count first reached size / 2 was one pair below the median for an odd
+  // number of pairs (the smallest difference of three).
+  int median = (static_cast<int>(matched_pair_ptrs.size()) - 1) / 2;
   int sum = 0;
   int best_pos = one_side_step_num;
   for (size_t i = 0; i < counts.size(); i++) {
-    int next_sum = sum + counts[i];
-    if (sum <= median && median <= next_sum) {
+    sum += counts[i];
+    if (sum > median) {
       best_pos = i;
       break;
     }
-    sum = next_sum;
   }
 
   double best_delta = -(best_pos - one_side_step_num) * refine_prec_step_width;
