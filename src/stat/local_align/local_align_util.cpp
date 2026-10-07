@@ -192,8 +192,11 @@ bool massMatch(double mass, double shift_mass, double err_tole,
 }
 
 // The site scores cut to the reported range (local_util::scrFilter with
-// the threshold); when no site reaches the threshold, the range of all the
-// sites with a positive score and the sum of their scores.
+// the threshold: the contiguous sites above it around the best site, the
+// sum of their scores as the confidence); when no site reaches the
+// threshold, the range of all the sites with a positive score, with the
+// best site's score as the confidence (their sum would be 1.0 whatever
+// the spread)
 std::vector<double> filterScores(const std::vector<double>& scr_vec,
                                  double threshold, int& bgn, int& end,
                                  double& conf) {
@@ -207,7 +210,7 @@ std::vector<double> filterScores(const std::vector<double>& scr_vec,
     if (scr_vec[i] > 0) {
       if (bgn < 0) bgn = i;
       end = i;
-      conf += scr_vec[i];
+      conf = std::max(conf, scr_vec[i]);
     }
   }
   return std::vector<double>(scr_vec.begin() + bgn, scr_vec.begin() + end + 1);

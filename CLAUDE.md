@@ -2244,8 +2244,14 @@ main's. What the alternative does, and how it differs from `stat/local`:
   passes the MIScore threshold `-H`, and (two shifts) when the localized
   PTMs overlap the original shifts; `LocalAlignProcessor` applies none of
   these. When no site reaches `-H`, the PTM is reported on the range from
-  the first to the last site with a positive score, their sum as the
-  confidence (`local_align_util::filterScores`).
+  the first to the last site with a positive score, with the **best
+  site's score** as the confidence (`local_align_util::filterScores`;
+  `LocalAnno::getConf`, the `<confidence>` of the PrSM XML). Above the
+  threshold the confidence is `scrFilter`'s, the sum of the scores of the
+  reported range; the sum over the fallback range would be 1.0 whatever
+  the spread, so it was replaced by the best site's score in experiment
+  140's amendment 1 (a Methyl over 18 K/R of H2B at 5.5% each: 0.055, not
+  1.0). The per-site scores are in the MIScore column either way.
 - **The proteoform is not truncated or extended**: `stat/local` also
   scores the candidate forms of `local_proteoform::getAllCandidateForms`
   (N- and C-terminal truncations by up to 5 residues, the N-terminal
