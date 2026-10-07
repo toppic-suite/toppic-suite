@@ -796,8 +796,12 @@ molecule that was fragmented. Facts to keep straight:
 
 ## PTCR spectra (`topfd/deconv/ptcr_ms2_deconv`)
 
-Branch `ptcr_ms2_deconv` (toppic_test experiment 136, report 0136). A PTCR
-spectrum is an MS/MS spectrum of proton transfer charge reduction of the
+Branch `ptcr_ms2_deconv` (toppic_test experiment 136, report 0136; merged
+into main on 2026-10-07 as 5f19b7cb: with the branch's float EnvCNN / ECScore
+models the merged topfd writes the branch's PTCR, fragment PTCR and LC-MS
+outputs, and main's quantized models change only EnvCNN scores there, no
+mass line; 480_F3_02 within the variation of two runs of main faa8e9c3;
+report 0136 section 9). A PTCR spectrum is an MS/MS spectrum of proton transfer charge reduction of the
 isolated ions without dissociation: no fragments, only the isolated intact
 species at lower charges. Facts to keep straight:
 
