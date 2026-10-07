@@ -40,8 +40,10 @@ namespace diagonal_util {
 // most dependent ions within the fragment tolerance: of the best delta
 // intervals the one closest to 0, in it the median error of its ions; 0 when
 // no ion matches. The last diagonal's N-terminal shift and the other
-// diagonals' C-terminal shifts are moved by the delta. Returns the refined
-// precursor mass.
+// diagonals' C-terminal shifts are moved by the delta. A single diagonal
+// (only TopMG's graph alignment passes one: an alignment without shifts) is
+// anchored at its N-terminus: its C-terminal ions are the dependent ions and
+// its C-terminal shift is moved. Returns the refined precursor mass.
 double refinePrecursorByMatchedIons(const ProteoformPtr& proteo_ptr,
                                     const ExtendMsPtrVec& ms_three_ptr_vec,
                                     DiagHeaderPtrVec& header_ptrs,

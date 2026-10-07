@@ -75,7 +75,9 @@ struct DepIonPair {
 // the precursor-dependent ions of the headers (the C-terminal ions of every
 // diagonal but the last and the N-terminal ions of the last: the ions whose
 // theoretical masses move with the precursor mass) paired with the peaks of
-// each spectrum. ion_num gets the number of dependent ions.
+// each spectrum. A single diagonal (TopMG's graph alignment without shifts)
+// is anchored at its N-terminus, so its C-terminal ions are the dependent
+// ones. ion_num gets the number of dependent ions.
 std::vector<DepIonPair> getDepIonPairs(const ProteoformPtr& proteo_ptr,
                                        const ExtendMsPtrVec& ms_three_ptr_vec,
                                        const DiagHeaderPtrVec& header_ptrs,
@@ -85,6 +87,9 @@ std::vector<DepIonPair> getDepIonPairs(const ProteoformPtr& proteo_ptr,
   ion_num = 0;
   int first_res_pos = header_ptrs[0]->getTruncFirstResPos();
   size_t last = header_ptrs.size() - 1;
+  // the diagonal whose N-terminal ions are the dependent ones; none when
+  // there is one diagonal
+  size_t n_term_idx = last > 0 ? last : header_ptrs.size();
   for (size_t j = 0; j < ms_three_ptr_vec.size(); j++) {
     const ExtendMsPtr& ms_ptr = ms_three_ptr_vec[j];
     std::vector<double> ms_masses = extend_ms_util::getExtendMassVec(ms_ptr);
@@ -100,7 +105,7 @@ std::vector<DepIonPair> getDepIonPairs(const ProteoformPtr& proteo_ptr,
       int end = header_ptrs[i]->getMatchLastBpPos() - first_res_pos;
       for (size_t t = 0; t < theo_peak_ptrs.size(); t++) {
         const IonPtr& ion_ptr = theo_peak_ptrs[t]->getIonPtr();
-        if (ion_ptr->getIonTypePtr()->isNTerm() != (i == last) ||
+        if (ion_ptr->getIonTypePtr()->isNTerm() != (i == n_term_idx) ||
             ion_ptr->getPos() < bgn || ion_ptr->getPos() > end) {
           continue;
         }
@@ -230,6 +235,10 @@ double refinePrecursorByMatchedIons(const ProteoformPtr& proteo_ptr,
     delta = std::min(std::max(median, lo), hi);
   }
 
+  if (header_ptrs.size() == 1) {
+    header_ptrs[0]->changeOnlyCTermShift(delta);
+    return prec_mass + delta;
+  }
   for (size_t i = 0; i < header_ptrs.size() - 1; i++) {
     header_ptrs[i]->changeOnlyCTermShift(delta);
   }
