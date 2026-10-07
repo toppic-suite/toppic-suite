@@ -37,8 +37,9 @@ struct Para {
   ModPtrVec mod_list_N;
   ModPtrVec mod_list_C;
   ModPtrVec mod_list_any;
-  // a PTM mass may match the shift at one isotope mass away
-  bool iso = true;
+  // a PTM mass may match the shift at one isotope mass away (off: a 1 Da
+  // precursor error is not turned into a PTM; toppic_test experiment 140)
+  bool iso = false;
   // the explanations have at most this many PTMs (1 or 2)
   int max_ptm = 2;
   // two-shift PrSMs are split and explained piece by piece

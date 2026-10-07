@@ -2229,8 +2229,11 @@ main's. What the alternative does, and how it differs from `stat/local`:
   the explanations are the single PTMs X of the `-B` file with
   |mass(X) - m| < e and a modifiable site, and the unordered pairs {X, Y}
   (X = Y allowed) with |mass(X) + mass(Y) - m| < e and two sites in one of
-  the two orders; a match one isotope mass away counts too (switch `iso`,
-  as `local_util::getPtmPtrVecByMass`). The shift is replaced only when
+  the two orders. Unlike `local_util::getPtmPtrVecByMass`, a match one
+  isotope mass away does **not** count by default (switch `iso`, 0 since
+  experiment 140's amendment 1: with it on, a +12.98 Da shift of a PrSM
+  with a +1.00 Da second shift became a Methyl at -1 Da, i.e. a 1 Da
+  precursor error turned into a PTM). The shift is replaced only when
   there is **exactly one** explanation; with none or several it stays
   (logged "none" / "ambiguous"). Dimethyl is never chosen when Methyl is
   listed too (Dimethyl vs Methyl+Methyl), nor Acetyl when Trimethyl is
@@ -2292,7 +2295,8 @@ main's. What the alternative does, and how it differs from `stat/local`:
   does. A one-shift PrSM whose shift is within [-1, 1] Da + e is left
   alone (`stat/local`'s rule).
 - **Research aids.** `TOPPIC_LOCAL_ALIGN_PARA` ("name=value,..."): `iso`
-  (1), `max_ptm` (2; 1 = single PTMs only), `split` (1).
+  (0; 1 = the isotope match of `stat/local`), `max_ptm` (2; 1 = single
+  PTMs only), `split` (1).
   `TOPPIC_LOCAL_ALIGN_LOG=<file>`: one tab-separated line per shift
   handled (spectrum id, PrSM id, protein, shift index and mass, piece with
   the break site and the matched sites of the range, the explanations,
