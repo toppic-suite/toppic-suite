@@ -2257,13 +2257,17 @@ main's. What the alternative does, and how it differs from `stat/local`:
   truncations by up to 5 residues, the N-terminal acetylation forms) and
   takes the best; `local_align` first explains the shift value of the
   proteoform as it is. When that gives no explanation and the shift has
-  at most `term_max_matched` (2) matched cleavage sites on its N-terminal
-  (C-terminal) side (`compMatchedSites` of the original proteoform), the
-  candidate proteoforms whose start (end) is moved by up to `term_range`
-  (5) residues are tried (`LocalAlignProcessor::processTerminal`, the
-  forms of `local_proteoform::getCandidateForm`, so a new start of 0 or 1
-  brings the N-terminal acetylation variants; the shift's residues and the
-  piece stay inside): each candidate's unexplained mass is the adjusted
+  at most `term_max_matched` (3; 2 until amendment 4) matched cleavage
+  sites on its N-terminal (C-terminal) side (`compMatchedSites` of the
+  original proteoform), the candidate proteoforms whose start (end) is
+  moved by up to `term_range` (5) residues are tried
+  (`LocalAlignProcessor::processTerminal`, the forms of
+  `local_proteoform::getCandidateForm`, so a new start of 0 or 1 brings
+  the N-terminal acetylation variants; the shift's residues and the piece
+  stay inside), and on the N-terminal side also the other N-terminal forms
+  of the **unmoved** start (the acetylation dropped, or added: main's
+  candidates include them, and -26.9 Da + 42.01 is an Oxidation; amendment
+  4): each candidate's unexplained mass is the adjusted
   precursor mass minus the candidate's mass, and the one-explanation rule
   counts over all (candidate, explanation) pairs ("term_localized",
   "term_none", "term_ambiguous" in the log, the explanations tagged
@@ -2323,7 +2327,8 @@ main's. What the alternative does, and how it differs from `stat/local`:
   alone (`stat/local`'s rule).
 - **Research aids.** `TOPPIC_LOCAL_ALIGN_PARA` ("name=value,..."): `iso`
   (0; 1 = the isotope match of `stat/local`), `max_ptm` (2; 1 = single
-  PTMs only), `split` (1).
+  PTMs only), `split` (1), `term` (1), `term_range` (5),
+  `term_max_matched` (3).
   `TOPPIC_LOCAL_ALIGN_LOG=<file>`: one tab-separated line per shift
   handled (spectrum id, PrSM id, protein, shift index and mass, piece with
   the break site and the matched sites of the range, the explanations,

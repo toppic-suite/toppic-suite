@@ -242,8 +242,11 @@ LocalAlignProcessor::PieceResult LocalAlignProcessor::processTerminal(
   };
   std::vector<Cand> cands;
   std::string names;
+  std::string ori_prot_mod = form_ptr->getProtModPtr()->getType();
   for (int d = -para_.term_range; d <= para_.term_range; d++) {
-    if (d == 0) continue;
+    // the unmoved end is the standard attempt; the unmoved start is tried
+    // with its other N-terminal forms (the acetylation dropped or added)
+    if (d == 0 && !n_side) continue;
     int new_start = start;
     int new_end = end;
     if (n_side) {
@@ -263,6 +266,9 @@ LocalAlignProcessor::PieceResult LocalAlignProcessor::processTerminal(
     ProteoformPtrVec forms = local_proteoform::getCandidateForm(
         form_ptr->getFastaSeqPtr(), start, new_start, new_end, kept, mng_ptr_);
     for (size_t f = 0; f < forms.size(); f++) {
+      if (d == 0 && forms[f]->getProtModPtr()->getType() == ori_prot_mod) {
+        continue;
+      }
       int cand_len = forms[f]->getLen();
       int pb = n_side ? 0 : piece_bgn;
       int pe = n_side ? piece_end - d : cand_len;
@@ -420,15 +426,19 @@ PrsmPtr LocalAlignProcessor::processOnePrsm(const PrsmPtr& prsm_ptr) {
   if (explained.empty()) return prsm_ptr;
 
   // the result proteoform: the original one, or the one with the moved
-  // start / end of the terminal candidates
+  // start / end (or the other N-terminal form) of the terminal candidates
   int final_start = start;
   int final_end = end;
   ProtModPtr n_prot_mod = form_ptr->getProtModPtr();
+  bool n_changed = false;
   for (size_t k = 0; k < results.size(); k++) {
     if (results[k].cand_form == nullptr) continue;
-    if (results[k].cand_form->getStartPos() != start) {
+    if (results[k].cand_form->getStartPos() != start ||
+        results[k].cand_form->getProtModPtr()->getType() !=
+            n_prot_mod->getType()) {
       final_start = results[k].cand_form->getStartPos();
       n_prot_mod = results[k].cand_form->getProtModPtr();
+      n_changed = true;
     }
     if (results[k].cand_form->getEndPos() != end) {
       final_end = results[k].cand_form->getEndPos();
@@ -436,7 +446,7 @@ PrsmPtr LocalAlignProcessor::processOnePrsm(const PrsmPtr& prsm_ptr) {
   }
   ProteoformPtr base_ptr;
   MassShiftPtrVec all_shifts;
-  if (final_start == start && final_end == end) {
+  if (!n_changed && final_end == end) {
     base_ptr = form_ptr;
     const MassShiftPtrVec& ori_shifts = form_ptr->getMassShiftPtrVec();
     for (size_t k = 0; k < ori_shifts.size(); k++) {

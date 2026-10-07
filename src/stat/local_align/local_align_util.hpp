@@ -46,10 +46,12 @@ struct Para {
   bool split = true;
   // a shift without an explanation that has at most term_max_matched
   // matched cleavage sites on its N-terminal (C-terminal) side is tried on
-  // the proteoforms whose start (end) is moved by up to term_range residues
+  // the proteoforms whose start (end) is moved by up to term_range residues,
+  // and on the N-terminal side also on the other N-terminal forms of the
+  // unmoved start (the N-terminal acetylation dropped or added)
   bool term = true;
   int term_range = 5;
-  int term_max_matched = 2;
+  int term_max_matched = 3;
 };
 
 // A shift of a piece: its cleavage-site range [left, right) in the piece's

@@ -64,9 +64,11 @@ class LocalAlignProcessor {
                            const std::string& piece_name, int shift_idx);
 
   // The shift explained on the candidate proteoforms whose start (n_side)
-  // or end is moved by up to term_range residues: the one-explanation rule
-  // over all candidates. piece_bgn / piece_end are the piece's bounds in
-  // the original proteoform, kept_shifts its shifts other than the one
+  // or end is moved by up to term_range residues, and on the N-terminal
+  // side also on the other N-terminal forms of the unmoved start (the
+  // acetylation dropped or added): the one-explanation rule over all
+  // candidates. piece_bgn / piece_end are the piece's bounds in the
+  // original proteoform, kept_shifts its shifts other than the one
   // explained (and the protein N-terminal ones).
   PieceResult processTerminal(const PrsmPtr& prsm_ptr,
                               const MassShiftPtr& shift_ptr, bool n_side,
