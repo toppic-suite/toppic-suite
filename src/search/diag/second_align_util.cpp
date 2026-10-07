@@ -17,6 +17,7 @@
 
 #include <cstdlib>
 #include <fstream>
+#include <limits>
 #include <mutex>
 #include <sstream>
 
@@ -38,7 +39,7 @@ PrsmPtr genePrsm(const ProteoformPtr& proteo_ptr,
                  DeconvMsPtrVec& deconv_ms_ptr_vec,
                  const ExtendMsPtrVec& ms_three_ptr_vec,
                  const PrsmParaPtr& prsm_para_ptr, double& refine_prec_mass,
-                 ExtendMsPtrVec& refine_ms_ptr_vec) {
+                 ExtendMsPtrVec& refine_ms_ptr_vec, double clamp_prec_mass) {
   int first_pos = header_ptrs[0]->getTruncFirstResPos();
   int last_pos = header_ptrs[header_ptrs.size() - 1]->getTruncLastResPos();
   ProteoformPtr sub_proteo_ptr = proteoform_factory::geneSubProteoform(
@@ -50,8 +51,20 @@ PrsmPtr genePrsm(const ProteoformPtr& proteo_ptr,
 
   // the refinement moves the headers' shifts
   DiagHeaderPtrVec headers = header_ptrs;
+  double delta_min = -std::numeric_limits<double>::infinity();
+  double delta_max = std::numeric_limits<double>::infinity();
+  if (clamp_prec_mass > 0) {
+    // the delta that keeps the refined precursor within the tolerance of
+    // the observed one
+    double prec_mass =
+        ms_three_ptr_vec[0]->getMsHeaderPtr()->getFirstPrecMonoMass();
+    double tole = prec_tole_ptr->compPrecErrorTole(clamp_prec_mass);
+    delta_min = clamp_prec_mass - tole - prec_mass;
+    delta_max = clamp_prec_mass + tole - prec_mass;
+  }
   refine_prec_mass = diagonal_util::refinePrecursorByMatchedIons(
-      proteo_ptr, ms_three_ptr_vec, headers, prec_tole_ptr, min_mass);
+      proteo_ptr, ms_three_ptr_vec, headers, prec_tole_ptr, min_mass,
+      delta_min, delta_max);
 
   refine_ms_ptr_vec = extend_ms_factory::geneMsThreePtrVec(
       deconv_ms_ptr_vec, sp_para_ptr, refine_prec_mass);

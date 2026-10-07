@@ -249,17 +249,19 @@ double distToZero(double lo, double hi) {
 
 }  // namespace
 
-double refinePrecursorByMatchedIons(const ProteoformPtr& proteo_ptr,
-                                    const ExtendMsPtrVec& ms_three_ptr_vec,
-                                    DiagHeaderPtrVec& header_ptrs,
-                                    const PeakTolerancePtr& prec_tole_ptr,
-                                    double min_mass) {
+double refinePrecursorByMatchedIons(
+    const ProteoformPtr& proteo_ptr, const ExtendMsPtrVec& ms_three_ptr_vec,
+    DiagHeaderPtrVec& header_ptrs, const PeakTolerancePtr& prec_tole_ptr,
+    double min_mass, double delta_min, double delta_max) {
   double prec_mass =
       ms_three_ptr_vec[0]->getMsHeaderPtr()->getFirstPrecMonoMass();
   if (header_ptrs.size() == 0) {
     return prec_mass;
   }
   double tole = prec_tole_ptr->compPrecErrorTole(prec_mass);
+  // the delta range [-tole, tole], cut to [delta_min, delta_max]
+  double range_lo = std::max(-tole, delta_min);
+  double range_hi = std::min(tole, delta_max);
   int ion_num = 0;
   std::vector<DepIonPair> pairs = getDepIonPairs(
       proteo_ptr, ms_three_ptr_vec, header_ptrs, tole, min_mass, ion_num);
@@ -275,8 +277,8 @@ double refinePrecursorByMatchedIons(const ProteoformPtr& proteo_ptr,
   };
   std::vector<Event> events;
   for (size_t p = 0; p < pairs.size(); p++) {
-    double lo = std::max(-pairs[p].diff - pairs[p].frag_tole, -tole);
-    double hi = std::min(-pairs[p].diff + pairs[p].frag_tole, tole);
+    double lo = std::max(-pairs[p].diff - pairs[p].frag_tole, range_lo);
+    double hi = std::min(-pairs[p].diff + pairs[p].frag_tole, range_hi);
     if (lo <= hi) {
       events.push_back(Event{lo, 0, pairs[p].ion_id});
       events.push_back(Event{hi, 1, pairs[p].ion_id});
@@ -327,8 +329,8 @@ double refinePrecursorByMatchedIons(const ProteoformPtr& proteo_ptr,
         b = static_cast<int>(p);
       }
     }
-    double lo = -tole;
-    double hi = tole;
+    double lo = range_lo;
+    double hi = range_hi;
     std::vector<double> errors;
     for (int i = 0; i < ion_num; i++) {
       if (best_pair[i] >= 0) {

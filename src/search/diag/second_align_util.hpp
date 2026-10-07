@@ -50,12 +50,16 @@ namespace second_align_util {
 // refined precursor, the headers' ranges refined, the PrSM. refine_prec_mass
 // and refine_ms_ptr_vec receive the refined precursor and the extended
 // spectra at it; nullptr when the range refinement leaves no header.
+// With clamp_prec_mass > 0 (the observed precursor mass, for the second
+// pass with PrsmPara::useSecondAlignClamp) the refined precursor is kept
+// within the precursor tolerance of that mass.
 PrsmPtr genePrsm(const ProteoformPtr& proteo_ptr,
                  const DiagHeaderPtrVec& header_ptrs,
                  DeconvMsPtrVec& deconv_ms_ptr_vec,
                  const ExtendMsPtrVec& ms_three_ptr_vec,
                  const PrsmParaPtr& prsm_para_ptr, double& refine_prec_mass,
-                 ExtendMsPtrVec& refine_ms_ptr_vec);
+                 ExtendMsPtrVec& refine_ms_ptr_vec,
+                 double clamp_prec_mass = 0);
 
 // The PRM peaks of the spectra at the refined precursor mass (label-free),
 // with the zero and precursor peaks, as prm_ms_util::getPrmPeakPtrs builds

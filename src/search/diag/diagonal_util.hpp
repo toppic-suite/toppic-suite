@@ -16,6 +16,8 @@
 #ifndef TOPPIC_SEARCH_DIAG_DIAGONAL_UTIL_HPP_
 #define TOPPIC_SEARCH_DIAG_DIAGONAL_UTIL_HPP_
 
+#include <limits>
+
 #include "ms/spec/extend_ms.hpp"
 #include "para/peak_tolerance.hpp"
 #include "prsm/peak_ion_pair.hpp"
@@ -48,11 +50,15 @@ double refinePrecursorAndHeaderShift(const ProteoformPtr& proteo_ptr,
 // the best delta interval the one closest to 0, in it the median error of
 // its ions; 0 when no ion matches. The headers' shifts are moved as in
 // refinePrecursorAndHeaderShift. Returns the refined precursor mass.
-double refinePrecursorByMatchedIons(const ProteoformPtr& proteo_ptr,
-                                    const ExtendMsPtrVec& ms_three_ptr_vec,
-                                    DiagHeaderPtrVec& header_ptrs,
-                                    const PeakTolerancePtr& prec_tole_ptr,
-                                    double min_mass);
+// With delta_min / delta_max the delta range is [-T, T] cut to them (the
+// second alignment's refinement clamped to the observed precursor's
+// window, search/diag/second_align_util).
+double refinePrecursorByMatchedIons(
+    const ProteoformPtr& proteo_ptr, const ExtendMsPtrVec& ms_three_ptr_vec,
+    DiagHeaderPtrVec& header_ptrs, const PeakTolerancePtr& prec_tole_ptr,
+    double min_mass,
+    double delta_min = -std::numeric_limits<double>::infinity(),
+    double delta_max = std::numeric_limits<double>::infinity());
 
 // The precursor refinement of the variable PTM search. Once the alignment
 // has chosen the variable PTMs, the proteoform mass is exact: the refined

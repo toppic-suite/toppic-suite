@@ -79,6 +79,10 @@ class PrsmPara {
   // first alignment's tolerances).
   const std::string& getSecondAlignMode() const { return second_align_mode_; }
   bool useSecondAlign() const { return second_align_mode_ != "disabled"; }
+  // --second-align-clamp: the second pass's refined precursor is kept within
+  // the precursor tolerance of the observed precursor (without it the
+  // refinement at the first pass's precursor can end up to 2T from it)
+  bool useSecondAlignClamp() const { return second_align_clamp_; }
 
   // The number of unexpected mass shifts of TopMG's proteoform-graph
   // alignment, separate from toppic's --num-shift, which governs toppic's own
@@ -113,6 +117,7 @@ class PrsmPara {
 
   bool use_multi_type_align_ = true;
   std::string second_align_mode_ = "disabled";
+  bool second_align_clamp_ = false;
 
   int topmg_shift_num_ = 1;
 };

@@ -142,6 +142,7 @@ PrsmPara::PrsmPara(const std::map<std::string, std::string>& arguments) {
   if (getArg(arguments, "secondAlign") != "") {
     second_align_mode_ = getArg(arguments, "secondAlign");
   }
+  second_align_clamp_ = (getArg(arguments, "secondAlignClamp") == "true");
 
   // the unexpected shifts of the proteoform-graph alignment: TopMG's own
   // number, not the shiftNumber of toppic's stages; an absent key keeps 1

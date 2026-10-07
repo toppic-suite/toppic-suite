@@ -409,6 +409,8 @@ PrsmPtr PsAlignMultiType::geneResult(const ProteoformTypePtr& type_ptr,
 
   // the second alignment at the refined precursor, shared by the types
   // whose first results refine the precursor to the same mass
+  double prec_mass =
+      ms_three_ptr_vec[0]->getMsHeaderPtr()->getFirstPrecMonoMass();
   std::shared_ptr<PsAlignMultiType> second_align_ptr;
   for (size_t i = 0; i < second_align_ptrs_.size(); i++) {
     if (second_align_ptrs_[i].first == refine_prec_mass) {
@@ -419,8 +421,6 @@ PrsmPtr PsAlignMultiType::geneResult(const ProteoformTypePtr& type_ptr,
   if (second_align_ptr == nullptr) {
     SpParaPtr sp_para_ptr = prsm_para_ptr->getSpParaPtr();
     bool strict = prsm_para_ptr->getSecondAlignMode() == "strict";
-    double prec_mass =
-        ms_three_ptr_vec[0]->getMsHeaderPtr()->getFirstPrecMonoMass();
     PrmPeakPtrVec prm_peaks = second_align_util::genePrmPeaks(
         deconv_ms_ptr_vec, sp_para_ptr, refine_prec_mass, strict);
     DiagHeaderPtrVec moved_header_ptrs = second_align_util::moveHeaders(
@@ -445,7 +445,8 @@ PrsmPtr PsAlignMultiType::geneResult(const ProteoformTypePtr& type_ptr,
     ExtendMsPtrVec second_ms_ptr_vec;
     second_prsm_ptr = second_align_util::genePrsm(
         proteo_ptr, second_header_ptrs, deconv_ms_ptr_vec, refine_ms_ptr_vec,
-        prsm_para_ptr, second_prec_mass, second_ms_ptr_vec);
+        prsm_para_ptr, second_prec_mass, second_ms_ptr_vec,
+        prsm_para_ptr->useSecondAlignClamp() ? prec_mass : 0);
   }
   if (second_align_util::logEnabled()) {
     std::ostringstream out;
@@ -453,9 +454,8 @@ PrsmPtr PsAlignMultiType::geneResult(const ProteoformTypePtr& type_ptr,
     out << std::fixed;
     out << "multi\t" << deconv_ms_ptr_vec[0]->getMsHeaderPtr()->getSpecId()
         << "\t" << type_ptr->getName() << "\t" << shift_num << "\t"
-        << proteo_ptr->getSeqName() << "\t"
-        << ms_three_ptr_vec[0]->getMsHeaderPtr()->getFirstPrecMonoMass()
-        << "\t" << getAlignScr(type_ptr, shift_num) << "\t"
+        << proteo_ptr->getSeqName() << "\t" << prec_mass << "\t"
+        << getAlignScr(type_ptr, shift_num) << "\t"
         << refine_prec_mass << "\t"
         << second_align_util::prsmInfo(first_prsm_ptr) << "\t";
     if (second_header_ptrs.size() > 0) {
