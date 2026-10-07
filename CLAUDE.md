@@ -2288,19 +2288,18 @@ main's. What the alternative does, and how it differs from `stat/local`:
 - **Two PTMs for one shift**: both orders are scored with the DP of
   `LocalProcessor::compTwoPtmScr` and the better order is localized by
   the break-point method of `twoPtmLocalize` (ported, with the site pairs'
-  probabilities summed directly). The two VARIABLE shifts take the tight
-  ranges of their sites above the threshold, `[bgn_1, end_1]` and
-  `[bgn_2, end_2]`, not `local_proteoform::createProteoformPtr`'s ranges
-  extended to the break point. There the `LocalAnno` score vectors were
-  cut by `scrFilter` to the sites above the threshold while the
-  alterations' ranges run to the break point, and `Proteoform::getMIScore`
-  and the ProForma writer index a vector from the alteration's left
-  position over its whole range (past the first vector's end when
-  `end_1 < break_pos`, and misaligned for the second when
-  `bgn_2 > break_pos + 1`). Fixed in this branch (experiment 140,
-  amendment 2): `createProteoformPtr` pads the vectors with zeros to the
-  alterations' ranges, so the ranges and the printed sites are as before
-  and the reads are in bounds.
+  probabilities summed directly). The two VARIABLE shifts take the ranges
+  of their sites above the threshold, `[bgn_1, end_1]` and
+  `[bgn_2, end_2]`. `local_proteoform::createProteoformPtr` builds its
+  alterations with the break point as one end, but `Alter::setLocalAnno`
+  resets an alteration's range to its annotation's `[bgn, end + 1)`, so
+  main's ranges are the same tight ranges and match the score vectors
+  that `Proteoform::getMIScore` and the ProForma writer index from the
+  alteration's left position. Experiment 140's amendment 2 first read
+  this as a latent out-of-range read and padded the vectors to the
+  break-point ranges (4cdb0069), which emptied the MIScore of the second
+  PTM of every two-PTM PrSM (13 on 480); the padding was reverted and the
+  comment in `createProteoformPtr` states the rule.
 - **Two unexpected shifts.** `stat/local` explains the sum of the two
   shifts by one ordered pair over the whole proteoform; `local_align`
   splits the proteoform at a cleavage site b between the shifts (first
