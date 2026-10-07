@@ -10,7 +10,7 @@ TopPIC Suite on Windows with [MSYS2](https://www.msys2.org).
   MSYS2 libraries are built with GCC, and mixing compilers fails at link time
 * CMake >= 3.16 and Ninja
 * Boost >= 1.74 (filesystem, iostreams, thread, chrono, serialization,
-  program_options)
+  program_options, and nowide, which the ProteoWizard code needs on Windows)
 * pugixml, SQLite3, zlib and zstd development libraries
 * ONNX Runtime from MSYS2 (the vendored library under `ext/onnx/` is for
   Linux only)

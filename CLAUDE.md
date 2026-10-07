@@ -215,14 +215,13 @@ path and linked into `toppic_common`:
   decodes zstd-compressed arrays) with `WITHOUT_MZ5` and `WITHOUT_MZMLB` (so no
   HDF5; mz5 and mzMLb are not supported). `ms/mzml/pw_ms_reader` uses it to
   read mzML/mzXML. pwiz uses its own `minimxml` parser, **not** Xerces. It needs
-  a few Boost pieces the system package lacks (`boost/nowide`, the `boost::enums`
-  library, the singleton utility); those are vendored under `ext/boost`, which
-  `ext/` (the include root) resolves ahead of the system Boost while everything
-  else still comes from the system. The vendored nowide's `iostream.cpp` (the
-  Windows UTF-8 console streams `boost::nowide::cerr` etc. that pwiz's
-  `Stream.hpp` uses) is appended to the `pwiz` sources; it is an empty TU off
-  Windows, and it must be that copy, not the system `boost_nowide` library,
-  because the vendored headers predate Boost.Nowide. Treat `ext/pwiz` and
+  a few headers of pwiz's `boost_aux` that Boost itself does not have (the
+  `boost::enums` library, the singleton utility, `boost/nowide/system.hpp`);
+  those are vendored under `ext/boost`, and everything else, Boost.Nowide
+  included, comes from the system Boost. The nowide parts pwiz uses are
+  header-only off Windows; on Windows `pwiz` links `Boost::nowide` (the UTF-8
+  console streams `boost::nowide::cerr` etc. of pwiz's `Stream.hpp`, and the
+  file buffer), which `find_package(Boost)` requests only there. Treat `ext/pwiz` and
   `ext/boost` as third-party: do not reformat them or hold them to the
   IWYU/include-order rules.
   Their `.cpp` files are built with `-w`; the `ext/` directory is added to every

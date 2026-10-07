@@ -223,7 +223,9 @@ endif()
 # files TopPIC needs (ext/README.md): every .cpp in it is compiled. It is built
 # as a static library against Boost, zlib and zstd and linked into
 # toppic_common. The vendored sources include themselves as "pwiz/...", so ext/
-# is the include root. WITHOUT_MZ5 and WITHOUT_MZMLB drop the HDF5-backed mz5
+# is the include root; ext/boost holds the few headers of pwiz's boost_aux that
+# Boost itself does not have (boost::enums, the singleton utility,
+# nowide/system.hpp). WITHOUT_MZ5 and WITHOUT_MZMLB drop the HDF5-backed mz5
 # and mzMLb formats, so no HDF5 dependency is needed (pwiz reports an mzMLb
 # file as not supported).
 #
@@ -232,7 +234,16 @@ endif()
 # longer ships the compiled stub library or its boost_system CMake config, so
 # requesting it makes find_package fail there. Its symbols (error_code etc.,
 # used through Boost.Filesystem) come from the headers on every platform.
-find_package(Boost 1.74 REQUIRED COMPONENTS filesystem iostreams thread chrono serialization program_options)
+#
+# pwiz reads and writes through Boost.Nowide (part of Boost since 1.73). Off
+# Windows the parts it uses are header-only (they are the std streams), so
+# only Windows needs the compiled nowide library: its UTF-8 console streams
+# (boost::nowide::cerr etc.) and its file buffer.
+set(TOPPIC_BOOST_COMPONENTS filesystem iostreams thread chrono serialization program_options)
+if(WIN32)
+  list(APPEND TOPPIC_BOOST_COMPONENTS nowide)
+endif()
+find_package(Boost 1.74 REQUIRED COMPONENTS ${TOPPIC_BOOST_COMPONENTS})
 # pwiz's BinaryDataEncoder decodes zstd-compressed binary data arrays
 # (pwiz/utility/misc/mzd.hpp, since pwiz 3.0.26278), so pwiz links libzstd.
 find_path(ZSTD_INCLUDE_DIR zstd.h)
@@ -243,13 +254,6 @@ if(NOT ZSTD_INCLUDE_DIR OR NOT ZSTD_LIBRARY)
 endif()
 file(GLOB_RECURSE PWIZ_SRCS CONFIGURE_DEPENDS
   ${CMAKE_CURRENT_SOURCE_DIR}/ext/pwiz/*.cpp)
-# pwiz writes its diagnostics through boost::nowide::cerr/cout (utility/misc/
-# Stream.hpp). On Windows the vendored ext/boost/nowide headers declare those
-# as UTF-8 console streams defined in nowide's iostream.cpp, so that source is
-# compiled into pwiz as well (elsewhere it is an empty translation unit: the
-# header just aliases std::cerr etc.). It is the vendored copy, not the
-# system Boost.Nowide, because the vendored headers predate Boost's version.
-list(APPEND PWIZ_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/ext/boost/nowide/iostream.cpp)
 add_library(pwiz STATIC ${PWIZ_SRCS})
 target_include_directories(pwiz SYSTEM PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/ext)
 target_include_directories(pwiz SYSTEM PRIVATE ${ZSTD_INCLUDE_DIR})
@@ -265,8 +269,9 @@ set_target_properties(pwiz PROPERTIES POSITION_INDEPENDENT_CODE ON)
 # Third-party: silence its warnings (the -Wdeprecated noise from Boost especially).
 target_compile_options(pwiz PRIVATE -w)
 if(WIN32)
-  # random_access_compressed_ifstream.cpp uses ntohl()/htonl() from Winsock.
-  target_link_libraries(pwiz PUBLIC ws2_32)
+  # random_access_compressed_ifstream.cpp uses ntohl()/htonl() from Winsock;
+  # Boost.Nowide's console streams and file buffer are compiled code there.
+  target_link_libraries(pwiz PUBLIC Boost::nowide ws2_32)
 endif()
 
 # src for the hand-written headers, and the build-tree gen/ dir for the

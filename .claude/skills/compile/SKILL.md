@@ -41,7 +41,9 @@ make -j$(nproc)          # macOS: make -j$(sysctl -n hw.ncpu)
 - Boost >= 1.74: filesystem, iostreams, thread, chrono, serialization,
   program_options. Not `system`: Boost.System is header-only since 1.69,
   and Boost >= 1.90 (Ubuntu 26.04) ships no `boost_system` library or CMake
-  config, so listing it makes `find_package(Boost)` fail.
+  config, so listing it makes `find_package(Boost)` fail. On Windows also
+  nowide (pwiz's UTF-8 console streams and file buffer); elsewhere pwiz uses
+  Boost.Nowide header-only.
 - pugixml, SQLite3, zlib, zstd development packages.
 - Qt6 (Core, Gui, Widgets) for the `*_gui` targets only.
 - Git LFS: the EnvCNN/ECScore model files and the isotope table under
