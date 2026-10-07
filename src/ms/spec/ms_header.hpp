@@ -77,6 +77,19 @@ class MsHeader {
   // without dissociation (activation PTCR, TopFD only; ptcr_ms2_deconv)
   bool isPtcr() const { return ptcr_; }
 
+  // A fragment PTCR spectrum: the fragments of a dissociation (the header's
+  // activation), charge-reduced by proton transfer, e.g. the MS3 scan
+  // "X@cid60 Y@ptr10" (ptcr_ms2_deconv::deconvFragments)
+  bool isFragPtcr() const { return frag_ptcr_; }
+
+  // The isolation window of the proton transfer stage: the window of the
+  // precursor whose activation is the proton transfer (the second one of an
+  // MS3 scan), the precursor window when that is the only one. -1 when
+  // unknown.
+  double getPtcrWinBegin() const { return ptcr_win_begin_; }
+
+  double getPtcrWinEnd() const { return ptcr_win_end_; }
+
   // The N-terminal label mass (toppic -N) of an extended spectrum: the
   // precursor mass of its header is then the label-free one, and its
   // N-terminal fragment masses still carry the label, which the matching of
@@ -160,6 +173,13 @@ class MsHeader {
 
   void setPtcr(bool ptcr) { ptcr_ = ptcr; }
 
+  void setFragPtcr(bool frag_ptcr) { frag_ptcr_ = frag_ptcr; }
+
+  void setPtcrWin(double begin, double end) {
+    ptcr_win_begin_ = begin;
+    ptcr_win_end_ = end;
+  }
+
   void setNTermLabelMass(double n_term_label_mass) {
     n_term_label_mass_ = n_term_label_mass;
   }
@@ -220,8 +240,12 @@ class MsHeader {
   // the selected ion of the input file (getSelectedMz, getSelectedCharge)
   double selected_mz_ = -1;
   int selected_charge_ = 0;
-  // a PTCR spectrum (isPtcr)
+  // a PTCR spectrum (isPtcr), a fragment PTCR spectrum (isFragPtcr)
   bool ptcr_ = false;
+  bool frag_ptcr_ = false;
+  // the isolation window of the proton transfer stage (getPtcrWinBegin)
+  double ptcr_win_begin_ = -1;
+  double ptcr_win_end_ = -1;
   // N-terminal label mass of an extended spectrum (getNTermLabelMass)
   double n_term_label_mass_ = 0;
 

@@ -20,8 +20,12 @@
 #include <string>
 #include <vector>
 
+#include "ms/env/match_env.hpp"
+#include "ms/feature/spec_feature.hpp"
 #include "ms/mzml/mzml_ms.hpp"
+#include "ms/spec/deconv_ms.hpp"
 #include "ms/spec/ms_header.hpp"
+#include "ms/spec/precursor.hpp"
 #include "topfd/common/topfd_para.hpp"
 
 namespace toppic {
@@ -48,6 +52,25 @@ namespace toppic {
 //      otherwise the most intense species that could have been isolated at
 //      that charge; otherwise the most intense species; with none, the
 //      selected ion itself.
+// With MS1 spectra, a species matching a feature of the spectrum's precursor
+// window (10 ppm, also one isotope apart) gets the feature's id, and the
+// precursor its id and intensity.
+//
+// Fragment PTCR spectra (MsHeader::isFragPtcr: a dissociation, then proton
+// transfer charge reduction of the fragments, e.g. the MS3 scan "X@cid60
+// Y@ptr10"): every fragment appears as a charge ladder from its charge z0,
+// at which it lay in the isolation window of the proton transfer stage, and
+// no fragment has more charges or mass than its precursor. They are
+// deconvoluted as other MS/MS spectra (deconv_ms2_process::deconvMsTwo,
+// --deconv-ms2) and written to the MS/MS msalign file with the
+// dissociation's activation. The selected ion bounds the fragments
+// (getSelectedIonPrec; with MS1 features, the larger of its bounds and the
+// features'), and without MS1 features of the precursor window it is their
+// precursor. The charge-series search above, with that bound,
+// z0 <= the precursor's charge and masses below the precursor's
+// (deconvFragments; switch frag=2), matched fewer theoretical fragments of
+// AAV2 capsid proteins than the MS/MS search (toppic_test experiment 136,
+// amendment 1).
 // The research switches are in PtcrPara (cpp), set with the environment
 // variable TOPFD_PTCR_PARA ("name=value,...").
 namespace ptcr_ms2_deconv {
@@ -77,6 +100,11 @@ struct Species {
   double mass_mad_ppm = 0;
   // the precursor of the spectrum
   bool is_prec = false;
+  // the MS1 feature the species matches (-1: none) and its mass
+  int feature_id = -1;
+  double feature_mass = 0;
+  // the envelopes of the species, one per charge
+  MatchEnvPtrVec envs;
 };
 
 // A deconvoluted PTCR spectrum: its header, with the precursor set, and its
@@ -90,8 +118,48 @@ using PtcrSpecPtr = std::shared_ptr<PtcrSpec>;
 using PtcrSpecPtrVec = std::vector<PtcrSpecPtr>;
 
 // Deconvolute one PTCR spectrum (MsHeader::isPtcr). Sets the precursor of
-// the spectrum's header.
-PtcrSpecPtr deconv(const MzmlMsPtr& ms_ptr, const TopfdParaPtr& topfd_para_ptr);
+// the spectrum's header. feat_ptrs: the MS1 features of the spectrum's
+// precursor window (none without MS1 spectra).
+PtcrSpecPtr deconv(const MzmlMsPtr& ms_ptr, const TopfdParaPtr& topfd_para_ptr,
+                   const SpecFeaturePtrVec& feat_ptrs);
+
+// Deconvolute one fragment PTCR spectrum (MsHeader::isFragPtcr) with the
+// charge-series search (switch frag=2; not the default). max_mass
+// and max_charge bound the fragments (the precursors' largest mass and
+// charge); feat_ptrs are the MS1 features of the precursor window (none
+// without MS1 spectra). Sets the spectrum's precursors: the features';
+// without them the precursor species of the spectrum (the surviving
+// precursor, charge-reduced, at the selected ion's charge and m/z), else
+// the selected ion. The species are the fragments, most intense first,
+// without the masses within frag_prec_margin of the precursor mass or
+// above it.
+PtcrSpecPtr deconvFragments(const MzmlMsPtr& ms_ptr,
+                            const TopfdParaPtr& topfd_para_ptr,
+                            double max_mass, int max_charge,
+                            const SpecFeaturePtrVec& feat_ptrs);
+
+// The fragment species of a fragment PTCR spectrum as an MS/MS spectrum:
+// one mass per species (intensity, highest charge, best EnvCNN score)
+DeconvMsPtr getDeconvMs(const PtcrSpecPtr& spec_ptr);
+
+// How fragment PTCR spectra are deconvoluted (research switch frag of
+// TOPFD_PTCR_PARA): 1 (default) as other MS/MS spectra, the fragments
+// bounded by the selected ion too, which is the precursor when the precursor
+// window has no MS1 feature (getSelectedIonPrec); 0 as other MS/MS spectra
+// (-o: the precursor of -c and -m); 2 deconvFragments
+int getFragMode();
+
+// The selected ion of an MS/MS spectrum (its m/z, else the isolation
+// window's target, and its charge) as its precursor, nullptr without a
+// charge. Sets max_mass and max_charge, the bounds of its fragments: the
+// mass of the window's upper end at the selected charge, and that charge
+// (-c and -m do not cap them).
+PrecursorPtr getSelectedIonPrec(const MsHeaderPtr& header_ptr,
+                                double& max_mass, int& max_charge);
+
+// Write the species of PTCR or fragment PTCR spectra, one line per species,
+// to tsv_name
+void writeTsv(PtcrSpecPtrVec spec_ptrs, const std::string& tsv_name);
 
 // Write the PTCR spectra, sorted by spectrum id: msalign_name in the msalign
 // format (one line per species: mass, intensity, highest charge, best EnvCNN

@@ -275,11 +275,13 @@ struct WinFit {
 // One spectrum's search.
 class GreedySearch {
  public:
-  // sn_ratio: the signal-to-noise ratio of the seed threshold; bound (may be
-  // empty): the charges a mass may have (deconvSeries)
+  // sn_ratio: the signal-to-noise ratio of the seed threshold; max_mass,
+  // max_charge: the bounds of the masses and charges; bound (may be empty):
+  // the charges a mass may have (deconvSeries)
   GreedySearch(const PeakPtrVec& peak_list, const TopfdParaPtr& topfd_para_ptr,
                const EnvParaPtr& env_para_ptr, double sn_ratio,
-               ChargeBound bound, std::ostream* debug_os);
+               double max_mass, int max_charge, ChargeBound bound,
+               std::ostream* debug_os);
 
   // the charge series of the masses found, in the order they were found
   std::vector<FitVec> run();
@@ -328,13 +330,14 @@ class GreedySearch {
 GreedySearch::GreedySearch(const PeakPtrVec& peak_list,
                            const TopfdParaPtr& topfd_para_ptr,
                            const EnvParaPtr& env_para_ptr, double sn_ratio,
-                           ChargeBound bound, std::ostream* debug_os)
+                           double max_mass, int max_charge, ChargeBound bound,
+                           std::ostream* debug_os)
     : para_(getPara()),
       env_para_ptr_(env_para_ptr),
       bound_(std::move(bound)),
       debug_os_(debug_os),
-      max_charge_(topfd_para_ptr->getMaxCharge()),
-      max_mass_(topfd_para_ptr->getMaxMass()) {
+      max_charge_(max_charge),
+      max_mass_(max_mass) {
   mzs_.reserve(peak_list.size());
   intes_.reserve(peak_list.size());
   for (const PeakPtr& peak : peak_list) {
@@ -1053,7 +1056,8 @@ void addPrecWinEnvs(const PeakPtrVec& peak_list,
     if (search == nullptr) {
       search = std::make_unique<GreedySearch>(
           peak_list, topfd_para_ptr, env_para_ptr,
-          topfd_para_ptr->getMsOneSnRatio(), ChargeBound(), nullptr);
+          topfd_para_ptr->getMsOneSnRatio(), topfd_para_ptr->getMaxMass(),
+          topfd_para_ptr->getMaxCharge(), ChargeBound(), nullptr);
     }
     WinFit win_fit = search->fitWindow(win.begin, win.end);
     if (win_fit.seed < 0) {
@@ -1135,7 +1139,9 @@ MatchEnvPtrVec deconv(const PeakPtrVec& peak_list,
     debug_os = std::make_unique<std::ofstream>(debug_name);
   }
   GreedySearch search(peak_list, topfd_para_ptr, env_para_ptr,
-                      topfd_para_ptr->getMsOneSnRatio(), ChargeBound(),
+                      topfd_para_ptr->getMsOneSnRatio(),
+                      topfd_para_ptr->getMaxMass(),
+                      topfd_para_ptr->getMaxCharge(), ChargeBound(),
                       debug_os.get());
   std::vector<FitVec> masses = search.run();
 
@@ -1185,7 +1191,8 @@ MatchEnvPtrVec deconv(const PeakPtrVec& peak_list,
 
 std::vector<MatchEnvPtrVec> deconvSeries(const PeakPtrVec& peak_list,
                                          const TopfdParaPtr& topfd_para_ptr,
-                                         double sn_ratio,
+                                         double sn_ratio, double max_mass,
+                                         int max_charge,
                                          const ChargeBound& bound,
                                          double min_envcnn,
                                          const std::string& debug_name) {
@@ -1202,7 +1209,7 @@ std::vector<MatchEnvPtrVec> deconvSeries(const PeakPtrVec& peak_list,
     debug_os = std::make_unique<std::ofstream>(debug_name);
   }
   GreedySearch search(peak_list, topfd_para_ptr, env_para_ptr, sn_ratio,
-                      bound, debug_os.get());
+                      max_mass, max_charge, bound, debug_os.get());
   std::vector<FitVec> masses = search.run();
 
   std::vector<double> intes;

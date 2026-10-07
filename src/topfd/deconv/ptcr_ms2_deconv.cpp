@@ -60,6 +60,19 @@ struct PtcrPara {
   double sn_ratio = 0;
   // the mass refined from the matched isotope peaks (1) or the search's (0)
   int refine = 1;
+  // fragment PTCR spectra (getFragMode): 1 the MS/MS search with the
+  // selected ion as the precursor when no MS1 feature is; 0 as other MS/MS
+  // spectra; 2 the charge-series search (deconvFragments)
+  int frag = 1;
+  // frag 2: fragment envelopes with a lower EnvCNN score are dropped (0:
+  // none; the search's -F filters the masses)
+  double frag_min_envcnn = 0;
+  // frag 2: fragment species within this mass (Da) of the precursor mass,
+  // or above it, are not fragments (the surviving precursor)
+  double frag_prec_margin = 20;
+  // a species matches an MS1 feature within this tolerance (ppm), also one
+  // isotope apart
+  double feature_ppm = 10;
 };
 
 PtcrPara readPara() {
@@ -89,6 +102,14 @@ PtcrPara readPara() {
       para.sn_ratio = value;
     } else if (name == "refine") {
       para.refine = static_cast<int>(value);
+    } else if (name == "frag") {
+      para.frag = static_cast<int>(value);
+    } else if (name == "frag_min_envcnn") {
+      para.frag_min_envcnn = value;
+    } else if (name == "frag_prec_margin") {
+      para.frag_prec_margin = value;
+    } else if (name == "feature_ppm") {
+      para.feature_ppm = value;
     } else {
       LOG_WARN("Unknown TOPFD_PTCR_PARA entry " << name);
     }
@@ -234,6 +255,7 @@ Species getSpecies(const MatchEnvPtrVec& envs, int refine) {
     devs.emplace_back(std::abs(e.first - shift), e.second);
   }
   species.mass_mad_ppm = weightedMedian(devs) / species.mono_mass * 1e6;
+  species.envs = envs;
   return species;
 }
 
@@ -304,99 +326,307 @@ std::string joinInts(const std::vector<int>& values) {
   return os.str();
 }
 
-}  // namespace
-
-PtcrSpecPtr deconv(const MzmlMsPtr& ms_ptr,
-                   const TopfdParaPtr& topfd_para_ptr) {
-  const PtcrPara& para = getPara();
-  MsHeaderPtr header_ptr = ms_ptr->getMsHeaderPtr();
-  double lo = header_ptr->getPrecWinBegin() - para.win_margin;
-  double hi = header_ptr->getPrecWinEnd() + para.win_margin;
-  bool has_window = header_ptr->getPrecWinBegin() > 0 && hi > lo;
-  IsoRange iso_range(para.iso_min_rel);
-  greedy_ms1_deconv::ChargeBound bound;
-  if (para.band != 0 && has_window) {
-    // charge z of mass M only when some z0 >= z puts the envelope of M in the
-    // isolation window
-    bound = [lo, hi, iso_min_rel = para.iso_min_rel](double mono_mass,
-                                                      int z) {
-      // one cache per thread: the search runs in the MS/MS worker threads
-      thread_local IsoRange cache(iso_min_rel);
-      std::pair<double, double> iso = cache.get(mono_mass);
-      for (int z0 = z; z0 <= z + 1000; z0++) {
-        int pos = compWindow(mono_mass, z0, iso, lo, hi);
-        if (pos < 0) {
-          return false;
-        }
-        if (pos == 0) {
-          return true;
-        }
-      }
+// The charge bound of the search: charge z of mass M only when some z0 in
+// [z, z_cap] puts the envelope of M (its isotopes >= iso_min_rel of the
+// apex) in [lo, hi]; masses above max_mass are excluded.
+greedy_ms1_deconv::ChargeBound makeBound(double lo, double hi, int z_cap,
+                                         double max_mass, double iso_min_rel) {
+  return [lo, hi, z_cap, max_mass, iso_min_rel](double mono_mass, int z) {
+    if (mono_mass > max_mass || z > z_cap) {
       return false;
-    };
+    }
+    // one cache per thread: the search runs in the MS/MS worker threads
+    thread_local IsoRange cache(iso_min_rel);
+    std::pair<double, double> iso = cache.get(mono_mass);
+    for (int z0 = z; z0 <= z_cap; z0++) {
+      int pos = compWindow(mono_mass, z0, iso, lo, hi);
+      if (pos < 0) {
+        return false;
+      }
+      if (pos == 0) {
+        return true;
+      }
+    }
+    return false;
+  };
+}
+
+// The isolation window of the proton transfer stage, with the margin
+bool getPtcrWindow(const MsHeaderPtr& header_ptr, double margin, double& lo,
+                   double& hi) {
+  double bgn = header_ptr->getPtcrWinBegin();
+  double end = header_ptr->getPtcrWinEnd();
+  if (bgn <= 0) {
+    bgn = header_ptr->getPrecWinBegin();
+    end = header_ptr->getPrecWinEnd();
   }
-  double sn_ratio =
-      para.sn_ratio > 0 ? para.sn_ratio : topfd_para_ptr->getMsTwoSnRatio();
-  std::string debug_name;
+  lo = bgn - margin;
+  hi = end + margin;
+  return bgn > 0 && hi > lo;
+}
+
+std::string getDebugName(const MsHeaderPtr& header_ptr) {
   const char* debug_scan = std::getenv("TOPFD_PTCR_DEBUG_SCAN");
   int scan = header_ptr->getFirstScanNum();
   if (debug_scan != nullptr && std::atoi(debug_scan) == scan) {
-    debug_name = "ptcr_scan" + std::to_string(scan) + ".txt";
+    return "ptcr_scan" + std::to_string(scan) + ".txt";
   }
-  std::vector<MatchEnvPtrVec> masses = greedy_ms1_deconv::deconvSeries(
-      ms_ptr->getPeakPtrVec(), topfd_para_ptr, sn_ratio, bound,
-      para.min_envcnn, debug_name);
+  return "";
+}
 
-  PtcrSpecPtr spec_ptr = std::make_shared<PtcrSpec>();
-  spec_ptr->header_ptr = header_ptr;
+// The species of the search's masses, with their isolation charges (z0 <=
+// z_cap), most intense first
+std::vector<Species> getSpeciesVec(const std::vector<MatchEnvPtrVec>& masses,
+                                   bool has_window, double lo, double hi,
+                                   IsoRange& iso_range, int z_cap) {
+  const PtcrPara& para = getPara();
+  std::vector<Species> result;
   for (const MatchEnvPtrVec& envs : masses) {
     Species species = getSpecies(envs, para.refine);
     if (has_window) {
       std::pair<int, int> iso_charges = getIsoCharges(
           species.mono_mass, iso_range.get(species.mono_mass), lo, hi);
       species.iso_charge_min = iso_charges.first;
-      species.iso_charge_max = iso_charges.second;
+      species.iso_charge_max = std::min(iso_charges.second, z_cap);
+      if (species.iso_charge_max < species.iso_charge_min) {
+        species.iso_charge_min = 0;
+        species.iso_charge_max = 0;
+      }
     }
-    spec_ptr->species.push_back(std::move(species));
+    result.push_back(std::move(species));
   }
   std::stable_sort(
-      spec_ptr->species.begin(), spec_ptr->species.end(),
+      result.begin(), result.end(),
       [](const Species& a, const Species& b) { return a.inte > b.inte; });
+  return result;
+}
+
+// The MS1 feature of a mass: the nearest within feature_ppm, else one within
+// feature_ppm one isotope apart; nullptr when none
+SpecFeaturePtr matchFeature(double mass, const SpecFeaturePtrVec& feat_ptrs) {
+  double tol = getPara().feature_ppm * 1e-6 * mass;
+  double iso = mass_constant::getIsotopeMass();
+  for (int k : {0, -1, 1}) {
+    SpecFeaturePtr best = nullptr;
+    double best_err = tol;
+    for (const SpecFeaturePtr& feat : feat_ptrs) {
+      double err = std::abs(feat->getPrecMonoMass() + k * iso - mass);
+      if (err <= best_err) {
+        best_err = err;
+        best = feat;
+      }
+    }
+    if (best != nullptr) {
+      return best;
+    }
+  }
+  return nullptr;
+}
+
+// The offset (Da) of the averagine apex from the monoisotopic mass
+double getApexOffset(double mono_mass) {
+  EnvPtr env = EnvBase::getEnvByMonoMass(mono_mass);
+  if (env == nullptr || env->getPeakNum() == 0) {
+    return 0;
+  }
+  return env->getReferMz() - env->getMonoMz();
+}
+
+}  // namespace
+
+int getFragMode() { return getPara().frag; }
+
+PrecursorPtr getSelectedIonPrec(const MsHeaderPtr& header_ptr,
+                                double& max_mass, int& max_charge) {
+  int sel_z = header_ptr->getSelectedCharge();
+  double sel_mz = header_ptr->getSelectedMz();
+  if (sel_mz <= 0) {
+    sel_mz = header_ptr->getPrecTargetMz();
+  }
+  if (sel_z <= 0 || sel_mz <= 0) {
+    return nullptr;
+  }
+  double half_win =
+      (header_ptr->getPrecWinEnd() - header_ptr->getPrecWinBegin()) / 2;
+  max_mass = (sel_mz - mass_constant::getProtonMass() + half_win) * sel_z;
+  max_charge = sel_z;
+  return std::make_shared<Precursor>(0, -1, sel_mz, sel_z, 0.0);
+}
+
+PtcrSpecPtr deconv(const MzmlMsPtr& ms_ptr, const TopfdParaPtr& topfd_para_ptr,
+                   const SpecFeaturePtrVec& feat_ptrs) {
+  const PtcrPara& para = getPara();
+  MsHeaderPtr header_ptr = ms_ptr->getMsHeaderPtr();
+  double lo = 0;
+  double hi = 0;
+  bool has_window = getPtcrWindow(header_ptr, para.win_margin, lo, hi);
+  IsoRange iso_range(para.iso_min_rel);
+  // the charges up to -c, or the selected ion's when higher
+  int max_charge = std::max(topfd_para_ptr->getMaxCharge(),
+                            header_ptr->getSelectedCharge());
+  double max_mass = topfd_para_ptr->getMaxMass();
+  greedy_ms1_deconv::ChargeBound bound;
+  if (para.band != 0 && has_window) {
+    // charge z of mass M only when some z0 >= z puts the envelope of M in the
+    // isolation window
+    bound = makeBound(lo, hi, 100000, max_mass, para.iso_min_rel);
+  }
+  double sn_ratio =
+      para.sn_ratio > 0 ? para.sn_ratio : topfd_para_ptr->getMsTwoSnRatio();
+  std::vector<MatchEnvPtrVec> masses = greedy_ms1_deconv::deconvSeries(
+      ms_ptr->getPeakPtrVec(), topfd_para_ptr, sn_ratio, max_mass, max_charge,
+      bound, para.min_envcnn, getDebugName(header_ptr));
+
+  PtcrSpecPtr spec_ptr = std::make_shared<PtcrSpec>();
+  spec_ptr->header_ptr = header_ptr;
+  spec_ptr->species =
+      getSpeciesVec(masses, has_window, lo, hi, iso_range, 100000);
+  for (Species& s : spec_ptr->species) {
+    SpecFeaturePtr feat = matchFeature(s.mono_mass, feat_ptrs);
+    if (feat != nullptr) {
+      s.feature_id = feat->getFracFeatureId();
+      s.feature_mass = feat->getPrecMonoMass();
+    }
+  }
   PrecursorPtr prec_ptr = getPrecursor(spec_ptr->species, header_ptr,
                                        iso_range);
+  // the precursor species' feature: its id and intensity
+  for (const Species& s : spec_ptr->species) {
+    if (s.is_prec && s.feature_id >= 0) {
+      for (const SpecFeaturePtr& feat : feat_ptrs) {
+        if (feat->getFracFeatureId() == s.feature_id) {
+          prec_ptr = std::make_shared<Precursor>(
+              0, s.feature_id, prec_ptr->getMonoMz(), prec_ptr->getCharge(),
+              feat->getPrecInte());
+        }
+      }
+    }
+  }
   header_ptr->setPrecPtrVec(PrecursorPtrVec{prec_ptr});
   return spec_ptr;
 }
 
-void write(PtcrSpecPtrVec spec_ptrs, const std::string& msalign_name,
-           const std::string& tsv_name, const std::string& para_str,
-           bool avg_mass) {
+PtcrSpecPtr deconvFragments(const MzmlMsPtr& ms_ptr,
+                            const TopfdParaPtr& topfd_para_ptr,
+                            double max_mass, int max_charge,
+                            const SpecFeaturePtrVec& feat_ptrs) {
+  const PtcrPara& para = getPara();
+  MsHeaderPtr header_ptr = ms_ptr->getMsHeaderPtr();
+  double proton = mass_constant::getProtonMass();
+  double lo = 0;
+  double hi = 0;
+  bool has_window = getPtcrWindow(header_ptr, para.win_margin, lo, hi);
+  IsoRange iso_range(para.iso_min_rel);
+  // the precursor: its charge caps the fragments' charges, and its mass
+  // (here the selected ion's, estimated from the m/z of the window centre)
+  // their masses
+  int sel_z = header_ptr->getSelectedCharge();
+  double sel_mz = header_ptr->getSelectedMz();
+  if (sel_mz <= 0) {
+    sel_mz = header_ptr->getPrecTargetMz();
+  }
+  double half_win = (header_ptr->getPrecWinEnd() -
+                     header_ptr->getPrecWinBegin()) / 2;
+  double sel_mass = sel_z > 0 && sel_mz > 0 ? (sel_mz - proton) * sel_z : 0;
+  if (sel_mass > 0) {
+    max_charge = feat_ptrs.empty() ? sel_z : std::max(max_charge, sel_z);
+    double sel_max = sel_mass + half_win * sel_z + 50;
+    max_mass = feat_ptrs.empty() ? sel_max : std::max(max_mass, sel_max);
+  }
+  greedy_ms1_deconv::ChargeBound bound;
+  if (para.band != 0 && has_window) {
+    bound = makeBound(lo, hi, max_charge, max_mass, para.iso_min_rel);
+  } else {
+    bound = [max_mass, max_charge](double mono_mass, int z) {
+      return mono_mass <= max_mass && z <= max_charge;
+    };
+  }
+  double sn_ratio =
+      para.sn_ratio > 0 ? para.sn_ratio : topfd_para_ptr->getMsTwoSnRatio();
+  std::vector<MatchEnvPtrVec> masses = greedy_ms1_deconv::deconvSeries(
+      ms_ptr->getPeakPtrVec(), topfd_para_ptr, sn_ratio, max_mass, max_charge,
+      bound, para.frag_min_envcnn, getDebugName(header_ptr));
+  std::vector<Species> all =
+      getSpeciesVec(masses, has_window, lo, hi, iso_range, max_charge);
+
+  // the precursors: the MS1 features; without them, the surviving precursor
+  // species (its apex at the selected ion's m/z and charge, within the
+  // window), else the selected ion
+  PrecursorPtrVec prec_ptrs;
+  for (std::size_t i = 0; i < feat_ptrs.size(); i++) {
+    const SpecFeaturePtr& feat = feat_ptrs[i];
+    prec_ptrs.push_back(std::make_shared<Precursor>(
+        static_cast<int>(i), feat->getFracFeatureId(), feat->getPrecMonoMz(),
+        feat->getPrecCharge(), feat->getPrecInte()));
+  }
+  int prec_idx = -1;
+  if (prec_ptrs.empty() && sel_mass > 0) {
+    for (std::size_t i = 0; i < all.size(); i++) {
+      double apex = all[i].mono_mass + getApexOffset(all[i].mono_mass);
+      if (std::abs(apex - sel_mass) <= half_win * sel_z + 10 &&
+          all[i].charges.size() >= 2) {
+        prec_idx = static_cast<int>(i);
+        break;
+      }
+    }
+    if (prec_idx >= 0) {
+      Species& s = all[prec_idx];
+      s.is_prec = true;
+      prec_ptrs.push_back(std::make_shared<Precursor>(
+          0, -1, s.mono_mass / sel_z + proton, sel_z, s.inte));
+    } else {
+      prec_ptrs.push_back(
+          std::make_shared<Precursor>(0, -1, sel_mz, sel_z, 0.0));
+    }
+  }
+  header_ptr->setPrecPtrVec(prec_ptrs);
+
+  // the fragments: below the precursor mass less the margin
+  double prec_mass = max_mass;
+  if (!prec_ptrs.empty()) {
+    prec_mass = 0;
+    for (const PrecursorPtr& prec : prec_ptrs) {
+      prec_mass = std::max(prec_mass, prec->getMonoMass());
+    }
+  }
+  PtcrSpecPtr spec_ptr = std::make_shared<PtcrSpec>();
+  spec_ptr->header_ptr = header_ptr;
+  for (Species& s : all) {
+    if (s.is_prec || s.mono_mass >= prec_mass - para.frag_prec_margin) {
+      continue;
+    }
+    spec_ptr->species.push_back(std::move(s));
+  }
+  return spec_ptr;
+}
+
+DeconvMsPtr getDeconvMs(const PtcrSpecPtr& spec_ptr) {
+  const MsHeaderPtr& header_ptr = spec_ptr->header_ptr;
+  int sp_id = header_ptr->getSpecId();
+  DeconvPeakPtrVec peaks;
+  for (std::size_t i = 0; i < spec_ptr->species.size(); i++) {
+    const Species& s = spec_ptr->species[i];
+    peaks.push_back(std::make_shared<DeconvPeak>(
+        sp_id, static_cast<int>(i), s.mono_mass, s.inte, s.charges.back(),
+        s.best_envcnn));
+  }
+  return std::make_shared<DeconvMs>(header_ptr, peaks);
+}
+
+void writeTsv(PtcrSpecPtrVec spec_ptrs, const std::string& tsv_name) {
   std::sort(spec_ptrs.begin(), spec_ptrs.end(),
             [](const PtcrSpecPtr& a, const PtcrSpecPtr& b) {
               return a->header_ptr->getSpecId() < b->header_ptr->getSpecId();
             });
-  MsAlignWriter writer(msalign_name);
-  writer.writePara(para_str);
   std::ofstream tsv(tsv_name);
   tsv << "Spectrum ID\tScan\tSpecies\tPrecursor\tMonoisotopic mass"
          "\tSearch mass\tIntensity\tCharges\tHighest charge"
          "\tIsolation charges\tCharge intensities\tCharge EnvCNN scores"
-         "\tBest EnvCNN score\tMatched peaks\tMass MAD (ppm)\n";
+         "\tBest EnvCNN score\tMatched peaks\tMass MAD (ppm)\tFeature ID"
+         "\tFeature mass\n";
   for (const PtcrSpecPtr& spec_ptr : spec_ptrs) {
     const MsHeaderPtr& header_ptr = spec_ptr->header_ptr;
     int sp_id = header_ptr->getSpecId();
-    DeconvPeakPtrVec peaks;
-    for (std::size_t i = 0; i < spec_ptr->species.size(); i++) {
-      const Species& s = spec_ptr->species[i];
-      peaks.push_back(std::make_shared<DeconvPeak>(
-          sp_id, static_cast<int>(i), s.mono_mass, s.inte, s.charges.back(),
-          s.best_envcnn));
-    }
-    DeconvMsPtr ms_ptr = std::make_shared<DeconvMs>(header_ptr, peaks);
-    if (avg_mass) {
-      ms_ptr = avg_mass_util::getAvgMassMs(ms_ptr);
-    }
-    writer.writeMs(ms_ptr);
     for (std::size_t i = 0; i < spec_ptr->species.size(); i++) {
       const Species& s = spec_ptr->species[i];
       std::ostringstream intes;
@@ -420,9 +650,33 @@ void write(PtcrSpecPtrVec spec_ptrs, const std::string& msalign_name,
       }
       tsv << "\t" << intes.str() << "\t" << scores.str() << "\t"
           << std::setprecision(3) << s.best_envcnn << "\t" << s.match_peak_num
-          << "\t" << std::setprecision(2) << s.mass_mad_ppm << "\n";
+          << "\t" << std::setprecision(2) << s.mass_mad_ppm << "\t"
+          << s.feature_id << "\t";
+      if (s.feature_id >= 0) {
+        tsv << std::setprecision(6) << s.feature_mass;
+      }
+      tsv << "\n";
     }
   }
+}
+
+void write(PtcrSpecPtrVec spec_ptrs, const std::string& msalign_name,
+           const std::string& tsv_name, const std::string& para_str,
+           bool avg_mass) {
+  std::sort(spec_ptrs.begin(), spec_ptrs.end(),
+            [](const PtcrSpecPtr& a, const PtcrSpecPtr& b) {
+              return a->header_ptr->getSpecId() < b->header_ptr->getSpecId();
+            });
+  MsAlignWriter writer(msalign_name);
+  writer.writePara(para_str);
+  for (const PtcrSpecPtr& spec_ptr : spec_ptrs) {
+    DeconvMsPtr ms_ptr = getDeconvMs(spec_ptr);
+    if (avg_mass) {
+      ms_ptr = avg_mass_util::getAvgMassMs(ms_ptr);
+    }
+    writer.writeMs(ms_ptr);
+  }
+  writeTsv(spec_ptrs, tsv_name);
 }
 
 }  // namespace ptcr_ms2_deconv

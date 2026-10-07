@@ -86,7 +86,8 @@ using ChargeBound = std::function<bool(double mono_mass, int charge)>;
 
 // The search of deconv with a charge bound, for PTCR spectra
 // (ptcr_ms2_deconv): sn_ratio is the signal-to-noise ratio of the seed
-// threshold (deconv uses the MS1 one). Returns the masses found, in the
+// threshold (deconv uses the MS1 one), max_mass and max_charge the bounds of
+// the masses and charges (deconv uses -m and -c). Returns the masses found, in the
 // order found, each as its envelopes at its charges (all at one
 // monoisotopic mass), matched to peak_list, with the intensities shared
 // between envelopes assigned and the EnvCNN scores; envelopes below
@@ -94,7 +95,8 @@ using ChargeBound = std::function<bool(double mono_mass, int charge)>;
 // No precursor-window step.
 std::vector<MatchEnvPtrVec> deconvSeries(const PeakPtrVec& peak_list,
                                          const TopfdParaPtr& topfd_para_ptr,
-                                         double sn_ratio,
+                                         double sn_ratio, double max_mass,
+                                         int max_charge,
                                          const ChargeBound& bound,
                                          double min_envcnn,
                                          const std::string& debug_name = "");
