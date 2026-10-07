@@ -2083,6 +2083,70 @@ merged). Facts to keep straight:
   window matches), the E-value's generating function (relaxed tolerance on
   the observed precursor), TopMG.
 
+## Second alignment of the shift searches (`search/diag/second_align_util`, `--second-align`, issue #614)
+
+Branch `second_align` (toppic_test experiment 144, report 0144; not
+merged). toppic's hidden `--second-align <disabled|strict|relax>`
+(argument key `secondAlign`, default `disabled`; any other value is
+refused; `PrsmPara::getSecondAlignMode` / `useSecondAlign`; the parameter
+block prints "Second alignment at the refined precursor: strict" when it
+is on). Facts to keep straight:
+
+- **Why.** The one-shift and multiple-shift alignments (PsAlign,
+  PsAlignMultiType) match the precursor-dependent ions with the fragment
+  tolerance plus the precursor's (the previous section), and the PrSM's
+  annotation matches them with the fragment tolerance at the refined
+  precursor, so the dynamic program counts ions the annotation does not
+  and can choose a diagonal set on their strength (report 0135 section 7:
+  "A second alignment on the refined precursor with the strict tolerance
+  would make the alignment and the annotation agree").
+- **What it does** (`PsAlign::geneResult`, `PsAlignMultiType::geneResult`).
+  The first pass is main's result, factored into
+  `second_align_util::genePrsm` (the precursor refined by the matched
+  ions to P', the extended spectra at P', the ranges refined, the PrSM).
+  With the option, for every call with a first alignment: the PRM peaks
+  are rebuilt at P' (`genePrmPeaks`: `prm_ms_factory::geneMsSixPtrVec`
+  with the refined precursor, so the REVERSED peaks are P' - (m - C
+  shift), plus the zero and precursor peaks sized on P'; with `strict`
+  every fragment peak's N-strict-C-relax and N-relax-C-strict tolerances
+  are set to its strict tolerance ppo x m; with `relax` they stay the
+  first alignment's, which measures the precursor move alone); the first
+  alignment's headers are moved to P' (`moveHeaders`: an N-anchored
+  header keeps its N-terminal shift, a C-anchored one keeps its
+  C-terminal shift, so its N-terminal shift moves by P' - P; C-terminal
+  shifts and truncation positions from `DiagHeader::initHeader` at P');
+  the diagonals are rebuilt (`geneDiagonals`, headers without a pair
+  dropped); the same dynamic program runs on them (PsAlign for the type of
+  the last `compute()`, which it now remembers; PsAlignMultiType for the
+  types of the last `compute()` together, kept by P' in
+  `second_align_ptrs_` so the types whose first results refine to the same
+  mass share one second alignment); the second result for the same type
+  and shift number goes through `genePrsm` again (the refinement by
+  matched ions at P', T around P'; the range refinement; the PrSM). That
+  PrSM is returned; with no second alignment of positive score the first
+  PrSM is kept, so the method loses no candidate. The candidates are
+  ranked by the PrSM's matched fragments as before, and the E-values are
+  computed from the PrSM afterwards (the generating function is
+  unchanged). The zero-shift search, the variable PTM search and TopMG's
+  graph alignment are untouched; `--second-align disabled` runs main's
+  code path (the development subset gives main's 41 stage files byte for
+  byte).
+- **The second refinement is not clamped to the observed precursor**: the
+  refinement at P' searches [-T, T] around P', so the final precursor can
+  lie up to 2T from P (on the development subset 7% of the one-shift
+  calls end beyond T from P, 4% after the first pass alone).
+- **Research log.** `TOPPIC_SECOND_ALIGN_LOG=<file>` appends one
+  tab-separated line per `geneResult` call with a first alignment: stage
+  (`one` / `multi`), spectrum id, type, shift number, protein, P, the
+  first score, P', the first PrSM (start, end, matched theoretical
+  fragments, shifts as left:right:mass), the second score (`-` without a
+  second alignment), P'', the second PrSM, and `second` / `first` for the
+  PrSM kept. The alignment's score is the sum of the diagonal pairs'
+  scores (one per spectrum and ion type per matched cleavage) with the
+  zero and precursor peaks counted with the group's spectrum number each,
+  so score - 2 against the PrSM's matched fragments measures the agreement.
+- **Results on 480_F3_02** (toppic_test experiment 144): see report 0144.
+
 ## Range of a variable PTM shift (`seq/mass_shift`, `search/varptmsearch/var_ptm_align`)
 
 Branch `var_ptm_narrow_range` (toppic_test experiment 122, report 0122;
