@@ -28,6 +28,7 @@
 #include "seq/fasta_seq.hpp"
 #include "seq/mass_shift.hpp"
 #include "seq/proteoform.hpp"
+#include "seq/proteoform_util.hpp"
 #include "sql/sql_util.hpp"
 
 namespace toppic {
@@ -85,6 +86,7 @@ void PrsmSqlWriter::createPrsmTable(const std::string& table_name) {
                                  "prev_amino_acid TEXT NOT NULL,"
                                  "proteoform TEXT NOT NULL,"
                                  "next_amino_acid TEXT NOT NULL,"
+                                 "proforma TEXT NOT NULL,"
                                  "proteoform_mass REAL NOT NULL,"
                                  "n_terminal_form TEXT NOT NULL,"
                                  "fixed_ptms TEXT NOT NULL,"
@@ -113,7 +115,7 @@ void PrsmSqlWriter::write(const std::string& input_file_ext,
       sql_db_, "INSERT INTO " + table_name +
                    " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, "
                    "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, "
-                   "?, ?, ?, ?, ?, ?);");
+                   "?, ?, ?, ?, ?, ?, ?);");
   sqlite3_stmt* shift_stmt = nullptr;
   sqlite3_stmt* match_stmt = nullptr;
   if (write_details) {
@@ -213,6 +215,7 @@ void PrsmSqlWriter::writePrsm(sqlite3_stmt* stmt, const PrsmPtr& prsm_ptr) {
   bindText(stmt, idx++, form_ptr->getPrevAminoAcid());
   bindText(stmt, idx++, form_ptr->getProteoformMatchSeq());
   bindText(stmt, idx++, form_ptr->getNextAminoAcid());
+  bindText(stmt, idx++, proteoform_util::getProFormaStr(form_ptr));
   sqlite3_bind_double(stmt, idx++, form_ptr->getMass());
   bindText(stmt, idx++, form_ptr->getProtModPtr()->getType());
   bindText(stmt, idx++, form_ptr->getAlterStr(AlterType::FIXED));

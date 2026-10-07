@@ -32,7 +32,7 @@
 	      <name>Cysteine</name>
       </amino_acid>
       <ptm>
-        <abbreviation>Carbamidomethylation</abbreviation>
+        <abbreviation>Carbamidomethyl</abbreviation>
       </ptm>
     </mod_residue>
     <mod_type>SIDE_CHAIN</mod_type>

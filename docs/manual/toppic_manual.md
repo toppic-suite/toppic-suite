@@ -150,7 +150,7 @@ after `<name>_ms2`:
 | `sample_post_ms2_toppic_proteoform.tsv`, `..._proteoform_single.tsv` | One PrSM per identified proteoform (the best one), passing the proteoform-level cutoff. |
 | `sample_post_ms2_toppic_protein.tsv`, `..._protein_single.tsv` | One PrSM per identified protein (the best one), passing the protein-level cutoff. |
 | `sample_post_ms2_toppic_prsm.xml`, `..._proteoform.xml`, `..._protein.xml` | The same three sets of PrSMs in XML, read by TopDiff and the visualization tools. Every PrSM records the TopPIC Suite version that wrote it, and TopDiff reads only the files of its own version. Every proteoform element has its classification, `<classification>` (the `Proteoform classification` column). |
-| `sample.sqlite` | Updated with the tables `prsm`, `proteoform`, `protein`, `prsm_mass_shift`, `prsm_protein_match` and `fasta_seq`, for visualization. |
+| `sample.sqlite` | Updated with the tables `prsm`, `proteoform`, `protein`, `prsm_mass_shift`, `prsm_protein_match` and `fasta_seq`, for visualization. The first three hold the PrSMs of the tables below, with a `proforma` column for `ProForma`. |
 | `sample_post_ms2.toppic_record_prsm` | The best PrSM of every spectrum after the FDR computation and before the cutoffs, decoy identifications included. Always kept. |
 
 The `_single` tables have one line per PrSM. The tables without `_single`
@@ -170,7 +170,9 @@ columns are:
 | `Proteoform ID`, `Proteoform intensity` | The proteoform cluster and its abundance. |
 | `Feature ID`, `Feature intensity`, `Feature score`, `Feature apex time` | The TopFD proteoform feature of the spectrum: id, abundance, ECScore and apex retention time (minutes). |
 | `# Protein hits`, `Protein accession`, `Protein description` | Number of proteins containing the proteoform, and the reported protein. |
-| `First residue`, `Last residue`, `Special amino acids`, `Database protein sequence`, `Previous amino acid`, `Proteoform`, `Next amino acid`, `Proteoform mass` | Position of the proteoform in the protein, the protein sequence, the proteoform with its modifications (the annotation is explained in [Proteoform annotation](proteoform.md)), and its mass. |
+| `First residue`, `Last residue`, `Special amino acids`, `Database protein sequence`, `Previous amino acid`, `Proteoform`, `Next amino acid` | Position of the proteoform in the protein, the protein sequence, and the proteoform with its modifications (the annotation is explained in [Proteoform annotation](proteoform.md)). |
+| `ProForma` | The proteoform in the ProForma 2.1 notation of the HUPO-PSI (https://github.com/HUPO-PSI/ProForma), with the PTMs as Unimod names and accessions, for example `[Acetyl|UNIMOD:1]-SGREGM[Oxidation|UNIMOD:35]DEE...` (see [Proteoform annotation](proteoform.md), section 6). |
+| `Proteoform mass` | The monoisotopic mass of the proteoform. |
 | `Protein N-terminal form`, `Fixed PTMs`, `# Unexpected modifications`, `Unexpected modifications`, `# Variable PTMs`, `Variable PTMs`, `MIScore` | The N-terminal form, the modifications of the proteoform as `name:[position]` lists (see [Proteoform annotation](proteoform.md)), and the modification identification score of the PTM characterization. |
 | `# Matched exp fragments`, `# Matched theo fragments`, `E-value` | The match statistics and the E-value. |
 | `Spectrum-level Q-value`, `Proteoform-level Q-value`, `Protein-level Q-value` | The FDR-based q-values (only with `--decoy`; `-` otherwise). |
@@ -280,6 +282,12 @@ modification, or `*` for any residue; `Position` is `any`, `N-term` or
 accession, or `-1` when unknown. Lines starting with `#` are comments. A
 name that is not one of the built-in PTMs of `res/base_data/ptm_base.xml`
 (such as `Acetyl`, `Phospho`, `Oxidation`) may be used on one line only.
+A line whose name is a built-in PTM uses the built-in entry and its mass
+(a WARNING is printed when the line's mass differs by more than 0.01 Da);
+the built-in PTMs are every Unimod modification under its Unimod (PSI-MS)
+name; the names of earlier versions, such as `Carbamidomethylation` (now
+`Carbamidomethyl`), are no longer built in (see
+[Proteoform annotation](proteoform.md), section 3).
 
 In the variable PTM file (`-b`), `N-term` is the N-terminus of the
 proteoform, the alpha-amine of its first residue: a truncation N-terminal

@@ -16,6 +16,7 @@
 #ifndef TOPPIC_COMMON_BASE_PTM_BASE_HPP_
 #define TOPPIC_COMMON_BASE_PTM_BASE_HPP_
 
+#include <string>
 #include <unordered_map>
 
 #include "common/base/ptm.hpp"
@@ -43,6 +44,15 @@ class PtmBase {
    */
   static const PtmPtr& getPtmPtrByAbbrName(const std::string& abbr_name);
 
+  /**
+   * The Unimod (PSI-MS) name of a Unimod id: the abbreviation of the
+   * ptm_base.xml entry with that id (ptm_base.xml holds every Unimod
+   * modification). Empty when there is none (an id newer than the file, or
+   * not Unimod's). PTMs added from modification files are not looked up:
+   * their names are not checked.
+   */
+  static std::string getUnimodName(int unimod_id);
+
   static PtmPtr getPtmPtr(const PtmPtr& p);
 
   /**
@@ -54,14 +64,18 @@ class PtmBase {
 
  private:
   static PtmPtrVec ptm_ptr_vec_;
+  // abbreviations -> PTMs
   static std::unordered_map<std::string, PtmPtr> ptm_abbr_name_map_;
+  // Unimod ids of the ptm_base.xml PTMs -> their abbreviations
+  static std::unordered_map<int, std::string> unimod_name_map_;
   static PtmPtr empty_ptm_ptr_;
   static PtmPtr acetylation_ptr_;
   static PtmPtr c57_ptr_;
   static PtmPtr c58_ptr_;
 
+  static std::string getEmptyPtmAbbrName() { return "No PTM"; }
   static std::string getAcetylationAbbrName() { return "Acetyl"; }
-  static std::string getC57AbbrName() { return "Carbamidomethylation"; }
+  static std::string getC57AbbrName() { return "Carbamidomethyl"; }
   static std::string getC58AbbrName() { return "Carboxymethyl"; }
 };
 
