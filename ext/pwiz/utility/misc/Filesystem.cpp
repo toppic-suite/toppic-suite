@@ -38,6 +38,7 @@
     #include <wincrypt.h>
     #include <winternl.h>
     #include <Psapi.h>
+    #include <RestartManager.h>
     #include <boost/nowide/convert.hpp>
     #include <boost/noncopyable.hpp>
 #else
@@ -61,7 +62,9 @@
 #include <boost/spirit/include/karma.hpp>
 //#include <boost/xpressive/xpressive.hpp>
 #include <iostream>
+#include <sstream>
 #include <thread>
+#include <filesystem>
 
 using std::string;
 using std::vector;
@@ -254,6 +257,97 @@ PWIZ_API_DECL bool running_on_wine()
 }
 
 
+/// <summary>
+/// We often encounter tools that can't deal with Unicode characters in file paths, this method
+/// will try to convert such paths to a non-Unicode version using the 8.3 format short path name.
+/// Converts only the segments that need it, to avoid trashing filename extensions.
+/// e.g. "C:\Program Files\Common Files\my files with ünicode\foo.mzml" (note the umlaut U) => ""C:\Program Files\Common Files\MYFILE~1\foo.mzml"
+///
+/// Only works on NTFS volumes, with 8.3 support enabled. So, for example, not on Docker instances.
+/// </summary>
+/// <param name="utf8Path">Path to an existing file or directory</param>
+/// <returns>Path with unicode segments changed to 8.3 representation, if possible</returns>
+PWIZ_API_DECL string get_non_unicode_path(const std::string& utf8Path)
+{
+#ifdef _WIN32
+    if (utf8Path.empty() ||
+        std::all_of(utf8Path.begin(), utf8Path.end(), [](unsigned char c) { return c >= 32 && c <= 126; }))
+    {
+        return utf8Path; // No unicode found
+    }
+
+    // UTF-8 -> UTF-16
+    int wideLen = MultiByteToWideChar(CP_UTF8, 0, utf8Path.c_str(), -1, nullptr, 0);
+    if (wideLen <= 0)
+        return utf8Path; // No conversion possible
+
+    std::wstring widePath(wideLen, L'\0');
+    MultiByteToWideChar(CP_UTF8, 0, utf8Path.c_str(), -1, &widePath[0], wideLen);
+    widePath.resize(wcslen(widePath.c_str()));
+    if (widePath.empty())
+        return utf8Path; // No conversion possible
+
+    bfs::path fsPath(widePath);
+    bfs::path root = fsPath.root_path();
+    bfs::path result = root;
+
+    bfs::path current = root;
+    auto rel = fsPath.relative_path();
+    for (auto it = rel.begin(); it != rel.end(); ++it)
+    {
+        const bfs::path& part = *it;
+        current /= part; // For path existence checks
+
+        // Detect non-printable / non-ASCII characters in this component
+        bool needsShort = std::any_of(part.native().begin(), part.native().end(),
+            [](wchar_t ch) { return ch < 32 || ch > 126; });
+
+        bfs::path usePart = part;
+        if (needsShort && bfs::exists(current))
+        {
+            // Query Windows short (8.3) name for the accumulated path
+            DWORD len = GetShortPathNameW(current.c_str(), nullptr, 0);
+            if (len > 0)
+            {
+                std::wstring shortBuf(len, L'\0');
+                DWORD copied = GetShortPathNameW(current.c_str(), &shortBuf[0], len);
+                if (copied > 0)
+                {
+                    // Resize to the actual returned length to drop trailing nulls
+                    shortBuf.resize(copied);
+                    bfs::path shortFs(shortBuf);
+                    usePart = shortFs.filename();
+                }
+            }
+        }
+
+        // Add (possibly 8.3'ed) section to path
+        result /= usePart;
+
+        // If the accumulated path doesn't exist, append remaining parts unchanged
+        // and stop trying to query short names (they can't exist).
+        if (!bfs::exists(current))
+        {
+            ++it;
+            for (; it != rel.end(); ++it)
+                result /= *it;
+            break;
+        }
+    }
+
+    // UTF-16 -> UTF-8
+    std::wstring resultW = result.wstring();
+    int utf8Len = WideCharToMultiByte(CP_UTF8, 0, resultW.c_str(), -1, nullptr, 0, nullptr, nullptr);
+    if (utf8Len <= 0)
+        return utf8Path;
+    std::string utf8(utf8Len, '\0');
+    WideCharToMultiByte(CP_UTF8, 0, resultW.c_str(), -1, &utf8[0], utf8Len, nullptr, nullptr);
+    utf8.resize(strlen(utf8.c_str()));
+    return utf8;
+#else
+    return utf8Path;
+#endif
+}
 PWIZ_API_DECL void force_close_handles_to_filepath(const std::string& filepath, bool closeMemoryMappedSections) noexcept(true)
 {
 #ifdef WIN32
@@ -432,6 +526,113 @@ PWIZ_API_DECL void force_close_handles_to_filepath(const std::string& filepath, 
 }
 
 
+PWIZ_API_DECL std::string find_locking_processes(const std::string& path)
+{
+    // Gate on PWIZ_HAS_RESTART_MANAGER (set by the Jamfile under
+    // <toolset>msvc:) rather than _MSC_VER -- clang-cl also defines
+    // _MSC_VER but the Jamfile does not link rstrtmgr.lib for non-msvc
+    // toolsets, so an _MSC_VER-only gate would compile the body but
+    // fail at link.
+#ifdef PWIZ_HAS_RESTART_MANAGER
+    DWORD sessionHandle = 0;
+    WCHAR sessionKey[CCH_RM_SESSION_KEY + 1] = {0};
+    DWORD rcStart = RmStartSession(&sessionHandle, 0, sessionKey);
+    if (rcStart != ERROR_SUCCESS)
+    {
+        std::ostringstream oss;
+        oss << "(RmStartSession failed, rc=" << rcStart << ")";
+        return oss.str();
+    }
+
+    std::string result;
+    try
+    {
+        std::wstring widePath = boost::locale::conv::utf_to_utf<wchar_t>(path);
+        PCWSTR files[1] = { widePath.c_str() };
+        DWORD rcRegister = RmRegisterResources(sessionHandle, 1, files, 0, nullptr, 0, nullptr);
+        if (rcRegister != ERROR_SUCCESS)
+        {
+            std::ostringstream oss;
+            oss << "(RmRegisterResources failed, rc=" << rcRegister << ")";
+            result = oss.str();
+        }
+        else
+        {
+            UINT nProcInfoNeeded = 0;
+            UINT nProcInfo = 0;
+            DWORD lpdwRebootReasons = RmRebootReasonNone;
+            DWORD rc = RmGetList(sessionHandle, &nProcInfoNeeded, &nProcInfo, nullptr, &lpdwRebootReasons);
+            if (rc != ERROR_MORE_DATA && rc != ERROR_SUCCESS)
+            {
+                std::ostringstream oss;
+                oss << "(RmGetList failed, rc=" << rc << ")";
+                result = oss.str();
+            }
+            else
+            {
+                // Treat ERROR_MORE_DATA with nProcInfoNeeded==0 as a fuzzy
+                // degenerate case: RM indicated holders exist but didn't
+                // size the buffer. Floor at 16 so the second call has a
+                // chance to return them rather than silently reporting
+                // "no holders".
+                if (rc == ERROR_MORE_DATA && nProcInfoNeeded == 0)
+                    nProcInfoNeeded = 16;
+
+                if (nProcInfoNeeded > 0)
+                {
+                    // Retry the fetch a few times if the holder list grows
+                    // between the sizing call and the fetch (RmGetList returns
+                    // ERROR_MORE_DATA in that race); otherwise we would lose
+                    // the diagnostic on exactly the contested cases this
+                    // helper is meant to surface.
+                    DWORD rc2 = ERROR_MORE_DATA;
+                    std::vector<RM_PROCESS_INFO> procs;
+                    for (int attempt = 0; attempt < 3 && rc2 == ERROR_MORE_DATA; ++attempt)
+                    {
+                        procs.resize(nProcInfoNeeded);
+                        nProcInfo = nProcInfoNeeded;
+                        rc2 = RmGetList(sessionHandle, &nProcInfoNeeded, &nProcInfo, procs.data(), &lpdwRebootReasons);
+                    }
+                    if (rc2 == ERROR_SUCCESS)
+                    {
+                        std::ostringstream oss;
+                        for (UINT i = 0; i < nProcInfo; ++i)
+                        {
+                            if (i > 0)
+                                oss << ", ";
+                            oss << boost::locale::conv::utf_to_utf<char>(procs[i].strAppName)
+                                << " (PID " << procs[i].Process.dwProcessId << ")";
+                        }
+                        result = oss.str();
+                    }
+                    else
+                    {
+                        std::ostringstream oss;
+                        oss << "(RmGetList (second call) failed, rc=" << rc2 << ")";
+                        result = oss.str();
+                    }
+                }
+            }
+        }
+    }
+    catch (const std::exception& e)
+    {
+        if (result.empty())
+            result = std::string("(internal exception: ") + e.what() + ")";
+    }
+    catch (...)
+    {
+        if (result.empty())
+            result = "(unknown internal exception)";
+    }
+    RmEndSession(sessionHandle);
+    return result.empty() ? "(no holders identified by RestartManager)" : result;
+#else
+    return "(RestartManager not available on this platform)";
+#endif
+}
+
+
 PWIZ_API_DECL void enable_utf8_path_operations()
 {
     UTF8_BoostFilesystemPathImbuer::instance->imbue();
@@ -449,7 +650,12 @@ PWIZ_API_DECL int expand_pathmask(const bfs::path& pathmask,
 #ifdef WIN32
     path maskParentPath = pathmask.parent_path();
 	WIN32_FIND_DATAW fdata;
-	HANDLE srcFile = FindFirstFileExW(boost::nowide::widen(pathmask.string()).c_str(), FindExInfoStandard, &fdata, FindExSearchNameMatch, NULL, 0);
+    // A mask that does not start with a literal prefix, "*.t2d" for one, makes the filesystem
+    // walk the whole directory to answer, so how much of it is read per call decides what a
+    // large directory costs here. FIND_FIRST_EX_LARGE_FETCH asks for as much per call as the
+    // filesystem will give, and FindExInfoBasic drops the 8.3 short name, which is a separate
+    // lookup per entry and is not read below.
+	HANDLE srcFile = FindFirstFileExW(boost::nowide::widen(pathmask.string()).c_str(), FindExInfoBasic, &fdata, FindExSearchNameMatch, NULL, FIND_FIRST_EX_LARGE_FETCH);
 	if (srcFile == INVALID_HANDLE_VALUE)
 		return 0; // no matches
 
@@ -524,6 +730,11 @@ PWIZ_API_DECL void copy_directory(const bfs::path& from, const bfs::path& to, bo
         else
             bfs::copy(from, to);
     }
+}
+
+PWIZ_API_DECL bfs::path canonical(const bfs::path from)
+{
+    return PWIZ_API_DECL bfs::path(std::filesystem::canonical(std::filesystem::u8path(from.string())).u8string());
 }
 
 

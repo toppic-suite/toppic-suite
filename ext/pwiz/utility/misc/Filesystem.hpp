@@ -104,6 +104,16 @@ PWIZ_API_DECL bool running_on_wine();
 PWIZ_API_DECL void force_close_handles_to_filepath(const std::string& filepath, bool closeMemoryMappedSections = false) noexcept(true);
 
 
+/// Always exported. When PWIZ_HAS_RESTART_MANAGER is defined (set by the Jamfile
+/// under the msvc toolset, where rstrtmgr.lib is linked), the body uses the Restart
+/// Manager API to identify processes holding handles on the given path; returns a
+/// comma-separated "appname (PID N)" listing, or a sentinel string describing the
+/// failure mode (RmStartSession / RmRegisterResources / RmGetList failure with rc,
+/// etc.). On any other build the body returns a stub sentinel string -- the symbol
+/// itself is always linkable so callers do not need to conditionally compile.
+PWIZ_API_DECL std::string find_locking_processes(const std::string& path);
+
+
 /// adds utf8_codecvt_facet to boost::filesystem::path's default behavior so it works with UTF-8 std::strings;
 /// uses a singleton so the imbuement is only done once
 PWIZ_API_DECL void enable_utf8_path_operations();
@@ -121,6 +131,22 @@ PWIZ_API_DECL int expand_pathmask(const bfs::path& pathmask,
 /// - if "ec" is not NULL, it will set it to the error code
 /// - if "ec" is NULL, a boost::filesystem_error is thrown
 PWIZ_API_DECL void copy_directory(const bfs::path& from, const bfs::path& to, bool recursive = true, boost::system::error_code* ec = 0);
+
+/// <summary>
+/// We often encounter tools that can't deal with Unicode characters in file paths, this method
+/// will try to convert such paths to a non-Unicode version using the 8.3 format short path name.
+/// Converts only the segments that need it, to avoid trashing filename extensions.
+/// e.g. "C:\Program Files\Common Files\my files with ünicode\foo.mzml" (note the umlaut U) => ""C:\Program Files\Common Files\MYFILE~1\foo.mzml"
+///
+/// Only works on NTFS volumes, with 8.3 support enabled. So, for example, not on Docker instances.
+/// </summary>
+/// <param name="utf8Path">Path to an existing file</param>
+/// <returns>Path with unicode segments changed to 8.3 representation, if possible</returns>    
+PWIZ_API_DECL string get_non_unicode_path(const string& utf8Path);
+
+/// wrapper for std::filesystem::canonical because boost::filesystem::canonical has an issue on Wine
+PWIZ_API_DECL bfs::path canonical(const bfs::path from);
+
 
 PWIZ_API_DECL enum ByteSizeAbbreviation
 {

@@ -10,8 +10,8 @@ TopPIC Suite on Windows with [MSYS2](https://www.msys2.org).
   MSYS2 libraries are built with GCC, and mixing compilers fails at link time
 * CMake >= 3.16 and Ninja
 * Boost >= 1.74 (filesystem, iostreams, thread, chrono, serialization,
-  program_options)
-* pugixml, SQLite3 and zlib development libraries
+  program_options, and nowide, which the ProteoWizard code needs on Windows)
+* pugixml, SQLite3, zlib and zstd development libraries
 * ONNX Runtime from MSYS2 (the vendored library under `ext/onnx/` is for
   Linux only)
 * Qt6 (Core, Gui, Widgets) for the GUI tools
@@ -44,6 +44,7 @@ pacman -S mingw-w64-ucrt-x86_64-gcc mingw-w64-ucrt-x86_64-cmake mingw-w64-ucrt-x
 # libraries
 pacman -S mingw-w64-ucrt-x86_64-boost mingw-w64-ucrt-x86_64-pugixml \
           mingw-w64-ucrt-x86_64-sqlite3 mingw-w64-ucrt-x86_64-zlib \
+          mingw-w64-ucrt-x86_64-zstd \
           mingw-w64-ucrt-x86_64-onnxruntime
 
 # Qt6 for the GUI tools
@@ -121,7 +122,7 @@ scripts\win_release.bat 1.9.1.0
 
 It copies the twelve executables from `bin\`, walks their import tables
 with `objdump` and copies every UCRT64 DLL they need (Boost is linked
-statically; the runtime DLLs are the GCC runtime, pugixml, SQLite, zlib,
+statically; the runtime DLLs are the GCC runtime, pugixml, SQLite, zlib, zstd,
 ONNX Runtime and, for the GUIs, Qt6 and its dependencies), the Qt
 `platforms`, `styles` and `imageformats` plugins, the `res` directory and
 the `LICENSE` into `toppic-windows-<version>\`, zips that folder with the
