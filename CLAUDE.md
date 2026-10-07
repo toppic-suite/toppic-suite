@@ -2263,8 +2263,11 @@ main's. What the alternative does, and how it differs from `stat/local`:
   moved by up to `term_range` (5) residues are tried
   (`LocalAlignProcessor::processTerminal`, the forms of
   `local_proteoform::getCandidateForm`, so a new start of 0 or 1 brings
-  the N-terminal acetylation variants; the shift's residues and the piece
-  stay inside), and on the N-terminal side also the other N-terminal forms
+  the N-terminal acetylation variants; the piece keeps at least one
+  residue, and a truncation may cut into the shift's range - until
+  amendment 4 the shift's residues had to stay inside, which skipped the
+  truncations that explain a shift sitting on the terminal residues, 31
+  of main's moved-start localizations on 480), and on the N-terminal side also the other N-terminal forms
   of the **unmoved** start (the acetylation dropped, or added: main's
   candidates include them, and -26.9 Da + 42.01 is an Oxidation; amendment
   4): each candidate's unexplained mass is the adjusted

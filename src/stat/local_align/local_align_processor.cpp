@@ -249,18 +249,17 @@ LocalAlignProcessor::PieceResult LocalAlignProcessor::processTerminal(
     if (d == 0 && !n_side) continue;
     int new_start = start;
     int new_end = end;
+    // The piece keeps at least one residue. A truncation may cut into the
+    // shift's range: the shift's residues near the terminus are the ones a
+    // truncation explains (a -128.07 Da shift on the residues 1-9 is a
+    // Dimethyl once the first residue, an R, is dropped), and the PTM
+    // sites are searched over the whole piece of the candidate.
     if (n_side) {
       new_start = start + d;
-      // the shift's residues and the piece stay in the proteoform
-      if (new_start < 0 || d > shift_ptr->getLeftBpPos() || d >= piece_end) {
-        continue;
-      }
+      if (new_start < 0 || d >= piece_end) continue;
     } else {
       new_end = end + d;
-      if (new_end > prot_len - 1 || -d > len - shift_ptr->getRightBpPos() ||
-          len + d <= piece_bgn) {
-        continue;
-      }
+      if (new_end > prot_len - 1 || len + d <= piece_bgn) continue;
     }
     MassShiftPtrVec kept = kept_shifts;
     ProteoformPtrVec forms = local_proteoform::getCandidateForm(
