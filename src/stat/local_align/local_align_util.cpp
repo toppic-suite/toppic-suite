@@ -455,6 +455,30 @@ std::vector<int> compMatchedSites(const ProteoformPtr& form_ptr,
   return matched;
 }
 
+int countMatchedSites(const std::vector<int>& matched_sites, int from, int to) {
+  int n = 0;
+  for (int j = std::max(from, 0); j <= to && j < static_cast<int>(matched_sites.size()); j++) {
+    n += matched_sites[j];
+  }
+  return n;
+}
+
+MassShiftPtr shiftPositions(const MassShiftPtr& shift_ptr, int delta) {
+  if (delta == 0) return shift_ptr;
+  AlterPtr ori = shift_ptr->getAlterPtr(0);
+  AlterPtr alter = std::make_shared<Alter>(
+      ori->getLeftBpPos() - delta, ori->getRightBpPos() - delta,
+      ori->getTypePtr(), ori->getMass(), ori->getModPtr());
+  LocalAnnoPtr anno = ori->getLocalAnno();
+  if (anno != nullptr) {
+    alter->setLocalAnno(std::make_shared<LocalAnno>(
+        anno->getLeftBpPos() - delta, anno->getRightBpPos() - delta,
+        anno->getConf(), anno->getScrVec(), anno->getRawScr(),
+        anno->getPtmPtr()));
+  }
+  return std::make_shared<MassShift>(alter);
+}
+
 int findBreakSite(const MassShiftPtr& shift_1, const MassShiftPtr& shift_2,
                   const std::vector<int>& matched_sites, int& matched_num) {
   int lo = shift_1->getRightBpPos();

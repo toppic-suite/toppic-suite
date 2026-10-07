@@ -45,13 +45,34 @@ class LocalAlignProcessor {
   // the switches of TOPPIC_LOCAL_ALIGN_PARA ("name=value,...")
   void readPara();
 
+  // The result of a piece: the new VARIABLE shifts, in the coordinates of
+  // cand_form when the proteoform's start or end was moved to explain the
+  // shift (nullptr: the original proteoform's)
+  struct PieceResult {
+    bool ok = false;
+    MassShiftPtrVec shifts;
+    ProteoformPtr cand_form;
+    std::string decision;
+  };
+
   PrsmPtr processOnePrsm(const PrsmPtr& prsm_ptr);
 
-  // the shift of the piece explained and localized: the new shifts are
-  // appended to new_shifts; false when the shift stays
-  bool processPiece(const PrsmPtr& prsm_ptr, const local_align::Piece& piece,
-                    const std::string& piece_name, int shift_idx,
-                    MassShiftPtrVec& new_shifts);
+  // the shift of the piece explained and localized on the proteoform as it
+  // is; the decision is logged
+  PieceResult processPiece(const PrsmPtr& prsm_ptr,
+                           const local_align::Piece& piece,
+                           const std::string& piece_name, int shift_idx);
+
+  // The shift explained on the candidate proteoforms whose start (n_side)
+  // or end is moved by up to term_range residues: the one-explanation rule
+  // over all candidates. piece_bgn / piece_end are the piece's bounds in
+  // the original proteoform, kept_shifts its shifts other than the one
+  // explained (and the protein N-terminal ones).
+  PieceResult processTerminal(const PrsmPtr& prsm_ptr,
+                              const MassShiftPtr& shift_ptr, bool n_side,
+                              int piece_bgn, int piece_end,
+                              const MassShiftPtrVec& kept_shifts,
+                              const std::string& piece_name, int shift_idx);
 
   void log(const PrsmPtr& prsm_ptr, int shift_idx, double shift_mass,
            const std::string& piece_name, const std::string& expl_names,

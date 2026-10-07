@@ -44,6 +44,12 @@ struct Para {
   int max_ptm = 2;
   // two-shift PrSMs are split and explained piece by piece
   bool split = true;
+  // a shift without an explanation that has at most term_max_matched
+  // matched cleavage sites on its N-terminal (C-terminal) side is tried on
+  // the proteoforms whose start (end) is moved by up to term_range residues
+  bool term = true;
+  int term_range = 5;
+  int term_max_matched = 2;
 };
 
 // A shift of a piece: its cleavage-site range [left, right) in the piece's
@@ -107,6 +113,12 @@ Piece makePiece(const ProteoformPtr& form_ptr, int bgn, int end,
 std::vector<int> compMatchedSites(const ProteoformPtr& form_ptr,
                                   const ExtendMsPtrVec& extend_ms_ptr_vec,
                                   const LocalMngPtr& mng_ptr);
+
+// the number of matched sites in [from, to]
+int countMatchedSites(const std::vector<int>& matched_sites, int from, int to);
+
+// the shift moved by -delta positions, with its local annotation
+MassShiftPtr shiftPositions(const MassShiftPtr& shift_ptr, int delta);
 
 // The break site between the two unexpected shifts: the middle matched site
 // of [first shift's right position, second shift's left position], or the

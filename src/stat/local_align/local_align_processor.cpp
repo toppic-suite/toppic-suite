@@ -34,6 +34,7 @@
 #include "prsm/prsm_xml_writer.hpp"
 #include "seq/alter_type.hpp"
 #include "seq/local_anno.hpp"
+#include "stat/local/local_proteoform.hpp"
 
 namespace toppic {
 
@@ -74,6 +75,12 @@ void LocalAlignProcessor::readPara() {
       para_.max_ptm = static_cast<int>(value);
     } else if (name == "split") {
       para_.split = value != 0;
+    } else if (name == "term") {
+      para_.term = value != 0;
+    } else if (name == "term_range") {
+      para_.term_range = static_cast<int>(value);
+    } else if (name == "term_max_matched") {
+      para_.term_max_matched = static_cast<int>(value);
     } else {
       LOG_ERROR("Unknown TOPPIC_LOCAL_ALIGN_PARA switch " << name);
     }
@@ -173,11 +180,10 @@ std::string shiftSites(const MassShiftPtrVec& shifts, int start_pos) {
 
 }  // namespace
 
-bool LocalAlignProcessor::processPiece(const PrsmPtr& prsm_ptr,
-                                       const local_align::Piece& piece,
-                                       const std::string& piece_name,
-                                       int shift_idx,
-                                       MassShiftPtrVec& new_shifts) {
+LocalAlignProcessor::PieceResult LocalAlignProcessor::processPiece(
+    const PrsmPtr& prsm_ptr, const local_align::Piece& piece,
+    const std::string& piece_name, int shift_idx) {
+  PieceResult result;
   double err_tole = mng_ptr_->prec_tole_ptr_->compStrictErrorTole(
       prsm_ptr->getAdjustedPrecMass());
   std::vector<local_align::Explanation> expls =
@@ -188,28 +194,126 @@ bool LocalAlignProcessor::processPiece(const PrsmPtr& prsm_ptr,
     names += expls[k].getName();
   }
   if (expls.empty()) {
+    result.decision = "none";
     log(prsm_ptr, shift_idx, piece.shift_mass, piece_name, "-", "none", "-");
-    return false;
+    return result;
   }
   if (expls.size() > 1) {
+    result.decision = "ambiguous";
     log(prsm_ptr, shift_idx, piece.shift_mass, piece_name, names, "ambiguous",
         "-");
-    return false;
+    return result;
   }
   int best_score = 0;
-  MassShiftPtrVec shifts = local_align::localize(
-      piece, expls[0], prsm_ptr->getRefineMsPtrVec(), para_, mng_ptr_,
-      best_score);
-  if (shifts.empty()) {
+  result.shifts = local_align::localize(piece, expls[0],
+                                        prsm_ptr->getRefineMsPtrVec(), para_,
+                                        mng_ptr_, best_score);
+  if (result.shifts.empty()) {
+    result.decision = "no_sites";
     log(prsm_ptr, shift_idx, piece.shift_mass, piece_name, names, "no_sites",
         "-");
-    return false;
+    return result;
   }
+  result.ok = true;
+  result.decision = "localized";
   log(prsm_ptr, shift_idx, piece.shift_mass, piece_name, names, "localized",
-      shiftSites(shifts, prsm_ptr->getProteoformPtr()->getStartPos()) +
+      shiftSites(result.shifts, prsm_ptr->getProteoformPtr()->getStartPos()) +
           " score=" + std::to_string(best_score));
-  new_shifts.insert(new_shifts.end(), shifts.begin(), shifts.end());
-  return true;
+  return result;
+}
+
+LocalAlignProcessor::PieceResult LocalAlignProcessor::processTerminal(
+    const PrsmPtr& prsm_ptr, const MassShiftPtr& shift_ptr, bool n_side,
+    int piece_bgn, int piece_end, const MassShiftPtrVec& kept_shifts,
+    const std::string& piece_name, int shift_idx) {
+  PieceResult result;
+  ProteoformPtr form_ptr = prsm_ptr->getProteoformPtr();
+  int start = form_ptr->getStartPos();
+  int end = form_ptr->getEndPos();
+  int len = form_ptr->getLen();
+  int prot_len = static_cast<int>(form_ptr->getFastaSeqPtr()->getRawSeq().length());
+  double adj_prec_mass = prsm_ptr->getAdjustedPrecMass();
+  double err_tole = mng_ptr_->prec_tole_ptr_->compStrictErrorTole(adj_prec_mass);
+  // the candidates: (form, piece, explanation)
+  struct Cand {
+    ProteoformPtr form;
+    local_align::Piece piece;
+    local_align::Explanation expl;
+  };
+  std::vector<Cand> cands;
+  std::string names;
+  for (int d = -para_.term_range; d <= para_.term_range; d++) {
+    if (d == 0) continue;
+    int new_start = start;
+    int new_end = end;
+    if (n_side) {
+      new_start = start + d;
+      // the shift's residues and the piece stay in the proteoform
+      if (new_start < 0 || d > shift_ptr->getLeftBpPos() || d >= piece_end) {
+        continue;
+      }
+    } else {
+      new_end = end + d;
+      if (new_end > prot_len - 1 || -d > len - shift_ptr->getRightBpPos() ||
+          len + d <= piece_bgn) {
+        continue;
+      }
+    }
+    MassShiftPtrVec kept = kept_shifts;
+    ProteoformPtrVec forms = local_proteoform::getCandidateForm(
+        form_ptr->getFastaSeqPtr(), start, new_start, new_end, kept, mng_ptr_);
+    for (size_t f = 0; f < forms.size(); f++) {
+      int cand_len = forms[f]->getLen();
+      int pb = n_side ? 0 : piece_bgn;
+      int pe = n_side ? piece_end - d : cand_len;
+      if (pe <= pb) continue;
+      // the other shifts of the candidate are all known
+      local_align::Piece piece =
+          local_align::makePiece(forms[f], pb, pe, nullptr);
+      piece.shift_mass = adj_prec_mass - forms[f]->getMass();
+      std::vector<local_align::Explanation> expls =
+          local_align::findExplanations(piece, err_tole, para_);
+      for (size_t k = 0; k < expls.size(); k++) {
+        if (!names.empty()) names += ";";
+        names += expls[k].getName() + (n_side ? "@start" : "@end") +
+                 std::to_string((n_side ? new_start : new_end) + 1) +
+                 (forms[f]->getProtModPtr()->getType() == "NONE" ? "" :
+                  "/" + forms[f]->getProtModPtr()->getType());
+        cands.push_back({forms[f], piece, expls[k]});
+      }
+    }
+  }
+  std::string side = n_side ? "N" : "C";
+  if (cands.empty()) {
+    result.decision = "term_none";
+    log(prsm_ptr, shift_idx, shift_ptr->getMassShift(), piece_name + "," + side,
+        "-", "term_none", "-");
+    return result;
+  }
+  if (cands.size() > 1) {
+    result.decision = "term_ambiguous";
+    log(prsm_ptr, shift_idx, shift_ptr->getMassShift(), piece_name + "," + side,
+        names, "term_ambiguous", "-");
+    return result;
+  }
+  int best_score = 0;
+  result.shifts = local_align::localize(cands[0].piece, cands[0].expl,
+                                        prsm_ptr->getRefineMsPtrVec(), para_,
+                                        mng_ptr_, best_score);
+  if (result.shifts.empty()) {
+    result.decision = "term_no_sites";
+    log(prsm_ptr, shift_idx, shift_ptr->getMassShift(), piece_name + "," + side,
+        names, "term_no_sites", "-");
+    return result;
+  }
+  result.ok = true;
+  result.cand_form = cands[0].form;
+  result.decision = "term_localized";
+  log(prsm_ptr, shift_idx, cands[0].piece.shift_mass, piece_name + "," + side,
+      names, "term_localized",
+      shiftSites(result.shifts, cands[0].form->getStartPos()) +
+          " score=" + std::to_string(best_score));
+  return result;
 }
 
 PrsmPtr LocalAlignProcessor::processOnePrsm(const PrsmPtr& prsm_ptr) {
@@ -218,67 +322,156 @@ PrsmPtr LocalAlignProcessor::processOnePrsm(const PrsmPtr& prsm_ptr) {
       form_ptr->getMassShiftPtrVec(AlterType::UNEXPECTED);
   std::sort(unexp_shifts.begin(), unexp_shifts.end(), MassShift::cmpPosInc);
   int len = form_ptr->getLen();
+  int start = form_ptr->getStartPos();
+  int end = form_ptr->getEndPos();
   double err_tole = mng_ptr_->prec_tole_ptr_->compStrictErrorTole(
       prsm_ptr->getAdjustedPrecMass());
+  if (unexp_shifts.size() != 1 && unexp_shifts.size() != 2) return prsm_ptr;
+  if (unexp_shifts.size() == 2 && !para_.split) return prsm_ptr;
+
+  // the shifts of the proteoform other than the explained one(s) and the
+  // protein N-terminal ones, which the candidate forms add themselves
+  auto keptShifts = [&](const MassShiftPtrVec& explained) {
+    MassShiftPtrVec kept;
+    const MassShiftPtrVec& all = form_ptr->getMassShiftPtrVec();
+    for (size_t k = 0; k < all.size(); k++) {
+      if (all[k]->getTypePtr() == AlterType::PROTEIN_VARIABLE) continue;
+      if (std::find(explained.begin(), explained.end(), all[k]) !=
+          explained.end()) {
+        continue;
+      }
+      kept.push_back(all[k]);
+    }
+    return kept;
+  };
+  std::vector<int> matched = local_align::compMatchedSites(
+      form_ptr, prsm_ptr->getRefineMsPtrVec(), mng_ptr_);
+  auto fewOnN = [&](const MassShiftPtr& s) {
+    return para_.term &&
+           local_align::countMatchedSites(matched, 1, s->getLeftBpPos()) <=
+               para_.term_max_matched;
+  };
+  auto fewOnC = [&](const MassShiftPtr& s) {
+    return para_.term &&
+           local_align::countMatchedSites(matched, s->getRightBpPos(), len - 1) <=
+               para_.term_max_matched;
+  };
+
   MassShiftPtrVec explained;
-  MassShiftPtrVec new_shifts;
+  std::vector<PieceResult> results;
   if (unexp_shifts.size() == 1) {
-    double mass = unexp_shifts[0]->getMassShift();
+    MassShiftPtr s = unexp_shifts[0];
+    double mass = s->getMassShift();
     // a shift within [-1, 1] Da is not characterized (LocalProcessor)
     if (std::abs(mass) <= 1 + err_tole) {
       log(prsm_ptr, 1, mass, "whole", "-", "small", "-");
       return prsm_ptr;
     }
-    local_align::Piece piece =
-        local_align::makePiece(form_ptr, 0, len, unexp_shifts[0]);
-    if (processPiece(prsm_ptr, piece, "whole", 1, new_shifts)) {
-      explained.push_back(unexp_shifts[0]);
+    local_align::Piece piece = local_align::makePiece(form_ptr, 0, len, s);
+    PieceResult r = processPiece(prsm_ptr, piece, "whole", 1);
+    if (!r.ok && r.decision == "none") {
+      MassShiftPtrVec kept = keptShifts({s});
+      if (fewOnN(s)) {
+        r = processTerminal(prsm_ptr, s, true, 0, len, kept, "whole", 1);
+      }
+      if (!r.ok && fewOnC(s)) {
+        r = processTerminal(prsm_ptr, s, false, 0, len, kept, "whole", 1);
+      }
     }
-  } else if (unexp_shifts.size() == 2) {
-    if (!para_.split) return prsm_ptr;
-    if (unexp_shifts[0]->getRightBpPos() > unexp_shifts[1]->getLeftBpPos()) {
+    if (r.ok) {
+      explained.push_back(s);
+      results.push_back(r);
+    }
+  } else {
+    MassShiftPtr s1 = unexp_shifts[0];
+    MassShiftPtr s2 = unexp_shifts[1];
+    if (s1->getRightBpPos() > s2->getLeftBpPos()) {
       log(prsm_ptr, 0, 0, "whole", "-", "overlap", "-");
       return prsm_ptr;
     }
-    std::vector<int> matched = local_align::compMatchedSites(
-        form_ptr, prsm_ptr->getRefineMsPtrVec(), mng_ptr_);
     int matched_num = 0;
-    int break_site = local_align::findBreakSite(unexp_shifts[0], unexp_shifts[1],
-                                                matched, matched_num);
-    std::string break_str = "break=" + std::to_string(break_site) +
-                            "/matched=" + std::to_string(matched_num);
-    local_align::Piece piece_1 =
-        local_align::makePiece(form_ptr, 0, break_site, unexp_shifts[0]);
-    if (processPiece(prsm_ptr, piece_1, "1:0-" + std::to_string(break_site) +
-                     "," + break_str, 1, new_shifts)) {
-      explained.push_back(unexp_shifts[0]);
+    int b = local_align::findBreakSite(s1, s2, matched, matched_num);
+    std::string break_str =
+        "break=" + std::to_string(b) + "/matched=" + std::to_string(matched_num);
+    std::string name_1 = "1:0-" + std::to_string(b) + "," + break_str;
+    std::string name_2 = "2:" + std::to_string(b) + "-" + std::to_string(len) +
+                         "," + break_str;
+    local_align::Piece piece_1 = local_align::makePiece(form_ptr, 0, b, s1);
+    PieceResult r1 = processPiece(prsm_ptr, piece_1, name_1, 1);
+    if (!r1.ok && r1.decision == "none" && fewOnN(s1)) {
+      r1 = processTerminal(prsm_ptr, s1, true, 0, b, keptShifts({s1}), name_1,
+                           1);
     }
-    local_align::Piece piece_2 =
-        local_align::makePiece(form_ptr, break_site, len, unexp_shifts[1]);
-    if (processPiece(prsm_ptr, piece_2, "2:" + std::to_string(break_site) + "-" +
-                     std::to_string(len) + "," + break_str, 2, new_shifts)) {
-      explained.push_back(unexp_shifts[1]);
+    local_align::Piece piece_2 = local_align::makePiece(form_ptr, b, len, s2);
+    PieceResult r2 = processPiece(prsm_ptr, piece_2, name_2, 2);
+    if (!r2.ok && r2.decision == "none" && fewOnC(s2)) {
+      r2 = processTerminal(prsm_ptr, s2, false, b, len, keptShifts({s2}),
+                           name_2, 2);
     }
-  } else {
-    return prsm_ptr;
+    if (r1.ok) {
+      explained.push_back(s1);
+      results.push_back(r1);
+    }
+    if (r2.ok) {
+      explained.push_back(s2);
+      results.push_back(r2);
+    }
   }
   if (explained.empty()) return prsm_ptr;
 
-  MassShiftPtrVec all_shifts;
-  const MassShiftPtrVec& ori_shifts = form_ptr->getMassShiftPtrVec();
-  for (size_t k = 0; k < ori_shifts.size(); k++) {
-    if (std::find(explained.begin(), explained.end(), ori_shifts[k]) ==
-        explained.end()) {
-      all_shifts.push_back(ori_shifts[k]);
+  // the result proteoform: the original one, or the one with the moved
+  // start / end of the terminal candidates
+  int final_start = start;
+  int final_end = end;
+  ProtModPtr n_prot_mod = form_ptr->getProtModPtr();
+  for (size_t k = 0; k < results.size(); k++) {
+    if (results[k].cand_form == nullptr) continue;
+    if (results[k].cand_form->getStartPos() != start) {
+      final_start = results[k].cand_form->getStartPos();
+      n_prot_mod = results[k].cand_form->getProtModPtr();
+    }
+    if (results[k].cand_form->getEndPos() != end) {
+      final_end = results[k].cand_form->getEndPos();
     }
   }
-  all_shifts.insert(all_shifts.end(), new_shifts.begin(), new_shifts.end());
+  ProteoformPtr base_ptr;
+  MassShiftPtrVec all_shifts;
+  if (final_start == start && final_end == end) {
+    base_ptr = form_ptr;
+    const MassShiftPtrVec& ori_shifts = form_ptr->getMassShiftPtrVec();
+    for (size_t k = 0; k < ori_shifts.size(); k++) {
+      if (std::find(explained.begin(), explained.end(), ori_shifts[k]) ==
+          explained.end()) {
+        all_shifts.push_back(ori_shifts[k]);
+      }
+    }
+  } else {
+    MassShiftPtrVec kept = keptShifts(explained);
+    ProteoformPtrVec forms = local_proteoform::getCandidateForm(
+        form_ptr->getFastaSeqPtr(), start, final_start, final_end, kept,
+        mng_ptr_);
+    base_ptr = forms[0];
+    for (size_t f = 0; f < forms.size(); f++) {
+      if (forms[f]->getProtModPtr()->getType() == n_prot_mod->getType()) {
+        base_ptr = forms[f];
+      }
+    }
+    all_shifts = base_ptr->getMassShiftPtrVec();
+  }
+  for (size_t k = 0; k < results.size(); k++) {
+    int cand_start = results[k].cand_form == nullptr
+                         ? start
+                         : results[k].cand_form->getStartPos();
+    for (size_t m = 0; m < results[k].shifts.size(); m++) {
+      all_shifts.push_back(local_align::shiftPositions(
+          results[k].shifts[m], final_start - cand_start));
+    }
+  }
   std::sort(all_shifts.begin(), all_shifts.end(), MassShift::cmpPosInc);
   ProteoformPtr new_form_ptr = std::make_shared<Proteoform>(
-      form_ptr->getFastaSeqPtr(), form_ptr->getProtModPtr(),
-      form_ptr->getStartPos(), form_ptr->getEndPos(), form_ptr->getResSeqPtr(),
-      all_shifts);
-  if (form_ptr->hasTruncNTermMod()) {
+      form_ptr->getFastaSeqPtr(), base_ptr->getProtModPtr(), final_start,
+      final_end, base_ptr->getResSeqPtr(), all_shifts);
+  if (form_ptr->hasTruncNTermMod() && final_start == start) {
     new_form_ptr->setTruncNTermModPtr(form_ptr->getTruncNTermModPtr());
   }
   new_form_ptr->setProteoClusterId(form_ptr->getProteoClusterId());
