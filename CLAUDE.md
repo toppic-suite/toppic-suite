@@ -368,6 +368,68 @@ abbreviation matches. Update it when that code or the table columns change.
 each `base_data` file, the two ONNX models, the Git LFS-tracked files);
 update it when a resource file is added, removed or repurposed.
 
+## Quantized ONNX models (`res/envcnn_models`, `res/ecscore_models`)
+
+The models the tools load, `envcnn_two_block.onnx` and
+`ecscore_seven_attr.onnx` (file names fixed in `onnx_env_cnn::initModel` and
+`onnx_ecscore::initModel`), are dynamically quantized (int8 weights,
+activations quantized at run time) forms of the float PyTorch exports kept
+next to them as `envcnn_two_block_full.onnx` and
+`ecscore_seven_attr_full.onnx`, which no code loads (toppic_test experiment
+131, issue #595). Both are made by `quantize.py` of that experiment (Python
+onnxruntime 1.24.1; the files keep opset 11 and IR version 6 and load in the
+vendored runtime 1.23.2). They are used by TopFD and TopDIA (both models) and
+by TopPIC's post mass matching (EnvCNN).
+
+- **Gemm -> MatMul + Add first.** The export writes every fully connected
+  layer as `Gemm(A, W, b, transB = 1)`, which onnxruntime's
+  `quantize_dynamic` does not quantize; the rewrite `MatMul(A, W^T) + b`
+  gives the same logits.
+- **EnvCNN (`fc_row`).** The three fully connected layers (fc.0 9,600 ->
+  2,048 holds 19.7 M of the 21.9 M parameters) get int8 weights with one
+  scale per output channel, and their inputs are quantized to uint8 with
+  **one scale per row** (envelope): `max(row) / 255`, valid because each is
+  a ReLU output (>= 0), built from ReduceMax, Max, Div, Round, Cast,
+  MatMulInteger and Mul. `quantize_dynamic` itself uses one activation scale
+  per call: the deconvolution scores up to 256 envelopes per call, and its
+  input has a few rows with values up to 825 (experimental intensities
+  divided by the theoretical envelope's highest peak; a neighbouring intense
+  peak), which coarsened the whole batch: scores moved by 0.06 on average,
+  4.7% of the fragment masses crossed toppic's 0.4 (`-F`), and 142 PrSMs of
+  480_F3_02 changed their proteoform. With one scale per row a score does not
+  depend on the batch (mean change 0.002). The convolutions stay float:
+  ConvInteger was slower than the float convolutions and less accurate. The
+  file is 22 MB instead of 87 MB.
+- **ECScore (`fc`).** `quantize_dynamic` with int8 weights, one scale per
+  tensor (113 k parameters, 122 kB). TopFD calls it once per candidate
+  feature (about 1 s per run in total either way); its scores change by
+  0.027 on average (its seven inputs have different ranges but share one
+  activation scale).
+- **Results** on 480_F3_02 (toppic_test experiment 131, report 0131; main
+  7eb5dbe9 with the models swapped in `res/`, i7-11700 with AVX-512 VNNI,
+  `topfd -u 16`, three runs each): TopFD 283 s against 408 s with the float
+  models (MS1 deconvolution 144 against 216 s, feature detection 64 against
+  75 s, MS/MS deconvolution 74 against 115 s; EnvCNN was 84-88% of the
+  deconvolution time and its int8 calls are 1.6-1.8x faster). 42,447
+  features against 45,360 (the quantized ECScore; the EnvCNN alone gives
+  45,367), 320 of the 4,318 MS/MS precursors changed. toppic (setting d of
+  toppic_test report 0062): 3,346-3,347 PrSMs, 1,996-1,998 proteoforms and
+  436 proteins against 3,336-3,342 / 1,998-2,000 / 437; 33 PrSMs with
+  another proteoform than in a float run (1-3 between float runs). The int8
+  speed-up depends on the CPU's int8 dot-product instructions; it was not
+  timed on CPUs without AVX-512 VNNI or on ARM.
+- **In the tree** (branch `quantized_onnx_models` on main 72534ded, merged
+  into main on 2026-10-06; toppic_test experiment 131, amendment 1; one run
+  each): TopFD 278.6 s
+  against 402.8 s with the float `*_full` models; its outputs are as close to
+  the experiment's arm B as two runs of B are to each other. toppic: 3,347
+  PrSMs, 1,997 proteoforms, 437 proteins against main's 3,338 / 2,001 / 436.
+  TopPIC's post mass matching with the int8 EnvCNN (5.7 s of EnvCNN against
+  16.9 s) gives the same tables and XML files as with the float model on the
+  same TopFD output; only 3,772 of the 724,767 EnvCNN scores in
+  `_post_ms2.msalign` change (up to 0.12, 41 across 0.4). TopDIA was not
+  tested.
+
 ## Envelope refinement and the core-peak intensity fit (`ms/env/match_env_refine`)
 
 After the DP stage, `DeconvSingleSp::postprocess` calls
