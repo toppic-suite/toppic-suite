@@ -787,10 +787,11 @@ species at lower charges. Facts to keep straight:
   search's own switches (`TOPFD_GREEDY_PARA`) apply too.
   `TOPFD_PTCR_DEBUG_SCAN=<scan>` writes one scan's decisions to
   `ptcr_scan<scan>.txt`.
-- **`-o` lost the first MS/MS spectrum of every file**: `MzmlMsGroupReader`'s
-  constructor reads one spectrum to check that the file is not empty and
-  rewound only when MS1 spectra are present (fixed in this branch; it also
-  affects TopDIA's MS/MS step, which runs with the missing-MS1 mode).
+- **`-o` lost the first MS/MS spectrum of every file without MS1
+  spectra**: `MzmlMsGroupReader`'s constructor reads one spectrum to check
+  that the file is not empty and rewound only when MS1 spectra are present
+  (fixed in this branch). TopDIA's MS/MS step runs in that mode on files
+  that start with an MS1 spectrum, which the skip consumed harmlessly.
 - **Results** (toppic_test experiment 136; data/ptcr_ms2, two single PTCR
   scans of an Orbitrap Eclipse, isolated at 16+ and 17+ with +-5 m/z, of a
   16.94 kDa proteoform and its co-isolated variants; ThermoRawFileParser
@@ -805,14 +806,17 @@ species at lower charges. Facts to keep straight:
   and a minor species' monoisotopic mass is not determined to the isotope
   (a joint least-squares fit of all species does not decide it either).
   Without the bound 81 / 102 more species (9% / 10% of the intensity),
-  2 of them found in the other scan. A species 1.4 m/z outside both
-  isolation windows is reproducible (16,835.55 Da, 1% of the intensity):
-  the window edges are not sharp, but margins of 0.5-3 m/z added mostly
-  irreproducible species, so the margin stays 0. main 38ba67dc writes 420 /
+  2 of them at the same mass in the other scan. One species whose envelope
+  ends 0.8 and 0.5 m/z below the two windows is reproducible (16,835.55 Da,
+  1% of the intensity): the window edges are not sharp, but margins of
+  0.5-3 m/z added mostly irreproducible species, so the margin stays 0. main 38ba67dc writes 420 /
   487 envelope lines (one per charge state) with a dummy precursor (`-o`:
   charge 30, mass 50,000 Da), 21 / 33 masses above 10 kDa with a
   1-isotope twin, 72% / 77% of the lines (15% / 19% of the intensity) of
-  masses outside every band, charges up to 30.
+  masses outside every band, charges up to 30. On 480_F3_02 (no PTCR
+  spectra) the branch's TopFD output equals main's within the variation of
+  two main runs (MS/MS spectra identical; 702 against 727 MS1 spectra with
+  a differing mass; same time and memory).
 
 ## Post mass matching (`prsm/prsm_post_mass_match`, toppic only)
 
