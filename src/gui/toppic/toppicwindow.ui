@@ -933,6 +933,16 @@ level:</string>
          </item>
          <item>
           <property name="text">
+           <string>ETCID</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>ETHCD</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
            <string>HCD</string>
           </property>
          </item>

@@ -164,7 +164,7 @@ MS/MS deconvolution:
 
 | Option | Default | Meaning |
 |---|---|---|
-| `-a`, `--activation <CID\|ETD\|HCD\|MPD\|UVPD\|FILE>` | FILE | Fragmentation method. `FILE` takes it from each spectrum in the input file; give a method explicitly when the file does not record it or records it wrongly. |
+| `-a`, `--activation <CID\|ETD\|ETCID\|ETHCD\|HCD\|MPD\|UVPD\|FILE>` | FILE | Fragmentation method. `FILE` takes it from the activation terms of each spectrum in the input file, whatever their order: ETD with beam-type or supplemental beam-type CID (or the EThcD term) is ETHCD, ETD with CID or supplemental CID (or the ETciD term) is ETCID, otherwise ETD, HCD, CID or MPD. ETCID (ETciD) and ETHCD (EThcD) have the ion types of ETD (c, z-dot). Give a method explicitly when the file does not record it or records it wrongly. |
 | `-s`, `--ms-two-sn-ratio <number>` | 1 | Signal-to-noise ratio for MS/MS spectra. Only peaks with intensity at least `ratio × noise level` can be the reference peak of an isotopic envelope; the other peaks of an envelope must be above the noise level. Values below 1, down to 0, lower both thresholds to `ratio × noise level`; the noise level itself still bounds how far isotopic envelopes extend. |
 | `-w`, `--precursor-window <number>` | 3.0 | Default precursor isolation window width (m/z). Ignored when the file contains isolation window information. |
 | `-n`, `--msdeconv` | off | Rank isotopic envelopes with the MS-Deconv score instead of the EnvCNN neural-network score. |

@@ -36,6 +36,70 @@
 
 namespace toppic {
 
+namespace {
+
+// The activation of an MS/MS spectrum from the activation cvParams of its
+// precursor, or "" when it has no known one. The set of terms decides, not
+// their order: converters write the terms of a combined activation in
+// different orders (msconvert: CID, ETD, ECD, PQD, HCD, then the
+// supplemental term; ThermoRawFileParser: the first reaction, then the
+// supplemental one), and neither writes the EThcD or ETciD term.
+// - EThcD (MS:1002631), or ETD (MS:1000598) with beam-type CID (MS:1000422)
+//   or supplemental beam-type CID (MS:1002678): ETHCD.
+// - ETciD (MS:1003182), or ETD with CID (MS:1000133) or supplemental CID
+//   (MS:1002679): ETCID. EThcD is tested first, so ETD with both kinds of
+//   CID is ETHCD.
+// - Otherwise ETD, HCD (beam-type CID, a kind of CID), CID, then MPD
+//   (MS:1000435).
+std::string getActivationName(const std::vector<pwiz::data::CVParam>& cv_list) {
+  bool cid = false;
+  bool hcd = false;
+  bool etd = false;
+  bool mpd = false;
+  bool supp_cid = false;
+  bool supp_hcd = false;
+  bool ethcd = false;
+  bool etcid = false;
+  for (size_t i = 0; i < cv_list.size(); i++) {
+    LOG_DEBUG("cv list " << i << " " << cv_list[i].cvid << " "
+                         << cv_list[i].value);
+    pwiz::cv::CVID cvid = cv_list[i].cvid;
+    cid = cid || cvid == pwiz::cv::MS_CID;
+    hcd = hcd || cvid == pwiz::cv::MS_HCD;
+    etd = etd || cvid == pwiz::cv::MS_ETD;
+    mpd = mpd || cvid == pwiz::cv::MS_MPD;
+    supp_cid = supp_cid ||
+               cvid == pwiz::cv::MS_supplemental_collision_induced_dissociation;
+    supp_hcd =
+        supp_hcd ||
+        cvid ==
+            pwiz::cv::MS_supplemental_beam_type_collision_induced_dissociation;
+    ethcd = ethcd || cvid == pwiz::cv::MS_EThcD;
+    etcid = etcid || cvid == pwiz::cv::MS_ETciD;
+  }
+  if (ethcd || (etd && (hcd || supp_hcd))) {
+    return "ETHCD";
+  }
+  if (etcid || (etd && (cid || supp_cid))) {
+    return "ETCID";
+  }
+  if (etd) {
+    return "ETD";
+  }
+  if (hcd) {
+    return "HCD";
+  }
+  if (cid) {
+    return "CID";
+  }
+  if (mpd) {
+    return "MPD";
+  }
+  return "";
+}
+
+}  // namespace
+
 PwMsReader::PwMsReader(const std::string& file_name) { init(file_name); }
 
 PwMsReader::PwMsReader(const std::string& file_name, double isolation_window) {
@@ -214,25 +278,8 @@ void PwMsReader::parseActivation(const MsHeaderPtr& header_ptr,
   if (ac_name == "" || ac_name == "FILE") {
     ac_name = "";
     if (cur_spec_ptr->precursors.size() > 0) {
-      std::vector<pwiz::data::CVParam> cv_list =
-          cur_spec_ptr->precursors[0].activation.cvParams;
-      for (size_t i = 0; i < cv_list.size(); i++) {
-        LOG_DEBUG("cv list " << i << " " << cv_list[i].cvid << " "
-                             << cv_list[i].value);
-        if (cv_list[i].cvid == pwiz::cv::MS_CID) {
-          ac_name = "CID";
-          break;
-        } else if (cv_list[i].cvid == pwiz::cv::MS_HCD) {
-          ac_name = "HCD";
-          break;
-        } else if (cv_list[i].cvid == pwiz::cv::MS_ETD) {
-          ac_name = "ETD";
-          break;
-        } else if (cv_list[i].cvid == pwiz::cv::MS_MPD) {
-          ac_name = "MPD";
-          break;
-        }
-      }
+      ac_name =
+          getActivationName(cur_spec_ptr->precursors[0].activation.cvParams);
     }
   }
   if (ac_name == "") {
