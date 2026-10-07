@@ -57,19 +57,23 @@ class LocalAlignProcessor {
 
   PrsmPtr processOnePrsm(const PrsmPtr& prsm_ptr);
 
-  // the shift of the piece explained and localized on the proteoform as it
-  // is; the decision is logged
+  // The shift of the piece explained and localized on the proteoform as it
+  // is and, with n_forms (the piece holds the N-terminus and the shift has
+  // few matched sites on its N-terminal side), on its other N-terminal
+  // forms of the same start (the acetylation dropped or added); the
+  // tie-break rules over all candidates, then the one-explanation rule.
+  // kept_shifts: the proteoform's shifts other than the one explained.
   PieceResult processPiece(const PrsmPtr& prsm_ptr,
                            const local_align::Piece& piece,
-                           const std::string& piece_name, int shift_idx);
+                           const std::string& piece_name, int shift_idx,
+                           const MassShiftPtrVec& kept_shifts, bool n_forms);
 
   // The shift explained on the candidate proteoforms whose start (n_side)
-  // or end is moved by up to term_range residues, and on the N-terminal
-  // side also on the other N-terminal forms of the unmoved start (the
-  // acetylation dropped or added): the one-explanation rule over all
-  // candidates. piece_bgn / piece_end are the piece's bounds in the
-  // original proteoform, kept_shifts its shifts other than the one
-  // explained (and the protein N-terminal ones).
+  // or end is moved by up to term_range residues: the tie-break rules,
+  // then the one-explanation rule over all candidates. piece_bgn /
+  // piece_end are the piece's bounds in the original proteoform,
+  // kept_shifts its shifts other than the one explained (and the protein
+  // N-terminal ones).
   PieceResult processTerminal(const PrsmPtr& prsm_ptr,
                               const MassShiftPtr& shift_ptr, bool n_side,
                               int piece_bgn, int piece_end,

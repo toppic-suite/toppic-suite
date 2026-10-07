@@ -2279,10 +2279,17 @@ main's. What the alternative does, and how it differs from `stat/local`:
   residue, and a truncation may cut into the shift's range - until
   amendment 4 the shift's residues had to stay inside, which skipped the
   truncations that explain a shift sitting on the terminal residues, 31
-  of main's moved-start localizations on 480), and on the N-terminal side also the other N-terminal forms
-  of the **unmoved** start (the acetylation dropped, or added: main's
-  candidates include them, and -26.9 Da + 42.01 is an Oxidation; amendment
-  4): each candidate's unexplained mass is the adjusted
+  of main's moved-start localizations on 480). The other N-terminal forms
+  of the **unmoved** start (the acetylation dropped, or added: main's base
+  candidates include them, and +37.95 Da + 42.01 is a Phospho) belong to
+  the **standard attempt** (`processPiece`, `n_forms`): when the piece
+  holds the N-terminus and the shift has at most `term_max_matched`
+  matched sites on its N-terminal side, their explanations join the pool
+  of the proteoform's own before the tie-break rules, so that a PTM on the
+  acetylation form competes with Acetyl + the PTM on the plain form
+  (amendments 4 and 5; until 8476656b they were terminal candidates, tried
+  only after an "ambiguous" standard attempt had already stopped). Each
+  candidate's unexplained mass is the adjusted
   precursor mass minus the candidate's mass, and the one-explanation rule
   counts over all (candidate, explanation) pairs ("term_localized",
   "term_none", "term_ambiguous" in the log, the explanations tagged

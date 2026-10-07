@@ -187,33 +187,85 @@ std::string shiftSites(const MassShiftPtrVec& shifts, int start_pos) {
 
 }  // namespace
 
+namespace {
+
+bool isAcetylForm(const std::string& type) {
+  return type == ProtModBase::getType_M_ACETYLATION() ||
+         type == ProtModBase::getType_NME_ACETYLATION();
+}
+
+}  // namespace
+
 LocalAlignProcessor::PieceResult LocalAlignProcessor::processPiece(
     const PrsmPtr& prsm_ptr, const local_align::Piece& piece,
-    const std::string& piece_name, int shift_idx) {
+    const std::string& piece_name, int shift_idx,
+    const MassShiftPtrVec& kept_shifts, bool n_forms) {
   PieceResult result;
-  double err_tole = mng_ptr_->prec_tole_ptr_->compStrictErrorTole(
-      prsm_ptr->getAdjustedPrecMass());
+  ProteoformPtr form_ptr = prsm_ptr->getProteoformPtr();
+  double adj_prec_mass = prsm_ptr->getAdjustedPrecMass();
+  double err_tole = mng_ptr_->prec_tole_ptr_->compStrictErrorTole(adj_prec_mass);
+  // the candidates: the explanations of the piece on the proteoform as it
+  // is (form nullptr) and, with n_forms, on its other N-terminal forms of
+  // the same start (the acetylation dropped or added), as main's base
+  // candidate forms
+  struct Cand {
+    ProteoformPtr form;
+    local_align::Piece piece;
+    local_align::Explanation expl;
+    bool acetyl_form;
+    std::string name;
+  };
+  std::vector<Cand> cands;
+  std::string ori_type = form_ptr->getProtModPtr()->getType();
   std::vector<local_align::Explanation> expls =
       local_align::findExplanations(piece, err_tole, para_);
-  std::string names;
   for (size_t k = 0; k < expls.size(); k++) {
-    if (k > 0) names += ";";
-    names += expls[k].getName();
+    cands.push_back({nullptr, piece, expls[k], isAcetylForm(ori_type),
+                     expls[k].getName()});
   }
-  if (expls.empty()) {
+  if (n_forms) {
+    MassShiftPtrVec kept = kept_shifts;
+    ProteoformPtrVec forms = local_proteoform::getCandidateForm(
+        form_ptr->getFastaSeqPtr(), form_ptr->getStartPos(),
+        form_ptr->getStartPos(), form_ptr->getEndPos(), kept, mng_ptr_);
+    for (size_t f = 0; f < forms.size(); f++) {
+      std::string type = forms[f]->getProtModPtr()->getType();
+      if (type == ori_type) continue;
+      local_align::Piece alt =
+          local_align::makePiece(forms[f], piece.bgn, piece.end, nullptr);
+      alt.shift_mass = adj_prec_mass - forms[f]->getMass();
+      std::vector<local_align::Explanation> alt_expls =
+          local_align::findExplanations(alt, err_tole, para_);
+      for (size_t k = 0; k < alt_expls.size(); k++) {
+        cands.push_back({forms[f], alt, alt_expls[k], isAcetylForm(type),
+                         alt_expls[k].getName() + "/" + type});
+      }
+    }
+  }
+  std::string names;
+  for (size_t k = 0; k < cands.size(); k++) {
+    if (k > 0) names += ";";
+    names += cands[k].name;
+  }
+  if (cands.empty()) {
     result.decision = "none";
     log(prsm_ptr, shift_idx, piece.shift_mass, piece_name, "-", "none", "-");
     return result;
   }
-  // several explanations: the tie-break rules, then the one-explanation rule
+  // several candidates: the tie-break rules, then the one-explanation rule
   std::string rule;
   std::string all_names;
   size_t chosen = 0;
-  if (expls.size() > 1) {
+  if (cands.size() > 1) {
     std::vector<size_t> kept;
     if (para_.tie) {
-      std::vector<bool> acetyl_forms(expls.size(), false);
-      kept = local_align::breakTies(expls, acetyl_forms, rule);
+      std::vector<local_align::Explanation> pool;
+      std::vector<bool> acetyl_forms;
+      for (size_t k = 0; k < cands.size(); k++) {
+        pool.push_back(cands[k].expl);
+        acetyl_forms.push_back(cands[k].acetyl_form);
+      }
+      kept = local_align::breakTies(pool, acetyl_forms, rule);
     }
     if (kept.size() != 1) {
       result.decision = "ambiguous";
@@ -223,22 +275,25 @@ LocalAlignProcessor::PieceResult LocalAlignProcessor::processPiece(
     }
     chosen = kept[0];
     all_names = names;
-    names = expls[chosen].getName();
+    names = cands[chosen].name;
   }
+  const Cand& cand = cands[chosen];
   int best_score = 0;
-  result.shifts = local_align::localize(piece, expls[chosen],
+  result.shifts = local_align::localize(cand.piece, cand.expl,
                                         prsm_ptr->getRefineMsPtrVec(), para_,
                                         mng_ptr_, best_score);
   if (result.shifts.empty()) {
     result.decision = "no_sites";
-    log(prsm_ptr, shift_idx, piece.shift_mass, piece_name, names, "no_sites",
-        "-", rule, all_names);
+    log(prsm_ptr, shift_idx, cand.piece.shift_mass, piece_name, names,
+        "no_sites", "-", rule, all_names);
     return result;
   }
   result.ok = true;
+  result.cand_form = cand.form;
   result.decision = "localized";
-  log(prsm_ptr, shift_idx, piece.shift_mass, piece_name, names, "localized",
-      shiftSites(result.shifts, prsm_ptr->getProteoformPtr()->getStartPos()) +
+  log(prsm_ptr, shift_idx, cand.piece.shift_mass, piece_name, names,
+      "localized",
+      shiftSites(result.shifts, form_ptr->getStartPos()) +
           " score=" + std::to_string(best_score),
       rule, all_names);
   return result;
@@ -264,11 +319,10 @@ LocalAlignProcessor::PieceResult LocalAlignProcessor::processTerminal(
   };
   std::vector<Cand> cands;
   std::string names;
-  std::string ori_prot_mod = form_ptr->getProtModPtr()->getType();
   for (int d = -para_.term_range; d <= para_.term_range; d++) {
-    // the unmoved end is the standard attempt; the unmoved start is tried
-    // with its other N-terminal forms (the acetylation dropped or added)
-    if (d == 0 && !n_side) continue;
+    // the unmoved terminus, with its N-terminal forms, is the standard
+    // attempt (processPiece)
+    if (d == 0) continue;
     int new_start = start;
     int new_end = end;
     // The piece keeps at least one residue. A truncation may cut into the
@@ -287,9 +341,6 @@ LocalAlignProcessor::PieceResult LocalAlignProcessor::processTerminal(
     ProteoformPtrVec forms = local_proteoform::getCandidateForm(
         form_ptr->getFastaSeqPtr(), start, new_start, new_end, kept, mng_ptr_);
     for (size_t f = 0; f < forms.size(); f++) {
-      if (d == 0 && forms[f]->getProtModPtr()->getType() == ori_prot_mod) {
-        continue;
-      }
       int cand_len = forms[f]->getLen();
       int pb = n_side ? 0 : piece_bgn;
       int pe = n_side ? piece_end - d : cand_len;
@@ -329,9 +380,8 @@ LocalAlignProcessor::PieceResult LocalAlignProcessor::processTerminal(
       std::vector<bool> acetyl_forms;
       for (size_t k = 0; k < cands.size(); k++) {
         expls.push_back(cands[k].expl);
-        std::string type = cands[k].form->getProtModPtr()->getType();
-        acetyl_forms.push_back(type == ProtModBase::getType_M_ACETYLATION() ||
-                               type == ProtModBase::getType_NME_ACETYLATION());
+          acetyl_forms.push_back(
+            isAcetylForm(cands[k].form->getProtModPtr()->getType()));
       }
       kept = local_align::breakTies(expls, acetyl_forms, rule);
     }
@@ -419,9 +469,9 @@ PrsmPtr LocalAlignProcessor::processOnePrsm(const PrsmPtr& prsm_ptr) {
       return prsm_ptr;
     }
     local_align::Piece piece = local_align::makePiece(form_ptr, 0, len, s);
-    PieceResult r = processPiece(prsm_ptr, piece, "whole", 1);
+    MassShiftPtrVec kept = keptShifts({s});
+    PieceResult r = processPiece(prsm_ptr, piece, "whole", 1, kept, fewOnN(s));
     if (!r.ok && r.decision == "none") {
-      MassShiftPtrVec kept = keptShifts({s});
       if (fewOnN(s)) {
         r = processTerminal(prsm_ptr, s, true, 0, len, kept, "whole", 1);
       }
@@ -448,13 +498,15 @@ PrsmPtr LocalAlignProcessor::processOnePrsm(const PrsmPtr& prsm_ptr) {
     std::string name_2 = "2:" + std::to_string(b) + "-" + std::to_string(len) +
                          "," + break_str;
     local_align::Piece piece_1 = local_align::makePiece(form_ptr, 0, b, s1);
-    PieceResult r1 = processPiece(prsm_ptr, piece_1, name_1, 1);
+    PieceResult r1 = processPiece(prsm_ptr, piece_1, name_1, 1, keptShifts({s1}),
+                                  fewOnN(s1));
     if (!r1.ok && r1.decision == "none" && fewOnN(s1)) {
       r1 = processTerminal(prsm_ptr, s1, true, 0, b, keptShifts({s1}), name_1,
                            1);
     }
     local_align::Piece piece_2 = local_align::makePiece(form_ptr, b, len, s2);
-    PieceResult r2 = processPiece(prsm_ptr, piece_2, name_2, 2);
+    PieceResult r2 = processPiece(prsm_ptr, piece_2, name_2, 2, keptShifts({s2}),
+                                  false);
     if (!r2.ok && r2.decision == "none" && fewOnC(s2)) {
       r2 = processTerminal(prsm_ptr, s2, false, b, len, keptShifts({s2}),
                            name_2, 2);
