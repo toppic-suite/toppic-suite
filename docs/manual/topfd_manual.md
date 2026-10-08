@@ -140,7 +140,9 @@ TopFD runs; they are merged into the final files and deleted at the end.
 e.g. CID of a peptide and then CID of one of its fragments) is deconvoluted
 after the MS/MS spectra, when the file has such scans: its precursor is the
 species of the parent MS2 spectrum's deconvolution whose isotopic envelope
-falls in the MS3 isolation window (the most intense one), or the selected
+falls in the MS3 isolation window (the most intense one, its monoisotopic
+mass checked against the MS2 spectrum's peaks one isotope below and above),
+or the selected
 ion of the file at every possible charge when the MS2 spectrum has no
 species there; the fragments are deconvoluted with the MS/MS method bounded
 by that precursor's mass and charge and written to `sample_ms3.msalign` and

@@ -1102,11 +1102,22 @@ FAIMS data). Facts to keep straight:
   selected ion m/z of the file at every charge from 1 to the MS2
   precursor's charge, written as multiple precursors (the file's charge
   state of an MS3 precursor is not usable: 10 for a third of the scans).
-  On 480-like peptide data the chosen species is a b or y ion of the
-  identified parent peptide in two thirds of the cases and one isotope
-  off (the MS2 deconvolution's monoisotopic error: -1 Da for 2-6 kDa
-  fragments at charge 3-6, +1 Da below 3 kDa) in a quarter; TopPIC's
-  zero-shift search tolerates the +-1 Da precursor error.
+  On the test data the chosen species is a b or y ion of the identified
+  parent peptide in two thirds of the cases and one isotope off (the
+  MS2 deconvolution's monoisotopic error: -1 Da for 2-6 kDa fragments at
+  charge 3-6, +1 Da below 3 kDa) in a quarter, so the species' mass is
+  **corrected by one isotope from the parent MS2 scan's centroid peaks**
+  (`correctIsotope`; the stage keeps the MS2 scans' peaks as it reads
+  them): when the peak one isotope above the reported monoisotopic m/z
+  is more than `TOPFD_MS3_ISO_K` (4) times the theoretical ratio
+  (`EnvBase::getEnvByMonoMass`) times the reported peak, the mass goes up
+  one isotope; else when a peak one isotope below holds at least
+  `TOPFD_MS3_ISO_C` (0.1) of the reported peak, it goes down one;
+  `TOPFD_MS3_ISO_CORRECT=0` turns it off and the `_ms3.tsv` column
+  "Isotope correction" records the shift. A cosine of the whole
+  theoretical envelope against the peaks was tried first and did not
+  separate the cases (experiment 146, amendment 1). TopPIC's zero-shift
+  search tolerates the +-1 Da precursor error anyway.
 - **The deconvolution** is the MS/MS one (`greedy_ms2_deconv::deconv`,
   or `DeconvSingleSp` at level 2 with `--deconv-ms2 msdeconv`) bounded by
   the precursor's mass (+1 Da) and charge (the MS2 precursor's in the
