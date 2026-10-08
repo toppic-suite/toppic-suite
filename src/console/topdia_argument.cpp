@@ -185,11 +185,11 @@ bool Argument::parse(int argc, char* argv[]) {
         "pseudo-peak-number,V", po::value<std::string>(&pseudo_min_peaks),
         "<an integer of at least 10>. The minimum number of peaks in a "
         "pseudo-MS/MS spectrum. The default value is 25.")(
-        "ms1-intensity-correlation-cutoff,p",
+        "ms1-intensity-correlation-cutoff,y",
         po::value<std::string>(&ms1_seed_env_inte_corr_tole_cutoff),
         "<a number in [0,1]>. Set the MS1 seed envelope intensity correlation "
         "cutoff value for extracting features. The default value is 0.5.")(
-        "ms2-intensity-correlation-cutoff,P",
+        "ms2-intensity-correlation-cutoff,Y",
         po::value<std::string>(&ms2_seed_env_inte_corr_tole_cutoff),
         "<a number in [0,1]>. Set the MS2 seed envelope intensity correlation "
         "cutoff value for extracting features. The default value is 0.5.")(
@@ -199,13 +199,13 @@ bool Argument::parse(int argc, char* argv[]) {
         "thread-number,u", po::value<std::string>(&thread_number),
         "<a positive integer>. Number of threads used in spectral "
         "deconvolution. Default value: 1.")(
-        "deconv-ms1", po::value<std::string>(&deconv_ms1),
+        "deconv-ms1,p", po::value<std::string>(&deconv_ms1),
         "<greedy|msdeconv>. Set the deconvolution method of MS1 spectra: "
         "msdeconv, the MS-Deconv dynamic programming, or greedy, TopFD's "
         "default greedy search, which decides the charge state of the most "
         "intense peak with all the charge states of its mass and subtracts "
         "the mass's envelopes. The default value is msdeconv.")(
-        "deconv-ms2", po::value<std::string>(&deconv_ms2),
+        "deconv-ms2,q", po::value<std::string>(&deconv_ms2),
         "<greedy|msdeconv|flashdeconv>. Set the deconvolution method of "
         "MS/MS spectra: msdeconv, the MS-Deconv dynamic programming; greedy, "
         "TopFD's default greedy search adapted to fragment ions; or "

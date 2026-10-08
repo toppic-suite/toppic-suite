@@ -105,8 +105,8 @@ std::string geneTopdiaCommand(const TopfdParaPtr& topfd_para_ptr,
   oss << "-B " << topfd_para_ptr->getMs2MinScanNum() << " ";
   oss << "-v " << topdia_para_ptr->getPseudoScoreCutoff() << " ";
   oss << "-V " << topdia_para_ptr->getPseudoMinPeaks() << " ";
-  oss << "-p " << topdia_para_ptr->getMs1SeedEnvInteCorrToleCutoff() << " ";
-  oss << "-P " << topdia_para_ptr->getMs2SeedEnvInteCorrToleCutoff() << " ";
+  oss << "-y " << topdia_para_ptr->getMs1SeedEnvInteCorrToleCutoff() << " ";
+  oss << "-Y " << topdia_para_ptr->getMs2SeedEnvInteCorrToleCutoff() << " ";
   command = command + oss.str();
   if (topfd_para_ptr->isSortUseMsDeconv()) {
     command = command + "-n ";

@@ -120,8 +120,8 @@ Deconvolution:
 | `-s`, `--ms-two-sn-ratio <number>` | 1 | Signal-to-noise ratio for MS/MS spectra. |
 | `-w`, `--precursor-window <number>` | 4.0 (TopFD: 3.0) | Default isolation window width (m/z), used only when the file records none. |
 | `-n`, `--msdeconv` | off | Rank isotopic envelopes with the MS-Deconv score instead of EnvCNN. |
-| `--deconv-ms1 <greedy\|msdeconv>` | msdeconv (TopFD: greedy) | MS1 deconvolution method (section 2, step 1). In `topdia_gui`: "MS1 deconvolution". |
-| `--deconv-ms2 <greedy\|msdeconv\|flashdeconv>` | msdeconv (TopFD: greedy) | MS/MS deconvolution method (section 2, step 3); `flashdeconv` is experimental. In `topdia_gui`: "MS/MS deconvolution". |
+| `-p`, `--deconv-ms1 <greedy\|msdeconv>` | msdeconv (TopFD: greedy) | MS1 deconvolution method (section 2, step 1). In `topdia_gui`: "MS1 deconvolution". |
+| `-q`, `--deconv-ms2 <greedy\|msdeconv\|flashdeconv>` | msdeconv (TopFD: greedy) | MS/MS deconvolution method (section 2, step 3); `flashdeconv` is experimental. In `topdia_gui`: "MS/MS deconvolution". |
 | `-d`, `--final-filtering` | off | Filter the envelopes of MS/MS scans by the estimated number of fragment ions. |
 | `-o`, `--missing-level-one` | off | Accepted, but the run fails at the pseudo-spectrum step without MS1 scans (section 1). |
 | `-u`, `--thread-number <int>` | 1 | Number of threads. |
@@ -135,8 +135,8 @@ Feature detection:
 | `-T`, `--ms2-ecscore-cutoff <0..1>` | 0 | ECScore cutoff for fragment features. |
 | `-B`, `--ms2-min-scan-number <1\|2\|3>` | 1 | Minimum number of MS/MS scans of a fragment feature. |
 | `-i`, `--single-scan-noise` | off | Use each MS1 scan's own noise level instead of the whole map's when filtering low-intensity peaks. |
-| `-p`, `--ms1-intensity-correlation-cutoff <0..1>` | 0.5 | Minimum correlation between the intensities of a seed isotopic envelope and the theoretical ones for starting an MS1 proteoform feature. |
-| `-P`, `--ms2-intensity-correlation-cutoff <0..1>` | 0.5 | The same cutoff for starting a fragment feature in an isolation window. |
+| `-y`, `--ms1-intensity-correlation-cutoff <0..1>` | 0.5 | Minimum correlation between the intensities of a seed isotopic envelope and the theoretical ones for starting an MS1 proteoform feature. |
+| `-Y`, `--ms2-intensity-correlation-cutoff <0..1>` | 0.5 | The same cutoff for starting a fragment feature in an isolation window. |
 
 Pseudo spectra:
 
