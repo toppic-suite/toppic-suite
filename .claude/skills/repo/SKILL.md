@@ -36,8 +36,8 @@ a sync should produce, and works without manual conflict resolution.
 - The private `main` is at the state to publish and the release tag exists
   there. Release tags are annotated, `v<version>` with the message
   `TopPIC Suite <version>`, where `<version>` is the `project(... VERSION
-  ...)` of `CMakeLists.txt` (e.g. `v2.0.0.0`):
-  `git tag -a v2.0.0.0 -m "TopPIC Suite 2.0.0.0" && git push origin v2.0.0.0`.
+  ...)` of `CMakeLists.txt` (e.g. `v2.1.0`):
+  `git tag -a v2.1.0 -m "TopPIC Suite 2.1.0" && git push origin v2.1.0`.
 
 ## Procedure
 
@@ -89,7 +89,7 @@ Verify from anywhere:
 
 ```sh
 git ls-remote --heads https://github.com/toppic-suite/toppic-suite.git main
-git ls-remote --tags  https://github.com/toppic-suite/toppic-suite.git v2.0.0.0
+git ls-remote --tags  https://github.com/toppic-suite/toppic-suite.git v2.1.0
 ```
 
 The public `main` hash is the new merge commit (or, after a fast-forward,

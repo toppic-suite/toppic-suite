@@ -353,7 +353,7 @@ topfd -T -c 20 -m 30000 data/spectrum_1.txt
 prints
 
 ```text
-TopFD 2.0.0.0
+TopFD 2.1.0
 Total thread number: 16
 Total memory: 31.07 GiB
 Available memory: 21.36 GiB

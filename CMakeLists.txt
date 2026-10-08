@@ -34,7 +34,7 @@ if(NOT CMAKE_HOST_WIN32)
   endif()
 endif()
 
-project(TopPIC_claude VERSION 2.0.0.0 LANGUAGES C CXX)
+project(TopPIC_claude VERSION 2.1.0 LANGUAGES C CXX)
 message(STATUS "Project name: " ${PROJECT_NAME})
 message(STATUS "System name: " ${CMAKE_SYSTEM_NAME})
 

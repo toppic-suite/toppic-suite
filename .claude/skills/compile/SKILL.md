@@ -123,7 +123,7 @@ ninja
 - Release zip: `scripts\win_release.bat [version]` (run from cmd or
   PowerShell after building) bundles `bin\*.exe`, the UCRT64 DLLs they
   import, the Qt plugins and `res/` into `toppic-windows-<version>.zip` in the
-  repository root (default version `2.0.0.0`); the extracted folder runs
+  repository root (default version `2.1.0`); the extracted folder runs
   without MSYS2 on `PATH`.
 
 ### macOS (Xcode CLT + Homebrew)
