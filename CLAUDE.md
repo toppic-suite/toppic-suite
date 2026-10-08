@@ -2083,6 +2083,44 @@ merged). Facts to keep straight:
   window matches), the E-value's generating function (relaxed tolerance on
   the observed precursor), TopMG.
 
+## The filters' mass list (`ms/factory/prm_ms_util`, `getIntMassErrorList`)
+
+Branch `filter_pairs` (toppic_test experiments 138 and 142, reports 0138 and
+0142; not merged). Facts to keep straight:
+
+- **What the list is.** The PRM peaks of a spectrum (prefix list: ORIGINAL
+  m - N shift, REVERSED P - (m - C shift); suffix list: the same minus H2O)
+  as integer masses round(x x `filter_scale_`, 100 = 0.01 Da) with the
+  tolerance ceil(tol x 100) (ORIGINAL ppo x m, REVERSED ppo x (m + P)), plus
+  the zero and precursor entries, sorted. The users add 1 per entry to every
+  column in its window: `MassMatch::compScores` (one-shift and variable PTM
+  filters), `compDiagMaxScoresImpl` (multi-shift filter) and
+  `CompShiftLowMem::findBestShift` (the diagonal finder of `PtmSlowMatch`).
+  The zero-shift filter does not use it; TopMG uses it in its one-shift
+  filter (and the multi-shift one with `--use-asf-diagonal`).
+- **One entry per integer mass and base type.** Peaks of one type with the
+  same integer mass give one entry (the largest tolerance); an ORIGINAL and a
+  REVERSED peak of the same integer mass are two. Main kept one entry per
+  integer mass: at an accurate precursor a b ion and the PRM P - y of its
+  complementary y ion differ by (precursor error - fragment error) x the
+  masses, a few mDa, and often shared an integer mass, so the right
+  proteoform scored one point for the pair (two when a bin boundary fell
+  between the peaks). On 480_F3_02 an identified spectrum lost 10.9 entries.
+- **Repeated integer masses are fine for the users**: they loop over the
+  entries, and `findBestShift` takes its range from the first and the last
+  entry (the precursor entry). Main already had them for combined spectra
+  (the merging restarts per spectrum).
+- **Results** (toppic_test experiment 142, against main 7b5112c2):
+  480_F3_02 setting d 3,369 / 2,003 / 441 against 3,354 / 1,996 / 440, more
+  targets at every rank of the target-decoy list; the TMT E. coli set of
+  experiment 80 444 / 263 / 69 against 454 / 244 / 67 (more targets at most
+  ranks; a lower 1% cutoff); TopMG in toppic (`--topmg topmg-only`) 3,025 /
+  1,768 / 422 against 3,010 / 1,765 / 420. No change where the precursor and
+  fragment errors differ by 10 ppm (P1_high_high_85min_1: nothing merges) or
+  on st_1. No time or memory cost. Right proteoforms near a filter's top-N
+  cutoff can still drop out when other candidates gain (4 of 23 changed
+  spectra on 480).
+
 ## Range of a variable PTM shift (`seq/mass_shift`, `search/varptmsearch/var_ptm_align`)
 
 Branch `var_ptm_narrow_range` (toppic_test experiment 122, report 0122;
