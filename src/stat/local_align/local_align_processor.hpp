@@ -55,6 +55,27 @@ class LocalAlignProcessor {
     std::string decision;
   };
 
+  // A candidate explanation of a shift: the proteoform it is on (nullptr:
+  // the proteoform as it is), the piece on that proteoform, the
+  // explanation, whether the proteoform carries the N-terminal
+  // acetylation, and the name for the log
+  struct Cand {
+    ProteoformPtr form;
+    local_align::Piece piece;
+    local_align::Explanation expl;
+    bool acetyl_form = false;
+    std::string name;
+  };
+
+  // The tie-break rules (local_align::breakTies) and, for the explanations
+  // left that differ only by Acetyl vs Trimethyl on the same proteoform,
+  // the site scores (both localized, the better match score wins, then
+  // the higher confidence, then Acetyl), then the one-explanation rule.
+  // Returns the index of the chosen candidate with its localized shifts
+  // and match score, or -1 (ambiguous); rule names the rules that decided.
+  int choose(const PrsmPtr& prsm_ptr, const std::vector<Cand>& cands,
+             MassShiftPtrVec& shifts, int& best_score, std::string& rule);
+
   PrsmPtr processOnePrsm(const PrsmPtr& prsm_ptr);
 
   // The shift of the piece explained and localized on the proteoform as it

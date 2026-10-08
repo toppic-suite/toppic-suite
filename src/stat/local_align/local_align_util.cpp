@@ -414,16 +414,6 @@ std::vector<size_t> breakTies(const std::vector<Explanation>& expls,
       return !acetyl_forms[i] && expls[i].hasPtm("Acetyl");
     });
   }
-  // (3) Acetyl over Trimethyl
-  bool any_acetyl = false;
-  for (size_t k = 0; k < kept.size(); k++) {
-    if (expls[kept[k]].hasPtm("Acetyl")) any_acetyl = true;
-  }
-  if (any_acetyl) {
-    apply("acetyl_over_trimethyl", [&](size_t i) {
-      return expls[i].hasPtm("Trimethyl") && !expls[i].hasPtm("Acetyl");
-    });
-  }
   return kept;
 }
 

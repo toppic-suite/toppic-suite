@@ -115,11 +115,11 @@ struct Explanation {
 // acetylation form over Acetyl + the PTM on the plain form); (2) the
 // N-terminal acetylation form over an Acetyl of -B on the plain form
 // (acetyl_forms[i]: the explanation's candidate proteoform carries the
-// acetylation); (3) Acetyl over Trimethyl (0.036 Da apart) - the
-// explanations with Trimethyl and without Acetyl are dropped when one with
-// Acetyl is left. Returns the indices of the explanations kept; rule names
-// the rules that reduced the set ("fewer_ptms", "acetyl_form",
-// "acetyl_over_trimethyl", joined by '+'; empty when none applied).
+// acetylation). Acetyl vs Trimethyl (0.036 Da apart) is not decided here:
+// LocalAlignProcessor::choose localizes both and takes the better match
+// score. Returns the indices of the explanations kept; rule names the
+// rules that reduced the set ("fewer_ptms", "acetyl_form", joined by '+';
+// empty when none applied).
 std::vector<size_t> breakTies(const std::vector<Explanation>& expls,
                               const std::vector<bool>& acetyl_forms,
                               std::string& rule);

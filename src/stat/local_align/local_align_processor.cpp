@@ -196,6 +196,92 @@ bool isAcetylForm(const std::string& type) {
 
 }  // namespace
 
+int LocalAlignProcessor::choose(const PrsmPtr& prsm_ptr,
+                                const std::vector<Cand>& cands,
+                                MassShiftPtrVec& shifts, int& best_score,
+                                std::string& rule) {
+  rule = "";
+  std::vector<size_t> kept;
+  for (size_t k = 0; k < cands.size(); k++) kept.push_back(k);
+  if (cands.size() > 1 && para_.tie) {
+    std::vector<local_align::Explanation> pool;
+    std::vector<bool> acetyl_forms;
+    for (size_t k = 0; k < cands.size(); k++) {
+      pool.push_back(cands[k].expl);
+      acetyl_forms.push_back(cands[k].acetyl_form);
+    }
+    kept = local_align::breakTies(pool, acetyl_forms, rule);
+  }
+  if (kept.size() > 1 && para_.tie) {
+    // Acetyl vs Trimethyl: the explanations left are on the same
+    // proteoform and the same up to Acetyl <-> Trimethyl
+    auto key = [&](size_t i) {
+      std::vector<std::string> abbrs;
+      abbrs.push_back(cands[i].expl.first->getAbbrName());
+      if (cands[i].expl.second != nullptr) {
+        abbrs.push_back(cands[i].expl.second->getAbbrName());
+      }
+      for (size_t k = 0; k < abbrs.size(); k++) {
+        if (abbrs[k] == "Trimethyl") abbrs[k] = "Acetyl";
+      }
+      std::sort(abbrs.begin(), abbrs.end());
+      return abbrs[0] + (abbrs.size() > 1 ? "+" + abbrs[1] : "");
+    };
+    bool eligible = true;
+    bool any_acetyl = false;
+    bool any_trimethyl = false;
+    for (size_t k = 0; k < kept.size(); k++) {
+      if (key(kept[k]) != key(kept[0]) ||
+          cands[kept[k]].form != cands[kept[0]].form) {
+        eligible = false;
+      }
+      if (cands[kept[k]].expl.hasPtm("Acetyl")) any_acetyl = true;
+      if (cands[kept[k]].expl.hasPtm("Trimethyl")) any_trimethyl = true;
+    }
+    if (eligible && any_acetyl && any_trimethyl) {
+      int best = -1;
+      int best_scr = -1;
+      double best_conf = -1;
+      MassShiftPtrVec best_shifts;
+      std::string detail;
+      for (size_t k = 0; k < kept.size(); k++) {
+        const Cand& cand = cands[kept[k]];
+        int scr = 0;
+        MassShiftPtrVec cur = local_align::localize(
+            cand.piece, cand.expl, prsm_ptr->getRefineMsPtrVec(), para_,
+            mng_ptr_, scr);
+        if (cur.empty()) scr = -1;
+        double conf = 0;
+        for (size_t m = 0; m < cur.size(); m++) {
+          conf += cur[m]->getAlterPtr(0)->getLocalAnno()->getConf();
+        }
+        detail += (detail.empty() ? "" : "/") + cand.expl.getName() + ":" +
+                  std::to_string(scr);
+        bool better = scr > best_scr || (scr == best_scr && conf > best_conf) ||
+                      (scr == best_scr && conf == best_conf &&
+                       cand.expl.hasPtm("Acetyl") && best >= 0 &&
+                       !cands[best].expl.hasPtm("Acetyl"));
+        if (best < 0 || better) {
+          best = static_cast<int>(kept[k]);
+          best_scr = scr;
+          best_conf = conf;
+          best_shifts = cur;
+        }
+      }
+      rule += (rule.empty() ? "" : "+") + std::string("site_scores(") + detail + ")";
+      shifts = best_shifts;
+      best_score = best_scr;
+      return best;
+    }
+  }
+  if (kept.size() != 1) return -1;
+  const Cand& cand = cands[kept[0]];
+  shifts = local_align::localize(cand.piece, cand.expl,
+                                 prsm_ptr->getRefineMsPtrVec(), para_,
+                                 mng_ptr_, best_score);
+  return static_cast<int>(kept[0]);
+}
+
 LocalAlignProcessor::PieceResult LocalAlignProcessor::processPiece(
     const PrsmPtr& prsm_ptr, const local_align::Piece& piece,
     const std::string& piece_name, int shift_idx,
@@ -208,13 +294,6 @@ LocalAlignProcessor::PieceResult LocalAlignProcessor::processPiece(
   // is (form nullptr) and, with n_forms, on its other N-terminal forms of
   // the same start (the acetylation dropped or added), as main's base
   // candidate forms
-  struct Cand {
-    ProteoformPtr form;
-    local_align::Piece piece;
-    local_align::Explanation expl;
-    bool acetyl_form;
-    std::string name;
-  };
   std::vector<Cand> cands;
   std::string ori_type = form_ptr->getProtModPtr()->getType();
   std::vector<local_align::Explanation> expls =
@@ -252,36 +331,21 @@ LocalAlignProcessor::PieceResult LocalAlignProcessor::processPiece(
     log(prsm_ptr, shift_idx, piece.shift_mass, piece_name, "-", "none", "-");
     return result;
   }
-  // several candidates: the tie-break rules, then the one-explanation rule
+  // the tie-break rules and the site scores, then the one-explanation rule
   std::string rule;
-  std::string all_names;
-  size_t chosen = 0;
-  if (cands.size() > 1) {
-    std::vector<size_t> kept;
-    if (para_.tie) {
-      std::vector<local_align::Explanation> pool;
-      std::vector<bool> acetyl_forms;
-      for (size_t k = 0; k < cands.size(); k++) {
-        pool.push_back(cands[k].expl);
-        acetyl_forms.push_back(cands[k].acetyl_form);
-      }
-      kept = local_align::breakTies(pool, acetyl_forms, rule);
-    }
-    if (kept.size() != 1) {
-      result.decision = "ambiguous";
-      log(prsm_ptr, shift_idx, piece.shift_mass, piece_name, names,
-          "ambiguous", "-", rule);
-      return result;
-    }
-    chosen = kept[0];
-    all_names = names;
-    names = cands[chosen].name;
+  MassShiftPtrVec shifts;
+  int best_score = 0;
+  int chosen = choose(prsm_ptr, cands, shifts, best_score, rule);
+  if (chosen < 0) {
+    result.decision = "ambiguous";
+    log(prsm_ptr, shift_idx, piece.shift_mass, piece_name, names, "ambiguous",
+        "-", rule);
+    return result;
   }
   const Cand& cand = cands[chosen];
-  int best_score = 0;
-  result.shifts = local_align::localize(cand.piece, cand.expl,
-                                        prsm_ptr->getRefineMsPtrVec(), para_,
-                                        mng_ptr_, best_score);
+  std::string all_names = cands.size() > 1 ? names : "";
+  if (cands.size() > 1) names = cand.name;
+  result.shifts = shifts;
   if (result.shifts.empty()) {
     result.decision = "no_sites";
     log(prsm_ptr, shift_idx, cand.piece.shift_mass, piece_name, names,
@@ -311,12 +375,7 @@ LocalAlignProcessor::PieceResult LocalAlignProcessor::processTerminal(
   int prot_len = static_cast<int>(form_ptr->getFastaSeqPtr()->getRawSeq().length());
   double adj_prec_mass = prsm_ptr->getAdjustedPrecMass();
   double err_tole = mng_ptr_->prec_tole_ptr_->compStrictErrorTole(adj_prec_mass);
-  // the candidates: (form, piece, explanation)
-  struct Cand {
-    ProteoformPtr form;
-    local_align::Piece piece;
-    local_align::Explanation expl;
-  };
+  // the candidates on the moved termini
   std::vector<Cand> cands;
   std::string names;
   for (int d = -para_.term_range; d <= para_.term_range; d++) {
@@ -352,12 +411,13 @@ LocalAlignProcessor::PieceResult LocalAlignProcessor::processTerminal(
       std::vector<local_align::Explanation> expls =
           local_align::findExplanations(piece, err_tole, para_);
       for (size_t k = 0; k < expls.size(); k++) {
+        std::string type = forms[f]->getProtModPtr()->getType();
+        std::string name = expls[k].getName() + (n_side ? "@start" : "@end") +
+                           std::to_string((n_side ? new_start : new_end) + 1) +
+                           (type == "NONE" ? "" : "/" + type);
         if (!names.empty()) names += ";";
-        names += expls[k].getName() + (n_side ? "@start" : "@end") +
-                 std::to_string((n_side ? new_start : new_end) + 1) +
-                 (forms[f]->getProtModPtr()->getType() == "NONE" ? "" :
-                  "/" + forms[f]->getProtModPtr()->getType());
-        cands.push_back({forms[f], piece, expls[k]});
+        names += name;
+        cands.push_back({forms[f], piece, expls[k], isAcetylForm(type), name});
       }
     }
   }
@@ -368,38 +428,22 @@ LocalAlignProcessor::PieceResult LocalAlignProcessor::processTerminal(
         "-", "term_none", "-");
     return result;
   }
-  // several candidates: the tie-break rules over all (candidate,
+  // the tie-break rules and the site scores over all (candidate,
   // explanation) pairs, then the one-explanation rule
   std::string rule;
-  std::string all_names;
-  size_t chosen = 0;
-  if (cands.size() > 1) {
-    std::vector<size_t> kept;
-    if (para_.tie) {
-      std::vector<local_align::Explanation> expls;
-      std::vector<bool> acetyl_forms;
-      for (size_t k = 0; k < cands.size(); k++) {
-        expls.push_back(cands[k].expl);
-          acetyl_forms.push_back(
-            isAcetylForm(cands[k].form->getProtModPtr()->getType()));
-      }
-      kept = local_align::breakTies(expls, acetyl_forms, rule);
-    }
-    if (kept.size() != 1) {
-      result.decision = "term_ambiguous";
-      log(prsm_ptr, shift_idx, shift_ptr->getMassShift(),
-          piece_name + "," + side, names, "term_ambiguous", "-", rule);
-      return result;
-    }
-    chosen = kept[0];
-    all_names = names;
-    names = str_util::split(names, ";")[chosen];
+  MassShiftPtrVec shifts;
+  int best_score = 0;
+  int chosen = choose(prsm_ptr, cands, shifts, best_score, rule);
+  if (chosen < 0) {
+    result.decision = "term_ambiguous";
+    log(prsm_ptr, shift_idx, shift_ptr->getMassShift(), piece_name + "," + side,
+        names, "term_ambiguous", "-", rule);
+    return result;
   }
   const Cand& cand = cands[chosen];
-  int best_score = 0;
-  result.shifts = local_align::localize(cand.piece, cand.expl,
-                                        prsm_ptr->getRefineMsPtrVec(), para_,
-                                        mng_ptr_, best_score);
+  std::string all_names = cands.size() > 1 ? names : "";
+  if (cands.size() > 1) names = cand.name;
+  result.shifts = shifts;
   if (result.shifts.empty()) {
     result.decision = "term_no_sites";
     log(prsm_ptr, shift_idx, shift_ptr->getMassShift(), piece_name + "," + side,

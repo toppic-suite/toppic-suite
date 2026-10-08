@@ -2242,14 +2242,19 @@ main's. What the alternative does, and how it differs from `stat/local`:
   Trimethyl over Methyl+Dimethyl, a PTM on the N-terminal acetylation
   form over Acetyl + the PTM on the plain form), (2) the N-terminal
   acetylation form over an Acetyl of `-B` on the plain form of the same
-  start (terminal candidates), (3) Acetyl over Trimethyl (0.036 Da apart,
-  within 10 ppm above 3.6 kDa): the explanations with Trimethyl and
-  without Acetyl are dropped. What is left after the rules must be one
-  explanation. Without the rules (`tie=0`) Dimethyl is never chosen when
-  Methyl is listed too, nor Acetyl when Trimethyl is. The PTMs are
-  recognized by the abbreviations `Acetyl` and `Trimethyl` of the `-B`
-  file. The log's `rule` column names the rules that decided and
-  `all_explanations` the set before them.
+  start (terminal candidates); (3) **Acetyl vs Trimethyl** (0.036 Da
+  apart, within 10 ppm above 3.6 kDa): when the explanations left are on
+  the same proteoform and the same up to Acetyl <-> Trimethyl, both are
+  localized and the better match score wins (then the higher confidence,
+  then Acetyl; `LocalAlignProcessor::choose`, logged
+  `site_scores(Acetyl:31/Trimethyl:33)`) - a first version of amendment
+  5 preferred Acetyl outright, which gave calmodulin's K115
+  trimethylation (758, 88.5%) an Acetyl at 48.9%. What is left after the
+  rules must be one explanation. Without the rules (`tie=0`) Dimethyl is
+  never chosen when Methyl is listed too, nor Acetyl when Trimethyl is.
+  The PTMs are recognized by the abbreviations `Acetyl` and `Trimethyl`
+  of the `-B` file. The log's `rule` column names the rules that decided
+  and `all_explanations` the set before them.
 - **No filters.** `LocalProcessor` keeps a localization only when the
   matched fragment number stays above the original's minus 5 and above
   0.67 x the original (`DESC_MATCH_LIMIT_`, `desc_ratio_`), when a site
