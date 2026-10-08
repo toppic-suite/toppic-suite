@@ -2191,7 +2191,9 @@ Branch `filter_pairs` (toppic_test experiments 138 and 142, reports 0138 and
 - **The rule is a hidden option**, `--filter-mass-list
   <merge|fragment|single>` of toppic and topmg (argument key
   `filterMassList`, default `fragment`; branch `filter_mass_list`,
-  toppic_test experiment 142, amendment 2). `SpPara::FilterMassListMode`
+  toppic_test experiment 142, amendment 2; merged into main on 2026-10-08
+  as abe33295, after `second_align`, `ps_align_penalty` and `local_align`).
+  `SpPara::FilterMassListMode`
   (`kMerge`, `kFragment`, `kSingle`; `setFilterMassListMode` from the
   name, `isFilterMassListModeName` for the parsers' check) is set by
   `PrsmPara` and passed to `getIntMassErrorList` by its four callers, so a
