@@ -493,8 +493,9 @@ visible options: `--deconv-ms1 <greedy|msdeconv>` and `--deconv-ms2
 <greedy|msdeconv|flashdeconv>` (`greedy`: the greedy searches of the next
 sections; `msdeconv`: MS-Deconv's dynamic programming, `DeconvSingleSp`;
 `flashdeconv`: the FLASHDeconv port below). In topfd they also have the
-short names `-x` and `-y` (2026-10-08; topdia has none, though both letters
-are free there too). Facts to keep straight:
+short names `-p` and `-q` (2026-10-08, briefly `-x` and `-y`; topdia has
+none, and its `-p` is `--ms1-intensity-correlation-cutoff`). Facts to keep
+straight:
 
 - **`TopfdPara` stores the names** (`ms1_deconv_method_`,
   `ms2_deconv_method_`; `getMs1DeconvMethods()` / `getMs2DeconvMethods()`

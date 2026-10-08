@@ -73,7 +73,7 @@ Key options (defaults): `-c` max charge 30, `-m` max mass 50000,
 `-r`/`-s` MS1/MS2 S/N ratio 3/1, `-t` ECScore cutoff 0.1, `-b` min scans 1,
 `-o` no MS1 scans (no features, precursor set to the `-m`/`-c` limits),
 `-N` no SQLite, `-D` also store raw MS1 peaks for 3D views,
-`-x`/`--deconv-ms1 <greedy|msdeconv>` and `-y`/`--deconv-ms2
+`-p`/`--deconv-ms1 <greedy|msdeconv>` and `-q`/`--deconv-ms2
 <greedy|msdeconv|flashdeconv>` the deconvolution methods (default greedy
 for both; `msdeconv` is the MS-Deconv dynamic programming of earlier
 versions, `flashdeconv` FLASHDeconv, experimental, not with `-T`). TopDIA
