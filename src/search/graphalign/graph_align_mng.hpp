@@ -87,7 +87,7 @@ class GraphAlignMng {
   // spectrum graph matches one of the proteoform graph when they differ by at
   // most this much (getIntTolerance(), in the integer masses of
   // convert_ratio_), and the post-processing merges PTM masses this close.
-  // Set by topmg --align-error-tolerance and toppic's hidden
+  // Set by topmg's hidden --align-error-tolerance and toppic's hidden
   // --topmg-align-error-tolerance (argument topmgAlignErrorTolerance,
   // default 0.1). The MCMC E-values (MCMCMng) keep their own 0.1 Da.
   double topmg_align_error_tolerance_ = 0.1;

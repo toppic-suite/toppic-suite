@@ -1685,9 +1685,11 @@ integer masses of `convert_ratio_` (274.335215 per Da: 0.1 Da is 28
 units) by `graph_align.cpp` (distance matching and cutoffs),
 `SpecGraph::compDistCover` and `graph_post_processor.cpp` (PTM masses this
 close are merged). It is the argument `topmgAlignErrorTolerance`, default
-0.1 Da (the former hard-coded `error_tolerance_`): topmg's visible
-`--align-error-tolerance` (a topmg_gui field, "Alignment error tolerance
-(Da)" on the Advanced Parameters tab, emitted by `gui/util/command.cpp`) and
+0.1 Da (the former hard-coded `error_tolerance_`): topmg's hidden
+`--align-error-tolerance` (visible in `-h` until 2026-10-08, when it was
+moved to the hidden options; still a topmg_gui field, "Alignment error
+tolerance (Da)" on the Advanced Parameters tab, emitted by
+`gui/util/command.cpp`; the parameter block still prints it) and
 toppic's hidden `--topmg-align-error-tolerance` for `--topmg pipeline` /
 `topmg-only`, as `topmgShiftNumber` is `--num-shift` / `--topmg-num-shift`.
 Both parsers refuse a value that is not a positive number. It is

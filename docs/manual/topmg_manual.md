@@ -80,7 +80,11 @@ is given; `sample_ms2.topmg_raw_prsm` is always kept.
    proteoform. The spectrum's mass graph is aligned to it by dynamic
    programming, allowing `--num-shift` unexpected mass shifts; a mass
    difference of the spectrum graph matches one of the proteoform graph
-   within `--align-error-tolerance` (0.1 Da).
+   within 0.1 Da. The hidden option `--align-error-tolerance <number>`
+   changes this tolerance (Da), which the post-processing also uses to merge
+   modification masses; the MCMC E-value computation keeps its own 0.1 Da.
+   In `topmg_gui` it is "Alignment error tolerance (Da)" on the Advanced
+   Parameters tab.
 5. **Graph alignment post-processing.** The aligned mass differences are
    converted into concrete modification assignments and mass shifts.
 6. **E-value computation using MCMC.** TopMCMC estimates a p-value for each
@@ -150,7 +154,6 @@ Proteoform graphs and mass shifts:
 | `-G`, `--var-ptm-in-gap <int>` | 5 | Maximum number of variable modifications on one edge (never more than `--var-ptm`). |
 | `-s`, `--num-shift <0\|1\|2>` | 1 | Maximum number of unexpected mass shifts in a proteoform, in addition to the variable modifications. TopMG keeps its own number: `toppic --num-shift` does not change it. |
 | `-M`, `--max-shift <number>` | 500 | Maximum absolute mass of an unexpected shift (Da). |
-| `--align-error-tolerance <number>` | 0.1 | Error tolerance (Da) for matching mass differences of the spectrum graph with those of the proteoform graph in the graph alignment; the post-processing also merges modification masses this close. The MCMC E-value computation keeps its own 0.1 Da. In `topmg_gui`: "Alignment error tolerance (Da)" on the Advanced Parameters tab. |
 | `-w`, `--whole-protein-only` | off | Report only proteoforms covering whole proteins, not truncated ones, that is, allow the proteoform type COMPLETE alone. |
 | `-D`, `--use-asf-diagonal` | off | Add the ASF-Diagonal filtering step (more candidates, more sensitive, slower). |
 

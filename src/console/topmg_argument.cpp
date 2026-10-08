@@ -70,8 +70,9 @@ std::map<std::string, std::string> TopmgArgument::initArguments() {
   arguments["proteoformPpmError"] = "false";
   arguments["proteoformErrorTolerance"] = "1.2";
   // the error tolerance (Da) of the graph alignment
-  // (GraphAlignMng::topmg_align_error_tolerance_); toppic's hidden
-  // --topmg-align-error-tolerance sets the same key
+  // (GraphAlignMng::topmg_align_error_tolerance_), set by the hidden
+  // --align-error-tolerance; toppic's hidden --topmg-align-error-tolerance
+  // sets the same key
   arguments["topmgAlignErrorTolerance"] = "0.1";
   arguments["cutoffSpectralType"] = "EVALUE";
   arguments["cutoffSpectralValue"] = "0.01";
@@ -344,10 +345,6 @@ bool TopmgArgument::parse(int argc, char* argv[]) {
         po::value<std::string>(&form_error_tole),
         "<a positive number>. Error tolerance for identifying PrSM clusters "
         "(in Dalton). Default value: 1.2 Dalton.")(
-        "align-error-tolerance", po::value<std::string>(&align_error_tole),
-        "<a positive number>. Error tolerance for matching mass differences "
-        "of the spectrum and proteoform graphs in the graph alignment (in "
-        "Dalton). Default value: 0.1 Dalton.")(
         "max-shift,M", po::value<std::string>(&max_shift_mass),
         "<a positive number>. Maximum absolute value of the mass shift (in "
         "Dalton). Default value: 500.")(
@@ -415,6 +412,7 @@ bool TopmgArgument::parse(int argc, char* argv[]) {
         "proteoform-ppm-error,Q", "")("proteoform-error-tolerance,p",
                                       po::value<std::string>(&form_error_tole),
                                       "")(
+        // hidden (not in display_desc): the graph alignment's error tolerance
         "align-error-tolerance", po::value<std::string>(&align_error_tole),
         "")(
         "max-shift,M", po::value<std::string>(&max_shift_mass), "")(

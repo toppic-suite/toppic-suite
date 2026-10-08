@@ -912,7 +912,7 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
       arguments_["topmgShiftNumber"] = topmg_shift_num;
     }
     // hidden: the error tolerance (Da) of that graph alignment, TopMG's
-    // --align-error-tolerance
+    // hidden --align-error-tolerance
     if (vm.count("topmg-align-error-tolerance")) {
       arguments_["topmgAlignErrorTolerance"] = topmg_align_error_tole;
     }
