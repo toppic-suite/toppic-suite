@@ -288,6 +288,10 @@ ProteoformPtr createProteoformPtr(const ProteoformPtr& base_form_ptr,
     LOG_ERROR("ERROR in localization!");
     exit(EXIT_FAILURE);
   }
+  // The alterations below are built with the break point as one end, but
+  // Alter::setLocalAnno resets an alteration's range to its annotation's,
+  // [bgn, end + 1), the range the score vectors cover (toppic_test
+  // experiment 140, amendment 2).
 
   LocalAnnoPtr anno_1 = std::make_shared<LocalAnno>(
       bgn_1, end_1, conf_1, scr_vec_1, match_score, ptm_ptr_1);

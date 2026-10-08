@@ -85,6 +85,7 @@
 #include "seq/fasta_util.hpp"
 #include "stat/local/local_mng.hpp"
 #include "stat/local/local_processor.hpp"
+#include "stat/local_align/local_align_processor.hpp"
 #include "stat/mcmc/mcmc_dpr_processor.hpp"
 #include "stat/mcmc/mcmc_mng.hpp"
 #include "stat/tdgf/cluster_prot_corrector.hpp"
@@ -1087,9 +1088,16 @@ int TopPIC_postprocess(std::map<std::string, std::string>& arguments,
           prsm_para_ptr, std::stod(arguments["localThreshold"]),
           arguments["localPtmFileName"], min_shift_mass, max_shift_mass,
           cur_suffix, "toppic_cluster_local");
-      LocalProcessorPtr local_ptr = std::make_shared<LocalProcessor>(local_mng);
-      local_ptr->process();
-      local_ptr = nullptr;
+      if (arguments["localAlign"] == "true") {
+        // hidden --local-align: the variable PTM search of stat/local_align
+        LocalAlignProcessorPtr local_ptr =
+            std::make_shared<LocalAlignProcessor>(local_mng);
+        local_ptr->process();
+      } else {
+        LocalProcessorPtr local_ptr =
+            std::make_shared<LocalProcessor>(local_mng);
+        local_ptr->process();
+      }
       std::cout << "PTM characterization - finished." << std::endl;
       cur_suffix = "toppic_cluster_local";
     }

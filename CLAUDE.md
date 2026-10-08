@@ -2426,6 +2426,178 @@ Facts to keep straight:
   21 / 1, where 210 of its 228 range shifts hold as many candidate
   residues as PTMs (decided).
 
+## PTM localization by a variable PTM search (`stat/local_align`, `--local-align`)
+
+Branch `local_align` (toppic_test experiment 140, report 0140; from main
+6eb40e97, not merged). toppic's hidden `--local-align` (argument
+`localAlign`) runs `LocalAlignProcessor` in place of `LocalProcessor` for
+the `-B` localization (the parameter block then prints "Localization
+method: Variable PTM search (local_align)"); without it the output is
+main's. What the alternative does, and how it differs from `stat/local`:
+
+- **Explanations of a shift.** For an unexpected shift of mass m and the
+  precursor tolerance e (`compStrictErrorTole(adjusted precursor mass)`),
+  the explanations are the single PTMs X of the `-B` file with
+  |mass(X) - m| < e and a modifiable site, and the unordered pairs {X, Y}
+  (X = Y allowed) with |mass(X) + mass(Y) - m| < e and two sites in one of
+  the two orders. Unlike `local_util::getPtmPtrVecByMass`, a match one
+  isotope mass away does **not** count by default (switch `iso`, 0 since
+  experiment 140's amendment 1: with it on, a +12.98 Da shift of a PrSM
+  with a +1.00 Da second shift became a Methyl at -1 Da, i.e. a 1 Da
+  precursor error turned into a PTM). The shift is replaced only when
+  there is **exactly one** explanation; with none or several it stays
+  (logged "none" / "ambiguous"). Several explanations are first reduced
+  by the **tie-break rules** of `local_align_util::breakTies` (switch
+  `tie`, 1; experiment 140's amendment 5), applied in this order while
+  more than one is left: (1) fewer PTMs (Dimethyl over Methyl+Methyl,
+  Trimethyl over Methyl+Dimethyl, a PTM on the N-terminal acetylation
+  form over Acetyl + the PTM on the plain form), (2) the N-terminal
+  acetylation form over an Acetyl of `-B` on the plain form of the same
+  start (terminal candidates); (3) **Acetyl vs Trimethyl** (0.036 Da
+  apart, within 10 ppm above 3.6 kDa): when the explanations left are on
+  the same proteoform and the same up to Acetyl <-> Trimethyl, both are
+  localized and the better match score wins (then the higher confidence,
+  then Acetyl; `LocalAlignProcessor::choose`, logged
+  `site_scores(Acetyl:31/Trimethyl:33)`) - a first version of amendment
+  5 preferred Acetyl outright, which gave calmodulin's K115
+  trimethylation (758, 88.5%) an Acetyl at 48.9%. What is left after the
+  rules must be one explanation. Without the rules (`tie=0`) Dimethyl is
+  never chosen when Methyl is listed too, nor Acetyl when Trimethyl is.
+  The PTMs are recognized by the abbreviations `Acetyl` and `Trimethyl`
+  of the `-B` file. The log's `rule` column names the rules that decided
+  and `all_explanations` the set before them.
+- **No filters.** `LocalProcessor` keeps a localization only when the
+  matched fragment number stays above the original's minus 5 and above
+  0.67 x the original (`DESC_MATCH_LIMIT_`, `desc_ratio_`), when a site
+  passes the MIScore threshold `-H`, and (two shifts) when the localized
+  PTMs overlap the original shifts; `LocalAlignProcessor` applies none of
+  these. When no site reaches `-H`, the PTM is reported on the range from
+  the first to the last site with a positive score, with the **best
+  site's score** as the confidence (`local_align_util::filterScores`;
+  `LocalAnno::getConf`, the `<confidence>` of the PrSM XML). Above the
+  threshold the confidence is `scrFilter`'s, the sum of the scores of the
+  reported range; the sum over the fallback range would be 1.0 whatever
+  the spread, so it was replaced by the best site's score in experiment
+  140's amendment 1 (a Methyl over 18 K/R of H2B at 5.5% each: 0.055, not
+  1.0). The per-site scores are in the MIScore column either way.
+- **The proteoform's termini.** `stat/local` scores the candidate forms
+  of `local_proteoform::getAllCandidateForms` (N- and C-terminal
+  truncations by up to 5 residues, the N-terminal acetylation forms) and
+  takes the best; `local_align` first explains the shift value of the
+  proteoform as it is. When that gives no explanation and the shift has
+  at most `term_max_matched` (3; 2 until amendment 4) matched cleavage
+  sites on its N-terminal (C-terminal) side (`compMatchedSites` of the
+  original proteoform), the candidate proteoforms whose start (end) is
+  moved by up to `term_range` (5) residues are tried
+  (`LocalAlignProcessor::processTerminal`, the forms of
+  `local_proteoform::getCandidateForm`, so a new start of 0 or 1 brings
+  the N-terminal acetylation variants; the piece keeps at least one
+  residue, and a truncation may cut into the shift's range - until
+  amendment 4 the shift's residues had to stay inside, which skipped the
+  truncations that explain a shift sitting on the terminal residues, 31
+  of main's moved-start localizations on 480). The other N-terminal forms
+  of the **unmoved** start (the acetylation dropped, or added: main's base
+  candidates include them, and +37.95 Da + 42.01 is a Phospho) belong to
+  the **standard attempt** (`processPiece`, `n_forms`): when the piece
+  holds the N-terminus and the shift has at most `term_max_matched`
+  matched sites on its N-terminal side, their explanations join the pool
+  of the proteoform's own before the tie-break rules, so that a PTM on the
+  acetylation form competes with Acetyl + the PTM on the plain form
+  (amendments 4 and 5; until 8476656b they were terminal candidates, tried
+  only after an "ambiguous" standard attempt had already stopped). Each
+  candidate's unexplained mass is the adjusted
+  precursor mass minus the candidate's mass, and the one-explanation rule
+  counts over all (candidate, explanation) pairs ("term_localized",
+  "term_none", "term_ambiguous" in the log, the explanations tagged
+  `@start<n>` / `@end<n>` and the N-terminal form). The result proteoform
+  takes the moved terminus (the base form from `getCandidateForm` with the
+  kept shifts, the new shifts moved with `shiftPositions`); a two-shift
+  PrSM can move its start for the first piece and its end for the second.
+  Switch `term` (1; 0 = the proteoform as it is only). Added in
+  experiment 140's amendment 3.
+- **The site tables** (`compOnePtmSTable`, `compTwoPtmMTable` in
+  `local_align_util.cpp`) are `local_util`'s with the known shifts of the
+  proteoform (the variable PTMs, and the other unexpected shift of a
+  piece) in the theoretical prefix and suffix masses, a cleavage site
+  inside a known shift's range giving no fragment (as
+  `Proteoform::getSeqSegmentPtrVec` does for the matching);
+  `local_util::compOnePtmSTable` ignores the known shifts. The protein
+  N-terminal modification of a proteoform read from the PrSM file (the
+  acetylation) is the residue sequence's N-terminal mod
+  (`ResidueSeq::getNModPtr`), not a residue's mass nor a shift that
+  `Proteoform::getMass` adds; `makePiece` adds it to the prefix masses of
+  a piece starting at the N-terminus (as `BpSpec` does) and to the N
+  offset of any other piece - missed until experiment 140's amendment 7,
+  so the N-terminal fragments of acetylated proteoforms never matched
+  (13 of 39 acetylated PrSMs localized by both main and the branch had
+  different site scores, none of the 194 plain ones). The fragment
+  match is a binary search of the sorted extended masses per theoretical
+  mass (not `compMTable`'s two-pointer walk, which needs monotonic
+  theoretical masses, broken by a negative known shift). The scores are
+  `prob_ratio_ ^ (score - best score)` before the normalization, so that
+  a score above ~230 does not overflow `pow`.
+- **Two PTMs for one shift**: both orders are scored with the DP of
+  `LocalProcessor::compTwoPtmScr` and the better order is localized by
+  the break-point method of `twoPtmLocalize` (ported, with the site pairs'
+  probabilities summed directly). The two VARIABLE shifts take the ranges
+  of their sites above the threshold, `[bgn_1, end_1]` and
+  `[bgn_2, end_2]`. `local_proteoform::createProteoformPtr` builds its
+  alterations with the break point as one end, but `Alter::setLocalAnno`
+  resets an alteration's range to its annotation's `[bgn, end + 1)`, so
+  main's ranges are the same tight ranges and match the score vectors
+  that `Proteoform::getMIScore` and the ProForma writer index from the
+  alteration's left position. Experiment 140's amendment 2 first read
+  this as a latent out-of-range read and padded the vectors to the
+  break-point ranges (4cdb0069), which emptied the MIScore of the second
+  PTM of every two-PTM PrSM (13 on 480); the padding was reverted and the
+  comment in `createProteoformPtr` states the rule.
+- **Two unexpected shifts.** `stat/local` explains the sum of the two
+  shifts by one ordered pair over the whole proteoform; `local_align`
+  splits the proteoform at a cleavage site b between the shifts (first
+  shift's right position <= b <= second's left position): the middle one
+  (by index) of the sites in that range matched by a fragment of the
+  spectra (`compMatchedSites`, the original proteoform with all its
+  shifts), or the middle of the range when none is matched. The piece
+  before b holds the first shift, the piece from b the second
+  (`makePiece`; a known shift belongs to the piece of its left position
+  and is cut at the piece's end), and each piece is explained on its own
+  with the residue masses and shifts of the other piece as its fragment
+  offsets (`Piece::n_offset`, `c_offset`), so that the pieces are matched
+  against the real spectra. A PrSM can come out with one shift explained
+  and the other kept (switch `split`, 0 = two-shift PrSMs left alone).
+- **The result PrSM** keeps the proteoform's residues, N-terminal form,
+  truncation N-terminal modification, start / end and cluster ids; the
+  explained shifts are replaced by the VARIABLE shifts, the PrSM takes the
+  proteoform with `setProteoformPtr` (matched numbers recounted) and the
+  adjusted precursor mass becomes the proteoform's mass, as `stat/local`
+  does. A one-shift PrSM whose shift is within [-1, 1] Da + e is left
+  alone (`stat/local`'s rule).
+- **Research aids.** `TOPPIC_LOCAL_ALIGN_PARA` ("name=value,..."): `iso`
+  (0; 1 = the isotope match of `stat/local`), `max_ptm` (2; 1 = single
+  PTMs only), `split` (1), `term` (1), `term_range` (5),
+  `term_max_matched` (3), `tie` (1; 0 = no tie-break rules).
+  `TOPPIC_LOCAL_ALIGN_LOG=<file>`: one tab-separated line per shift
+  handled (spectrum id, PrSM id, protein, shift index and mass, piece with
+  the break site and the matched sites of the range, the explanations,
+  the decision small / none / ambiguous / localized / no_sites / overlap,
+  the sites with the confidence and the score).
+- **Results** (toppic_test experiment 140, report 0140; 480_F3_02 in
+  setting d plus `-B` with Oxidation M, Acetyl K, Methyl KR, Dimethyl KR,
+  Trimethyl K, Phospho STY; the same 3,354 / 1,997 / 438 identifications
+  with equal E-values in every run, the stage 2-3 s): the branch replaces
+  400 shifts of 311 PrSMs (main 278 of 265): 222 one-shift PrSMs (116
+  Phospho, 42 Phospho+Phospho, 36 Methyl ...) and 109 pieces of the 163
+  two-shift PrSMs (76 Oxidation; 20 PrSMs with both shifts explained, 69
+  with one); 44 one-shift PrSMs are ambiguous (Dimethyl / Methyl+Methyl
+  19, Acetyl / Trimethyl 16), 42 localized shifts match one isotope away,
+  29 PTMs are on the fallback range. 148 PrSMs are localized by both
+  methods, 145 with the same PTM(s) and 141 with the same best site(s).
+  Main alone localizes 117 (76 by truncated candidate forms, 12 by
+  dropping the N-terminal acetylation form, 29 by choosing among
+  ambiguous explanations); the branch alone 163 (63 one-shift PrSMs by
+  pairs, 24 by single PTMs that main's filters rejected, 86 pieces of
+  two-shift PrSMs).
+
 ## toplib_build (`src/toplib`, `console/toplib_build`)
 
 toplib_build is a C++ port of TopLib's `src/ms_library_building.py`
@@ -2790,7 +2962,9 @@ above it, never the reverse:
   per thread and merge them with `PrsmStrMerge`. Use the runner for a new
   stage whose output order matters; `ZeroPtmSearchMng` and `PtmSearchMng`
   carry the thread number from the toppic `-u` option.
-- `src/stat` — E-value/p-value estimation (`count`/`local`/`mcmc`/`tdgf`);
+- `src/stat` — E-value/p-value estimation (`count`/`local`/`mcmc`/`tdgf`)
+  and the PTM localization (`local`, and its alternative `local_align`, see
+  its section);
   `tdgf/cluster_prot_corrector` (see the post mass matching section) is
   here rather than in `prsm` because it recomputes E-values.
 - `src/merge` — the topdiff feature-merge backend (`feature_prsm`,
