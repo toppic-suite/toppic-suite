@@ -2310,7 +2310,16 @@ main's. What the alternative does, and how it differs from `stat/local`:
   piece) in the theoretical prefix and suffix masses, a cleavage site
   inside a known shift's range giving no fragment (as
   `Proteoform::getSeqSegmentPtrVec` does for the matching);
-  `local_util::compOnePtmSTable` ignores the known shifts. The fragment
+  `local_util::compOnePtmSTable` ignores the known shifts. The protein
+  N-terminal modification of a proteoform read from the PrSM file (the
+  acetylation) is the residue sequence's N-terminal mod
+  (`ResidueSeq::getNModPtr`), not a residue's mass nor a shift that
+  `Proteoform::getMass` adds; `makePiece` adds it to the prefix masses of
+  a piece starting at the N-terminus (as `BpSpec` does) and to the N
+  offset of any other piece - missed until experiment 140's amendment 7,
+  so the N-terminal fragments of acetylated proteoforms never matched
+  (13 of 39 acetylated PrSMs localized by both main and the branch had
+  different site scores, none of the 194 plain ones). The fragment
   match is a binary search of the sorted extended masses per theoretical
   mass (not `compMTable`'s two-pointer walk, which needs monotonic
   theoretical masses, broken by a negative known shift). The scores are

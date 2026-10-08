@@ -467,6 +467,18 @@ Piece makePiece(const ProteoformPtr& form_ptr, int bgn, int end,
   piece.prefix_mass.assign(len + 1, 0.0);
   piece.suffix_mass.assign(len + 1, 0.0);
   piece.valid.assign(len + 1, true);
+  // The protein N-terminal modification (the acetylation of a proteoform
+  // read from the PrSM file) is the residue sequence's N-terminal mod, not
+  // part of any residue's mass: it belongs to the prefix masses of a piece
+  // that starts at the N-terminus and to the N offset of any other piece
+  // (as BpSpec starts its prefix masses with it). Until this was added
+  // (toppic_test experiment 140, amendment 7) the N-terminal fragments of
+  // acetylated proteoforms were 42.01 Da off and never matched.
+  double n_mod_mass = form_ptr->getResSeqPtr()->getNModPtr()->getShift();
+  if (bgn > 0) {
+    piece.n_offset += n_mod_mass;
+    n_mod_mass = 0;
+  }
   for (int j = 1; j <= len; j++) {
     piece.prefix_mass[j] =
         piece.prefix_mass[j - 1] + piece.residues[j - 1]->getMass();
@@ -474,6 +486,8 @@ Piece makePiece(const ProteoformPtr& form_ptr, int bgn, int end,
   for (int j = len - 1; j >= 0; j--) {
     piece.suffix_mass[j] = piece.suffix_mass[j + 1] + piece.residues[j]->getMass();
   }
+  for (int j = 1; j <= len; j++) piece.prefix_mass[j] += n_mod_mass;
+  piece.suffix_mass[0] += n_mod_mass;
   for (size_t k = 0; k < piece.known_shifts.size(); k++) {
     const ShiftRange& r = piece.known_shifts[k];
     for (int j = 0; j <= len; j++) {
