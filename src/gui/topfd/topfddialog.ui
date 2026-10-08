@@ -821,6 +821,37 @@ p, li { white-space: pre-wrap; }
       </item>
      </layout>
     </widget>
+    <widget class="QWidget" name="horizontalLayoutWidget_22">
+     <property name="geometry">
+      <rect>
+       <x>590</x>
+       <y>80</y>
+       <width>222</width>
+       <height>25</height>
+      </rect>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout_22">
+      <item>
+       <widget class="QCheckBox" name="textPeakListCheckBox">
+        <property name="toolTip">
+         <string>Each input file is a text peak list of one MS/MS spectrum, one peak per line: m/z and intensity separated by a space (topfd --text-peak-list).</string>
+        </property>
+        <property name="acceptDrops">
+         <bool>false</bool>
+        </property>
+        <property name="text">
+         <string>Text peak list input</string>
+        </property>
+        <property name="checkable">
+         <bool>true</bool>
+        </property>
+        <property name="checked">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
    </widget>
    <widget class="QWidget" name="horizontalLayoutWidget_6">
     <property name="geometry">

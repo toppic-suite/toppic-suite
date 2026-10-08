@@ -3131,7 +3131,11 @@ above it, never the reverse:
   `TopfdPara::setMzmlFileNameAndFaims` (base name = input path minus
   extension, `_<voltage>` appended for FAIMS; it also creates the SQLite
   database when enabled) — do not hand-roll output names or a second
-  `createSqlDb` call in a driver.
+  `createSqlDb` call in a driver. In topfd_gui the checkbox "Text peak list
+  input" (`textPeakListCheckBox`, Additional settings, third column, row 3)
+  sets `setTextPeakList` and `gui/util/command.cpp` emits `-T`; the Add
+  button then offers `*.txt` or all files, and Start refuses a list holding
+  an mzML/mzXML file (`readPeakFile`'s `std::stod` would throw on it).
 - `src/topdia` — the TopDIA pseudo-spectrum layer built on `topfd`/`ms`:
   `common` (`topdia_para` + `topdia_process`) and `pseudo_spec`
   (`mzrt_feature`, `pseudo_peak`, `pseudo_spectrum`, `generate_pseudo_spectrum`).
