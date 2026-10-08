@@ -2587,14 +2587,18 @@ Facts to keep straight:
   21 / 1, where 210 of its 228 range shifts hold as many candidate
   residues as PTMs (decided).
 
-## PTM localization by a variable PTM search (`stat/local_align`, `--local-align`)
+## PTM localization by a variable PTM search (`stat/local_align`, the default; `--local-original` for `stat/local`)
 
 Branch `local_align` (toppic_test experiment 140, report 0140; from main
-6eb40e97, merged into main as 927e2da3 on 2026-10-08). toppic's hidden `--local-align` (argument
-`localAlign`) runs `LocalAlignProcessor` in place of `LocalProcessor` for
-the `-B` localization (the parameter block then prints "Localization
-method: Variable PTM search (local_align)"); without it the output is
-main's. What the alternative does, and how it differs from `stat/local`:
+6eb40e97, merged into main as 927e2da3 on 2026-10-08). Since 2026-10-08
+`LocalAlignProcessor` is **the default** `-B` localization (argument
+`localAlign`, "true"); the hidden `--local-original` selects the MIScore
+candidate search of `stat/local` (`LocalProcessor`, the method before),
+and the hidden `--local-align` (the switch that selected the new method
+while it was optional) is still accepted. The parameter block prints
+"Localization method: Variable PTM search (local_align)" or "MIScore
+candidate search (local, --local-original)". Without `-B` neither runs.
+What the method does, and how it differs from `stat/local`:
 
 - **Explanations of a shift.** For an unexpected shift of mass m and the
   precursor tolerance e (`compStrictErrorTole(adjusted precursor mass)`),

@@ -113,8 +113,10 @@ std::map<std::string, std::string> ToppicArgument::initArguments() {
   arguments["localPtmFileName"] = "";
   arguments["localThreshold"] = "0.15";
   // the localization of -B by the variable PTM search of stat/local_align
-  // (hidden --local-align) instead of stat/local
-  arguments["localAlign"] = "false";
+  // (the default since toppic_test experiment 140); hidden --local-original
+  // selects the MIScore candidate search of stat/local (hidden --local-align
+  // is accepted and selects the default)
+  arguments["localAlign"] = "true";
 
   arguments["groupSpectrumNumber"] = "1";
   arguments["combinedOutputName"] = "";
@@ -344,10 +346,11 @@ void ToppicArgument::outputArguments(
            << "True" << std::endl;
     output << std::setw(gap) << std::left << "MIScore threshold:" << sep
            << arguments["localThreshold"] << std::endl;
-    if (arguments["localAlign"] == "true") {
-      output << std::setw(gap) << std::left << "Localization method:" << sep
-             << "Variable PTM search (local_align)" << std::endl;
-    }
+    output << std::setw(gap) << std::left << "Localization method:" << sep
+           << (arguments["localAlign"] == "true"
+                   ? "Variable PTM search (local_align)"
+                   : "MIScore candidate search (local, --local-original)")
+           << std::endl;
     output << std::setw(gap) << std::left
            << "Localization modification file name:" << sep
            << arguments["localPtmFileName"] << std::endl;
@@ -633,7 +636,8 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
         "post-min-peak-num,I", po::value<std::string>(&post_min_peak_num), "")(
         "average-mass,g", "")("disable-zero-shift-prec-error", "")(
         "enable-one-shift-prec-error", "")("enable-var-ptm-prec-error", "")(
-        "fdr-groups", "")("local-align", "")("disable-frag-mass-extension", "")(
+        "fdr-groups", "")("local-align", "")("local-original", "")(
+        "disable-frag-mass-extension", "")(
         "frag-mass-dedup", "")(
         "frag-extend-min-mass", po::value<std::string>(&frag_extend_min_mass),
         "")("var-ptm-filter-cand-num",
@@ -910,8 +914,13 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
       arguments_["postMassMatch"] = "false";
     }
 
-    // hidden: the PTM localization of -B by the variable PTM search of
-    // stat/local_align (toppic_test experiment 140)
+    // hidden: the PTM localization of -B by the MIScore candidate search of
+    // stat/local (the method before toppic_test experiment 140) instead of
+    // the default variable PTM search of stat/local_align; --local-align
+    // (the old switch for the default) is still accepted
+    if (vm.count("local-original")) {
+      arguments_["localAlign"] = "false";
+    }
     if (vm.count("local-align")) {
       arguments_["localAlign"] = "true";
     }

@@ -1089,7 +1089,8 @@ int TopPIC_postprocess(std::map<std::string, std::string>& arguments,
           arguments["localPtmFileName"], min_shift_mass, max_shift_mass,
           cur_suffix, "toppic_cluster_local");
       if (arguments["localAlign"] == "true") {
-        // hidden --local-align: the variable PTM search of stat/local_align
+        // the default: the variable PTM search of stat/local_align; hidden
+        // --local-original: the MIScore candidate search of stat/local
         LocalAlignProcessorPtr local_ptr =
             std::make_shared<LocalAlignProcessor>(local_mng);
         local_ptr->process();
