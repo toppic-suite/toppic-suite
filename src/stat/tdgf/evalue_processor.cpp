@@ -109,7 +109,21 @@ std::function<void()> geneTask(const SpectrumSetPtr& spec_set_ptr,
       comp_pvalue_ptr = std::make_shared<CompPValueArray>(test_num_ptr,
                                                           mng_ptr);
     }
-    comp_pvalue_ptr->process(spec_set_ptr, prsm_vec, is_separate);
+    // A PrSM with at most comp_evalue_min_match_theo_frag_num_ matched
+    // fragments gets the maximum E-value below whatever the generating
+    // function says, so a spectrum with no other PrSM needs no generating
+    // function (toppic_test experiment 150).
+    bool evalue_needed = false;
+    for (size_t i = 0; i < prsm_vec.size(); i++) {
+      if (std::round(prsm_vec[i]->getMatchTheoFragNum()) >
+          std::round(mng_ptr->comp_evalue_min_match_theo_frag_num_)) {
+        evalue_needed = true;
+        break;
+      }
+    }
+    if (evalue_needed) {
+      comp_pvalue_ptr->process(spec_set_ptr, prsm_vec, is_separate);
+    }
 
     for (unsigned i = 0; i < prsm_vec.size(); i++) {
       if (std::round(prsm_vec[i]->getMatchTheoFragNum()) <=

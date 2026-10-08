@@ -44,6 +44,7 @@
 #include "filter/mng/zero_ptm_filter_mng.hpp"
 #include "filter/oneptm/one_ptm_filter_processor.hpp"
 #include "filter/varptm/var_ptm_filter_processor.hpp"
+#include "filter/varptm/zero_var_ptm_filter_processor.hpp"
 #include "filter/zeroptm/zero_ptm_filter_processor.hpp"
 #include "ms/env/avg_mass_util.hpp"
 #include "ms/env/env_base.hpp"
@@ -304,7 +305,41 @@ std::string TopPIC_identify(std::map<std::string, std::string>& arguments) {
 
     std::vector<std::string> input_exts;
 
-    std::cout << "Zero unexpected shift filtering - started." << std::endl;
+    bool use_var_ptm = var_ptm_num >= 1 && var_ptm_file_name != "";
+    bool use_approx_spec = arguments["useApproxSpectra"] == "true";
+    // The zero-shift and variable PTM filters score the same four index
+    // files of every block, so by default they run as one pass over the
+    // blocks (zero_var_ptm_filter_processor, toppic_test experiment 150);
+    // the hidden --separate-var-ptm-filter runs them one after the other,
+    // as -A (approximate spectra) always does. The candidates are the same.
+    bool combined_filter = use_var_ptm && !use_approx_spec &&
+                           arguments["separateVarPtmFilter"] != "true";
+    // the variable PTM filter's manager, built where its stage starts
+    VarPtmFilterMngPtr var_filter_mng_ptr;
+    auto makeVarFilterMng = [&](int var_filter_thread_num) {
+      var_filter_mng_ptr = std::make_shared<VarPtmFilterMng>(
+          prsm_para_ptr, index_file_para, var_ptm_file_name, var_ptm_num,
+          var_filter_thread_num, use_approx_spec, "toppic_var_filter");
+      var_ptm_type_num = var_filter_mng_ptr->getSingleShiftNum();
+      n_term_var_ptm_type_num = var_filter_mng_ptr->getNTermShiftNum();
+      // the hidden --var-ptm-filter-cand-num <complete>,<prefix/suffix>,
+      // <internal> replaces the candidates kept per spectrum (5,20,30);
+      // ToppicArgument has checked the three numbers
+      if (arguments["varPtmFilterCandNum"] != "") {
+        std::vector<std::string> nums =
+            str_util::split(arguments["varPtmFilterCandNum"], ",");
+        var_filter_mng_ptr->comp_num_ = std::stoi(nums[0]);
+        var_filter_mng_ptr->pref_suff_num_ = std::stoi(nums[1]);
+        var_filter_mng_ptr->internal_num_ = std::stoi(nums[2]);
+      }
+    };
+
+    if (combined_filter) {
+      std::cout << "Zero unexpected shift and variable PTM filtering - started."
+                << std::endl;
+    } else {
+      std::cout << "Zero unexpected shift filtering - started." << std::endl;
+    }
     // The filtering steps require a large amount of memory, so each one asks
     // mem_check for its own thread number where it starts, from its own
     // per-thread budget and the memory available then; mem_check reports the
@@ -320,8 +355,17 @@ std::string TopPIC_identify(std::map<std::string, std::string>& arguments) {
         std::make_shared<ZeroPtmFilterMng>(prsm_para_ptr, index_file_para,
                                            zero_filter_thread_num,
                                            "toppic_zero_filter");
-    zero_ptm_filter_processor::process(zero_filter_mng_ptr);
-    std::cout << "Zero unexpected shift filtering - finished." << std::endl;
+    if (combined_filter) {
+      makeVarFilterMng(zero_filter_thread_num);
+      zero_var_ptm_filter_processor::process(zero_filter_mng_ptr,
+                                             var_filter_mng_ptr);
+      std::cout
+          << "Zero unexpected shift and variable PTM filtering - finished."
+          << std::endl;
+    } else {
+      zero_ptm_filter_processor::process(zero_filter_mng_ptr);
+      std::cout << "Zero unexpected shift filtering - finished." << std::endl;
+    }
 
     std::cout << "Zero unexpected shift search - started." << std::endl;
     ZeroPtmSearchMngPtr zero_search_mng_ptr =
@@ -339,32 +383,17 @@ std::string TopPIC_identify(std::map<std::string, std::string>& arguments) {
     input_exts.push_back("toppic_zero_shift_SUFFIX");
     input_exts.push_back("toppic_zero_shift_INTERNAL");
 
-    if (var_ptm_num >= 1 && var_ptm_file_name != "") {
-      std::cout << "Variable PTM filtering - started." << std::endl;
-      int var_filter_thread_num =
-          mem_check::getStageThreadNum("Variable PTM filtering", thread_num);
-      LOG_DEBUG("Variable PTM filter thread number " << var_filter_thread_num);
-      bool use_approx_spec = false;
-      if (arguments["useApproxSpectra"] == "true") {
-        use_approx_spec = true;
+    if (use_var_ptm) {
+      if (!combined_filter) {
+        std::cout << "Variable PTM filtering - started." << std::endl;
+        int var_filter_thread_num =
+            mem_check::getStageThreadNum("Variable PTM filtering", thread_num);
+        LOG_DEBUG("Variable PTM filter thread number "
+                  << var_filter_thread_num);
+        makeVarFilterMng(var_filter_thread_num);
+        var_ptm_filter_processor::process(var_filter_mng_ptr);
+        std::cout << "Variable PTM filtering - finished." << std::endl;
       }
-      VarPtmFilterMngPtr var_filter_mng_ptr = std::make_shared<VarPtmFilterMng>(
-          prsm_para_ptr, index_file_para, var_ptm_file_name, var_ptm_num,
-          var_filter_thread_num, use_approx_spec, "toppic_var_filter");
-      var_ptm_type_num = var_filter_mng_ptr->getSingleShiftNum();
-      n_term_var_ptm_type_num = var_filter_mng_ptr->getNTermShiftNum();
-      // the hidden --var-ptm-filter-cand-num <complete>,<prefix/suffix>,
-      // <internal> replaces the candidates kept per spectrum (5,20,30);
-      // ToppicArgument has checked the three numbers
-      if (arguments["varPtmFilterCandNum"] != "") {
-        std::vector<std::string> nums =
-            str_util::split(arguments["varPtmFilterCandNum"], ",");
-        var_filter_mng_ptr->comp_num_ = std::stoi(nums[0]);
-        var_filter_mng_ptr->pref_suff_num_ = std::stoi(nums[1]);
-        var_filter_mng_ptr->internal_num_ = std::stoi(nums[2]);
-      }
-      var_ptm_filter_processor::process(var_filter_mng_ptr);
-      std::cout << "Variable PTM filtering - finished." << std::endl;
 
       std::cout << "Variable PTM search - started." << std::endl;
       VarPtmSearchMngPtr var_ptm_search_mng_ptr =

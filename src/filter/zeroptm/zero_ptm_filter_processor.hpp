@@ -16,11 +16,24 @@
 #ifndef TOPPIC_FILTER_ZEROPTM_ZERO_PTM_FILTER_PROCESSOR_HPP_
 #define TOPPIC_FILTER_ZEROPTM_ZERO_PTM_FILTER_PROCESSOR_HPP_
 
+#include "filter/massmatch/filter_spec.hpp"
 #include "filter/mng/zero_ptm_filter_mng.hpp"
+#include "filter/zeroptm/zero_ptm_filter.hpp"
+#include "prsm/simple_prsm_mem_merge.hpp"
 
 namespace toppic {
 
 namespace zero_ptm_filter_processor {
+
+// the spectrum sets of the stage (the precursor offsets of
+// SpPara::getZeroShiftSearchPrecErrorVec), converted once
+FilterSpecPtrVec readSpectra(const ZeroPtmFilterMngPtr& mng_ptr);
+
+// scores the spectra against one block's filter and adds the candidates to
+// the combiner (also used by zero_var_ptm_filter_processor)
+void scoreBlock(const ZeroPtmFilterPtr& filter_ptr, int block_idx,
+                const ZeroPtmFilterMngPtr& mng_ptr,
+                const FilterSpecPtrVec& spectra, SimplePrsmMemMerge* combiner);
 
 void process(const ZeroPtmFilterMngPtr& mng_ptr);
 

@@ -146,6 +146,10 @@ std::map<std::string, std::string> ToppicArgument::initArguments() {
   // (hidden --second-align): disabled, strict (the fragment tolerance on
   // every peak) or relax (the first alignment's tolerances)
   arguments["secondAlign"] = "true";
+  // the zero-shift and variable PTM filters as one pass over the index
+  // (hidden --separate-var-ptm-filter runs them one after the other;
+  // toppic_test experiment 150)
+  arguments["separateVarPtmFilter"] = "false";
   // the tolerance of the complementary (REVERSED) PRM peaks in the E-values'
   // generating function (hidden --evalue-complement-tolerance): relax (the
   // default), strict or separate (PrsmPara::useEvalueStrictComplement,
@@ -288,6 +292,11 @@ void ToppicArgument::outputArguments(
   if (arguments["secondAlign"] == "false") {
     output << std::setw(gap) << std::left
            << "Second alignment at the refined precursor:" << sep << "false"
+           << std::endl;
+  }
+  if (arguments["separateVarPtmFilter"] == "true") {
+    output << std::setw(gap) << std::left
+           << "Zero-shift and variable PTM filters:" << sep << "separate"
            << std::endl;
   }
   if (arguments["evalueComplementTolerance"] != "relax") {
@@ -656,7 +665,7 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
         "deamid-selector", "")("disable-var-ptm-evalue-mod-residues", "")(
         "multi-skip-evalue", po::value<std::string>(&multi_skip_evalue),
             "")("disable-multi-type-align", "")(
-        "disable-second-align", "")(
+        "disable-second-align", "")("separate-var-ptm-filter", "")(
         "evalue-complement-tolerance",
         po::value<std::string>(&evalue_complement_tolerance), "")(
         "filter-mass-list", po::value<std::string>(&filter_mass_list), "")(
@@ -878,6 +887,12 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
     // 144); --disable-second-align keeps the first alignment's PrSM.
     if (vm.count("disable-second-align")) {
       arguments_["secondAlign"] = "false";
+    }
+
+    // hidden: the zero-shift and variable PTM filters one after the other
+    // instead of one pass over the index files (toppic_test experiment 150)
+    if (vm.count("separate-var-ptm-filter")) {
+      arguments_["separateVarPtmFilter"] = "true";
     }
 
     // hidden: the tolerance of the complementary (REVERSED, P - m) PRM

@@ -182,7 +182,7 @@ inline void filterBlockVariants(const ProteoformPtrVec& raw_forms,
 // Reads the msalign file once and converts every spectrum set into the block
 // independent form the filter scores, so that the blocks share the conversion
 // instead of repeating it.
-inline FilterSpecPtrVec readSpectra(const VarPtmFilterMngPtr& mng_ptr) {
+FilterSpecPtrVec readSpectra(const VarPtmFilterMngPtr& mng_ptr) {
   PrsmParaPtr prsm_para_ptr = mng_ptr->prsm_para_ptr_;
   SpParaPtr sp_para_ptr = prsm_para_ptr->getSpParaPtr();
   int group_spec_num = prsm_para_ptr->getGroupSpecNum();
@@ -218,14 +218,9 @@ inline FilterSpecPtrVec readSpectra(const VarPtmFilterMngPtr& mng_ptr) {
   return spectra;
 }
 
-inline void filterBlockCached(const ProteoformPtrVec& raw_forms, int block_idx,
-                              const VarPtmFilterMngPtr& mng_ptr,
-                              const FilterSpecPtrVec& spectra,
-                              SimplePrsmMemMerge* combiner) {
-  std::string block_str = std::to_string(block_idx);
-  VarPtmFilterPtr filter_ptr =
-      std::make_shared<VarPtmFilter>(raw_forms, mng_ptr, block_str);
-
+void scoreBlock(const VarPtmFilterPtr& filter_ptr, int block_idx,
+                const VarPtmFilterMngPtr& mng_ptr,
+                const FilterSpecPtrVec& spectra, SimplePrsmMemMerge* combiner) {
   PrsmParaPtr prsm_para_ptr = mng_ptr->prsm_para_ptr_;
   int group_spec_num = prsm_para_ptr->getGroupSpecNum();
   int block_num = static_cast<int>(mng_ptr->cnts_.size());
@@ -274,7 +269,9 @@ std::function<void()> geneTask(int block_idx,
     if (mng_ptr->use_approx_spec_) {
       filterBlockVariants(raw_forms, block_idx, mng_ptr, combiner);
     } else {
-      filterBlockCached(raw_forms, block_idx, mng_ptr, *spectra, combiner);
+      VarPtmFilterPtr filter_ptr = std::make_shared<VarPtmFilter>(
+          raw_forms, mng_ptr, std::to_string(block_idx));
+      scoreBlock(filter_ptr, block_idx, mng_ptr, *spectra, combiner);
     }
   };
 }

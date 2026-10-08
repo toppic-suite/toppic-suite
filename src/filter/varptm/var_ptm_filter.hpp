@@ -35,6 +35,16 @@ class VarPtmFilter {
   VarPtmFilter(const ProteoformPtrVec& proteo_ptrs,
                const VarPtmFilterMngPtr& mng_ptr, std::string block_str);
 
+  // The filter on indexes another filter has loaded: the zero-shift
+  // filter's four indexes of the same block are this filter's (the same
+  // files), so the combined zero-shift / variable PTM stage
+  // (zero_var_ptm_filter_processor) loads each block once (toppic_test
+  // experiment 150).
+  VarPtmFilter(const ProteoformPtrVec& proteo_ptrs,
+               const VarPtmFilterMngPtr& mng_ptr, MassMatchPtr term_index_ptr,
+               MassMatchPtr diag_index_ptr, MassMatchPtr rev_term_index_ptr,
+               MassMatchPtr rev_diag_index_ptr);
+
   // the block independent part of a spectrum set, computed once per stage
   static FilterSpecPtr geneFilterSpec(const PrmMsPtrVec& prm_ms_ptr_vec,
                                      const PrmMsPtrVec& srm_ms_ptr_vec,
@@ -96,6 +106,9 @@ class VarPtmFilter {
 
   // the sequence ranges of the index rows
   mass_match_util::IndexRowRanges row_ranges_;
+
+  // the row ranges and the N-terminal masks, from the four indexes
+  void initRows();
 
   // For each truncation N-terminal modification mass of the manager, the
   // rows of the diagonal index whose first residue can carry the PTM: 1 if
