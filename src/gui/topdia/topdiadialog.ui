@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1143</width>
+    <width>1103</width>
     <height>685</height>
    </rect>
   </property>
@@ -18,13 +18,13 @@
   </property>
   <property name="minimumSize">
    <size>
-    <width>1143</width>
+    <width>1103</width>
     <height>685</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
-    <width>1143</width>
+    <width>1103</width>
     <height>685</height>
    </size>
   </property>
@@ -292,7 +292,7 @@
      <rect>
       <x>30</x>
       <y>630</y>
-      <width>1079</width>
+      <width>1039</width>
       <height>50</height>
      </rect>
     </property>
@@ -407,7 +407,7 @@
      <rect>
       <x>30</x>
       <y>460</y>
-      <width>1079</width>
+      <width>1039</width>
       <height>161</height>
      </rect>
     </property>
@@ -459,7 +459,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
      <rect>
       <x>30</x>
       <y>60</y>
-      <width>1079</width>
+      <width>1039</width>
       <height>101</height>
      </rect>
     </property>
@@ -513,7 +513,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
      <rect>
       <x>30</x>
       <y>410</y>
-      <width>1079</width>
+      <width>1039</width>
       <height>51</height>
      </rect>
     </property>
@@ -660,7 +660,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
      <rect>
       <x>684</x>
       <y>160</y>
-      <width>425</width>
+      <width>385</width>
       <height>42</height>
      </rect>
     </property>
@@ -704,7 +704,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
      <rect>
       <x>684</x>
       <y>360</y>
-      <width>425</width>
+      <width>385</width>
       <height>42</height>
      </rect>
     </property>
@@ -748,7 +748,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
      <rect>
       <x>684</x>
       <y>320</y>
-      <width>425</width>
+      <width>385</width>
       <height>42</height>
      </rect>
     </property>
@@ -792,7 +792,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
      <rect>
       <x>684</x>
       <y>240</y>
-      <width>425</width>
+      <width>385</width>
       <height>42</height>
      </rect>
     </property>
@@ -806,7 +806,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
         </size>
        </property>
        <property name="text">
-        <string>MS1 isotopic envelope intensity correlation cutoff:</string>
+        <string>MS1 envelope intensity correlation cutoff:</string>
        </property>
       </widget>
      </item>
@@ -836,7 +836,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
      <rect>
       <x>684</x>
       <y>280</y>
-      <width>425</width>
+      <width>385</width>
       <height>42</height>
      </rect>
     </property>
@@ -850,7 +850,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
         </size>
        </property>
        <property name="text">
-        <string>MS2 isotopic envelope intensity correlation cutoff:</string>
+        <string>MS2 envelope intensity correlation cutoff:</string>
        </property>
       </widget>
      </item>
@@ -973,7 +973,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
      <rect>
       <x>684</x>
       <y>200</y>
-      <width>425</width>
+      <width>385</width>
       <height>42</height>
      </rect>
     </property>

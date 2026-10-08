@@ -535,11 +535,12 @@ command emits `-y` and `-Y`). Facts to keep straight:
   column's rows 3 and 4, above the MS1 and MS2 ECScore cutoffs ("Use
   single scan noise level" moved into the Additional settings box). The
   forms place widgets at fixed coordinates, so moving one means editing the
-  geometries of the widgets below it. topdia_gui's window is 1143 pixels
-  wide (was 965; left column rows 305, right column rows 425, deconvolution
-  drop-downs at most 120) so that every label and drop-down fits the
-  desktop font Ubuntu Sans 11, not only Qt's offscreen Sans Serif 9. To
-  check a form, build a small program on the generated
+  geometries of the widgets below it. topdia_gui's window is 1103 pixels
+  wide (was 965; left column rows 305, right column rows 385, deconvolution
+  drop-downs at most 120; the correlation cutoff labels say "MS1 envelope"
+  and "MS2 envelope", without "isotopic") so that every label and
+  drop-down fits the desktop font Ubuntu Sans 11, not only Qt's offscreen
+  Sans Serif 9. To check a form, build a small program on the generated
   `build/<tool>_gui_autogen/include/gui/<tool>/ui_<tool>dialog.h`, run it
   with `QT_QPA_PLATFORM=offscreen` and the font set by
   `QApplication::setFont`, and compare each `QLabel`'s
