@@ -53,6 +53,10 @@ class LocalAlignProcessor {
     MassShiftPtrVec shifts;
     ProteoformPtr cand_form;
     std::string decision;
+    // the other explanations of the shift on the same proteoform as the
+    // chosen one (cand_form; the proteoform as it is when none was
+    // chosen), each localized: Proteoform::alternative_mass_shift_list_
+    std::vector<MassShiftPtrVec> alternatives;
   };
 
   // A candidate explanation of a shift: the proteoform it is on (nullptr:
@@ -73,10 +77,28 @@ class LocalAlignProcessor {
   // the higher confidence, then Acetyl), then the one-explanation rule.
   // Returns the index of the chosen candidate with its localized shifts
   // and match score, or -1 (ambiguous); rule names the rules that decided.
+  int chooseOne(const PrsmPtr& prsm_ptr, const std::vector<Cand>& cands,
+                MassShiftPtrVec& shifts, int& best_score, std::string& rule);
+
+  // chooseOne, plus the other candidates on the chosen candidate's
+  // proteoform (the proteoform as it is when none is chosen) localized as
+  // the alternatives
   int choose(const PrsmPtr& prsm_ptr, const std::vector<Cand>& cands,
-             MassShiftPtrVec& shifts, int& best_score, std::string& rule);
+             MassShiftPtrVec& shifts, int& best_score, std::string& rule,
+             std::vector<MassShiftPtrVec>& alternatives);
 
   PrsmPtr processOnePrsm(const PrsmPtr& prsm_ptr);
+
+  // The alternative mass shift lists of the result proteoform out_form
+  // (Proteoform::alternative_mass_shift_list_): for every alternative of a
+  // shift, the proteoform's shifts other than the unexpected ones and the
+  // variable PTMs the localization added (new_shifts), the alternative's
+  // variable PTMs and the other unexpected shift(s) as they are. ori_start
+  // and unexp_shifts are the original proteoform's.
+  void setAlternatives(
+      const ProteoformPtr& out_form, int ori_start,
+      const MassShiftPtrVec& unexp_shifts, const MassShiftPtrVec& new_shifts,
+      const std::vector<std::pair<MassShiftPtr, PieceResult>>& alt_results);
 
   // The shift of the piece explained and localized on the proteoform as it
   // is and, with n_forms (the piece holds the N-terminus and the shift has

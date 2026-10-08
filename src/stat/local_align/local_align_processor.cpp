@@ -199,7 +199,26 @@ bool isAcetylForm(const std::string& type) {
 int LocalAlignProcessor::choose(const PrsmPtr& prsm_ptr,
                                 const std::vector<Cand>& cands,
                                 MassShiftPtrVec& shifts, int& best_score,
-                                std::string& rule) {
+                                std::string& rule,
+                                std::vector<MassShiftPtrVec>& alternatives) {
+  int chosen = chooseOne(prsm_ptr, cands, shifts, best_score, rule);
+  alternatives.clear();
+  ProteoformPtr ref = chosen >= 0 ? cands[chosen].form : nullptr;
+  for (size_t k = 0; k < cands.size(); k++) {
+    if (static_cast<int>(k) == chosen || cands[k].form != ref) continue;
+    int scr = 0;
+    MassShiftPtrVec alt = local_align::localize(
+        cands[k].piece, cands[k].expl, prsm_ptr->getRefineMsPtrVec(), para_,
+        mng_ptr_, scr);
+    if (!alt.empty()) alternatives.push_back(alt);
+  }
+  return chosen;
+}
+
+int LocalAlignProcessor::chooseOne(const PrsmPtr& prsm_ptr,
+                                   const std::vector<Cand>& cands,
+                                   MassShiftPtrVec& shifts, int& best_score,
+                                   std::string& rule) {
   rule = "";
   std::vector<size_t> kept;
   for (size_t k = 0; k < cands.size(); k++) kept.push_back(k);
@@ -335,7 +354,8 @@ LocalAlignProcessor::PieceResult LocalAlignProcessor::processPiece(
   std::string rule;
   MassShiftPtrVec shifts;
   int best_score = 0;
-  int chosen = choose(prsm_ptr, cands, shifts, best_score, rule);
+  int chosen = choose(prsm_ptr, cands, shifts, best_score, rule,
+                      result.alternatives);
   if (chosen < 0) {
     result.decision = "ambiguous";
     log(prsm_ptr, shift_idx, piece.shift_mass, piece_name, names, "ambiguous",
@@ -433,7 +453,8 @@ LocalAlignProcessor::PieceResult LocalAlignProcessor::processTerminal(
   std::string rule;
   MassShiftPtrVec shifts;
   int best_score = 0;
-  int chosen = choose(prsm_ptr, cands, shifts, best_score, rule);
+  int chosen = choose(prsm_ptr, cands, shifts, best_score, rule,
+                      result.alternatives);
   if (chosen < 0) {
     result.decision = "term_ambiguous";
     log(prsm_ptr, shift_idx, shift_ptr->getMassShift(), piece_name + "," + side,
@@ -459,6 +480,52 @@ LocalAlignProcessor::PieceResult LocalAlignProcessor::processTerminal(
           " score=" + std::to_string(best_score),
       rule, all_names);
   return result;
+}
+
+void LocalAlignProcessor::setAlternatives(
+    const ProteoformPtr& out_form, int ori_start,
+    const MassShiftPtrVec& unexp_shifts, const MassShiftPtrVec& new_shifts,
+    const std::vector<std::pair<MassShiftPtr, PieceResult>>& alt_results) {
+  MassShiftPtrVec2D alt_lists;
+  int out_start = out_form->getStartPos();
+  int out_len = out_form->getLen();
+  for (size_t r = 0; r < alt_results.size(); r++) {
+    const MassShiftPtr& shift_ptr = alt_results[r].first;
+    const PieceResult& result = alt_results[r].second;
+    int alt_start = result.cand_form == nullptr ? ori_start
+                                                : result.cand_form->getStartPos();
+    for (size_t a = 0; a < result.alternatives.size(); a++) {
+      MassShiftPtrVec list;
+      // the proteoform's shifts other than the unexpected ones and the
+      // variable PTMs the localization added
+      const MassShiftPtrVec& shifts = out_form->getMassShiftPtrVec();
+      for (size_t k = 0; k < shifts.size(); k++) {
+        if (shifts[k]->getTypePtr() == AlterType::UNEXPECTED) continue;
+        if (std::find(new_shifts.begin(), new_shifts.end(), shifts[k]) !=
+            new_shifts.end()) {
+          continue;
+        }
+        list.push_back(shifts[k]);
+      }
+      // the alternative explanation of this shift
+      for (size_t m = 0; m < result.alternatives[a].size(); m++) {
+        list.push_back(local_align::shiftPositions(result.alternatives[a][m],
+                                                   out_start - alt_start));
+      }
+      // the other unexpected shift(s) as they are
+      for (size_t u = 0; u < unexp_shifts.size(); u++) {
+        if (unexp_shifts[u] == shift_ptr) continue;
+        MassShiftPtr moved =
+            local_align::shiftPositions(unexp_shifts[u], out_start - ori_start);
+        if (moved->getLeftBpPos() >= 0 && moved->getRightBpPos() <= out_len) {
+          list.push_back(moved);
+        }
+      }
+      std::sort(list.begin(), list.end(), MassShift::cmpPosInc);
+      alt_lists.push_back(list);
+    }
+  }
+  if (!alt_lists.empty()) out_form->setAlternativeMassShiftPtrVec2D(alt_lists);
 }
 
 PrsmPtr LocalAlignProcessor::processOnePrsm(const PrsmPtr& prsm_ptr) {
@@ -504,6 +571,9 @@ PrsmPtr LocalAlignProcessor::processOnePrsm(const PrsmPtr& prsm_ptr) {
 
   MassShiftPtrVec explained;
   std::vector<PieceResult> results;
+  // the results with alternative explanations, ok or not (the shift and
+  // its result)
+  std::vector<std::pair<MassShiftPtr, PieceResult>> alt_results;
   if (unexp_shifts.size() == 1) {
     MassShiftPtr s = unexp_shifts[0];
     double mass = s->getMassShift();
@@ -527,6 +597,7 @@ PrsmPtr LocalAlignProcessor::processOnePrsm(const PrsmPtr& prsm_ptr) {
       explained.push_back(s);
       results.push_back(r);
     }
+    if (!r.alternatives.empty()) alt_results.push_back({s, r});
   } else {
     MassShiftPtr s1 = unexp_shifts[0];
     MassShiftPtr s2 = unexp_shifts[1];
@@ -563,8 +634,15 @@ PrsmPtr LocalAlignProcessor::processOnePrsm(const PrsmPtr& prsm_ptr) {
       explained.push_back(s2);
       results.push_back(r2);
     }
+    if (!r1.alternatives.empty()) alt_results.push_back({s1, r1});
+    if (!r2.alternatives.empty()) alt_results.push_back({s2, r2});
   }
-  if (explained.empty()) return prsm_ptr;
+  if (explained.empty()) {
+    // nothing replaced: the alternatives, if any, go on the proteoform as
+    // it is
+    setAlternatives(form_ptr, start, unexp_shifts, {}, alt_results);
+    return prsm_ptr;
+  }
 
   // the result proteoform: the original one, or the one with the moved
   // start / end (or the other N-terminal form) of the terminal candidates
@@ -609,19 +687,22 @@ PrsmPtr LocalAlignProcessor::processOnePrsm(const PrsmPtr& prsm_ptr) {
     }
     all_shifts = base_ptr->getMassShiftPtrVec();
   }
+  MassShiftPtrVec new_shifts;
   for (size_t k = 0; k < results.size(); k++) {
     int cand_start = results[k].cand_form == nullptr
                          ? start
                          : results[k].cand_form->getStartPos();
     for (size_t m = 0; m < results[k].shifts.size(); m++) {
-      all_shifts.push_back(local_align::shiftPositions(
+      new_shifts.push_back(local_align::shiftPositions(
           results[k].shifts[m], final_start - cand_start));
+      all_shifts.push_back(new_shifts.back());
     }
   }
   std::sort(all_shifts.begin(), all_shifts.end(), MassShift::cmpPosInc);
   ProteoformPtr new_form_ptr = std::make_shared<Proteoform>(
       form_ptr->getFastaSeqPtr(), base_ptr->getProtModPtr(), final_start,
       final_end, base_ptr->getResSeqPtr(), all_shifts);
+  setAlternatives(new_form_ptr, start, unexp_shifts, new_shifts, alt_results);
   if (form_ptr->hasTruncNTermMod() && final_start == start) {
     new_form_ptr->setTruncNTermModPtr(form_ptr->getTruncNTermModPtr());
   }

@@ -92,6 +92,23 @@ class Proteoform {
 
   const MassShiftPtrVec& getMassShiftPtrVec() const { return mass_shift_list_; }
 
+  // The alternative explanations of an unexpected shift by the PTM
+  // localization (stat/local_align): one complete mass shift list per
+  // alternative, with the proteoform's other shifts (fixed, protein
+  // variable, input and variable PTMs), the alternative's variable PTMs in
+  // place of the shift, and any other unexpected shift as it is. Positions
+  // are the proteoform's. Empty when the shift had one explanation.
+  const MassShiftPtrVec2D& getAlternativeMassShiftPtrVec2D() const {
+    return alternative_mass_shift_list_;
+  }
+  void setAlternativeMassShiftPtrVec2D(const MassShiftPtrVec2D& lists) {
+    alternative_mass_shift_list_ = lists;
+  }
+  // the TSV column "Alternative PTM explanation": each alternative's
+  // variable PTMs and unexpected shifts in position order ("Name:[a-b]",
+  // "+mass:[a-b]", joined by ';'), the alternatives joined by " | "
+  std::string getAlternativePtmStr();
+
   MassShiftPtrVec getMassShiftPtrVec(const AlterTypePtr& type_ptr);
 
   int getProteoClusterId() const { return proteo_cluster_id_; }
@@ -139,6 +156,9 @@ class Proteoform {
   void parseXml(XmlDOMElement element, const ProteoformPtr& db_proteoform);
 
   static std::string getXmlElementName() { return "proteoform"; }
+  static std::string getAlternativeXmlElementName() {
+    return "alternative_mass_shift_lists";
+  }
 
   PtmPtrVec getPtmVec(const AlterTypePtr& type);
 
@@ -217,6 +237,8 @@ class Proteoform {
   std::string classification_;
 
   MassShiftPtrVec mass_shift_list_;
+
+  MassShiftPtrVec2D alternative_mass_shift_list_;
 };
 
 using ProteoformPtrVec = std::vector<ProteoformPtr>;

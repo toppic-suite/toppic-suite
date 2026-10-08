@@ -140,6 +140,28 @@ void Proteoform::parseXml(XmlDOMElement element,
         xml_dom_util::getChildElement(list_element, shift_name.c_str(), i);
     mass_shift_list_.push_back(std::make_shared<MassShift>(shift_element));
   }
+
+  // the alternative mass shift lists (files written before they were
+  // added have none)
+  std::string alt_list_name = getAlternativeXmlElementName();
+  if (xml_dom_util::getChildCount(element, alt_list_name.c_str()) > 0) {
+    XmlDOMElement alt_element =
+        xml_dom_util::getChildElement(element, alt_list_name.c_str(), 0);
+    int alt_num =
+        xml_dom_util::getChildCount(alt_element, shift_list_name.c_str());
+    for (int k = 0; k < alt_num; k++) {
+      XmlDOMElement alt_list =
+          xml_dom_util::getChildElement(alt_element, shift_list_name.c_str(), k);
+      int n = xml_dom_util::getChildCount(alt_list, shift_name.c_str());
+      MassShiftPtrVec shifts;
+      for (int i = 0; i < n; i++) {
+        XmlDOMElement shift_element =
+            xml_dom_util::getChildElement(alt_list, shift_name.c_str(), i);
+        shifts.push_back(std::make_shared<MassShift>(shift_element));
+      }
+      alternative_mass_shift_list_.push_back(shifts);
+    }
+  }
 }
 
 // Get the mass of the modified proteoform
@@ -464,6 +486,44 @@ void Proteoform::appendXml(XmlDOMDocument* xml_doc, XmlDOMElement parent) {
   for (size_t i = 0; i < mass_shift_list_.size(); i++) {
     mass_shift_list_[i]->appendXml(xml_doc, cl);
   }
+  if (!alternative_mass_shift_list_.empty()) {
+    std::string alt_list_name = getAlternativeXmlElementName();
+    XmlDOMElement alt_element =
+        xml_doc->addElement(element, alt_list_name.c_str());
+    for (size_t k = 0; k < alternative_mass_shift_list_.size(); k++) {
+      XmlDOMElement alt_list =
+          xml_doc->addElement(alt_element, element_name.c_str());
+      for (size_t i = 0; i < alternative_mass_shift_list_[k].size(); i++) {
+        alternative_mass_shift_list_[k][i]->appendXml(xml_doc, alt_list);
+      }
+    }
+  }
+}
+
+std::string Proteoform::getAlternativePtmStr() {
+  std::string result;
+  for (size_t k = 0; k < alternative_mass_shift_list_.size(); k++) {
+    MassShiftPtrVec shifts;
+    for (size_t i = 0; i < alternative_mass_shift_list_[k].size(); i++) {
+      AlterTypePtr type_ptr = alternative_mass_shift_list_[k][i]->getTypePtr();
+      if (type_ptr == AlterType::VARIABLE || type_ptr == AlterType::UNEXPECTED) {
+        shifts.push_back(alternative_mass_shift_list_[k][i]);
+      }
+    }
+    std::sort(shifts.begin(), shifts.end(), MassShift::cmpPosInc);
+    std::string alt;
+    for (size_t i = 0; i < shifts.size(); i++) {
+      int left_pos = shifts[i]->getLeftBpPos();
+      int right_pos = shifts[i]->getRightBpPos();
+      if (i > 0) alt += ";";
+      alt += shifts[i]->getAnnoStr() + ":[" + std::to_string(left_pos + 1);
+      if (left_pos + 1 != right_pos) alt += "-" + std::to_string(right_pos);
+      alt += "]";
+    }
+    if (k > 0) result += " | ";
+    result += alt;
+  }
+  return result;
 }
 
 std::string Proteoform::getMIScore() {

@@ -2741,6 +2741,26 @@ What the method does, and how it differs from `stat/local`:
   adjusted precursor mass becomes the proteoform's mass, as `stat/local`
   does. A one-shift PrSM whose shift is within [-1, 1] Da + e is left
   alone (`stat/local`'s rule).
+- **Alternative explanations** (`Proteoform::alternative_mass_shift_list_`,
+  `MassShiftPtrVec2D`; toppic_test experiment 140, amendment 8). When a
+  shift has several explanations, the other candidates on the same
+  proteoform as the chosen one (the proteoform as it is when none is
+  chosen: the shift stays, the alternatives are all its explanations) are
+  localized too (`LocalAlignProcessor::choose`, `PieceResult::alternatives`)
+  and the result proteoform gets one complete mass shift list per
+  alternative (`setAlternatives`): its shifts other than the unexpected
+  ones and the variable PTMs the localization added, the alternative's
+  variable PTMs, and any other unexpected shift as it is - so for a
+  two-shift PrSM each list explains one shift and keeps the other as a
+  shift. Candidates on a moved terminus or another N-terminal form than
+  the result's cannot be expressed as a mass shift list and are left out.
+  PrSM XML: `<alternative_mass_shift_lists>` with one `<mass_shift_list>`
+  per alternative under the proteoform (read back by `parseXml`; older
+  files have none). PrSM TSV: the column "Alternative PTM explanation"
+  after MIScore (`getAlternativePtmStr`: each alternative's variable PTMs
+  and unexpected shifts in position order, `Name:[a-b]` / `+mass:[a-b]`
+  joined by `;`, the alternatives joined by ` | `). The SQLite PrSM table
+  does not have it.
 - **Research aids.** `TOPPIC_LOCAL_ALIGN_PARA` ("name=value,..."): `iso`
   (0; 1 = the isotope match of `stat/local`), `max_ptm` (2; 1 = single
   PTMs only), `split` (1), `term` (1), `term_range` (5),

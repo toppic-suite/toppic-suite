@@ -57,6 +57,7 @@ void PrsmMatchTableWriter::writeHeader(std::ofstream& file) {
        << "Fixed PTMs" << delim << "# Unexpected modifications" << delim
        << "Unexpected modifications" << delim << "# Variable PTMs" << delim
        << "Variable PTMs" << delim << "MIScore" << delim
+       << "Alternative PTM explanation" << delim
        << "# Matched exp fragments" << delim << "# Matched theo fragments"
        << delim << "E-value" << delim
        << "Spectrum-level Q-value" << delim << "Proteoform-level Q-value"
@@ -211,7 +212,9 @@ void PrsmMatchTableWriter::writePrsmStandardFormat(
            << form_ptr->getAlterStr(AlterType::UNEXPECTED) << delim
            << form_ptr->getVarPtmNum() << delim
            << form_ptr->getVarPtmStr() << delim
-           << form_ptr->getMIScore() << delim << prsm_ptr->getMatchExpFragNum()
+           << form_ptr->getMIScore() << delim
+           << form_ptr->getAlternativePtmStr() << delim
+           << prsm_ptr->getMatchExpFragNum()
            << delim << prsm_ptr->getMatchTheoFragNum() << delim
            << prsm_ptr->getEValue() << delim;
 

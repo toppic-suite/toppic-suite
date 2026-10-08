@@ -87,6 +87,7 @@ class MassShift {
 };
 
 using MassShiftPtrVec = std::vector<MassShiftPtr>;
+using MassShiftPtrVec2D = std::vector<MassShiftPtrVec>;
 
 }  // namespace toppic
 
