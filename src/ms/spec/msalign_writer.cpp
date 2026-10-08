@@ -60,6 +60,17 @@ void MsAlignWriter::writeMs(const DeconvMsPtr& ms_ptr) {
   if (header_ptr->getMsLevel() > 1) {
     output_ << "MS_ONE_ID=" << header_ptr->getMsOneId() << std::endl;
     output_ << "MS_ONE_SCAN=" << header_ptr->getMsOneScan() << std::endl;
+    if (header_ptr->getMsLevel() == 3) {
+      // an MS3 spectrum: its parent MS2 spectrum and that one's precursor
+      output_ << "MS_TWO_ID=" << header_ptr->getMsTwoId() << std::endl;
+      output_ << "MS_TWO_SCAN=" << header_ptr->getParentScan() << std::endl;
+      output_ << "MS_TWO_PRECURSOR_MZ=" << std::fixed << std::setprecision(6)
+              << header_ptr->getMsTwoPrecMz() << std::endl;
+      output_ << "MS_TWO_PRECURSOR_CHARGE=" << header_ptr->getMsTwoPrecCharge()
+              << std::endl;
+      output_ << "MS_TWO_PRECURSOR_MASS=" << std::fixed << std::setprecision(6)
+              << header_ptr->getMsTwoPrecMass() << std::endl;
+    }
     output_ << "PRECURSOR_WINDOW_BEGIN=" << std::fixed << std::setprecision(6)
             << header_ptr->getPrecWinBegin() << std::endl;
     output_ << "PRECURSOR_WINDOW_END=" << header_ptr->getPrecWinEnd()

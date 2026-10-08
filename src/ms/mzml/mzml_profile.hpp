@@ -29,6 +29,9 @@ class MzmlProfile {
               const std::map<double, std::pair<int, int>>& volt_map);
   int getMs1Cnt() const { return total_ms1_cnt_; }
   int getMs2Cnt() const { return total_ms2_cnt_; }
+  // the MS3 scans without a proton transfer stage (DeconvMs3Process)
+  int getMs3Cnt() const { return total_ms3_cnt_; }
+  void setMs3Cnt(int cnt) { total_ms3_cnt_ = cnt; }
   bool isFaims() const { return volt_map_.size() > 0; }
 
   // True if every MS/MS scan in the file specifies its precursor isolation
@@ -43,6 +46,7 @@ class MzmlProfile {
  private:
   int total_ms1_cnt_ = 0;
   int total_ms2_cnt_ = 0;
+  int total_ms3_cnt_ = 0;
   bool has_prec_window_ = false;
   std::map<double, std::pair<int, int>> volt_map_;
 };

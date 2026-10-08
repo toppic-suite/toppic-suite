@@ -92,6 +92,10 @@ class TopfdPara {
   // topfd --ptcr: every MS/MS spectrum is a PTCR spectrum (the activation
   // is then PTCR; see ptcr_ms2_deconv)
   bool isPtcrForced() const { return ptcr_forced_; }
+  // the MS3 spectral deconvolution (DeconvMs3Process), on by default;
+  // hidden --disable-ms3 turns it off
+  bool isMs3Deconv() const { return ms3_deconv_; }
+  int getMs3ScanNum() const { return ms_3_scan_num_; }
   int getThreadNum() const { return thread_num_; }
   double getMs1EcscoreCutoff() const { return ms1_ecscore_cutoff_; }
   double getMs2EcscoreCutoff() const { return ms2_ecscore_cutoff_; }
@@ -160,6 +164,8 @@ class TopfdPara {
   void setMs2PrecPairRefine(bool refine) { ms2_prec_pair_refine_ = refine; }
 
   void setPtcrForced(bool ptcr_forced) { ptcr_forced_ = ptcr_forced; }
+  void setMs3Deconv(bool ms3_deconv) { ms3_deconv_ = ms3_deconv; }
+  void setMs3ScanNumber(int ms3_scan_num) { ms_3_scan_num_ = ms3_scan_num; }
   void setMaxMissPeakNum(int num) { max_miss_peak_num_ = num; }
   void setMsOneRankPeakDistance(double d) { ms1_rank_peak_distance_ = d; }
   void setMsTwoRankPeakDistance(double d) { ms2_rank_peak_distance_ = d; }
@@ -312,6 +318,10 @@ class TopfdPara {
   bool ms2_prec_pair_refine_ = true;
   // topfd --ptcr (isPtcrForced)
   bool ptcr_forced_ = false;
+  // the MS3 spectral deconvolution (isMs3Deconv) and the MS3 scans of the
+  // file without a proton transfer stage
+  bool ms3_deconv_ = true;
+  int ms_3_scan_num_ = 0;
 
   //** information for each run **
   int frac_id_ = -1;

@@ -228,6 +228,11 @@ bool Argument::parse(int argc, char* argv[]) {
         "reduction of the isolated ions without dissociation), also when the "
         "file gives no proton transfer term: its species are deconvoluted "
         "and written to <base>_ptcr.msalign and <base>_ptcr.tsv.")(
+        "disable-ms3",
+        "Do not deconvolute the MS3 spectra of the file (the dissociation of "
+        "MS2 fragment ions; on by default when the file has MS3 scans without "
+        "a proton transfer stage, written to <base>_ms3.msalign and "
+        "<base>_ms3.tsv).")(
         "output-batmass-feature,O",
         "Output a feature file in the BatMass CSV format.")(
         "spectrum-file-name",
@@ -279,6 +284,9 @@ bool Argument::parse(int argc, char* argv[]) {
 
     if (vm.count("activation")) {
       topfd_para_ptr_->setActivation(activation);
+    }
+    if (vm.count("disable-ms3")) {
+      topfd_para_ptr_->setMs3Deconv(false);
     }
     if (vm.count("ptcr")) {
       // the readers mark every MS/MS spectrum PTCR (PwMsReader)
