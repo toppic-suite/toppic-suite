@@ -44,56 +44,48 @@ namespace {
 constexpr double ISOTOPE_DIFF = 1.00235;
 
 // The isotope correction of an MS2 species' monoisotopic mass from the parent
-// MS2 scan's centroid peaks (toppic_test experiment 146, amendment 1): the
-// theoretical envelope (EnvBase) at the reported monoisotopic mass and at
-// its neighbours one isotope lighter and heavier is compared with the peaks
-// within mz_tol of its positions by the cosine of the intensity vectors; a
-// neighbour whose monoisotopic peak is observed and whose cosine beats the
-// reported mass's by at least min_gain wins. Returns the shift in isotopes
-// (-1, 0, +1). The MS2 deconvolution reports the mass one isotope light for
-// 2-6 kDa fragments at charge 3-6 (the weak monoisotopic peak) and one
-// heavy below 3 kDa (a missing monoisotopic peak); TOPFD_MS3_ISO_CORRECT=0
-// turns the correction off.
-double envCosine(double mono_mass, int charge, const PeakPtrVec& peaks,
-                 double mz_tol, bool& mono_observed) {
-  mono_observed = false;
-  EnvPtr env_ptr = EnvBase::getEnvByMonoMass(mono_mass, charge);
-  if (env_ptr == nullptr) return -1;
-  double tt = 0, oo = 0, to = 0;
-  for (int i = 0; i < env_ptr->getPeakNum(); i++) {
-    double mz = env_ptr->getMz(i);
-    double theo = env_ptr->getInte(i);
-    double obs = 0;
-    for (const PeakPtr& p : peaks) {
-      if (std::abs(p->getPosition() - mz) <= mz_tol && p->getIntensity() > obs) {
-        obs = p->getIntensity();
-      }
+// MS2 scan's centroid peaks (toppic_test experiment 146, amendment 1). The
+// MS2 deconvolution reports the mass one isotope light for 2-6 kDa fragments
+// at charge 3-6 (the monoisotopic peak is weak there and the envelope fit
+// starts one peak early) and one isotope heavy below 3 kDa (a weak or
+// missing monoisotopic peak). Two intensity ratios at the reported
+// monoisotopic m/z decide: when the peak one isotope above is more than
+// iso_k times the theoretical ratio (EnvBase's envelope at the reported
+// mass) times the reported peak, the reported peak is not the monoisotopic
+// one and the mass goes up one isotope; else when a peak one isotope below
+// holds at least iso_c of the reported peak's intensity, the mass goes down
+// one (a true monoisotopic peak has nothing below it). On the test data
+// the rule takes the exact rate from 71% to 83% (k 4, c 0.1; a cosine of
+// the whole envelope against the peaks did not separate the cases).
+// Returns the shift in isotopes (-1, 0, +1). TOPFD_MS3_ISO_CORRECT=0 turns
+// it off; TOPFD_MS3_ISO_K and TOPFD_MS3_ISO_C set the thresholds.
+double inteAt(const PeakPtrVec& peaks, double mz, double tol) {
+  double inte = 0;
+  for (const PeakPtr& p : peaks) {
+    if (std::abs(p->getPosition() - mz) <= tol && p->getIntensity() > inte) {
+      inte = p->getIntensity();
     }
-    if (i == 0 && obs > 0) mono_observed = true;
-    tt += theo * theo;
-    oo += obs * obs;
-    to += theo * obs;
   }
-  if (tt <= 0 || oo <= 0) return 0;
-  return to / std::sqrt(tt * oo);
+  return inte;
 }
 
 int correctIsotope(double mono_mass, int charge, const PeakPtrVec& peaks,
-                   double mz_tol, double min_gain) {
-  bool mono_obs = false;
-  double base = envCosine(mono_mass, charge, peaks, mz_tol, mono_obs);
-  int best = 0;
-  double best_score = base;
-  for (int d = -1; d <= 1; d += 2) {
-    bool obs = false;
-    double score =
-        envCosine(mono_mass + d * ISOTOPE_DIFF, charge, peaks, mz_tol, obs);
-    if (obs && score > best_score + min_gain) {
-      best = d;
-      best_score = score;
-    }
-  }
-  return best;
+                   double mz_tol, double iso_k, double iso_c) {
+  EnvPtr env_ptr = EnvBase::getEnvByMonoMass(mono_mass, charge);
+  if (env_ptr == nullptr || env_ptr->getPeakNum() < 2) return 0;
+  double mono_mz = peak_util::compMz(mono_mass, charge);
+  // the theoretical ratio of the peak one isotope above the monoisotopic
+  // one to the monoisotopic one (the envelope's first two peaks)
+  double theo_ratio = env_ptr->getInte(0) > 0
+                          ? env_ptr->getInte(1) / env_ptr->getInte(0)
+                          : 0;
+  double i0 = inteAt(peaks, mono_mz, mz_tol);
+  if (i0 <= 0 || theo_ratio <= 0) return 0;
+  double up = inteAt(peaks, mono_mz + ISOTOPE_DIFF / charge, mz_tol);
+  double down = inteAt(peaks, mono_mz - ISOTOPE_DIFF / charge, mz_tol);
+  if (up > iso_k * theo_ratio * i0) return 1;
+  if (down > iso_c * i0) return -1;
+  return 0;
 }
 
 // The MS2 species whose isotopic envelope has a peak in the MS3 isolation
@@ -169,11 +161,13 @@ void DeconvMs3Process::process() {
 
   int total = topfd_para_ptr_->getMs3ScanNum();
   // the isotope correction of the MS2 species (correctIsotope); off with
-  // TOPFD_MS3_ISO_CORRECT=0, the gain with TOPFD_MS3_ISO_GAIN (0.02)
+  // TOPFD_MS3_ISO_CORRECT=0, the thresholds with TOPFD_MS3_ISO_K / _C
   const char* iso_env = std::getenv("TOPFD_MS3_ISO_CORRECT");
   bool iso_correct = iso_env == nullptr || std::atoi(iso_env) != 0;
-  const char* gain_env = std::getenv("TOPFD_MS3_ISO_GAIN");
-  double iso_gain = gain_env == nullptr ? 0.02 : std::atof(gain_env);
+  const char* k_env = std::getenv("TOPFD_MS3_ISO_K");
+  double iso_k = k_env == nullptr ? 4.0 : std::atof(k_env);
+  const char* c_env = std::getenv("TOPFD_MS3_ISO_C");
+  double iso_c = c_env == nullptr ? 0.1 : std::atof(c_env);
   // the centroid peaks of the MS2 scans read so far (the MS3 scans follow
   // their MS2 scan in the file)
   std::map<int, PeakPtrVec> ms2_peaks;
@@ -243,8 +237,8 @@ void DeconvMs3Process::process() {
       int charge = peak_ptr->getCharge();
       auto pk_it = ms2_peaks.find(ms2_scan);
       if (iso_correct && pk_it != ms2_peaks.end()) {
-        iso_shift = correctIsotope(mass, charge, pk_it->second,
-                                   topfd_para_ptr_->getMzError(), iso_gain);
+        iso_shift = correctIsotope(mass, charge, pk_it->second, 0.01, iso_k,
+                                   iso_c);
         if (iso_shift != 0) {
           mass += iso_shift * ISOTOPE_DIFF;
           iso_corrected++;
