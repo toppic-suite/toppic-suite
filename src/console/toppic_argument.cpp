@@ -111,6 +111,9 @@ std::map<std::string, std::string> ToppicArgument::initArguments() {
   arguments["cutoffProteinValue"] = "0.01";
   arguments["localPtmFileName"] = "";
   arguments["localThreshold"] = "0.15";
+  // the localization of -B by the variable PTM search of stat/local_align
+  // (hidden --local-align) instead of stat/local
+  arguments["localAlign"] = "false";
 
   arguments["groupSpectrumNumber"] = "1";
   arguments["combinedOutputName"] = "";
@@ -330,6 +333,10 @@ void ToppicArgument::outputArguments(
            << "True" << std::endl;
     output << std::setw(gap) << std::left << "MIScore threshold:" << sep
            << arguments["localThreshold"] << std::endl;
+    if (arguments["localAlign"] == "true") {
+      output << std::setw(gap) << std::left << "Localization method:" << sep
+             << "Variable PTM search (local_align)" << std::endl;
+    }
     output << std::setw(gap) << std::left
            << "Localization modification file name:" << sep
            << arguments["localPtmFileName"] << std::endl;
@@ -614,7 +621,7 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
         "post-min-peak-num,I", po::value<std::string>(&post_min_peak_num), "")(
         "average-mass,g", "")("disable-zero-shift-prec-error", "")(
         "enable-one-shift-prec-error", "")("enable-var-ptm-prec-error", "")(
-        "fdr-groups", "")("disable-frag-mass-extension", "")(
+        "fdr-groups", "")("local-align", "")("disable-frag-mass-extension", "")(
         "frag-mass-dedup", "")(
         "frag-extend-min-mass", po::value<std::string>(&frag_extend_min_mass),
         "")("var-ptm-filter-cand-num",
@@ -888,6 +895,12 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
 
     if (vm.count("disable-post-match")) {
       arguments_["postMassMatch"] = "false";
+    }
+
+    // hidden: the PTM localization of -B by the variable PTM search of
+    // stat/local_align (toppic_test experiment 140)
+    if (vm.count("local-align")) {
+      arguments_["localAlign"] = "true";
     }
 
     if (vm.count("post-min-peak-num")) {
