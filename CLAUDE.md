@@ -2306,6 +2306,10 @@ Facts to keep straight:
   annotation's fragments and the E-value either way, and the relaxed
   window inflated targets and decoys alike. The one-shift search takes
   38 s instead of 23 s; the multiple-shift search's 256 s are unchanged.
+  The pushed main 249433b1 (this, the penalty fix below, `filter_pairs`,
+  `topmg_prec_matched_ions` and `local_align`) gives 3,375 / 2,004 / 440
+  against the pre-merge main c7f13d66's 3,372 / 2,008 / 439, the same
+  cutoff (report 0144 amendment 2).
 
 ## Large-shift penalty of the shift alignments (`search/oneptmsearch/ps_align`, `search/ptmsearch/ps_align_multi_type`)
 
