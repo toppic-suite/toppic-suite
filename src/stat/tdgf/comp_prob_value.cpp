@@ -25,8 +25,10 @@ namespace toppic {
 CompProbValue::CompProbValue(double convert_ratio,
                              const ResFreqPtrVec& residue_ptrs,
                              double residue_avg_len, int max_layer_num,
-                             int max_table_height, double max_sp_prec_mass) {
+                             int max_table_height, double max_sp_prec_mass,
+                             bool strict_complement) {
   convert_ratio_ = convert_ratio;
+  strict_complement_ = strict_complement;
   setResidues(residue_ptrs, static_cast<int>(residue_avg_len));
 
   max_layer_num_ = max_layer_num;
@@ -178,20 +180,22 @@ inline void CompProbValue::setMassErr(const PrmPeakPtrVec2D& peak_ptr_2d,
                                       const PeakTolerancePtr& tole_ptr) {
   PrmPeakPtr zero_peak_ptr =
       prm_peak_factory::getZeroPeakPtr(0, prec_mass, tole_ptr, 0.0);
-  ProbPeak zero_peak(zero_peak_ptr, 0, height_, strict, convert_ratio_);
+  ProbPeak zero_peak(zero_peak_ptr, 0, height_, strict, strict_complement_,
+                     convert_ratio_);
   prob_peaks_.push_back(zero_peak);
 
   for (size_t spec_id = 0; spec_id < peak_ptr_2d.size(); spec_id++) {
     for (size_t peak_id = 0; peak_id < peak_ptr_2d[spec_id].size(); peak_id++) {
       ProbPeak cur_peak(peak_ptr_2d[spec_id][peak_id], spec_id, height_, strict,
-                        convert_ratio_);
+                        strict_complement_, convert_ratio_);
       prob_peaks_.push_back(cur_peak);
     }
   }
   // precursor mass
   PrmPeakPtr prec_peak_ptr =
       prm_peak_factory::getPrecPeakPtr(0, prec_mass, tole_ptr, 0.0);
-  ProbPeak prec_peak(prec_peak_ptr, 0, height_, strict, convert_ratio_);
+  ProbPeak prec_peak(prec_peak_ptr, 0, height_, strict, strict_complement_,
+                     convert_ratio_);
   prob_peaks_.push_back(prec_peak);
 }
 

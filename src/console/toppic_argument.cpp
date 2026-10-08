@@ -146,6 +146,11 @@ std::map<std::string, std::string> ToppicArgument::initArguments() {
   // (hidden --second-align): disabled, strict (the fragment tolerance on
   // every peak) or relax (the first alignment's tolerances)
   arguments["secondAlign"] = "true";
+  // the tolerance of the complementary (REVERSED) PRM peaks in the E-values'
+  // generating function (hidden --evalue-complement-tolerance): relax (the
+  // default), strict or separate (PrsmPara::useEvalueStrictComplement,
+  // useEvalueSeparate; toppic_test experiment 146)
+  arguments["evalueComplementTolerance"] = "relax";
   // the filters' mass list (hidden --filter-mass-list): merge, fragment or
   // single (SpPara::FilterMassListMode)
   arguments["filterMassList"] = "fragment";
@@ -284,6 +289,11 @@ void ToppicArgument::outputArguments(
     output << std::setw(gap) << std::left
            << "Second alignment at the refined precursor:" << sep << "false"
            << std::endl;
+  }
+  if (arguments["evalueComplementTolerance"] != "relax") {
+    output << std::setw(gap) << std::left
+           << "E-value tolerance of complementary ions:" << sep
+           << arguments["evalueComplementTolerance"] << std::endl;
   }
   if (arguments["precDaltonError"] != "") {
     output << std::setw(gap) << std::left
@@ -442,6 +452,7 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
   std::string multi_skip_evalue = "";
   std::string var_ptm_filter_cand_num = "";
   std::string filter_mass_list = "";
+  std::string evalue_complement_tolerance = "";
 
   /** Define and parse the program options*/
   try {
@@ -646,6 +657,8 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
         "multi-skip-evalue", po::value<std::string>(&multi_skip_evalue),
             "")("disable-multi-type-align", "")(
         "disable-second-align", "")(
+        "evalue-complement-tolerance",
+        po::value<std::string>(&evalue_complement_tolerance), "")(
         "filter-mass-list", po::value<std::string>(&filter_mass_list), "")(
         "topmg", po::value<std::string>(&topmg_mode), "")(
         "topmg-use-mcmc", "")(
@@ -865,6 +878,17 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
     // 144); --disable-second-align keeps the first alignment's PrSM.
     if (vm.count("disable-second-align")) {
       arguments_["secondAlign"] = "false";
+    }
+
+    // hidden: the tolerance of the complementary (REVERSED, P - m) PRM
+    // peaks in the generating function of the E-values: relax (the
+    // default, the precursor's error added), strict (the fragment
+    // tolerance on the fragment mass) or separate (one generating function
+    // per PrSM on PRM spectra at its own precursor, every peak strict;
+    // issue #616, toppic_test experiment 146, report 0146: strict and
+    // separate move the E-value scale without more identifications)
+    if (vm.count("evalue-complement-tolerance")) {
+      arguments_["evalueComplementTolerance"] = evalue_complement_tolerance;
     }
 
     // hidden: TopMG's identification - the ASF filtering with the variable
@@ -1387,6 +1411,14 @@ bool ToppicArgument::validateArguments() {
     }
   }
 
+  if (arguments_["evalueComplementTolerance"] != "strict" &&
+      arguments_["evalueComplementTolerance"] != "relax" &&
+      arguments_["evalueComplementTolerance"] != "separate") {
+    LOG_ERROR("--evalue-complement-tolerance "
+              << arguments_["evalueComplementTolerance"]
+              << " is not strict, relax or separate");
+    return false;
+  }
   if (!SpPara::isFilterMassListModeName(arguments_["filterMassList"])) {
     LOG_ERROR("--filter-mass-list " << arguments_["filterMassList"]
                                     << " error! The value should be merge, "

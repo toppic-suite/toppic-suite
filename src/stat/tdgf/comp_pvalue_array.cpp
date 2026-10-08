@@ -41,7 +41,8 @@ CompPValueArray::CompPValueArray(const CountTestNumPtr& test_num_ptr,
   comp_prob_ptr_ = std::make_shared<CompProbValue>(
       mng_ptr_->convert_ratio_, residue_ptrs_, test_num_ptr->getResidueAvgLen(),
       mng_ptr_->unexpected_shift_num_ + 1, mng_ptr_->max_table_height_,
-      mng_ptr_->max_prec_mass_);
+      mng_ptr_->max_prec_mass_,
+      mng_ptr_->prsm_para_ptr_->useEvalueStrictComplement());
   // the variable PTM PrSMs' residues: the residues and their modified forms,
   // which share the residue's frequency (toppic_test experiment 129)
   if (!mng_ptr_->var_ptm_mod_ptr_vec_.empty()) {
