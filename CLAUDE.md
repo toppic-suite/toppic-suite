@@ -2109,7 +2109,19 @@ threshold costs 3 points in the dynamic program. Facts to keep straight:
   stores it. The predecessor choice is unchanged; what changes is that a
   path through a large shift now competes with the no-shift and
   truncation alternatives 3 points down, and the end score reflects it.
-- **Results on 480_F3_02** (toppic_test experiment 145): see report 0145.
+- **Results on 480_F3_02** (toppic_test experiment 145, report 0145;
+  setting d, experiment 131's TopFD output, against main 7b5112c2): 3,354
+  PrSMs / 1,997 proteoforms / 437 proteins against 3,355 / 1,997 / 438,
+  the same E-value cutoff. 825 of the 14,670 best one-shift candidate
+  alignments change, 672 of them a shift above 300 Da replaced by a
+  smaller one (the same matched fragments in 593, 1-3 fewer in 206, more
+  in 26; targets and decoys alike); the multiple-shift stage files are
+  unchanged. 31 of 3,353 reported PrSMs get another proteoform, mostly a
+  large shift rewritten as a smaller one with the same or better
+  fragments and E-value; 2 MED9 PrSMs are lost when the feature's YBOX1
+  +14 Da PrSM takes the cluster (the penalty took 2905's -421 Da
+  alignment with 19 fragments down to a -49 Da one with 18) and SEM7A at
+  the protein cutoff; 1 gained. No time cost.
 
 ## Range of a variable PTM shift (`seq/mass_shift`, `search/varptmsearch/var_ptm_align`)
 
