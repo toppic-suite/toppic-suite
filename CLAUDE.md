@@ -2188,6 +2188,35 @@ Branch `filter_pairs` (toppic_test experiments 138 and 142, reports 0138 and
   on st_1. No time or memory cost. Right proteoforms near a filter's top-N
   cutoff can still drop out when other candidates gain (4 of 23 changed
   spectra on 480).
+- **The rule is a hidden option**, `--filter-mass-list
+  <merge|fragment|single>` of toppic and topmg (argument key
+  `filterMassList`, default `fragment`; branch `filter_mass_list`,
+  toppic_test experiment 142, amendment 2). `SpPara::FilterMassListMode`
+  (`kMerge`, `kFragment`, `kSingle`; `setFilterMassListMode` from the
+  name, `isFilterMassListModeName` for the parsers' check) is set by
+  `PrsmPara` and passed to `getIntMassErrorList` by its four callers, so a
+  new caller must pass `getFilterMassListMode()` too. `merge` is main's
+  rule up to 7b5112c2 (all peaks in one slot), `fragment` the rule above,
+  `single` one entry per peak. Both parsers refuse other values, and the
+  parameter block prints `Filter mass list:` only for `merge` and
+  `single`, so default output is unchanged. toppic's `--topmg` stages take
+  it from toppic's argument map. Checked on st_1 and 480_F3_02 (setting d;
+  every output file but the time lines and that parameter line, 64 per
+  run): the default and `fragment` write main c7f13d66's and filter_pairs
+  57e44368's files, `merge` main 7b5112c2's, `single` filter_all_masses
+  f6572a10's; topmg's one-shift filter files on st_1 equal those of the
+  three binaries mode by mode.
+- **`single` is not better** (toppic_test experiment 142, amendment 1,
+  against `fragment`): its extra entries (61 per identified 480_F3_02
+  spectrum, +13.6%) are 99% one fragment mass at its other charge states,
+  which TopFD lists separately, so a fragment counts once per charge state.
+  480_F3_02 3,357 / 2,000 / 437 against 3,369 / 2,003 / 441 (fewer targets
+  at most ranks, strong PrSMs lost at the filters' cutoffs); TopMG in
+  toppic fewer targets at every rank; topmg 2,017 against 2,052; TMT 525
+  against 444 PrSMs, mostly because two high-ranked decoys are not found;
+  P1_high_high 708 against 689 (a looser cutoff). The multi-shift filter,
+  whose time grows with the square of the list, takes 34% longer on 480 and
+  TMT, the runs 5-8%.
 
 ## Second alignment of the shift searches (`search/diag/second_align_util`, `--disable-second-align`, issue #614)
 

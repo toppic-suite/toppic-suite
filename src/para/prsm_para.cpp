@@ -136,6 +136,13 @@ PrsmPara::PrsmPara(const std::map<std::string, std::string>& arguments) {
     sp_para_ptr_->setFragExtendMinMass(
         std::stod(getArg(arguments, "fragExtendMinMass")));
   }
+  // the filters' mass list (toppic and topmg hidden --filter-mass-list,
+  // checked by their parsers); an absent key keeps the SpPara default,
+  // fragment
+  std::string filter_mass_list = getArg(arguments, "filterMassList");
+  if (filter_mass_list != "") {
+    sp_para_ptr_->setFilterMassListMode(filter_mass_list);
+  }
   // toppic hidden --disable-multi-type-align; default true
   use_multi_type_align_ = (getArg(arguments, "multiTypeAlign") != "false");
   // toppic hidden --disable-second-align; default true (an absent key, as

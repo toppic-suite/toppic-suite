@@ -72,4 +72,31 @@ void SpPara::setFragMassExtension(bool extend) {
   frag_ext_offsets_ = precErrorVec(extend);
 }
 
+const std::vector<std::string>& SpPara::getFilterMassListModeNames() {
+  static const std::vector<std::string> names = {"merge", "fragment",
+                                                 "single"};
+  return names;
+}
+
+bool SpPara::isFilterMassListModeName(const std::string& name) {
+  const std::vector<std::string>& names = getFilterMassListModeNames();
+  for (size_t i = 0; i < names.size(); i++) {
+    if (names[i] == name) {
+      return true;
+    }
+  }
+  return false;
+}
+
+bool SpPara::setFilterMassListMode(const std::string& name) {
+  const std::vector<std::string>& names = getFilterMassListModeNames();
+  for (size_t i = 0; i < names.size(); i++) {
+    if (names[i] == name) {
+      filter_mass_list_mode_ = static_cast<FilterMassListMode>(i);
+      return true;
+    }
+  }
+  return false;
+}
+
 }  // namespace toppic
