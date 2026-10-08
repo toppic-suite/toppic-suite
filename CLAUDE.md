@@ -2319,6 +2319,105 @@ Branch `filter_pairs` (toppic_test experiments 138 and 142, reports 0138 and
   whose time grows with the square of the list, takes 34% longer on 480 and
   TMT, the runs 5-8%.
 
+## Tag filter (`filter/tag`, `--tag-filter`)
+
+Branch `tag_filter` (toppic_test experiment 150, report 0150; from main
+d56ebc44, not merged). A sequence-tag protein filter whose candidates
+(simple PrSMs) join the candidate lists of toppic's identification stages.
+Off by default; the hidden toppic option `--tag-filter <stages>` (argument
+`tagFilterStages`, a comma-separated subset of `var`, `one`, `multi`,
+`topmg`, or `all`; any other name is refused) turns it on for the named
+stages, with the hidden `--tag-filter-length <n>` (`tagFilterLength`, the
+residues of a tag, default 4, at least `TagIndex::K`) and
+`--tag-filter-cand-num <n>` (`tagFilterCandNum`, the proteins kept per
+spectrum set, default 10). The parameter block prints the three only when
+the filter is on. Facts to keep straight:
+
+- **Tags** (`TagFilter::geneTags`). The PRM peaks of a spectrum set
+  (`prm_ms_util::getPrmPeakPtrs` on `getMsTwoPtrVec`: each fragment mass
+  as the N-terminal PRM, ORIGINAL, and as the precursor minus the mass,
+  REVERSED, plus the zero and precursor peaks), per base type, peaks within
+  the sum of their strict tolerances of each other merged (one fragment at
+  several charge states). Two peaks whose difference is a residue mass (the
+  19 letters with the fixed modifications; I is read as L) within the sum of
+  their strict tolerances are an edge, one per residue that fits (K and Q
+  both at a wide tolerance). A tag is a path of `tag_len_` edges in
+  increasing mass, so it reads the protein N to C whichever series it comes
+  from; the strings are looked up once each. About 180 tags per 480_F3_02
+  spectrum (1,100 without the merging of charge states).
+- **The index** (`TagIndex`). The search database (targets and decoys, the
+  file the searches read) as one text with I as L, the positions of every
+  4-mer in a bucket per 4-mer (as `prsm/search_fasta_match`), and the prefix
+  mass before every residue (`residue_util::convertStrToResiduePtrVec` with
+  the fixed modifications, so FASTA PTMs count; one double per residue,
+  180 MB for the human database). A tag is looked up by its rarest 4-mer
+  and verified at each position; every occurrence in every protein is
+  returned. Built once per stage, 2-3 s.
+- **Score** (`TagFilter::scoreHit`). An occurrence lies on the diagonal
+  s = (PRM mass of the tag's first peak) - (prefix mass before the tag);
+  the occurrences of a protein sorted by s form a diagonal while
+  neighbours are within the sum of their first peaks' N-terminal
+  tolerances (`getNStrictCRelaxTolerance`: the precursor's error enters a
+  REVERSED peak's PRM). A diagonal's support is the number of distinct
+  peaks its tags cover; the score is the best diagonal's support plus the
+  second's when that reaches `TagFilterMng::getMinScore()` (tag_len + 3,
+  default 7: a ladder of six residues or two tags apart on one diagonal),
+  and a protein below the minimum is not a candidate. The first version
+  counted the peaks of all occurrences: titin, nesprin and the other
+  longest proteins collected hundreds of chance 4-mers and filled every
+  list (37% decoys in the var lists, 7 of 174 confident zero-shift
+  proteins of the first 500 spectra listed); with the diagonals and the
+  minimum 83 of 174 are listed (one stage 88), 0.4% / 33% decoys. Ties go
+  to the shorter protein, then the name (a name tie put every `DECOY_`
+  before `sp|`). The top `cand_num_` proteins are the candidates.
+- **What a candidate carries, by stage** (`TagFilterMng::Stage`; the
+  spectrum sets of the stage's precursor error list, `getPrecErrorVec`, so
+  the search pairs them by precursor mass as it pairs the filter's):
+    - `one`: the diagonals' shifts (the best supported first, at most
+      `max_shift_num_` = 10, two within 0.01 Da once) as `n_term_shifts`
+      and, as c = P - protein mass - s (`getNTermShiftsFromCTermShifts`
+      inverts it), as `c_term_shifts`; the same candidate in the four type
+      files (`OnePtmSlowMatch` reads the lists its type needs).
+    - `var`: `geneVarPtmPrsms` finds the proteoforms containing the tag
+      whose mass matches the precursor: the N-terminus a protein N-terminal
+      form of `-n` (`allowMod` on the protein; s = the form's `getProtShift`
+      plus a sum of 0 to `-S` variable PTM masses within the first peak's
+      tolerance) or a truncation start i >= 1 (s = -prefix[i] + such a sum,
+      plus a Position N-term PTM mass with one PTM fewer and i >= 2), the
+      C-terminus the end e with prefix[e + 1] - prefix[start] + water +
+      the form's `getPepShift` or the N-term PTM + a sum of PTM masses = P
+      within `compPrecErrorTole`. One simple PrSM per (start, end, form,
+      N-term PTM): the range, `n_term_shifts` {the form's shift} (0 for
+      truncations), `c_term_shifts` {0}, the truncation N-terminal
+      modification shift when used, in the file of its type (complete /
+      prefix for forms, suffix / internal for truncations). `VarPtmSlowMatch`
+      exits on a form shift that is not an allowed `ProtMod` and reads
+      `getCTermShifts()[0]`, so both lists must be set.
+    - `multi` and `topmg`: the protein alone (`PtmSlowMatch` and the graph
+      alignment find their own diagonals).
+- **Files and joining.** The stage's mass filter runs as before; the tag
+  filter (`tag_filter_processor::process`, a thread pool over the spectra,
+  `OrderedTaskRunner` so the files are in msalign order) writes
+  `toppic_tag_filter_<stage>[_<TYPE>]` (`toppic_topmg_tag_filter` for the
+  hosted stage); `tag_filter_merge::process` writes `<filter>_tag[_<TYPE>]`,
+  the name the search then reads: the filter's candidates first, unchanged,
+  then the new tag candidates of the spectrum (`one`: a protein listed with
+  the same precursor variant gets the tag shifts added to its lists;
+  `var`: the same protein, range, N-terminal shift and truncation
+  modification is not repeated; `multi`: the same protein and precursor
+  variant is not repeated). For `topmg` the tag file is one more input of
+  the `SimplePrsmStrMerge` that builds `toppic_topmg_graph_filter` (the
+  best 20 x 5 instead of 20 x 4), so the graph alignment's score-10 rule
+  (`SimplePrsmFilter`) applies to the tag candidates too. The multi stage's
+  tag filter skips the identified spectra (`skip_spec_ids_`), the hosted
+  stage's scores the spectra TopMG searches (`search_spec_ids_`);
+  `cleanToppicDir` deletes the files. The console prints "Tag filtering
+  (<stage>) - started / finished", the index size, a summary (spectra,
+  tags, occurrences, candidates) and the joined counts.
+- **Without the option** the run is main d56ebc44's (the first 500 spectra
+  of 480_F3_02, setting d: every file; the toppic manual is unchanged, the
+  options being hidden).
+
 ## Second alignment of the shift searches (`search/diag/second_align_util`, `--disable-second-align`, issue #614)
 
 Branch `second_align` (toppic_test experiment 144, report 0144 and its

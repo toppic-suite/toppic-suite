@@ -20,6 +20,7 @@
 #include <exception>
 #include <filesystem>
 #include <iomanip>
+#include <set>
 #include <sstream>
 #include <string>
 #include <utility>
@@ -32,6 +33,8 @@
 #include "common/util/str_util.hpp"
 #include "common/util/version.hpp"
 #include "common/xml/xml_dom_util.hpp"
+#include "filter/tag/tag_filter_mng.hpp"
+#include "filter/tag/tag_index.hpp"
 #include "para/sp_para.hpp"
 #include "prsm/prsm_post_mass_match.hpp"
 #include "seq/fasta_util.hpp"
@@ -154,6 +157,13 @@ std::map<std::string, std::string> ToppicArgument::initArguments() {
   // the filters' mass list (hidden --filter-mass-list): merge, fragment or
   // single (SpPara::FilterMassListMode)
   arguments["filterMassList"] = "fragment";
+  // the tag filter (hidden --tag-filter): the stages whose candidate lists
+  // it joins (var, one, multi, topmg or all; empty = off), the tag length
+  // and the proteins kept per spectrum (filter/tag; toppic_test experiment
+  // 150)
+  arguments["tagFilterStages"] = "";
+  arguments["tagFilterLength"] = "4";
+  arguments["tagFilterCandNum"] = "10";
 
   arguments["version"] = "";
   return arguments;
@@ -320,6 +330,16 @@ void ToppicArgument::outputArguments(
     output << std::setw(gap) << std::left << "Filter mass list:" << sep
            << arguments["filterMassList"] << std::endl;
   }
+  // printed only when the tag filter is on
+  if (arguments["tagFilterStages"] != "") {
+    output << std::setw(gap) << std::left << "Tag filter stages:" << sep
+           << arguments["tagFilterStages"] << std::endl;
+    output << std::setw(gap) << std::left << "Tag filter tag length:" << sep
+           << arguments["tagFilterLength"] << std::endl;
+    output << std::setw(gap) << std::left
+           << "Tag filter candidates per spectrum:" << sep
+           << arguments["tagFilterCandNum"] << std::endl;
+  }
   if (arguments["postMassMatch"] == "true") {
     output << std::setw(gap) << std::left << "Post mass matching:" << sep
            << "True" << std::endl;
@@ -453,6 +473,9 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
   std::string var_ptm_filter_cand_num = "";
   std::string filter_mass_list = "";
   std::string evalue_complement_tolerance = "";
+  std::string tag_filter_stages = "";
+  std::string tag_filter_length = "";
+  std::string tag_filter_cand_num = "";
 
   /** Define and parse the program options*/
   try {
@@ -660,7 +683,10 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
         "evalue-complement-tolerance",
         po::value<std::string>(&evalue_complement_tolerance), "")(
         "filter-mass-list", po::value<std::string>(&filter_mass_list), "")(
-        "topmg", po::value<std::string>(&topmg_mode), "")(
+        "tag-filter", po::value<std::string>(&tag_filter_stages), "")(
+        "tag-filter-length", po::value<std::string>(&tag_filter_length), "")(
+        "tag-filter-cand-num", po::value<std::string>(&tag_filter_cand_num),
+        "")("topmg", po::value<std::string>(&topmg_mode), "")(
         "topmg-use-mcmc", "")(
         "topmg-num-shift", po::value<std::string>(&topmg_shift_num), "")(
         "topmg-align-error-tolerance",
@@ -1002,6 +1028,17 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
     // default); "single", one per peak (toppic_test experiment 142)
     if (vm.count("filter-mass-list")) {
       arguments_["filterMassList"] = filter_mass_list;
+    }
+    // hidden: the tag filter (filter/tag), whose candidate proteins join
+    // the lists of the named stages (toppic_test experiment 150)
+    if (vm.count("tag-filter")) {
+      arguments_["tagFilterStages"] = tag_filter_stages;
+    }
+    if (vm.count("tag-filter-length")) {
+      arguments_["tagFilterLength"] = tag_filter_length;
+    }
+    if (vm.count("tag-filter-cand-num")) {
+      arguments_["tagFilterCandNum"] = tag_filter_cand_num;
     }
 
     if (vm.count("filtering-result-number")) {
@@ -1423,6 +1460,35 @@ bool ToppicArgument::validateArguments() {
     LOG_ERROR("--filter-mass-list " << arguments_["filterMassList"]
                                     << " error! The value should be merge, "
                                        "fragment or single!");
+    return false;
+  }
+
+  // the tag filter: the stages, the tag length (at least the index's K-mer
+  // length) and the candidates per spectrum
+  std::set<TagFilterMng::Stage> tag_stages;
+  if (!TagFilterMng::parseStages(arguments_["tagFilterStages"], &tag_stages)) {
+    LOG_ERROR("--tag-filter " << arguments_["tagFilterStages"]
+                              << " error! The value should be a "
+                                 "comma-separated list of var, one, multi "
+                                 "and topmg, or all!");
+    return false;
+  }
+  auto isPositiveInt = [](const std::string& str, int min_value) {
+    return !str.empty() && str.size() <= 6 &&
+           str.find_first_not_of("0123456789") == std::string::npos &&
+           std::stoi(str) >= min_value;
+  };
+  if (!isPositiveInt(arguments_["tagFilterLength"], TagIndex::K)) {
+    LOG_ERROR("--tag-filter-length " << arguments_["tagFilterLength"]
+                                     << " error! The value should be an "
+                                        "integer of at least "
+                                     << TagIndex::K << ".");
+    return false;
+  }
+  if (!isPositiveInt(arguments_["tagFilterCandNum"], 1)) {
+    LOG_ERROR("--tag-filter-cand-num " << arguments_["tagFilterCandNum"]
+                                       << " error! The value should be a "
+                                          "positive integer.");
     return false;
   }
 

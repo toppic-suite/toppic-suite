@@ -43,6 +43,9 @@
 #include "filter/mng/var_ptm_filter_mng.hpp"
 #include "filter/mng/zero_ptm_filter_mng.hpp"
 #include "filter/oneptm/one_ptm_filter_processor.hpp"
+#include "filter/tag/tag_filter_merge.hpp"
+#include "filter/tag/tag_filter_mng.hpp"
+#include "filter/tag/tag_filter_processor.hpp"
 #include "filter/varptm/var_ptm_filter_processor.hpp"
 #include "filter/zeroptm/zero_ptm_filter_processor.hpp"
 #include "ms/env/avg_mass_util.hpp"
@@ -151,6 +154,9 @@ void cleanToppicDir(const std::string& fa_name, const std::string& sp_name,
     file_util::cleanPrefix(sp_name, sp_base + ".toppic_one_shift_");
     file_util::delFile(sp_base + ".toppic_multi_filter");
     file_util::cleanPrefix(sp_name, sp_base + ".toppic_multi_filter_");
+    // the tag filter's files and the joined lists (--tag-filter)
+    file_util::cleanPrefix(sp_name, sp_base + ".toppic_tag_filter_");
+    file_util::delFile(sp_base + ".toppic_topmg_tag_filter");
     file_util::delFile(sp_base + ".toppic_multi_combined");
     file_util::delFile(sp_base + ".toppic_multi_evalue");
     file_util::delFile(sp_base + ".toppic_multi_evalue_all");
@@ -257,11 +263,61 @@ void setVarPtmModResidues(std::map<std::string, std::string>& arguments,
 }  // namespace
 
 // protein filtering + database searching + E-value computation
+// The tag filter (filter/tag, hidden --tag-filter; toppic_test experiment
+// 150): the stages whose candidate lists it joins.
+std::set<TagFilterMng::Stage> getTagFilterStages(
+    std::map<std::string, std::string>& arguments) {
+  std::set<TagFilterMng::Stage> stages;
+  TagFilterMng::parseStages(arguments["tagFilterStages"], &stages);
+  return stages;
+}
+
+// The tag filter of one stage: its settings from the arguments, the run
+// and, for the var, one and multi stages, the joining of its candidates to
+// the stage's filter file <filter_ext> into <filter_ext>_tag, the name the
+// search then reads. The topmg stage adds its file to the graph filter
+// merge itself. Returns the file extension the search reads.
+std::string runTagFilter(std::map<std::string, std::string>& arguments,
+                         const PrsmParaPtr& prsm_para_ptr,
+                         TagFilterMng::Stage stage, int thread_num,
+                         const std::string& filter_ext,
+                         const std::set<int>& search_spec_ids,
+                         bool search_all, const std::set<int>& skip_spec_ids) {
+  std::string stage_name = TagFilterMng::getStageName(stage);
+  std::string tag_ext = stage == TagFilterMng::Stage::kTopmg
+                            ? "toppic_topmg_tag_filter"
+                            : "toppic_tag_filter_" + stage_name;
+  TagFilterMngPtr mng_ptr = std::make_shared<TagFilterMng>(
+      prsm_para_ptr, stage, thread_num, tag_ext);
+  mng_ptr->tag_len_ = std::stoi(arguments["tagFilterLength"]);
+  mng_ptr->cand_num_ = std::stoi(arguments["tagFilterCandNum"]);
+  mng_ptr->var_ptm_file_name_ = arguments["variablePtmFileName"];
+  mng_ptr->var_ptm_num_ = std::stoi(arguments["variablePtmNum"]);
+  mng_ptr->search_all_ = search_all;
+  mng_ptr->search_spec_ids_ = search_spec_ids;
+  mng_ptr->skip_spec_ids_ = skip_spec_ids;
+  std::cout << "Tag filtering (" << stage_name << ") - started." << std::endl;
+  tag_filter_processor::process(mng_ptr);
+  std::cout << "Tag filtering (" << stage_name << ") - finished." << std::endl;
+  if (stage == TagFilterMng::Stage::kTopmg) {
+    return tag_ext;
+  }
+  std::string out_ext = filter_ext + "_tag";
+  std::cout << "Tag filtering (" << stage_name
+            << ") - joining the candidate lists - started." << std::endl;
+  tag_filter_merge::process(prsm_para_ptr->getSpectrumFileName(), filter_ext,
+                            tag_ext, out_ext, stage);
+  std::cout << "Tag filtering (" << stage_name
+            << ") - joining the candidate lists - finished." << std::endl;
+  return out_ext;
+}
+
 std::string TopPIC_identify(std::map<std::string, std::string>& arguments) {
   try {
     if (!TopPIC_init(arguments)) {
       return "";
     }
+    std::set<TagFilterMng::Stage> tag_stages = getTagFilterStages(arguments);
 
     std::string db_file_name = arguments["databaseFileName"];
     std::string sp_file_name = arguments["spectrumFileName"];
@@ -366,11 +422,19 @@ std::string TopPIC_identify(std::map<std::string, std::string>& arguments) {
       var_ptm_filter_processor::process(var_filter_mng_ptr);
       std::cout << "Variable PTM filtering - finished." << std::endl;
 
+      // the tag filter's candidates join the list (--tag-filter var)
+      std::string var_filter_ext = "toppic_var_filter";
+      if (tag_stages.count(TagFilterMng::Stage::kVar) > 0) {
+        var_filter_ext = runTagFilter(
+            arguments, prsm_para_ptr, TagFilterMng::Stage::kVar, thread_num,
+            var_filter_ext, std::set<int>(), true, std::set<int>());
+      }
+
       std::cout << "Variable PTM search - started." << std::endl;
       VarPtmSearchMngPtr var_ptm_search_mng_ptr =
           std::make_shared<VarPtmSearchMng>(
               prsm_para_ptr, n_top, var_ptm_file_name, var_ptm_num, thread_num,
-              "toppic_var_filter", "toppic_var_ptm");
+              var_filter_ext, "toppic_var_ptm");
       VarPtmSearchProcessorPtr var_ptm_search_processor =
           std::make_shared<VarPtmSearchProcessor>(var_ptm_search_mng_ptr);
       var_ptm_search_processor->process();
@@ -394,11 +458,19 @@ std::string TopPIC_identify(std::map<std::string, std::string>& arguments) {
       one_ptm_filter_processor::process(one_ptm_filter_mng_ptr);
       std::cout << "One unexpected shift filtering - finished." << std::endl;
 
+      // the tag filter's candidates join the list (--tag-filter one)
+      std::string one_filter_ext = "toppic_one_filter";
+      if (tag_stages.count(TagFilterMng::Stage::kOne) > 0) {
+        one_filter_ext = runTagFilter(
+            arguments, prsm_para_ptr, TagFilterMng::Stage::kOne, thread_num,
+            one_filter_ext, std::set<int>(), true, std::set<int>());
+      }
+
       std::cout << "One unexpected shift search - started." << std::endl;
       int search_shift_num = 1;
       PtmSearchMngPtr one_search_mng_ptr = std::make_shared<PtmSearchMng>(
           prsm_para_ptr, n_top, min_shift_mass, max_shift_mass,
-          search_shift_num, thread_num, "toppic_one_filter",
+          search_shift_num, thread_num, one_filter_ext,
           "toppic_one_shift");
       OnePtmSearchProcessorPtr one_search_processor =
           std::make_shared<OnePtmSearchProcessor>(one_search_mng_ptr);
@@ -661,6 +733,15 @@ std::string TopPIC_topmg_identify(
       input_exts.push_back("toppic_topmg_multi_filter");
     }
 
+    // the tag filter's candidates join the graph filter merge
+    // (--tag-filter topmg)
+    if (getTagFilterStages(arguments).count(TagFilterMng::Stage::kTopmg) >
+        0) {
+      input_exts.push_back(runTagFilter(
+          arguments, prsm_para_ptr, TagFilterMng::Stage::kTopmg, thread_num,
+          "", search_spec_ids, false, std::set<int>()));
+    }
+
     std::cout << "TopMG combining filtering results - started." << std::endl;
     SimplePrsmStrMergePtr asf_filter_merger =
         std::make_shared<SimplePrsmStrMerge>(sp_file_name, input_exts,
@@ -867,10 +948,20 @@ std::string TopPIC_multi_ptm_search(
       std::cout << "Multiple unexpected shifts filtering - finished."
                 << std::endl;
 
+      // the tag filter's candidates join the list (--tag-filter multi), on
+      // the spectra this stage searches
+      std::string multi_filter_ext = "toppic_multi_filter";
+      if (getTagFilterStages(arguments).count(TagFilterMng::Stage::kMulti) >
+          0) {
+        multi_filter_ext = runTagFilter(
+            arguments, prsm_para_ptr, TagFilterMng::Stage::kMulti, thread_num,
+            multi_filter_ext, std::set<int>(), true, identified_spec_ids);
+      }
+
       std::cout << "Multiple unexpected shifts search - started." << std::endl;
       PtmSearchMngPtr multi_search_mng_ptr = std::make_shared<PtmSearchMng>(
           prsm_para_ptr, n_top, min_shift_mass, max_shift_mass, shift_num,
-          thread_num, "toppic_multi_filter", "toppic_multi_shift");
+          thread_num, multi_filter_ext, "toppic_multi_shift");
       PtmSearchProcessorPtr processor =
           std::make_shared<PtmSearchProcessor>(multi_search_mng_ptr);
       processor->process();
