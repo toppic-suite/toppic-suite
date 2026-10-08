@@ -224,7 +224,7 @@ MS1 deconvolution and proteoform feature detection:
 | Option | Default | Meaning |
 |---|---|---|
 | `-r`, `--ms-one-sn-ratio <number>` | 3 | Signal-to-noise ratio for MS1 spectra. In MS1 deconvolution it sets the reference-peak threshold (as `-s` does for MS/MS); in feature detection peaks below `ratio × noise level` are excluded from the LC-MS map. |
-| `--deconv-ms1 <greedy\|msdeconv>` | greedy | MS1 deconvolution method (section 1.2): `greedy`, the greedy search, or `msdeconv`, the MS-Deconv dynamic programming, the default method of earlier versions. In `topfd_gui`: "MS1 deconvolution". |
+| `-x`, `--deconv-ms1 <greedy\|msdeconv>` | greedy | MS1 deconvolution method (section 1.2): `greedy`, the greedy search, or `msdeconv`, the MS-Deconv dynamic programming, the default method of earlier versions. In `topfd_gui`: "MS1 deconvolution". |
 | `-t`, `--ecscore-cutoff <0..1>` | 0.1 | Features with an ECScore below the cutoff are removed. |
 | `-b`, `--min-scan-number <1\|2\|3>` | 1 | Minimum number of MS1 scans a feature must be detected in. |
 | `-l`, `--split-intensity-ratio <number>` | 2.5 | Intensity ratio required to split one feature into two. |
@@ -241,7 +241,7 @@ MS/MS deconvolution:
 | `-n`, `--msdeconv` | off | Rank isotopic envelopes with the MS-Deconv score instead of the EnvCNN neural-network score. |
 | `-v`, `--env-cnn-cutoff <0..1>` | 0 | Remove MS/MS envelopes whose EnvCNN score is below the cutoff. |
 | `-g`, `--frag-num-filtering` | off | Limit the number of fragment envelopes in an MS/MS spectrum based on the estimated number of fragment ions. |
-| `--deconv-ms2 <greedy\|msdeconv\|flashdeconv>` | greedy | MS/MS deconvolution method (section 1.2): `greedy`, the greedy search adapted to fragment ions; `msdeconv`, the MS-Deconv dynamic programming, the default method of earlier versions; or `flashdeconv`, the FLASHDeconv algorithm (experimental; the output files are the same; not with `-T`). In `topfd_gui`: "MS/MS deconvolution" (it replaces the former `-F`/`--ms2-flashdeconv`). |
+| `-y`, `--deconv-ms2 <greedy\|msdeconv\|flashdeconv>` | greedy | MS/MS deconvolution method (section 1.2): `greedy`, the greedy search adapted to fragment ions; `msdeconv`, the MS-Deconv dynamic programming, the default method of earlier versions; or `flashdeconv`, the FLASHDeconv algorithm (experimental; the output files are the same; not with `-T`). In `topfd_gui`: "MS/MS deconvolution" (it replaces the former `-F`/`--ms2-flashdeconv`). |
 
 ### 1.5 Examples
 
@@ -294,9 +294,9 @@ topfd -T [options] peaks.txt
 Only the parameters of MS/MS deconvolution apply. The useful ones are
 `-c`/`--max-charge`, `-m`/`--max-mass`, `-e`/`--mz-error`,
 `-s`/`--ms-two-sn-ratio`, `-n`/`--msdeconv`, `-v`/`--env-cnn-cutoff`,
-`-g`/`--frag-num-filtering` and `--deconv-ms2` (`greedy` or `msdeconv`;
+`-g`/`--frag-num-filtering` and `-y`/`--deconv-ms2` (`greedy` or `msdeconv`;
 `flashdeconv` is refused with `-T`). The MS1 and feature detection options
-(`-r`, `-t`, `-b`, `-l`, `-i`, `-f`, `--deconv-ms1`), `-o` and `-w` have
+(`-r`, `-t`, `-b`, `-l`, `-i`, `-f`, `-x`), `-o` and `-w` have
 no effect; `-u` only sets the number of threads ONNX Runtime uses for EnvCNN
 scoring. `-a`/`--activation` only sets the activation recorded
 in the SQLite database; when it is not given (or is `FILE`), HCD is

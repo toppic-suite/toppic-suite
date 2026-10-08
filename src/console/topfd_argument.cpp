@@ -167,13 +167,13 @@ bool Argument::parse(int argc, char* argv[]) {
         "Deconvolute a single MS/MS spectrum given as a text peak list: one "
         "peak per line, m/z and intensity separated by a space. The output "
         "files are named after the input file.")(
-        "deconv-ms1", po::value<std::string>(&deconv_ms1),
+        "deconv-ms1,x", po::value<std::string>(&deconv_ms1),
         "<greedy|msdeconv>. Set the deconvolution method of MS1 spectra: "
         "greedy, a greedy search that decides the charge state of the most "
         "intense peak with all the charge states of its mass and subtracts "
         "the mass's envelopes, or msdeconv, the MS-Deconv dynamic "
         "programming of earlier versions. The default value is greedy.")(
-        "deconv-ms2", po::value<std::string>(&deconv_ms2),
+        "deconv-ms2,y", po::value<std::string>(&deconv_ms2),
         "<greedy|msdeconv|flashdeconv>. Set the deconvolution method of "
         "MS/MS spectra: greedy, the greedy search of MS1 spectra adapted to "
         "fragment ions; msdeconv, the MS-Deconv dynamic programming of "

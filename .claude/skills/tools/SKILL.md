@@ -73,11 +73,12 @@ Key options (defaults): `-c` max charge 30, `-m` max mass 50000,
 `-r`/`-s` MS1/MS2 S/N ratio 3/1, `-t` ECScore cutoff 0.1, `-b` min scans 1,
 `-o` no MS1 scans (no features, precursor set to the `-m`/`-c` limits),
 `-N` no SQLite, `-D` also store raw MS1 peaks for 3D views,
-`--deconv-ms1 <greedy|msdeconv>` and `--deconv-ms2
+`-x`/`--deconv-ms1 <greedy|msdeconv>` and `-y`/`--deconv-ms2
 <greedy|msdeconv|flashdeconv>` the deconvolution methods (default greedy
 for both; `msdeconv` is the MS-Deconv dynamic programming of earlier
 versions, `flashdeconv` FLASHDeconv, experimental, not with `-T`). TopDIA
-takes the same two options with `msdeconv` as the default.
+takes the same two long options (no short names) with `msdeconv` as the
+default.
 
 - **Do not use `-N` if TopPIC will search the spectra**: TopPIC's default
   post mass matching needs `sample.sqlite` and fails without it (or run
