@@ -2146,7 +2146,13 @@ is on). Facts to keep straight:
   P' (`genePrsm` is called with clamp_prec_mass -1, which gives the
   refinement the delta range [0, 0]), so the PrSM is the second
   alignment's result at the first pass's precursor and nothing is
-  re-estimated. Results: toppic_test experiment 144, amendment 1.
+  re-estimated. On 480_F3_02 (toppic_test experiment 144, amendment 1):
+  3,356 / 1,996 / 439 with main's E-value cutoff, the second alignment
+  within 1 of the annotation for 98.4% of the one-shift and 98.3% of the
+  multiple-shift calls (the best of the variants), 14% and 19% of the
+  candidate PrSMs changed, no precursor beyond the tolerance, 66 shift
+  masses and 2 PrSMs apart from the clamped variant. The form to keep if
+  the second alignment is merged.
 - **The large-shift penalty differs between the two dynamic programs**
   (found with the log): `PsAlign::dp` takes the penalty (3 per shift above
   300 Da) off a predecessor's score only to choose the predecessor and
