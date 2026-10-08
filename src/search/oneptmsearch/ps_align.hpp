@@ -18,6 +18,7 @@
 
 #include <vector>
 
+#include "common/base/proteoform_type.hpp"
 #include "prsm/prsm.hpp"
 #include "search/diag/diag_header.hpp"
 #include "search/diag/diagonal.hpp"
@@ -46,6 +47,11 @@ class PsAlign {
 
   DiagHeaderPtrVec getDiagHeaders(int s) { return backtrack_diagonal_ptrs_[s]; }
 
+  // The PrSM of the alignment with shift_num shifts: the precursor refined
+  // by the matched ions, the ranges refined, the PrSM; nullptr without an
+  // alignment. With PrsmPara::useSecondAlign, the alignment is repeated at
+  // the refined precursor (search/diag/second_align_util) and the PrSM is
+  // the second alignment's, the first one's when the second has no result.
   PrsmPtr geneResult(int shift_num, const ProteoformPtr& proteo_ptr,
                      DeconvMsPtrVec& deconv_ms_ptr_vec,
                      ExtendMsPtrVec& ms_three_ptr_vec,
@@ -53,7 +59,9 @@ class PsAlign {
 
  protected:
   PsAlignParaPtr para_ptr_;
-  ;
+
+  // the type of the last compute(), for the second alignment
+  ProteoformTypePtr align_type_ptr_;
 
   std::vector<double> ms_masses_;
 

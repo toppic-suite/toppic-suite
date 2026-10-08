@@ -17,12 +17,11 @@
 
 #include <algorithm>
 #include <limits>
+#include <sstream>
 
-#include "ms/factory/extend_ms_factory.hpp"
 #include "search/diag/diag_header_util.hpp"
-#include "search/diag/diagonal_util.hpp"
+#include "search/diag/second_align_util.hpp"
 #include "search/oneptmsearch/path_type.hpp"
-#include "seq/proteoform_factory.hpp"
 
 namespace toppic {
 
@@ -38,6 +37,7 @@ PsAlign::PsAlign(const std::vector<double>& ms_masses,
 }
 
 void PsAlign::compute(const ProteoformTypePtr& align_type_ptr) {
+  align_type_ptr_ = align_type_ptr;
   dp(align_type_ptr);
   backtrace();
 }
@@ -348,36 +348,63 @@ PrsmPtr PsAlign::geneResult(int shift_num, const ProteoformPtr& proteo_ptr,
   if (header_ptrs.size() == 0) {
     return nullptr;
   }
-  int first_pos = header_ptrs[0]->getTruncFirstResPos();
-  int last_pos = header_ptrs[header_ptrs.size() - 1]->getTruncLastResPos();
-  ProteoformPtr sub_proteo_ptr = proteoform_factory::geneSubProteoform(
-      proteo_ptr, proteo_ptr->getFastaSeqPtr(), first_pos, last_pos);
-
-  double min_mass = prsm_para_ptr->getSpParaPtr()->getMinMass();
-  PeakTolerancePtr prec_tole_ptr =
-      prsm_para_ptr->getSpParaPtr()->getPrecTolerancePtr();
-
-  double refine_prec_mass = diagonal_util::refinePrecursorByMatchedIons(
-      proteo_ptr, ms_three_ptr_vec, header_ptrs, prec_tole_ptr, min_mass);
-
-  SpParaPtr sp_para_ptr = prsm_para_ptr->getSpParaPtr();
-  ExtendMsPtrVec refine_ms_ptr_vec = extend_ms_factory::geneMsThreePtrVec(
-      deconv_ms_ptr_vec, sp_para_ptr, refine_prec_mass);
-
-  DiagHeaderPtrVec refined_header_ptrs = diagonal_util::refineHeadersBgnEnd(
-      proteo_ptr, refine_ms_ptr_vec, header_ptrs, min_mass);
-
-  if (refined_header_ptrs.size() == 0) {
-    return nullptr;
+  // the first alignment's PrSM: main's result
+  double refine_prec_mass = 0;
+  ExtendMsPtrVec refine_ms_ptr_vec;
+  PrsmPtr first_prsm_ptr = second_align_util::genePrsm(
+      proteo_ptr, header_ptrs, deconv_ms_ptr_vec, ms_three_ptr_vec,
+      prsm_para_ptr, refine_prec_mass, refine_ms_ptr_vec);
+  if (!prsm_para_ptr->useSecondAlign() || first_prsm_ptr == nullptr) {
+    return first_prsm_ptr;
   }
 
-  MassShiftPtrVec shifts = diag_header_util::getDiagonalMassChanges(
-      refined_header_ptrs, first_pos, last_pos, AlterType::UNEXPECTED);
-  sub_proteo_ptr->addMassShiftPtrVec(shifts);
+  // the second alignment at the refined precursor
+  SpParaPtr sp_para_ptr = prsm_para_ptr->getSpParaPtr();
+  double prec_mass =
+      ms_three_ptr_vec[0]->getMsHeaderPtr()->getFirstPrecMonoMass();
+  PrmPeakPtrVec prm_peaks = second_align_util::genePrmPeaks(
+      deconv_ms_ptr_vec, sp_para_ptr, refine_prec_mass);
+  DiagHeaderPtrVec moved_header_ptrs = second_align_util::moveHeaders(
+      diagonal_ptrs_, refine_prec_mass - prec_mass, refine_prec_mass,
+      proteo_ptr);
+  std::vector<double> ms_masses;
+  DiagonalPtrVec diagonal_ptrs = second_align_util::geneDiagonals(
+      moved_header_ptrs, prm_peaks, deconv_ms_ptr_vec.size(), proteo_ptr,
+      ms_masses);
+  PsAlign second_align(ms_masses, seq_masses_, diagonal_ptrs, para_ptr_);
+  second_align.compute(align_type_ptr_);
+  DiagHeaderPtrVec second_header_ptrs = second_align.getDiagHeaders(shift_num);
 
-  return std::make_shared<Prsm>(sub_proteo_ptr, deconv_ms_ptr_vec,
-                                refine_prec_mass,
-                                prsm_para_ptr->getSpParaPtr());
+  PrsmPtr second_prsm_ptr = nullptr;
+  double second_prec_mass = 0;
+  if (second_header_ptrs.size() > 0) {
+    ExtendMsPtrVec second_ms_ptr_vec;
+    second_prsm_ptr = second_align_util::genePrsm(
+        proteo_ptr, second_header_ptrs, deconv_ms_ptr_vec, refine_ms_ptr_vec,
+        prsm_para_ptr, second_prec_mass, second_ms_ptr_vec, true);
+  }
+  if (second_align_util::logEnabled()) {
+    std::ostringstream out;
+    out.precision(4);
+    out << std::fixed;
+    out << "one\t" << deconv_ms_ptr_vec[0]->getMsHeaderPtr()->getSpecId()
+        << "\t" << align_type_ptr_->getName() << "\t" << shift_num << "\t"
+        << proteo_ptr->getSeqName() << "\t" << prec_mass << "\t"
+        << getAlignScr(shift_num) << "\t" << refine_prec_mass << "\t"
+        << second_align_util::prsmInfo(first_prsm_ptr) << "\t";
+    if (second_header_ptrs.size() > 0) {
+      out << second_align.getAlignScr(shift_num) << "\t" << second_prec_mass;
+    } else {
+      out << "-\t-";
+    }
+    out << "\t" << second_align_util::prsmInfo(second_prsm_ptr) << "\t"
+        << (second_prsm_ptr == nullptr ? "first" : "second");
+    second_align_util::log(out.str());
+  }
+  if (second_prsm_ptr == nullptr) {
+    return first_prsm_ptr;
+  }
+  return second_prsm_ptr;
 }
 
 } /* namespace toppic */

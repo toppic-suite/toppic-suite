@@ -136,6 +136,10 @@ std::map<std::string, std::string> ToppicArgument::initArguments() {
   arguments["fragMassDedup"] = "false";
   arguments["multiSkipEvalue"] = "";
   arguments["multiTypeAlign"] = "true";
+  // the second alignment of the shift searches at the refined precursor
+  // (hidden --second-align): disabled, strict (the fragment tolerance on
+  // every peak) or relax (the first alignment's tolerances)
+  arguments["secondAlign"] = "true";
 
   arguments["version"] = "";
   return arguments;
@@ -267,6 +271,11 @@ void ToppicArgument::outputArguments(
   output << std::setw(gap) << std::left << "Protein-level cutoff value:" << sep
          << arguments["cutoffProteinValue"] << std::endl;
 
+  if (arguments["secondAlign"] == "false") {
+    output << std::setw(gap) << std::left
+           << "Second alignment at the refined precursor:" << sep << "false"
+           << std::endl;
+  }
   if (arguments["precDaltonError"] != "") {
     output << std::setw(gap) << std::left
            << "Error tolerance for precursor masses:" << sep
@@ -613,6 +622,7 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
         "deamid-selector", "")("disable-var-ptm-evalue-mod-residues", "")(
         "multi-skip-evalue", po::value<std::string>(&multi_skip_evalue),
             "")("disable-multi-type-align", "")(
+        "disable-second-align", "")(
         "topmg", po::value<std::string>(&topmg_mode), "")(
         "topmg-use-mcmc", "")(
         "topmg-num-shift", po::value<std::string>(&topmg_shift_num), "")(
@@ -822,6 +832,15 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
     // PsAlign search.
     if (vm.count("disable-multi-type-align")) {
       arguments_["multiTypeAlign"] = "false";
+    }
+
+    // hidden: the one-shift and multiple-shift searches repeat their
+    // alignment at the refined precursor of the first alignment's result,
+    // with the fragment tolerance on every peak, and keep that precursor
+    // (search/diag/second_align_util, issue #614, toppic_test experiment
+    // 144); --disable-second-align keeps the first alignment's PrSM.
+    if (vm.count("disable-second-align")) {
+      arguments_["secondAlign"] = "false";
     }
 
     // hidden: TopMG's identification - the ASF filtering with the variable

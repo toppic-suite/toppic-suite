@@ -17,6 +17,8 @@
 #define TOPPIC_SEARCH_PTMSEARCH_PS_ALIGN_MULTI_TYPE_HPP_
 
 #include <array>
+#include <memory>
+#include <utility>
 #include <vector>
 
 #include "common/base/proteoform_type.hpp"
@@ -74,6 +76,12 @@ class PsAlignMultiType {
     return backtrack_diagonal_ptrs_[type_ptr->getId()][s];
   }
 
+  // The PrSM of the alignment of a type with shift_num shifts (as
+  // PsAlign::geneResult). With PrsmPara::useSecondAlign, the alignment is
+  // repeated at the refined precursor of this type's result, for the types
+  // of the last compute() together (search/diag/second_align_util); the
+  // second alignments are kept by refined precursor, so types whose first
+  // results refine the precursor to the same mass share one.
   PrsmPtr geneResult(const ProteoformTypePtr& type_ptr, int shift_num,
                      const ProteoformPtr& proteo_ptr,
                      DeconvMsPtrVec& deconv_ms_ptr_vec,
@@ -107,6 +115,13 @@ class PsAlignMultiType {
 
   // [type_id][s]
   std::vector<DiagHeaderPtrVec2D> backtrack_diagonal_ptrs_;
+
+  // the types of the last compute(), for the second alignments
+  ProteoformTypePtrVec type_ptrs_;
+
+  // the second alignments by refined precursor mass
+  std::vector<std::pair<double, std::shared_ptr<PsAlignMultiType>>>
+      second_align_ptrs_;
 
   std::vector<std::vector<double>> align_scores_;
 

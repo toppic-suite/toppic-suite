@@ -16,6 +16,8 @@
 #ifndef TOPPIC_SEARCH_DIAG_DIAGONAL_UTIL_HPP_
 #define TOPPIC_SEARCH_DIAG_DIAGONAL_UTIL_HPP_
 
+#include <limits>
+
 #include "ms/spec/extend_ms.hpp"
 #include "para/peak_tolerance.hpp"
 #include "prsm/peak_ion_pair.hpp"
@@ -44,11 +46,15 @@ namespace diagonal_util {
 // (only TopMG's graph alignment passes one: an alignment without shifts) is
 // anchored at its N-terminus: its C-terminal ions are the dependent ions and
 // its C-terminal shift is moved. Returns the refined precursor mass.
-double refinePrecursorByMatchedIons(const ProteoformPtr& proteo_ptr,
-                                    const ExtendMsPtrVec& ms_three_ptr_vec,
-                                    DiagHeaderPtrVec& header_ptrs,
-                                    const PeakTolerancePtr& prec_tole_ptr,
-                                    double min_mass);
+// With delta_min / delta_max the delta range is [-T, T] cut to them (the
+// second alignment keeps its precursor with [0, 0],
+// search/diag/second_align_util).
+double refinePrecursorByMatchedIons(
+    const ProteoformPtr& proteo_ptr, const ExtendMsPtrVec& ms_three_ptr_vec,
+    DiagHeaderPtrVec& header_ptrs, const PeakTolerancePtr& prec_tole_ptr,
+    double min_mass,
+    double delta_min = -std::numeric_limits<double>::infinity(),
+    double delta_max = std::numeric_limits<double>::infinity());
 
 // The precursor refinement of the variable PTM search. Once the alignment
 // has chosen the variable PTMs, the proteoform mass is exact: the refined

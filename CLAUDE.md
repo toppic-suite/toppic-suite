@@ -2189,6 +2189,93 @@ Branch `filter_pairs` (toppic_test experiments 138 and 142, reports 0138 and
   cutoff can still drop out when other candidates gain (4 of 23 changed
   spectra on 480).
 
+## Second alignment of the shift searches (`search/diag/second_align_util`, `--disable-second-align`, issue #614)
+
+Branch `second_align` (toppic_test experiment 144, report 0144 and its
+amendment 1; merged into main on 2026-10-08 in the form below). On by
+default; toppic's hidden `--disable-second-align` (argument key
+`secondAlign` = "false"; `PrsmPara::useSecondAlign`; the parameter block
+prints "Second alignment at the refined precursor: false" only then)
+keeps the first alignment's PrSM, main's behaviour before the merge.
+Facts to keep straight:
+
+- **Why.** The one-shift and multiple-shift alignments (PsAlign,
+  PsAlignMultiType) match the precursor-dependent ions with the fragment
+  tolerance plus the precursor's (the previous section), and the PrSM's
+  annotation matches them with the fragment tolerance at the refined
+  precursor, so the dynamic program counted ions the annotation did not
+  and could choose a diagonal set on their strength (report 0135 section
+  7: "A second alignment on the refined precursor with the strict
+  tolerance would make the alignment and the annotation agree").
+- **What it does** (`PsAlign::geneResult`, `PsAlignMultiType::geneResult`).
+  The first pass is the former `geneResult`, factored into
+  `second_align_util::genePrsm` (the precursor refined by the matched
+  ions to P', the extended spectra at P', the ranges refined, the PrSM).
+  Then, for every call with a first alignment: the PRM peaks are rebuilt
+  at P' (`genePrmPeaks`: `prm_ms_factory::geneMsSixPtrVec` with the
+  refined precursor, so the REVERSED peaks are P' - (m - C shift), plus
+  the zero and precursor peaks sized on P'; every fragment peak's
+  N-strict-C-relax and N-relax-C-strict tolerances set to its strict
+  tolerance ppo x m); the first alignment's headers are moved to P'
+  (`moveHeaders`: an N-anchored header keeps its N-terminal shift, a
+  C-anchored one keeps its C-terminal shift, so its N-terminal shift
+  moves by P' - P; C-terminal shifts and truncation positions from
+  `DiagHeader::initHeader` at P'); the diagonals are rebuilt
+  (`geneDiagonals`, headers without a pair dropped); the same dynamic
+  program runs on them (PsAlign for the type of the last `compute()`,
+  which it now remembers; PsAlignMultiType for the types of the last
+  `compute()` together, kept by P' in `second_align_ptrs_` so the types
+  whose first results refine to the same mass share one second
+  alignment); the second result for the same type and shift number goes
+  through `genePrsm` with `keep_prec` (the refinement's delta range is
+  [0, 0], so P' is kept and the headers keep their shifts), the range
+  refinement and the PrSM. That PrSM is returned; with no second
+  alignment of positive score the first PrSM is kept, so no candidate is
+  lost. The candidates are ranked by the PrSM's matched fragments as
+  before, and the E-values are computed from the PrSM afterwards (the
+  generating function is unchanged). The zero-shift search, the variable
+  PTM search and TopMG's graph alignment are untouched. The precursor
+  never leaves the window of the first refinement (+-T around the
+  observed precursor).
+- **`refinePrecursorByMatchedIons` takes an optional delta range**
+  (`delta_min` / `delta_max`, infinite by default), which cuts its
+  [-T, T]; only the second pass uses it, with [0, 0].
+- **Research log.** `TOPPIC_SECOND_ALIGN_LOG=<file>` appends one
+  tab-separated line per `geneResult` call with a first alignment: stage
+  (`one` / `multi`), spectrum id, type, shift number, protein, P, the
+  first score, P', the first PrSM (start, end, matched theoretical
+  fragments, shifts as left:right:mass), the second score (`-` without a
+  second alignment), P' again, the second PrSM, and `second` / `first`
+  for the PrSM kept. The alignment's score is the sum of the diagonal
+  pairs' scores (one per spectrum and ion type per matched cleavage) with
+  the zero and precursor peaks counted with the group's spectrum number
+  each, so score - 2 against the PrSM's matched fragments measures the
+  agreement (for the multiple-shift search add the large-shift penalty
+  back, 3 per shift above 300 Da).
+- **Variants tested and dropped** (experiment 144, branch commits
+  3dc127c4-26f7dbe3, kept in the branch's history): a second refinement
+  by the matched ions after the second alignment (+-T around P', so up to
+  2T from the observed precursor: 14% of the one-shift candidates and 68
+  reported shift PrSMs of 480_F3_02 ended beyond 10 ppm, and one such
+  move lost two ATIF1 oxidation PrSMs through the cluster protein
+  correction), the same clamped to the observed precursor's window, and
+  a second alignment with the first alignment's relaxed tolerances
+  (which left the alignment and the annotation apart: the tolerance is
+  the gap, not the precursor).
+- **Results on 480_F3_02** (setting d, experiment 131's TopFD output,
+  against main 7b5112c2): the second alignment's score is within 1 of the
+  PrSM's matched fragments for 98.4% of the 265,195 one-shift and 98.3%
+  of the 41,712 multiple-shift candidate alignments (the first alignment:
+  81.9% and 69.3%). It changes the positions or shifts of 14% and 19% of
+  the candidate PrSMs (the shift positions and diagonal sets; 695
+  one-shift candidates gain matched fragments, mostly +1, and 297 lose).
+  1% FDR: 3,356 PrSMs / 1,996 proteoforms / 439 proteins against 3,355 /
+  1,997 / 438, the same E-value cutoff (2.49) and decoys: within the data
+  set's noise, because the candidates that reach 1% FDR are chosen by the
+  annotation's fragments and the E-value either way, and the relaxed
+  window inflated targets and decoys alike. The one-shift search takes
+  38 s instead of 23 s; the multiple-shift search's 256 s are unchanged.
+
 ## Range of a variable PTM shift (`seq/mass_shift`, `search/varptmsearch/var_ptm_align`)
 
 Branch `var_ptm_narrow_range` (toppic_test experiment 122, report 0122;
