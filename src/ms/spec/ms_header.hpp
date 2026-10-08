@@ -111,6 +111,12 @@ class MsHeader {
   // The scan an MSn scan (n > 2) references as its precursor scan (the
   // spectrumRef of its last precursor: the MS(n-1) scan), -1 without one
   int getParentScan() const { return parent_scan_; }
+  // the parent MS2 spectrum of an MS3 spectrum (DeconvMs3Process): its id
+  // in the MS/MS msalign file and its first precursor
+  int getMsTwoId() const { return ms_two_id_; }
+  double getMsTwoPrecMz() const { return ms_two_prec_mz_; }
+  int getMsTwoPrecCharge() const { return ms_two_prec_charge_; }
+  double getMsTwoPrecMass() const { return ms_two_prec_mass_; }
 
   // The N-terminal label mass (toppic -N) of an extended spectrum: the
   // precursor mass of its header is then the label-free one, and its
@@ -206,6 +212,12 @@ class MsHeader {
   }
 
   void setParentScan(int parent_scan) { parent_scan_ = parent_scan; }
+  void setMsTwoId(int id) { ms_two_id_ = id; }
+  void setMsTwoPrec(double mz, int charge, double mass) {
+    ms_two_prec_mz_ = mz;
+    ms_two_prec_charge_ = charge;
+    ms_two_prec_mass_ = mass;
+  }
 
   void setPtcrWin(double begin, double end) {
     ptcr_win_begin_ = begin;
@@ -286,6 +298,11 @@ class MsHeader {
   double reduced_prec_win_end_ = -1;
   // the precursor scan an MSn scan references (getParentScan)
   int parent_scan_ = -1;
+  // the parent MS2 spectrum of an MS3 spectrum (getMsTwoId)
+  int ms_two_id_ = -1;
+  double ms_two_prec_mz_ = -1;
+  int ms_two_prec_charge_ = 0;
+  double ms_two_prec_mass_ = -1;
   // N-terminal label mass of an extended spectrum (getNTermLabelMass)
   double n_term_label_mass_ = 0;
 

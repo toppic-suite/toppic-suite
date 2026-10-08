@@ -33,6 +33,7 @@
 #include "ms/mzml/pw_ms_reader.hpp"
 #include "topfd/deconv/deconv_ms1_process.hpp"
 #include "topfd/deconv/deconv_ms2_process.hpp"
+#include "topfd/deconv/deconv_ms3_process.hpp"
 #include "topfd/deconv/flashdeconv_ms2_process.hpp"
 #include "topfd/ecscore/env_coll/env_coll_detect.hpp"
 #include "topfd/ecscore/score/onnx_ecscore.hpp"
@@ -94,6 +95,15 @@ void processFraction(const TopfdParaPtr& para_ptr) {
     ms2_proc_ptr->process();
   }
   std::cout << "MS/MS deconvolution finished." << std::endl;
+  // the MS3 spectra (the dissociation of MS2 fragment ions), after the MS/MS
+  // spectra whose species are their precursors
+  if (para_ptr->isMs3Deconv() && para_ptr->getMs3ScanNum() > 0 &&
+      !para_ptr->isFaims()) {
+    std::cout << "MS3 deconvolution started." << std::endl;
+    DeconvMs3ProcessPtr ms3_proc_ptr = std::make_shared<DeconvMs3Process>(para_ptr);
+    ms3_proc_ptr->process();
+    std::cout << "MS3 deconvolution finished." << std::endl;
+  }
 }
 
 void processOneFile(const TopfdParaPtr& para_ptr,
@@ -127,6 +137,7 @@ void processOneFile(const TopfdParaPtr& para_ptr,
       para_ptr->setFracId(0);
       para_ptr->setMs1ScanNumber(profile_ptr->getMs1Cnt());
       para_ptr->setMs2ScanNumber(profile_ptr->getMs2Cnt());
+      para_ptr->setMs3ScanNumber(profile_ptr->getMs3Cnt());
       para_ptr->setMzmlFileNameAndFaims(spec_file_name, false, -1);
       processFraction(para_ptr);
     }

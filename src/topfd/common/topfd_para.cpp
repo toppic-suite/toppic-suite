@@ -233,6 +233,11 @@ std::string TopfdPara::getTopfdParaStr(const std::string& prefix,
   }
   kv("Number of MS1 scans:") << ms_1_scan_num_ << std::endl;
   kv("Number of MS/MS scans:") << ms_2_scan_num_ << std::endl;
+  if (ms_3_scan_num_ > 0) {
+    kv("Number of MS3 scans:") << ms_3_scan_num_ << std::endl;
+    kv("MS3 spectral deconvolution:") << (ms3_deconv_ ? "on" : "off")
+                                      << std::endl;
+  }
   kv("Spectral data type:") << "Centroid" << std::endl;
   kv("Maximum charge:") << max_charge_ << std::endl;
   kv("Maximum monoisotopic mass:") << max_mass_ << " Dalton" << std::endl;

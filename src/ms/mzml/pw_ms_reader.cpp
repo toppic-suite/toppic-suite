@@ -543,9 +543,27 @@ void PwMsReader::parsePrecursor(const MsHeaderPtr& header_ptr,
     // an MSn scan belongs to the MS1 scan of its cycle; its precursor
     // reference is the MS(n-1) scan
     prec_scan_num = prev_ms1_scan_id_;
+    // the MS(n-1) scan: the spectrumRef of the precursor of the last stage
+    // of the filter string (ThermoRawFileParser writes the last stage
+    // first, msconvert the first stage first), else of the last precursor
     if (!cur_spec_ptr->precursors.empty()) {
-      header_ptr->setParentScan(
-          parseNum(cur_spec_ptr->precursors.back().spectrumID, -1));
+      const pwiz::msdata::Precursor* parent = &cur_spec_ptr->precursors.back();
+      std::vector<FilterStage> filter_stages =
+          getFilterStages(cur_spec_ptr, spec_info.msLevel);
+      if (!filter_stages.empty()) {
+        for (const pwiz::msdata::Precursor& prec : cur_spec_ptr->precursors) {
+          double target = 0;
+          double lower = 0;
+          double upper = 0;
+          getIsolationWindow(prec, target, lower, upper);
+          if (target > 0 &&
+              std::abs(target - filter_stages.back().target) <= 0.01) {
+            parent = &prec;
+            break;
+          }
+        }
+      }
+      header_ptr->setParentScan(parseNum(parent->spectrumID, -1));
     }
   }
   header_ptr->setMsOneScan(prec_scan_num);
@@ -774,6 +792,7 @@ bool isReadMsTwo(const pwiz::msdata::SpectrumPtr& spec, int ms_level,
 MzmlProfilePtr PwMsReader::readProfile() {
   int ms_1_cnt = 0;
   int ms_2_cnt = 0;
+  int ms_3_cnt = 0;
   bool all_ms2_have_prec_window = true;
   std::map<double, std::pair<int, int>> volt_map;
   bool get_binary_data = false;
@@ -789,6 +808,8 @@ MzmlProfilePtr PwMsReader::readProfile() {
     // too); other MSn scans are not counted
     if (ms_level > 2 &&
         !isReadMsTwo(cur_spec_ptr, ms_level, activation_ == getPtcrName())) {
+      // an MS3 scan without a proton transfer stage: DeconvMs3Process
+      if (ms_level == 3) ms_3_cnt++;
       continue;
     }
     double voltage = parseFaims(cur_spec_ptr);
@@ -829,6 +850,7 @@ MzmlProfilePtr PwMsReader::readProfile() {
   bool has_prec_window = (ms_2_cnt > 0) && all_ms2_have_prec_window;
   MzmlProfilePtr profile_ptr = std::make_shared<MzmlProfile>(
       ms_1_cnt, ms_2_cnt, has_prec_window, volt_map);
+  profile_ptr->setMs3Cnt(ms_3_cnt);
   return profile_ptr;
 }
 
