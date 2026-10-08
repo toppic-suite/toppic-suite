@@ -1515,7 +1515,7 @@ rule for choosing between the two tolerances: the
 precursor tolerance covers anything sized on the precursor mass — the
 `PeakTolerance::compPrecErrorTole(prec_mass)` checks in the
 filters/searches/E-value code (`MsHeader::getFirstPrecErrorTolerance(ppo)`
-until the Dalton option below), `refinePrecursorAndHeaderShift`, the
+until the Dalton option below), `refinePrecursorByMatchedIons`, the
 localization shift checks
 (`LocalMng::prec_tole_ptr_`), **and** the tolerance handed to
 `prm_ms_util::getIntMassErrorList` / `getPrmPeakPtrs` and
@@ -1541,7 +1541,7 @@ Facts to keep straight:
 
 - **One rule for a precursor tolerance.** `compPrecErrorTole(prec_mass)` is
   prec_mass x ppo (no minimum) or the Dalton value; it serves the filters'
-  and searches' precursor tests, `refinePrecursorAndHeaderShift`, the
+  and searches' precursor tests, `refinePrecursorByMatchedIons`, the
   E-values' candidate window and isotope offset (`CompPValueArray` keeps the
   tolerance as a member; its functions and `EValueProcessor`'s lost the ppo
   parameter) and the MCMC tolerance. `compStrictErrorTole(mass)` returns the
@@ -1564,8 +1564,11 @@ Facts to keep straight:
       fragment tolerance, 0 when none matches). On 480: 3,354 / 1,996 / 440,
       no shift PrSM at +2T. This branch's own fixes (amendment 1: bfa89f11,
       8a5a4582, 75c7ae13) were reverted (3413086c, amendment 2).
-    - **TopMG's graph alignment** (topmg and toppic `--topmg`) keeps
-      `refinePrecursorAndHeaderShift` with the fallback.
+    - **TopMG's graph alignment** (topmg and toppic `--topmg`) kept
+      `refinePrecursorAndHeaderShift` with the fallback until toppic_test
+      experiment 143, which gave it `refinePrecursorByMatchedIons` too and
+      removed the old function (section "Precursor refinement of TopMG's
+      graph alignment").
     - **In the merge** `refinePrecursorByMatchedIons` takes the precursor
       tolerance instead of its ppo (`compPrecErrorTole`, the same T without
       the option), so `--prec-dalton-error d` sets T = d: the shift searches
@@ -2015,7 +2018,9 @@ merged into main on 2026-10-05). Facts to keep straight:
       and no ion inside a shift's range is counted.
 - **The shift searches** (`PSAlign`, `PSAlignMultiType`, TopMG's graph
   alignment) do their own precursor refinement
-  (`refinePrecursorAndHeaderShift`, the median fragment error). The
+  (`refinePrecursorByMatchedIons`, the most precursor-dependent ions within
+  the fragment tolerance; until experiments 135 and 143
+  `refinePrecursorAndHeaderShift`, the median fragment error). The
   variable PTM search needs none: its proteoform mass is exact once the
   alignment has chosen the variable PTMs.
 - **Unchanged:** the dynamic programming (`VarPtmAlign::dp`) and the
@@ -2059,10 +2064,11 @@ merged). Facts to keep straight:
   interval; of equal intervals the one closest to 0; delta 0 when no ion is
   in reach. The shifts move as before: the last diagonal's N-terminal shift
   and the other diagonals' C-terminal shifts.
-- **`refinePrecursorAndHeaderShift`**, main's method, stays for TopMG's graph
-  alignment: the median of 0.005 Da bins over +-2T, which can leave the
-  precursor tolerance, and +floor(2T / 0.005) x 0.005 Da with fewer than two
-  pairs (report 0133).
+- **`refinePrecursorAndHeaderShift`**, main's method until then: the median
+  of 0.005 Da bins over +-2T, which can leave the precursor tolerance, and
+  +floor(2T / 0.005) x 0.005 Da with fewer than two pairs (report 0133).
+  It stayed for TopMG's graph alignment until toppic_test experiment 143
+  and is removed (next section).
 - **The variable PTM search needs neither:** its proteoform mass is exact
   (`refineVarPtmPrecursorAndHeaderShift`).
 - **Results on 480_F3_02** (`-s 2`, TopFD main 38ba67dc output):
@@ -2081,7 +2087,67 @@ merged). Facts to keep straight:
       running time.
 - **Unchanged:** the alignment (it still counts the ions only the relaxed
   window matches), the E-value's generating function (relaxed tolerance on
-  the observed precursor), TopMG.
+  the observed precursor).
+
+## Precursor refinement of TopMG's graph alignment (`search/graphalign/graph_align`, `search/diag/diagonal_util`)
+
+Branch `topmg_prec_matched_ions` (toppic_test experiment 143, report 0143; not
+merged). `GraphAlign::geneResult(s, m)`, shared by topmg and toppic `--topmg`,
+calls `refinePrecursorByMatchedIons` like `PsAlign` and `PsAlignMultiType`;
+`refinePrecursorAndHeaderShift`, its two helpers and
+`GraphAlignMng::refine_prec_step_width_` are removed. Facts to keep straight:
+
+- **Where TopMG's precursor error enters.** The spectrum graph's vertices are
+  PRM peaks of the observed precursor P (C-terminal ones P - (m - C shift)),
+  matched by distance within the alignment error tolerance (0.1 Da); every
+  diagonal's C-terminal shift is set from P (`geneHeaders`). The first
+  diagonal's shift comes from the zero vertex, the last one's from the
+  precursor vertex, an internal one's is the mean of its nodes' shifts.
+- **Single diagonals.** An alignment without unexpected shifts and variable
+  PTMs is one diagonal, anchored at the zero vertex: its N-terminal ions do not
+  move with P. `getDepIonPairs` takes its C-terminal ions as the dependent ions
+  and the refinement moves its C-terminal shift (be5fb6ff). With two or more
+  diagonals the rule is unchanged (the C-terminal ions of every diagonal but
+  the last, the N-terminal ions of the last). toppic's searches never pass one
+  diagonal: the one-PTM search asks `PsAlign` for one shift, the multiple-PTM
+  search for two or more.
+- **Downstream.** The PrSM's adjusted precursor is the refined one;
+  `GraphPostProcessor` and the MCMC take it, the generating function of toppic
+  `--topmg` works on the observed precursor's PRM spectra (its E-values did not
+  change when only the single diagonals' precursor moved).
+- **Results on 480_F3_02** (topfd main 7b5112c2, `-f C57 -d -t FDR -T FDR`,
+  Oxidation M, Phospho STY, Acetyl N-term; toppic `--topmg topmg-only`):
+    - The old method put 37.6% of 9,885 target graph alignments at its +2T
+      fallback (decoys 50.9%; 60% of the alignments with fewer than 5
+      fragments, 51% of single diagonals) and 44.3% outside [-T, T]; 281 of
+      2,981 reported PrSMs at +2T. Now none outside T.
+    - Same alignments: 1,024 of 9,238 targets gain matched fragments, 170 lose.
+    - Reported PrSMs without unexpected shifts: adjusted precursor within 1 ppm
+      of the proteoform mass for 96.1% (old 54.9%), > 10 ppm off 0.2% (6.0%).
+    - Every precursor moved by up to +-5 ppm: 82.1% of the reported PrSMs get
+      exactly the unmoved run's adjusted precursor (old 0%); strong alignments
+      with one diagonal 98.9%, two 90.5%, three or more 35.0%.
+    - 1% FDR: 2,968 / 1,748 / 403 PrSMs / proteoforms / proteins against
+      2,981 / 1,754 / 398; more targets at every fixed E-value (E <= 0.01:
+      2,752 against 2,736) and 4 / 10 more decoys at E <= 10 / 100, so the
+      cutoff fell from 55.3 to 24. On the moved precursors 2,957 / 1,744 / 405
+      against 2,954 / 1,738 / 402. Same running time.
+    - topmg (MCMC E-values, two runs each): 1,979 / 1,965 PrSMs against
+      2,021 / 2,002, proteoforms 1,212 / 1,217 against 1,239 / 1,219,
+      proteins 390 / 390 against 394 / 386. The refined decoys gain fragments
+      as the targets do (the old fallback hit half of the decoy alignments):
+      decoys at E <= 0.1 114 / 121 against 93 / 98. Unchanged PrSMs' MCMC
+      E-values scatter as between two runs of one binary (sd 0.9 in log10).
+      MCMC +1.6 min (15,423 post-processed PrSMs against 14,818).
+- **Known effects:**
+    - Three or more diagonals recover the precursor for only 35%: an internal
+      diagonal's mean shift mixes N-terminal and C-terminal PRM vertices, so it
+      carries part of P's error.
+    - A variable-PTM diagonal that matched no ion was dropped by
+      `refineHeadersBgnEnd` and its mass merged into the unexpected shift; when
+      the refined precursor lets one ion match, the diagonal stays and the
+      unexpected shift can exceed `max_ptm_mass_` (500 Da), so the PrSM is
+      rejected (spectrum 712 of 480, THOC4, E 2.5e-8 with the old method).
 
 ## The filters' mass list (`ms/factory/prm_ms_util`, `getIntMassErrorList`)
 

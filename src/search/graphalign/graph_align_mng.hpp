@@ -79,8 +79,6 @@ class GraphAlignMng {
     return std::ceil(min_consistent_dist_ * convert_ratio_);
   }
 
-  double refine_prec_step_width_ = 0.005;
-
   int prec_error_ = 0;
 
   double max_ptm_mass_ = 500;
