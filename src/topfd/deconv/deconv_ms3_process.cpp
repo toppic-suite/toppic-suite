@@ -16,12 +16,16 @@
 #include "topfd/deconv/deconv_ms3_process.hpp"
 
 #include <algorithm>
+#include <cmath>
+#include <cstdlib>
 #include <fstream>
 #include <iomanip>
 #include <iostream>
 #include <string>
 
 #include "common/util/logger.hpp"
+#include "ms/env/env.hpp"
+#include "ms/env/env_base.hpp"
 #include "ms/env/avg_mass_util.hpp"
 #include "ms/env/match_env_util.hpp"
 #include "ms/mzml/pw_ms_reader.hpp"
@@ -38,6 +42,59 @@ namespace {
 
 // The isotope peak spacing in m/z at charge z
 constexpr double ISOTOPE_DIFF = 1.00235;
+
+// The isotope correction of an MS2 species' monoisotopic mass from the parent
+// MS2 scan's centroid peaks (toppic_test experiment 146, amendment 1): the
+// theoretical envelope (EnvBase) at the reported monoisotopic mass and at
+// its neighbours one isotope lighter and heavier is compared with the peaks
+// within mz_tol of its positions by the cosine of the intensity vectors; a
+// neighbour whose monoisotopic peak is observed and whose cosine beats the
+// reported mass's by at least min_gain wins. Returns the shift in isotopes
+// (-1, 0, +1). The MS2 deconvolution reports the mass one isotope light for
+// 2-6 kDa fragments at charge 3-6 (the weak monoisotopic peak) and one
+// heavy below 3 kDa (a missing monoisotopic peak); TOPFD_MS3_ISO_CORRECT=0
+// turns the correction off.
+double envCosine(double mono_mass, int charge, const PeakPtrVec& peaks,
+                 double mz_tol, bool& mono_observed) {
+  mono_observed = false;
+  EnvPtr env_ptr = EnvBase::getEnvByMonoMass(mono_mass, charge);
+  if (env_ptr == nullptr) return -1;
+  double tt = 0, oo = 0, to = 0;
+  for (int i = 0; i < env_ptr->getPeakNum(); i++) {
+    double mz = env_ptr->getMz(i);
+    double theo = env_ptr->getInte(i);
+    double obs = 0;
+    for (const PeakPtr& p : peaks) {
+      if (std::abs(p->getPosition() - mz) <= mz_tol && p->getIntensity() > obs) {
+        obs = p->getIntensity();
+      }
+    }
+    if (i == 0 && obs > 0) mono_observed = true;
+    tt += theo * theo;
+    oo += obs * obs;
+    to += theo * obs;
+  }
+  if (tt <= 0 || oo <= 0) return 0;
+  return to / std::sqrt(tt * oo);
+}
+
+int correctIsotope(double mono_mass, int charge, const PeakPtrVec& peaks,
+                   double mz_tol, double min_gain) {
+  bool mono_obs = false;
+  double base = envCosine(mono_mass, charge, peaks, mz_tol, mono_obs);
+  int best = 0;
+  double best_score = base;
+  for (int d = -1; d <= 1; d += 2) {
+    bool obs = false;
+    double score =
+        envCosine(mono_mass + d * ISOTOPE_DIFF, charge, peaks, mz_tol, obs);
+    if (obs && score > best_score + min_gain) {
+      best = d;
+      best_score = score;
+    }
+  }
+  return best;
+}
 
 // The MS2 species whose isotopic envelope has a peak in the MS3 isolation
 // window [win_begin, win_end]: the most intense one, or -1. An envelope's
@@ -107,9 +164,20 @@ void DeconvMs3Process::process() {
       << "\tMS2 precursor m/z\tMS2 precursor charge\tMS2 precursor mass"
       << "\tIsolation target m/z\tIsolation window begin\tIsolation window end"
       << "\tPrecursor source\tPrecursor m/z\tPrecursor charge\tPrecursor mass"
-      << "\tPrecursor intensity\tPeaks\tDeconvoluted masses" << std::endl;
+      << "\tPrecursor intensity\tIsotope correction\tPeaks\tDeconvoluted masses"
+      << std::endl;
 
   int total = topfd_para_ptr_->getMs3ScanNum();
+  // the isotope correction of the MS2 species (correctIsotope); off with
+  // TOPFD_MS3_ISO_CORRECT=0, the gain with TOPFD_MS3_ISO_GAIN (0.02)
+  const char* iso_env = std::getenv("TOPFD_MS3_ISO_CORRECT");
+  bool iso_correct = iso_env == nullptr || std::atoi(iso_env) != 0;
+  const char* gain_env = std::getenv("TOPFD_MS3_ISO_GAIN");
+  double iso_gain = gain_env == nullptr ? 0.02 : std::atof(gain_env);
+  // the centroid peaks of the MS2 scans read so far (the MS3 scans follow
+  // their MS2 scan in the file)
+  std::map<int, PeakPtrVec> ms2_peaks;
+  int iso_corrected = 0;
   int spec_id = 0;
   int species_num = 0;
   int selected_num = 0;
@@ -117,9 +185,13 @@ void DeconvMs3Process::process() {
   int cnt = 0;
   while (reader.readNext() != -1) {
     MsHeaderPtr header_ptr = reader.getHeaderPtr();
-    if (header_ptr == nullptr || header_ptr->getMsLevel() != 3 ||
-        header_ptr->isPtcr() || header_ptr->isFragPtcr() ||
-        header_ptr->isReducedPrec()) {
+    if (header_ptr == nullptr) continue;
+    if (header_ptr->getMsLevel() == 2) {
+      ms2_peaks[header_ptr->getFirstScanNum()] = reader.getPeakList();
+      continue;
+    }
+    if (header_ptr->getMsLevel() != 3 || header_ptr->isPtcr() ||
+        header_ptr->isFragPtcr() || header_ptr->isReducedPrec()) {
       continue;
     }
     cnt++;
@@ -164,10 +236,20 @@ void DeconvMs3Process::process() {
     int species = ms2_ptr == nullptr
                       ? -1
                       : findPrecSpecies(ms2_ptr, win_begin, win_end);
+    int iso_shift = 0;
     if (species >= 0) {
       DeconvPeakPtr peak_ptr = ms2_ptr->getPeakPtr(species);
       double mass = peak_ptr->getPosition();
       int charge = peak_ptr->getCharge();
+      auto pk_it = ms2_peaks.find(ms2_scan);
+      if (iso_correct && pk_it != ms2_peaks.end()) {
+        iso_shift = correctIsotope(mass, charge, pk_it->second,
+                                   topfd_para_ptr_->getMzError(), iso_gain);
+        if (iso_shift != 0) {
+          mass += iso_shift * ISOTOPE_DIFF;
+          iso_corrected++;
+        }
+      }
       prec_ptr_vec.push_back(std::make_shared<Precursor>(
           0, -1, peak_util::compMz(mass, charge), charge,
           peak_ptr->getIntensity()));
@@ -229,12 +311,14 @@ void DeconvMs3Process::process() {
     }
     tsv << "\t" << std::setprecision(2)
         << (prec_ptr_vec.empty() ? 0.0 : prec_ptr_vec[0]->getInte()) << "\t"
-        << peak_list.size() << "\t" << deconv_ms_ptr->size() << std::endl;
+        << iso_shift << "\t" << peak_list.size() << "\t"
+        << deconv_ms_ptr->size() << std::endl;
   }
   std::cout << std::endl;
   std::cout << "MS3 spectra: " << cnt << " deconvoluted, " << species_num
             << " with the precursor from an MS2 species, " << selected_num
-            << " from the selected ion, " << no_parent_num
+            << " from the selected ion (" << iso_corrected
+            << " corrected by one isotope), " << no_parent_num
             << " without a parent MS2 spectrum." << std::endl;
 }
 
