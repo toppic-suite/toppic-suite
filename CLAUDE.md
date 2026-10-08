@@ -532,8 +532,8 @@ command emits `-y` and `-Y`). Facts to keep straight:
   `--deconv-ms1 <m> --deconv-ms2 <m>`. In topfd_gui they are the third
   column's rows 4 and 5 (the window grew by 40 pixels, and the former "Use
   FLASHDeconv for MS/MS" checkbox is gone); in topdia_gui the middle
-  column's rows 3 and 6 ("Use single scan noise level" moved into the
-  Additional settings box). The forms place widgets at fixed coordinates,
+  column's rows 3 and 4, above the MS1 and MS2 ECScore cutoffs ("Use
+  single scan noise level" moved into the Additional settings box). The forms place widgets at fixed coordinates,
   so moving one means editing the geometries of the widgets below it.
 
 ## FLASHDeconv MS/MS deconvolution (`topfd/deconv/flashdeconv_ms2_process`)

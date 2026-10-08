@@ -615,7 +615,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
     <property name="geometry">
      <rect>
       <x>300</x>
-      <y>280</y>
+      <y>320</y>
       <width>291</width>
       <height>42</height>
      </rect>
@@ -1016,7 +1016,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
     <property name="geometry">
      <rect>
       <x>300</x>
-      <y>320</y>
+      <y>360</y>
       <width>291</width>
       <height>42</height>
      </rect>
@@ -1108,7 +1108,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
     <property name="geometry">
      <rect>
       <x>300</x>
-      <y>360</y>
+      <y>280</y>
       <width>291</width>
       <height>42</height>
      </rect>
