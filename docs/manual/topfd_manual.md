@@ -102,6 +102,8 @@ FAIMS data `sample_<voltage>` per voltage level, e.g. `sample_-40`).
 | `sample_ms2.msalign` | Deconvoluted MS/MS spectra with precursor information (monoisotopic masses; average masses with `-A`). **This is the input of TopPIC and TopMG.** |
 | `sample_ptcr.msalign` | Only when the file has PTCR spectra (see below): their deconvoluted species, one line per species, in the `msalign` format with `ACTIVATION=PTCR`. Not read by TopPIC or TopMG. |
 | `sample_ptcr.tsv` | The same species with their charge ladders: one line per species with its spectrum, monoisotopic mass, intensity, charges, the charges at which it could have been isolated, the intensity and EnvCNN score per charge, whether it is the precursor, and the MS1 feature it matches (`Feature ID`, `Feature mass`; -1 and empty without one). |
+| `sample_ms3.msalign` | Only when the file has MS3 scans (the dissociation of MS2 fragment ions; see below): the deconvoluted MS3 spectra in the `msalign` format with `LEVEL=3`, the parent MS2 spectrum (`MS_TWO_ID`, `MS_TWO_SCAN`, its precursor as `MS_TWO_PRECURSOR_*`) and the MS3 precursor (the MS2 fragment ion). |
+| `sample_ms3.tsv` | One line per MS3 scan: its MS2 and MS1 scans, the MS2 precursor, the isolation window, how the precursor was determined (`ms2_species`: a species of the parent MS2 spectrum's deconvolution; `selected_ion`: the file's selected ion at every charge up to the MS2 precursor's), the precursor and the number of masses. |
 | `sample_ms1.feature` | Proteoform features detected in the LC-MS map: one line per feature with its mass, intensity, retention-time and scan range, charge range, apex and ECScore. |
 | `sample_ms2.feature` | The features assigned to each MS/MS spectrum (precursor mass, m/z, charge and intensity), one line per spectrum and feature. |
 | `sample_feature.xml` | The proteoform features in XML, with their per-charge envelope information; read by TopPIC and TopMG when they combine fractions (`-c`). |
@@ -133,6 +135,18 @@ and no feature files are produced.
 With more than one thread, per-thread partial `msalign` files
 (`sample_ms1.msalign_0`, `sample_ms2.msalign_0`, `_1`, ...) exist while
 TopFD runs; they are merged into the final files and deleted at the end.
+
+**MS3 spectra.** An MS3 scan (the dissociation of an MS2 fragment ion,
+e.g. CID of a peptide and then CID of one of its fragments) is deconvoluted
+after the MS/MS spectra, when the file has such scans: its precursor is the
+species of the parent MS2 spectrum's deconvolution whose isotopic envelope
+falls in the MS3 isolation window (the most intense one), or the selected
+ion of the file at every possible charge when the MS2 spectrum has no
+species there; the fragments are deconvoluted with the MS/MS method bounded
+by that precursor's mass and charge and written to `sample_ms3.msalign` and
+`sample_ms3.tsv`. The hidden option `--disable-ms3` turns the stage off.
+TopPIC and TopMG do not read `sample_ms3.msalign` by themselves; TopPIC
+can search it as an MS/MS file with `-x` and `--disable-post-match`.
 
 **PTCR spectra.** An MS/MS spectrum whose activation in the input file is
 proton transfer charge reduction (PSI-MS MS:1003249, or proton transfer

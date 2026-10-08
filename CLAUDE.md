@@ -1062,6 +1062,73 @@ species at lower charges. Facts to keep straight:
   alone (7e5b5a64) are within the variation of two main runs, and with the
   EnvCNN input (above) toppic's identifications equal main's.
 
+## MS3 spectral deconvolution (`topfd/deconv/deconv_ms3_process`, `--disable-ms3`)
+
+Branch `ms3_deconv` (toppic_test experiment 146, report 0146; from main
+205dc03c). An MS3 scan is the dissociation of an MS2 fragment ion (a
+tryptic digest on an Orbitrap Fusion Lumos: CID MS2 of the peptide, CID
+MS3 of up to three of its fragments). TopFD read only the MS3 scans with a
+proton transfer stage (PTCR, above); the others were skipped. Since this
+branch they are deconvoluted by a stage after the MS/MS deconvolution,
+`DeconvMs3Process`, on by default when the file has such scans
+(`MzmlProfile::getMs3Cnt`, counted by `PwMsReader::readProfile`; the
+parameter block prints "Number of MS3 scans" and "MS3 spectral
+deconvolution: on / off"; hidden `topfd --disable-ms3`; not run for
+FAIMS data). Facts to keep straight:
+
+- **Reading.** The stage reads the mzML file again with `PwMsReader`
+  (which reads every scan; the MS/MS stage's `MzmlMsGroupReader` is what
+  skips MS3 scans) and keeps the level-3 scans that are not PTCR,
+  fragment PTCR or charge-reduced-precursor spectra. The parent MS2 scan
+  of an MSn scan (`MsHeader::getParentScan`) is the `spectrumRef` of the
+  precursor element whose isolation target is the **last** stage of the
+  filter string (`getFilterStages`): ThermoRawFileParser 2.0 writes the
+  MS3 stage first and the MS1 stage second, msconvert the MS1 stage
+  first; without a filter string the last precursor (msconvert's order).
+  The MS1 scan is the cycle's (`MS_ONE_SCAN`, `prev_ms1_scan_id_`). The
+  isolation target and window are the first precursor element's
+  (`parsePrecursor`), which is the MS3 stage for ThermoRawFileParser
+  files - with msconvert files it would be the MS1 stage (not tested).
+  The activation is the stages' (CID).
+- **The precursor** of an MS3 spectrum is an MS2 fragment: the species
+  of the parent MS2 scan's deconvolution (`<base>_ms2.msalign`, read
+  back by scan) whose isotopic envelope (the monoisotopic m/z and the
+  `1 + mass / 800` isotope peaks above it) has a peak in the MS3
+  isolation window, the most intense when several (`findPrecSpecies`);
+  its mass, charge, m/z and intensity are the precursor
+  (`PRECURSOR_FEATURE_ID` -1: a fragment has no MS1 feature). Without
+  one - in the test data the MS3 scans of the noise MS2 scans at the
+  gradient's ends, whose MS2 precursor has the dummy charge 1 - the
+  selected ion m/z of the file at every charge from 1 to the MS2
+  precursor's charge, written as multiple precursors (the file's charge
+  state of an MS3 precursor is not usable: 10 for a third of the scans).
+  On 480-like peptide data the chosen species is a b or y ion of the
+  identified parent peptide in two thirds of the cases and one isotope
+  off (the MS2 deconvolution's monoisotopic error: -1 Da for 2-6 kDa
+  fragments at charge 3-6, +1 Da below 3 kDa) in a quarter; TopPIC's
+  zero-shift search tolerates the +-1 Da precursor error.
+- **The deconvolution** is the MS/MS one (`greedy_ms2_deconv::deconv`,
+  or `DeconvSingleSp` at level 2 with `--deconv-ms2 msdeconv`) bounded by
+  the precursor's mass (+1 Da) and charge (the MS2 precursor's in the
+  fallback case), single-threaded (8,000 MS3 scans of 75 peaks take
+  about 80 s).
+- **Output.** `<base>_ms3.msalign` in the msalign format with `LEVEL=3`,
+  `MS_ONE_ID` / `MS_ONE_SCAN`, and the new lines `MS_TWO_ID` /
+  `MS_TWO_SCAN` (the parent MS2 spectrum's id in `_ms2.msalign` and its
+  scan) and `MS_TWO_PRECURSOR_MZ` / `_CHARGE` / `_MASS` (the parent's
+  first precursor; `MsHeader::setMsTwoId`, `setMsTwoPrec`; written by
+  `MsAlignWriter` for level 3, ignored by `MsAlignReader`), the
+  precursor lines and the masses; `<base>_ms3.tsv`, one row per MS3 scan
+  (scan, MS2 scan and id, MS1 scan and id, retention time, the MS2
+  precursor, the isolation target and window, the precursor source
+  `ms2_species` / `selected_ion`, the precursor(s), peaks, masses). The
+  MS1 / MS2 msalign and feature files and the SQLite database are
+  unchanged (checked file for file against main). TopPIC searches an MS3
+  msalign file with `-x` (no feature file) and `--disable-post-match`
+  (the SQLite database has no MS3 peaks); a y-ion precursor is a
+  both-truncated proteoform with no shift, a b-ion one carries -18.011
+  Da as its unexpected shift.
+
 ## Post mass matching (`prsm/prsm_post_mass_match`, toppic only)
 
 After the search, the clustering, the cluster protein correction and the
