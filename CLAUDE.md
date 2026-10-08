@@ -757,9 +757,11 @@ rows) is written as `DeconvSingleSp`'s. Facts to keep straight:
 
 ## Precursor isotope correction from fragment pairs (`topfd/deconv/prec_pair_refine`, `--skip-ms2-prec-pair-refine`)
 
-On by default in topfd; `--skip-ms2-prec-pair-refine` turns it off (branch
-`high_res_prec_pair_refine`, toppic_test experiment 116, report 0116; tested
-as the hidden `--ms2-prec-pair-refine`, which the merge into main replaced).
+On by default in topfd; the hidden `--skip-ms2-prec-pair-refine` turns it
+off (branch `high_res_prec_pair_refine`, toppic_test experiment 116, report
+0116; tested as the hidden `--ms2-prec-pair-refine`, which the merge into
+main replaced; `--skip-ms2-prec-pair-refine` was visible in `-h` until
+2026-10-08, when it was moved to the hidden options).
 b + y = the proteoform mass, so fragment pair sums show the mass of the
 molecule that was fragmented. Facts to keep straight:
 
@@ -3129,7 +3131,11 @@ above it, never the reverse:
   `TopfdPara::setMzmlFileNameAndFaims` (base name = input path minus
   extension, `_<voltage>` appended for FAIMS; it also creates the SQLite
   database when enabled) — do not hand-roll output names or a second
-  `createSqlDb` call in a driver.
+  `createSqlDb` call in a driver. In topfd_gui the checkbox "Text peak list
+  input" (`textPeakListCheckBox`, Additional settings, third column, row 3)
+  sets `setTextPeakList` and `gui/util/command.cpp` emits `-T`; the Add
+  button then offers `*.txt` or all files, and Start refuses a list holding
+  an mzML/mzXML file (`readPeakFile`'s `std::stod` would throw on it).
 - `src/topdia` — the TopDIA pseudo-spectrum layer built on `topfd`/`ms`:
   `common` (`topdia_para` + `topdia_process`) and `pseudo_spec`
   (`mzrt_feature`, `pseudo_peak`, `pseudo_spectrum`, `generate_pseudo_spectrum`).

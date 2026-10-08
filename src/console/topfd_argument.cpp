@@ -178,18 +178,18 @@ bool Argument::parse(int argc, char* argv[]) {
         "MS/MS spectra: greedy, the greedy search of MS1 spectra adapted to "
         "fragment ions; msdeconv, the MS-Deconv dynamic programming of "
         "earlier versions; or flashdeconv, the FLASHDeconv algorithm "
-        "(experimental). The default value is greedy.")(
-        "skip-ms2-prec-pair-refine",
-        "Skip the precursor isotope correction. By default the precursor "
-        "masses of an MS/MS spectrum are corrected by one isotope when the "
-        "sums of pairs of its fragment masses (complementary b and y ions) "
-        "clearly support the corrected mass and the precursor's envelope in "
-        "the MS1 spectrum does not contradict it.");
+        "(experimental). The default value is greedy.");
 
     // Advanced options accepted on the command line but hidden from the help
     // message; the positional spectrum file argument is also hidden here.
     po::options_description hidden_desc("Hidden options");
     hidden_desc.add_options()(
+        "skip-ms2-prec-pair-refine",
+        "Skip the precursor isotope correction. By default the precursor "
+        "masses of an MS/MS spectrum are corrected by one isotope when the "
+        "sums of pairs of its fragment masses (complementary b and y ions) "
+        "clearly support the corrected mass and the precursor's envelope in "
+        "the MS1 spectrum does not contradict it.")(
         "output-dp-envs",
         "Dump the windowed candidate envelopes and DP-selected envelopes of "
         "each spectrum to win_envs.txt / dp_envs.txt (debugging).")(

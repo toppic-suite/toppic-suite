@@ -23,8 +23,9 @@ on Windows). The general form is
 topfd [options] spectrum-file ...
 ```
 
-`topfd -h` prints the option list. The GUI tool `topfd_gui` offers the first
-function only.
+`topfd -h` prints the option list. The GUI tool `topfd_gui` offers both
+functions: the second one with the checkbox "Text peak list input" under
+"Additional settings" (`-T`).
 
 **Paths must not contain spaces.** TopFD refuses to run if the directory of
 the executable contains a space, and input files whose path contains spaces
@@ -216,7 +217,7 @@ Parameters that apply to both MS1 and MS/MS deconvolution:
 | `-N`, `--no-sql` | off | Do not write the `.sqlite` database. **Do not use it if TopPIC will search the spectra**: TopPIC's post mass matching, which is on by default, reads the centroided MS/MS peaks from this database and stops with an error when it is missing (see the [TopPIC manual](toppic_manual.md); `toppic --disable-post-match` is the alternative). |
 | `-A`, `--average-mass` | off | Report average masses instead of monoisotopic masses for the precursor and fragment ions in `sample_ms2.msalign` (section 1.3). The MS1 msalign file, the feature files and the SQLite database keep monoisotopic masses. Search such a file with `toppic --average-mass`. Also applies to `-T`. |
 | `-D`, `--sql-3d` | off | Also store the raw MS1 peaks for 3D visualisation in the `.sqlite` database: `PEAKS0` holds every MS1 peak and `PEAKS1`, `PEAKS2`, ... progressively down-sampled copies, with one `CONFIG` row per table. Cannot be combined with `--no-sql`; has no effect with `-T` or `-o`. In `topfd_gui`, the checkbox "MS1 3D visualization data" under "Additional settings" turns this on (it is greyed out while "Do not generate SQLite database" is checked). |
-| `-T`, `--text-peak-list` | off | The input is a text peak list (one MS/MS spectrum), not an mzML file; see section 2. |
+| `-T`, `--text-peak-list` | off | The input is a text peak list (one MS/MS spectrum), not an mzML file; see section 2. In `topfd_gui`, the checkbox "Text peak list input" under "Additional settings" turns this on; the Add button then lists `.txt` files (or all files), and Start refuses to run while an mzML or mzXML file is in the list. |
 
 MS1 deconvolution and proteoform feature detection:
 

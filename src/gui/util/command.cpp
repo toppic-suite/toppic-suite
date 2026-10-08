@@ -70,6 +70,9 @@ std::string geneTopfdCommand(const TopfdParaPtr& para_ptr,
   }
   command = command + "--deconv-ms1 " + para_ptr->getMs1DeconvMethod() +
             " --deconv-ms2 " + para_ptr->getMs2DeconvMethod() + " ";
+  if (para_ptr->isTextPeakList()) {
+    command = command + "-T ";
+  }
   for (size_t i = 0; i < spec_file_lst.size(); i++) {
     command = command + spec_file_lst[i] + " ";
   }

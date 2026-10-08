@@ -139,6 +139,7 @@ void TopFDDialog::on_defaultButton_clicked() {
       QString::fromStdString(para_ptr->getMs1DeconvMethod()));
   ui->ms2DeconvComboBox->setCurrentText(
       QString::fromStdString(para_ptr->getMs2DeconvMethod()));
+  ui->textPeakListCheckBox->setChecked(para_ptr->isTextPeakList());
 
   ui->outputTextBrowser->clear();
   ui->outputTextBrowser->setText(
@@ -155,9 +156,12 @@ std::vector<std::string> TopFDDialog::getSpecFileList() {
 }
 
 void TopFDDialog::on_addButton_clicked() {
+  // a text peak list may have any extension (topfd --text-peak-list)
+  QString filter = ui->textPeakListCheckBox->isChecked()
+                       ? "Text peak lists (*.txt);;All files (*)"
+                       : "Spectra files (*.mzXML *.mzML *.mzxml *.mzml)";
   QStringList spfiles = QFileDialog::getOpenFileNames(
-      this, "Select spectrum files", lastDir_,
-      "Spectra files (*.mzXML *.mzML *.mzxml *.mzml)");
+      this, "Select spectrum files", lastDir_, filter);
   for (int i = 0; i < spfiles.size(); i++) {
     QString spfile = spfiles.at(i);
     updatedir(spfile);
@@ -210,6 +214,23 @@ void TopFDDialog::on_delButton_clicked() {
 }
 
 void TopFDDialog::on_startButton_clicked() {
+  // topfd --text-peak-list reads every input file as a peak list and stops
+  // on an mzML/mzXML file, so refuse the run here.
+  if (ui->textPeakListCheckBox->isChecked()) {
+    for (int i = 0; i < ui->listWidget->count(); i++) {
+      QString spfile = ui->listWidget->item(i)->text();
+      if (spfile.endsWith(".mzML", Qt::CaseInsensitive) ||
+          spfile.endsWith(".mzXML", Qt::CaseInsensitive)) {
+        QMessageBox::warning(
+            this, tr("Warning"),
+            tr("Text peak list input is checked, but %1 is an mzML or mzXML "
+               "file. Remove it or uncheck the option.")
+                .arg(spfile),
+            QMessageBox::Yes);
+        return;
+      }
+    }
+  }
   lockDialog();
   toppic::TopfdParaPtr paraPtr = this->getParaPtr();
   std::vector<std::string> specFileList = this->getSpecFileList();
@@ -327,6 +348,7 @@ toppic::TopfdParaPtr TopFDDialog::getParaPtr() {
       ui->ms1DeconvComboBox->currentText().toStdString());
   para_ptr_->setMs2DeconvMethod(
       ui->ms2DeconvComboBox->currentText().toStdString());
+  para_ptr_->setTextPeakList(ui->textPeakListCheckBox->isChecked());
 
   return para_ptr_;
 }
@@ -358,6 +380,7 @@ void TopFDDialog::lockDialog() {
   ui->sql3dCheckBox->setEnabled(false);
   ui->ms1DeconvComboBox->setEnabled(false);
   ui->ms2DeconvComboBox->setEnabled(false);
+  ui->textPeakListCheckBox->setEnabled(false);
 }
 
 void TopFDDialog::unlockDialog() {
@@ -388,6 +411,7 @@ void TopFDDialog::unlockDialog() {
   ui->sql3dCheckBox->setEnabled(!ui->noSqlCheckBox->isChecked());
   ui->ms1DeconvComboBox->setEnabled(true);
   ui->ms2DeconvComboBox->setEnabled(true);
+  ui->textPeakListCheckBox->setEnabled(true);
 }
 
 bool TopFDDialog::checkError() {
