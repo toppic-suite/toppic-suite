@@ -533,8 +533,18 @@ command emits `-y` and `-Y`). Facts to keep straight:
   column's rows 4 and 5 (the window grew by 40 pixels, and the former "Use
   FLASHDeconv for MS/MS" checkbox is gone); in topdia_gui the middle
   column's rows 3 and 4, above the MS1 and MS2 ECScore cutoffs ("Use
-  single scan noise level" moved into the Additional settings box). The forms place widgets at fixed coordinates,
-  so moving one means editing the geometries of the widgets below it.
+  single scan noise level" moved into the Additional settings box). The
+  forms place widgets at fixed coordinates, so moving one means editing the
+  geometries of the widgets below it. topdia_gui's window is 1143 pixels
+  wide (was 965; left column rows 305, right column rows 425, deconvolution
+  drop-downs at most 120) so that every label and drop-down fits the
+  desktop font Ubuntu Sans 11, not only Qt's offscreen Sans Serif 9. To
+  check a form, build a small program on the generated
+  `build/<tool>_gui_autogen/include/gui/<tool>/ui_<tool>dialog.h`, run it
+  with `QT_QPA_PLATFORM=offscreen` and the font set by
+  `QApplication::setFont`, and compare each `QLabel`'s
+  `sizeHint().width()` with its `width()` (and `grab().save()` a
+  screenshot).
 
 ## FLASHDeconv MS/MS deconvolution (`topfd/deconv/flashdeconv_ms2_process`)
 
