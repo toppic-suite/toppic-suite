@@ -2086,7 +2086,7 @@ merged). Facts to keep straight:
 ## The filters' mass list (`ms/factory/prm_ms_util`, `getIntMassErrorList`)
 
 Branch `filter_pairs` (toppic_test experiments 138 and 142, reports 0138 and
-0142; not merged). Facts to keep straight:
+0142; merged into main on 2026-10-07 as 5fb46b2c). Facts to keep straight:
 
 - **What the list is.** The PRM peaks of a spectrum (prefix list: ORIGINAL
   m - N shift, REVERSED P - (m - C shift); suffix list: the same minus H2O)
