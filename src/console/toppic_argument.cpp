@@ -148,7 +148,7 @@ std::map<std::string, std::string> ToppicArgument::initArguments() {
   arguments["secondAlign"] = "true";
   // the tolerance of the complementary (REVERSED) PRM peaks in the E-values'
   // generating function (hidden --evalue-complement-tolerance): strict or
-  // relax (PrsmPara::useEvalueStrictComplement)
+  // relax or separate (PrsmPara::useEvalueStrictComplement, useEvalueSeparate)
   arguments["evalueComplementTolerance"] = "strict";
   // the filters' mass list (hidden --filter-mass-list): merge, fragment or
   // single (SpPara::FilterMassListMode)
@@ -881,9 +881,10 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
 
     // hidden: the tolerance of the complementary (REVERSED, P - m) PRM
     // peaks in the generating function of the E-values: strict (the
-    // default, the fragment tolerance on the fragment mass) or relax (the
-    // precursor's error added, the tolerance before; issue #616,
-    // toppic_test experiment 146)
+    // default, the fragment tolerance on the fragment mass), relax (the
+    // precursor's error added, the tolerance before) or separate (one
+    // generating function per PrSM on PRM spectra at its own precursor,
+    // every peak strict; issue #616, toppic_test experiment 146)
     if (vm.count("evalue-complement-tolerance")) {
       arguments_["evalueComplementTolerance"] = evalue_complement_tolerance;
     }
@@ -1409,10 +1410,11 @@ bool ToppicArgument::validateArguments() {
   }
 
   if (arguments_["evalueComplementTolerance"] != "strict" &&
-      arguments_["evalueComplementTolerance"] != "relax") {
+      arguments_["evalueComplementTolerance"] != "relax" &&
+      arguments_["evalueComplementTolerance"] != "separate") {
     LOG_ERROR("--evalue-complement-tolerance "
               << arguments_["evalueComplementTolerance"]
-              << " is not strict or relax");
+              << " is not strict, relax or separate");
     return false;
   }
   if (!SpPara::isFilterMassListModeName(arguments_["filterMassList"])) {

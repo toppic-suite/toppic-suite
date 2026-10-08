@@ -438,8 +438,9 @@ std::string TopPIC_identify(std::map<std::string, std::string>& arguments) {
     EValueProcessorPtr processor =
         std::make_shared<EValueProcessor>(tdgf_mng_ptr);
     processor->init();
-    // compute E-value for a set of prsms each run
-    processor->process(false);
+    // compute E-value for a set of prsms each run (or one PrSM at a time
+    // at its own precursor with --evalue-complement-tolerance separate)
+    processor->process(prsm_para_ptr->useEvalueSeparate());
     processor = nullptr;
     std::cout << "E-value computation - finished." << std::endl;
 
@@ -724,7 +725,7 @@ std::string TopPIC_topmg_identify(
       EValueProcessorPtr processor =
           std::make_shared<EValueProcessor>(tdgf_mng_ptr);
       processor->init();
-      processor->process(false);
+      processor->process(prsm_para_ptr->useEvalueSeparate());
       processor = nullptr;
       std::cout << "E-value computation using TDGF - finished." << std::endl;
     } else {

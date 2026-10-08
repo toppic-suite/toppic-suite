@@ -46,6 +46,8 @@ int process(const PrsmParaPtr& prsm_para_ptr, const TdgfMngPtr& tdgf_mng_ptr,
             const std::string& output_file_ext, bool remove_topmg_others,
             int* removed_num) {
   std::string sp_file_name = prsm_para_ptr->getSpectrumFileName();
+  // the E-values are recomputed as the E-value stages computed them
+  const bool separate = prsm_para_ptr->useEvalueSeparate();
   std::string base_name = file_util::basename(sp_file_name);
   FastaIndexReaderPtr seq_reader = std::make_shared<FastaIndexReader>(
       prsm_para_ptr->getSearchDbFileNameWithFolder());
@@ -148,9 +150,10 @@ int process(const PrsmParaPtr& prsm_para_ptr, const TdgfMngPtr& tdgf_mng_ptr,
             std::this_thread::sleep_for(std::chrono::milliseconds(10));
           }
           pool_ptr->enqueue(
-              [evalue_processor, spec_set_ptr, sele_prsm_ptrs]() mutable {
-                evalue_processor->compEvaluesThreadLocal(spec_set_ptr,
-                                                         sele_prsm_ptrs, false);
+              [evalue_processor, spec_set_ptr, sele_prsm_ptrs,
+               separate]() mutable {
+                evalue_processor->compEvaluesThreadLocal(
+                    spec_set_ptr, sele_prsm_ptrs, separate);
               });
         }
       }

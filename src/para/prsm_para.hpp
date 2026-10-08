@@ -87,6 +87,13 @@ class PrsmPara {
   bool useEvalueStrictComplement() const {
     return use_evalue_strict_complement_;
   }
+  // --evalue-complement-tolerance separate: every PrSM gets its own
+  // generating function on PRM spectra rebuilt at its adjusted precursor
+  // with the strict tolerance on every peak (the "separate" mode of
+  // EValueProcessor::process, CompPValueArray::compSingleExpectedValue),
+  // instead of one per spectrum on the spectrum set's PRM spectra at the
+  // observed precursor (toppic_test experiment 146)
+  bool useEvalueSeparate() const { return use_evalue_separate_; }
 
   // The number of unexpected mass shifts of TopMG's proteoform-graph
   // alignment, separate from toppic's --num-shift, which governs toppic's own
@@ -122,6 +129,7 @@ class PrsmPara {
   bool use_multi_type_align_ = true;
   bool use_second_align_ = true;
   bool use_evalue_strict_complement_ = true;
+  bool use_evalue_separate_ = false;
 
   int topmg_shift_num_ = 1;
 };
