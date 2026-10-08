@@ -52,7 +52,9 @@ namespace second_align_util {
 // spectra at it; nullptr when the range refinement leaves no header.
 // With clamp_prec_mass > 0 (the observed precursor mass, for the second
 // pass with PrsmPara::useSecondAlignClamp) the refined precursor is kept
-// within the precursor tolerance of that mass.
+// within the precursor tolerance of that mass; with clamp_prec_mass < 0
+// (PrsmPara::useSecondAlignFixed) the precursor is not refined (delta 0),
+// the headers keep their shifts.
 PrsmPtr genePrsm(const ProteoformPtr& proteo_ptr,
                  const DiagHeaderPtrVec& header_ptrs,
                  DeconvMsPtrVec& deconv_ms_ptr_vec,

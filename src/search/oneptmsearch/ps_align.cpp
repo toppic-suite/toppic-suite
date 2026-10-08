@@ -383,7 +383,9 @@ PrsmPtr PsAlign::geneResult(int shift_num, const ProteoformPtr& proteo_ptr,
     second_prsm_ptr = second_align_util::genePrsm(
         proteo_ptr, second_header_ptrs, deconv_ms_ptr_vec, refine_ms_ptr_vec,
         prsm_para_ptr, second_prec_mass, second_ms_ptr_vec,
-        prsm_para_ptr->useSecondAlignClamp() ? prec_mass : 0);
+        prsm_para_ptr->useSecondAlignFixed()
+            ? -1
+            : (prsm_para_ptr->useSecondAlignClamp() ? prec_mass : 0));
   }
   if (second_align_util::logEnabled()) {
     std::ostringstream out;

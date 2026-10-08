@@ -53,7 +53,10 @@ PrsmPtr genePrsm(const ProteoformPtr& proteo_ptr,
   DiagHeaderPtrVec headers = header_ptrs;
   double delta_min = -std::numeric_limits<double>::infinity();
   double delta_max = std::numeric_limits<double>::infinity();
-  if (clamp_prec_mass > 0) {
+  if (clamp_prec_mass < 0) {
+    delta_min = 0;
+    delta_max = 0;
+  } else if (clamp_prec_mass > 0) {
     // the delta that keeps the refined precursor within the tolerance of
     // the observed one
     double prec_mass =

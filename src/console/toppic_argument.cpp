@@ -141,6 +141,7 @@ std::map<std::string, std::string> ToppicArgument::initArguments() {
   // every peak) or relax (the first alignment's tolerances)
   arguments["secondAlign"] = "disabled";
   arguments["secondAlignClamp"] = "false";
+  arguments["secondAlignFixed"] = "false";
 
   arguments["version"] = "";
   return arguments;
@@ -277,6 +278,7 @@ void ToppicArgument::outputArguments(
            << "Second alignment at the refined precursor:" << sep
            << arguments["secondAlign"]
            << (arguments["secondAlignClamp"] == "true" ? ", clamped" : "")
+           << (arguments["secondAlignFixed"] == "true" ? ", fixed precursor" : "")
            << std::endl;
   }
   if (arguments["precDaltonError"] != "") {
@@ -627,7 +629,7 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
         "multi-skip-evalue", po::value<std::string>(&multi_skip_evalue),
             "")("disable-multi-type-align", "")(
         "second-align", po::value<std::string>(&second_align), "")(
-        "second-align-clamp", "")(
+        "second-align-clamp", "")("second-align-fixed", "")(
         "topmg", po::value<std::string>(&topmg_mode), "")(
         "topmg-use-mcmc", "")(
         "topmg-num-shift", po::value<std::string>(&topmg_shift_num), "")(
@@ -851,6 +853,10 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
     // precursor tolerance of the observed precursor
     if (vm.count("second-align-clamp")) {
       arguments_["secondAlignClamp"] = "true";
+    }
+    // hidden: the second alignment keeps the first pass's refined precursor
+    if (vm.count("second-align-fixed")) {
+      arguments_["secondAlignFixed"] = "true";
     }
 
     // hidden: TopMG's identification - the ASF filtering with the variable
