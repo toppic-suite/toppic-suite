@@ -26,6 +26,7 @@
 
 #include "common/base/amino_acid.hpp"
 #include "common/util/file_util.hpp"
+#include "common/util/stage_profile.hpp"
 #include "common/util/logger.hpp"
 #include "filter/massmatch/mass_match_factory.hpp"
 #include "filter/massmatch/index_load_gate.hpp"
@@ -136,6 +137,7 @@ VarPtmFilter::VarPtmFilter(const ProteoformPtrVec& proteo_ptrs,
           lock.unlock();
         }
       }
+      stage_profile::Timer load_timer("var.load");
       IndexLoadGate::Slot load_slot(index_load_gate);
       term_index_ptr_->deserializeMassMatch(
           mng_ptr->var_ptm_file_vec_[0] + suffix, index_dir);
@@ -244,6 +246,7 @@ void VarPtmFilter::scoreIndexes(
     const FilterSpecPtr& spec_ptr,
     const std::vector<std::pair<int, int>>& prec_minus_water_mass_errors,
     bool score_term) {
+  stage_profile::Timer score_timer("var.score");
   const std::vector<std::pair<int, int>>& pref_mass_errors =
       spec_ptr->getPrefMassErrors();
   const std::vector<std::pair<int, int>>& suff_mass_errors =
@@ -292,6 +295,7 @@ void VarPtmFilter::scoreIndexes(
 std::array<ProtCandidatePtrVec, 4> VarPtmFilter::findTypeCands(
     const FilterSpecPtr& spec_ptr, std::vector<double>& ptm_shifts,
     const std::vector<char>* diag_mask) {
+  stage_profile::Timer find_timer("var.find");
   PeakTolerancePtr tole_ptr =
       mng_ptr_->prsm_para_ptr_->getSpParaPtr()->getPrecTolerancePtr();
   double prec_minus_water_mass =

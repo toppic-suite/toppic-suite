@@ -23,6 +23,7 @@
 
 #include "common/thread/simple_thread_pool.hpp"
 #include "common/util/logger.hpp"
+#include "common/util/stage_profile.hpp"
 #include "filter/massmatch/filter_spec.hpp"
 #include "filter/varptm/var_ptm_filter.hpp"
 #include "filter/varptm/var_ptm_filter_processor.hpp"
@@ -127,6 +128,7 @@ void process(const ZeroPtmFilterMngPtr& zero_mng_ptr,
                                &var_spectra, &zero_combiner, &var_combiner));
   }
   pool_ptr->shutDown();
+  stage_profile::report("zero_var_filter");
   std::cout << std::endl;
   std::cout << "Zero unexpected shift filtering - combining blocks started."
             << std::endl;

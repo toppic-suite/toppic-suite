@@ -22,6 +22,7 @@
 #include "common/thread/simple_thread_pool.hpp"
 #include "common/util/file_util.hpp"
 #include "common/util/logger.hpp"
+#include "common/util/stage_profile.hpp"
 #include "ms/factory/spectrum_set_factory.hpp"
 #include "ms/spec/msalign_util.hpp"
 #include "prsm/prsm.hpp"
@@ -183,6 +184,7 @@ void PtmSearchProcessor::process() {
     deconv_ms_ptr_vec = ms_reader_ptr->getNextMsPtrVec();
   }
   pool_ptr->shutDown();
+  stage_profile::report("multi_search");
   simple_prsm_reader.close();
   for (int i = 0; i < mng_ptr_->thread_num_; i++) {
     writer_set_ptr_vec[i]->close();

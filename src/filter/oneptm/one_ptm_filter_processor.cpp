@@ -23,6 +23,7 @@
 #include "common/thread/simple_thread_pool.hpp"
 #include "common/util/file_util.hpp"
 #include "common/util/logger.hpp"
+#include "common/util/stage_profile.hpp"
 #include "filter/massmatch/filter_spec.hpp"
 #include "filter/oneptm/one_ptm_filter.hpp"
 #include "ms/factory/prm_ms_factory.hpp"
@@ -250,6 +251,7 @@ void process(const OnePtmFilterMngPtr& mng_ptr) {
                                &spectra, &combiner));
   }
   pool_ptr->shutDown();
+  stage_profile::report("one_filter");
   std::cout << std::endl;
 
   std::cout << "One unexpected shift filtering - combining blocks started."

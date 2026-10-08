@@ -25,6 +25,7 @@
 #include "common/thread/simple_thread_pool.hpp"
 #include "common/util/file_util.hpp"
 #include "common/util/logger.hpp"
+#include "common/util/stage_profile.hpp"
 #include "common/util/str_util.hpp"
 #include "common/xml/xml_dom_document.hpp"
 #include "common/xml/xml_dom_util.hpp"
@@ -325,6 +326,7 @@ void DiagFilterProcessor::process() {
                                mod_mass_list, mng_ptr_, this));
   }
   pool_ptr->shutDown();
+  stage_profile::report("diag_filter");
   std::cout << std::endl;
 
   std::cout

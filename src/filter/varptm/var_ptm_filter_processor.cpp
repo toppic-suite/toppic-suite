@@ -21,6 +21,7 @@
 #include "common/thread/simple_thread_pool.hpp"
 #include "common/util/file_util.hpp"
 #include "common/util/logger.hpp"
+#include "common/util/stage_profile.hpp"
 #include "filter/massmatch/filter_spec.hpp"
 #include "filter/varptm/var_ptm_filter.hpp"
 #include "ms/factory/prm_ms_factory.hpp"
@@ -315,6 +316,7 @@ void process(const VarPtmFilterMngPtr& mng_ptr) {
                                &spectra, &combiner));
   }
   pool_ptr->shutDown();
+  stage_profile::report("var_filter");
   std::cout << std::endl;
   std::cout << "Variable PTM filtering - combining blocks started."
             << std::endl;

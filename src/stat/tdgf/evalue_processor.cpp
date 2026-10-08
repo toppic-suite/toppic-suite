@@ -24,6 +24,7 @@
 #include "common/thread/simple_thread_pool.hpp"
 #include "common/util/file_util.hpp"
 #include "common/util/logger.hpp"
+#include "common/util/stage_profile.hpp"
 #include "ms/factory/spectrum_set_factory.hpp"
 #include "ms/spec/msalign_util.hpp"
 #include "prsm/prsm.hpp"
@@ -122,7 +123,10 @@ std::function<void()> geneTask(const SpectrumSetPtr& spec_set_ptr,
       }
     }
     if (evalue_needed) {
+      stage_profile::Timer table_timer("evalue.table");
       comp_pvalue_ptr->process(spec_set_ptr, prsm_vec, is_separate);
+    } else {
+      stage_profile::add("evalue.skipped", 0);
     }
 
     for (unsigned i = 0; i < prsm_vec.size(); i++) {
@@ -221,6 +225,7 @@ void EValueProcessor::process(bool is_separate) {
               << spectrum_num << " of " << spectrum_num << " spectra.\r";
   }
   pool_ptr->shutDown();
+  stage_profile::report("evalue");
   std::cout << std::endl;
   prsm_reader.close();
   prsm_xml_writer_util::closeWriterPtrVec(writer_ptr_vec);

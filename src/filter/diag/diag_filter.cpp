@@ -22,6 +22,7 @@
 #include <utility>
 
 #include "common/util/file_util.hpp"
+#include "common/util/stage_profile.hpp"
 #include "filter/massmatch/mass_match_factory.hpp"
 #include "filter/massmatch/index_load_gate.hpp"
 #include "filter/massmatch/mass_match_util.hpp"
@@ -77,6 +78,7 @@ DiagFilter::DiagFilter(const ProteoformPtrVec& proteo_ptrs,
           lock.unlock();
         }
       }
+      stage_profile::Timer load_timer("diag.load");
       IndexLoadGate::Slot load_slot(index_load_gate);
       index_ptr_->deserializeMassMatch(file_name, index_dir);
       if (lock.owns_lock()) {
@@ -119,6 +121,12 @@ SimplePrsmPtrVec DiagFilter::getBestMatch(const PrmMsPtrVec& ms_ptr_vec) {
 }
 
 SimplePrsmPtrVec DiagFilter::getBestMatch(const DiagFilterSpectrum& spectrum) {
+  stage_profile::Timer score_timer("diag.score");
+  if (stage_profile::enabled()) {
+    long n = static_cast<long>(spectrum.getMassErrors().size());
+    stage_profile::add("diag.masses", 0, n);
+    stage_profile::add("diag.masses_sq", 0, n * n);
+  }
   SimplePrsmPtrVec match_ptrs = compute(spectrum);
   SimplePrsmPtrVec unique_match_ptrs =
       simple_prsm_util::getUniqueMatches(match_ptrs);

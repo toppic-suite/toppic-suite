@@ -21,6 +21,7 @@
 #include <mutex>
 
 #include "common/util/file_util.hpp"
+#include "common/util/stage_profile.hpp"
 #include "common/util/logger.hpp"
 #include "filter/massmatch/mass_match_factory.hpp"
 #include "filter/massmatch/index_load_gate.hpp"
@@ -81,6 +82,7 @@ OnePtmFilter::OnePtmFilter(const ProteoformPtrVec& proteo_ptrs,
           lock.unlock();
         }
       }
+      stage_profile::Timer load_timer("one.load");
       IndexLoadGate::Slot load_slot(index_load_gate);
       // complete file name is a ptm type from topindexfile vector + parameters
       // + db block id (block_str)
@@ -188,6 +190,8 @@ void OnePtmFilter::computeBestMatch(const FilterSpecPtr& spec_ptr) {
   const std::vector<std::pair<int, int>>& suff_mass_errors =
       spec_ptr->getSuffMassErrors();
 
+  std::unique_ptr<stage_profile::Timer> score_timer =
+      std::make_unique<stage_profile::Timer>("one.score");
   term_scores_.assign(term_index_ptr_->getRowNum(), 0);
   term_index_ptr_->compScores(pref_mass_errors, term_scores_);
 
@@ -200,6 +204,8 @@ void OnePtmFilter::computeBestMatch(const FilterSpecPtr& spec_ptr) {
   rev_diag_scores_.assign(rev_diag_index_ptr_->getRowNum(), 0);
   rev_diag_index_ptr_->compScores(suff_mass_errors, rev_diag_scores_);
 
+  score_timer = nullptr;
+  stage_profile::Timer find_timer("one.find");
   // the best row score of each proteoform in each index, computed once and
   // shared by the four proteoform types below
   mass_match_util::compProteoMaxScores(term_scores_, term_index_ptr_,
