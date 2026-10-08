@@ -2354,6 +2354,74 @@ threshold costs 3 points in the dynamic program. Facts to keep straight:
   alignment with 19 fragments down to a -49 Da one with 18) and SEM7A at
   the protein cutoff; 1 gained. No time cost.
 
+## Tolerance of the complementary PRM peaks in the E-values (`stat/tdgf/prob_peak`, `--evalue-complement-tolerance`, issue #616)
+
+Branch `evalue_strict_complement` (toppic_test experiment 146, report 0146;
+from main 90d744d7). Facts to keep straight:
+
+- **The three tolerances of a PRM peak** (`prm_ms_factory::addSixMasses`,
+  the fragment tolerance ppm): an ORIGINAL peak (a b-ion mass m) has
+  strict = N-strict-C-relax = ppm x m and N-relax-C-strict = ppm x (m + P);
+  a REVERSED peak (the complementary mass P - m of a y-ion, P the
+  precursor the PRM spectrum was built at) has strict = N-relax-C-strict
+  = ppm x m and N-strict-C-relax = ppm x (m + P), the precursor's error
+  added because P - m moves with P. The searches use the relaxed
+  tolerances for the precursor-dependent ions (`compDiagPair`), the
+  annotation and the second alignment the strict one at the refined
+  precursor.
+- **The generating function before the branch** (`ProbPeak`, the "strict"
+  flag false in toppic; the separate mode with the PRM spectra at the
+  PrSM's precursor, `CompPValueArray::compSingleExpectedValue`, is not
+  used) took every peak's N-strict-C-relax tolerance: the strict window
+  for an ORIGINAL peak and the relaxed one, about twice as wide, for a
+  REVERSED peak, on the six-mass PRM spectra of the spectrum set at the
+  observed precursor P (or P +- 1 isotope for the PrSMs found there).
+- **The branch**: `ProbPeak` takes the strict tolerance for a REVERSED peak
+  too (`PrsmPara::useEvalueStrictComplement`, default true, passed to
+  `CompProbValue` by `CompPValueArray`; the cluster protein correction's
+  recomputation goes through the same `PrsmPara`). The zero and precursor
+  peaks are ORIGINAL and unchanged, so the precursor peak's width, which
+  normalizes the shift E-values (`compPrecProbs`), stays the precursor
+  tolerance. toppic's hidden `--evalue-complement-tolerance <strict|relax>`
+  (argument `evalueComplementTolerance`, default `strict`; anything else
+  is rejected) restores the relaxed tolerance with `relax`; the parameter
+  block prints "E-value tolerance of complementary ions: relax" only then.
+  topmg has no option (its own E-values are the MCMC's; `--topmg` in
+  toppic follows the setting). With `relax` the run is main's byte for
+  byte (development subset: 63 files but the parameter line).
+  `separate` (6f612533) selects the code's separate mode instead
+  (`PrsmPara::useEvalueSeparate`, `EValueProcessor::process(true)` in
+  both E-value stages and the cluster protein correction): one
+  generating function per PrSM on PRM spectra rebuilt at the PrSM's
+  adjusted precursor, every peak strict, the proteoform mass as the
+  precursor. It costs nothing (the E-value stage's time is the table
+  setup per spectrum, 176 s on 480 either way).
+- **The generating function's resolution** (report 0146 section 7):
+  `TdgfMng::convert_ratio_` is 27.4335 units per Da (0.0365 Da; the
+  searches use 274.335), residue masses are rounded to integers (proline
+  +0.50 unit), and a window is ceil(tolerance x 27.4335) units, so a
+  strict window of 10 ppm x m is one unit for every fragment below 3.65
+  kDa and a relaxed one, 10 ppm x (m + P), one unit below 3.65 kDa and
+  up to six at 20 kDa. The strict setting therefore changes nothing for
+  precursors below 3.6 kDa and most for the heaviest, and a PrSM whose
+  ions form a long ladder on a proline- or D/E-rich stretch can get a
+  probability of 0 ("Invalid e value", the placeholder 1e300) because no
+  integer path hits all its one-unit windows (NPM scans 3786 and 3617,
+  FNBP4 6285 on 480; the separate mode has them too).
+- **Results on 480_F3_02** (setting d, experiment 131's TopFD output,
+  against main 8688fd08): strict 3,374 PrSMs / 1,994 proteoforms / 441
+  proteins, separate 3,373 / 1,997 / 444, base 3,375 / 2,004 / 440.
+  Every E-value falls (targets median x 10^-0.45, decoys x 10^-0.31,
+  more for heavier precursors and higher scores) and the cutoffs with
+  them (PrSM 0.84 against 2.50); 8 spectra report a one-shift form of
+  the same protein instead of main's plain form, the multiple-shift
+  stage skips 41 more spectra because its skip threshold (the smallest
+  first-pass decoy E-value, experiment 131) falls from 0.021 to 0.009
+  and 7 two-shift PrSMs are lost that way (ROA2 5019 with 39 fragments,
+  JUPI1 4202 with 40). Not merged; the recommendation is `relax` as the
+  default if the option is merged, and a finer generating-function
+  resolution before the strict tolerance is tried again.
+
 ## Range of a variable PTM shift (`seq/mass_shift`, `search/varptmsearch/var_ptm_align`)
 
 Branch `var_ptm_narrow_range` (toppic_test experiment 122, report 0122;
