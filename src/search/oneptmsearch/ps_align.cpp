@@ -360,11 +360,10 @@ PrsmPtr PsAlign::geneResult(int shift_num, const ProteoformPtr& proteo_ptr,
 
   // the second alignment at the refined precursor
   SpParaPtr sp_para_ptr = prsm_para_ptr->getSpParaPtr();
-  bool strict = prsm_para_ptr->getSecondAlignMode() == "strict";
   double prec_mass =
       ms_three_ptr_vec[0]->getMsHeaderPtr()->getFirstPrecMonoMass();
   PrmPeakPtrVec prm_peaks = second_align_util::genePrmPeaks(
-      deconv_ms_ptr_vec, sp_para_ptr, refine_prec_mass, strict);
+      deconv_ms_ptr_vec, sp_para_ptr, refine_prec_mass);
   DiagHeaderPtrVec moved_header_ptrs = second_align_util::moveHeaders(
       diagonal_ptrs_, refine_prec_mass - prec_mass, refine_prec_mass,
       proteo_ptr);
@@ -382,10 +381,7 @@ PrsmPtr PsAlign::geneResult(int shift_num, const ProteoformPtr& proteo_ptr,
     ExtendMsPtrVec second_ms_ptr_vec;
     second_prsm_ptr = second_align_util::genePrsm(
         proteo_ptr, second_header_ptrs, deconv_ms_ptr_vec, refine_ms_ptr_vec,
-        prsm_para_ptr, second_prec_mass, second_ms_ptr_vec,
-        prsm_para_ptr->useSecondAlignFixed()
-            ? -1
-            : (prsm_para_ptr->useSecondAlignClamp() ? prec_mass : 0));
+        prsm_para_ptr, second_prec_mass, second_ms_ptr_vec, true);
   }
   if (second_align_util::logEnabled()) {
     std::ostringstream out;

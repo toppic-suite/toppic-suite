@@ -138,12 +138,9 @@ PrsmPara::PrsmPara(const std::map<std::string, std::string>& arguments) {
   }
   // toppic hidden --disable-multi-type-align; default true
   use_multi_type_align_ = (getArg(arguments, "multiTypeAlign") != "false");
-  // toppic hidden --second-align; an absent key keeps "disabled"
-  if (getArg(arguments, "secondAlign") != "") {
-    second_align_mode_ = getArg(arguments, "secondAlign");
-  }
-  second_align_clamp_ = (getArg(arguments, "secondAlignClamp") == "true");
-  second_align_fixed_ = (getArg(arguments, "secondAlignFixed") == "true");
+  // toppic hidden --disable-second-align; default true (an absent key, as
+  // in topmg, keeps it on, but only toppic's shift searches use it)
+  use_second_align_ = (getArg(arguments, "secondAlign") != "false");
 
   // the unexpected shifts of the proteoform-graph alignment: TopMG's own
   // number, not the shiftNumber of toppic's stages; an absent key keeps 1

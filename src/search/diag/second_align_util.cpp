@@ -39,7 +39,7 @@ PrsmPtr genePrsm(const ProteoformPtr& proteo_ptr,
                  DeconvMsPtrVec& deconv_ms_ptr_vec,
                  const ExtendMsPtrVec& ms_three_ptr_vec,
                  const PrsmParaPtr& prsm_para_ptr, double& refine_prec_mass,
-                 ExtendMsPtrVec& refine_ms_ptr_vec, double clamp_prec_mass) {
+                 ExtendMsPtrVec& refine_ms_ptr_vec, bool keep_prec) {
   int first_pos = header_ptrs[0]->getTruncFirstResPos();
   int last_pos = header_ptrs[header_ptrs.size() - 1]->getTruncLastResPos();
   ProteoformPtr sub_proteo_ptr = proteoform_factory::geneSubProteoform(
@@ -53,17 +53,9 @@ PrsmPtr genePrsm(const ProteoformPtr& proteo_ptr,
   DiagHeaderPtrVec headers = header_ptrs;
   double delta_min = -std::numeric_limits<double>::infinity();
   double delta_max = std::numeric_limits<double>::infinity();
-  if (clamp_prec_mass < 0) {
+  if (keep_prec) {
     delta_min = 0;
     delta_max = 0;
-  } else if (clamp_prec_mass > 0) {
-    // the delta that keeps the refined precursor within the tolerance of
-    // the observed one
-    double prec_mass =
-        ms_three_ptr_vec[0]->getMsHeaderPtr()->getFirstPrecMonoMass();
-    double tole = prec_tole_ptr->compPrecErrorTole(clamp_prec_mass);
-    delta_min = clamp_prec_mass - tole - prec_mass;
-    delta_max = clamp_prec_mass + tole - prec_mass;
   }
   refine_prec_mass = diagonal_util::refinePrecursorByMatchedIons(
       proteo_ptr, ms_three_ptr_vec, headers, prec_tole_ptr, min_mass,
@@ -89,21 +81,20 @@ PrsmPtr genePrsm(const ProteoformPtr& proteo_ptr,
 
 PrmPeakPtrVec genePrmPeaks(const DeconvMsPtrVec& deconv_ms_ptr_vec,
                            const SpParaPtr& sp_para_ptr,
-                           double refine_prec_mass, bool strict) {
+                           double refine_prec_mass) {
   // the PRM factory takes the observed (labelled) precursor mass and the
   // label, and builds the peaks for the label-free mass
   double n_term_label_mass = sp_para_ptr->getNTermLabelMass();
   PrmMsPtrVec ms_six_ptr_vec = prm_ms_factory::geneMsSixPtrVec(
       deconv_ms_ptr_vec, sp_para_ptr, refine_prec_mass + n_term_label_mass,
       n_term_label_mass);
-  if (strict) {
-    for (size_t i = 0; i < ms_six_ptr_vec.size(); i++) {
-      for (size_t j = 0; j < ms_six_ptr_vec[i]->size(); j++) {
-        PrmPeakPtr peak_ptr = ms_six_ptr_vec[i]->getPeakPtr(j);
-        double tole = peak_ptr->getStrictTolerance();
-        peak_ptr->setNStrictCRelaxTolerance(tole);
-        peak_ptr->setNRelaxCStrictTolerance(tole);
-      }
+  // the fragment tolerance on every peak
+  for (size_t i = 0; i < ms_six_ptr_vec.size(); i++) {
+    for (size_t j = 0; j < ms_six_ptr_vec[i]->size(); j++) {
+      PrmPeakPtr peak_ptr = ms_six_ptr_vec[i]->getPeakPtr(j);
+      double tole = peak_ptr->getStrictTolerance();
+      peak_ptr->setNStrictCRelaxTolerance(tole);
+      peak_ptr->setNRelaxCStrictTolerance(tole);
     }
   }
   // the zero and precursor peaks, sized on the refined precursor

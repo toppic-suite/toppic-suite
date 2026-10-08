@@ -72,20 +72,12 @@ class PrsmPara {
   // pass per type. Default true; toppic hidden --disable-multi-type-align
   // falls back to the original one-pass-per-type PsAlign.
   bool useMultiTypeAlign() const { return use_multi_type_align_; }
-  // The second alignment of the one-shift and multiple-shift searches at the
-  // refined precursor of the first alignment's result (toppic hidden
-  // --second-align, search/diag/second_align_util): "disabled" (default),
-  // "strict" (the fragment tolerance on every PRM peak) or "relax" (the
-  // first alignment's tolerances).
-  const std::string& getSecondAlignMode() const { return second_align_mode_; }
-  bool useSecondAlign() const { return second_align_mode_ != "disabled"; }
-  // --second-align-clamp: the second pass's refined precursor is kept within
-  // the precursor tolerance of the observed precursor (without it the
-  // refinement at the first pass's precursor can end up to 2T from it)
-  bool useSecondAlignClamp() const { return second_align_clamp_; }
-  // --second-align-fixed: the second pass keeps the first pass's refined
-  // precursor (no second refinement; the clamp is then moot)
-  bool useSecondAlignFixed() const { return second_align_fixed_; }
+  // The second alignment of the one-shift and multiple-shift searches
+  // (search/diag/second_align_util, issue #614): the dynamic program
+  // repeated at the refined precursor of the first alignment's result with
+  // the fragment tolerance on every PRM peak, the precursor kept. Default
+  // true; toppic hidden --disable-second-align keeps the first alignment.
+  bool useSecondAlign() const { return use_second_align_; }
 
   // The number of unexpected mass shifts of TopMG's proteoform-graph
   // alignment, separate from toppic's --num-shift, which governs toppic's own
@@ -119,9 +111,7 @@ class PrsmPara {
   SpParaPtr sp_para_ptr_;
 
   bool use_multi_type_align_ = true;
-  std::string second_align_mode_ = "disabled";
-  bool second_align_clamp_ = false;
-  bool second_align_fixed_ = false;
+  bool use_second_align_ = true;
 
   int topmg_shift_num_ = 1;
 };

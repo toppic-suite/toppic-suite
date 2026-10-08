@@ -31,18 +31,19 @@
 
 namespace toppic {
 
-// The second alignment of toppic's shift searches (hidden --second-align,
-// issue #614). The first alignment (PsAlign, PsAlignMultiType) matches the
-// precursor-dependent ions with the fragment tolerance plus the precursor's
-// (the N-strict-C-relax and N-relax-C-strict PRM tolerances); the PrSM
-// matches them with the fragment tolerance at the refined precursor. The
-// second alignment repeats the dynamic program at the refined precursor of
-// the first alignment's result, on PRM peaks rebuilt at that precursor,
-// with the same diagonals moved to it, and (mode strict) with the fragment
-// tolerance on every peak, so that the alignment and the annotation agree.
-// Its result goes through the same precursor refinement, range refinement
-// and PrSM construction as the first one. With no second alignment of a
-// positive score, the first alignment's PrSM is kept.
+// The second alignment of toppic's shift searches (issue #614, toppic_test
+// experiment 144). The first alignment (PsAlign, PsAlignMultiType) matches
+// the precursor-dependent ions with the fragment tolerance plus the
+// precursor's (the N-strict-C-relax and N-relax-C-strict PRM tolerances);
+// the PrSM matches them with the fragment tolerance at the refined
+// precursor. The second alignment repeats the dynamic program at the
+// refined precursor of the first alignment's result, on PRM peaks rebuilt
+// at that precursor with the fragment tolerance on every peak, with the
+// same diagonals moved to it, so that the alignment and the annotation
+// agree. Its result keeps that precursor and goes through the same range
+// refinement and PrSM construction as the first one. With no second
+// alignment of a positive score, the first alignment's PrSM is kept.
+// Off with toppic's hidden --disable-second-align (PrsmPara::useSecondAlign).
 namespace second_align_util {
 
 // main's result of an alignment (PsAlign::geneResult before this branch):
@@ -50,29 +51,24 @@ namespace second_align_util {
 // refined precursor, the headers' ranges refined, the PrSM. refine_prec_mass
 // and refine_ms_ptr_vec receive the refined precursor and the extended
 // spectra at it; nullptr when the range refinement leaves no header.
-// With clamp_prec_mass > 0 (the observed precursor mass, for the second
-// pass with PrsmPara::useSecondAlignClamp) the refined precursor is kept
-// within the precursor tolerance of that mass; with clamp_prec_mass < 0
-// (PrsmPara::useSecondAlignFixed) the precursor is not refined (delta 0),
+// With keep_prec (the second pass) the precursor is not refined (the
+// refinement's delta range is [0, 0]): the spectra's precursor is kept and
 // the headers keep their shifts.
 PrsmPtr genePrsm(const ProteoformPtr& proteo_ptr,
                  const DiagHeaderPtrVec& header_ptrs,
                  DeconvMsPtrVec& deconv_ms_ptr_vec,
                  const ExtendMsPtrVec& ms_three_ptr_vec,
                  const PrsmParaPtr& prsm_para_ptr, double& refine_prec_mass,
-                 ExtendMsPtrVec& refine_ms_ptr_vec,
-                 double clamp_prec_mass = 0);
+                 ExtendMsPtrVec& refine_ms_ptr_vec, bool keep_prec = false);
 
 // The PRM peaks of the spectra at the refined precursor mass (label-free),
 // with the zero and precursor peaks, as prm_ms_util::getPrmPeakPtrs builds
-// them for the first alignment. With strict, every fragment peak's
-// N-strict-C-relax and N-relax-C-strict tolerances are set to its strict
-// tolerance (ppo x the fragment mass), the tolerance of the PrSM's matching;
-// without it they stay the first alignment's (the fragment tolerance plus
-// the precursor's error).
+// them for the first alignment, but every fragment peak's N-strict-C-relax
+// and N-relax-C-strict tolerances set to its strict tolerance (ppo x the
+// fragment mass), the tolerance of the PrSM's matching.
 PrmPeakPtrVec genePrmPeaks(const DeconvMsPtrVec& deconv_ms_ptr_vec,
                            const SpParaPtr& sp_para_ptr,
-                           double refine_prec_mass, bool strict);
+                           double refine_prec_mass);
 
 // The first alignment's diagonal headers moved from the observed precursor
 // to the refined one (delta = refined - observed): a header anchored at the
@@ -96,10 +92,10 @@ DiagonalPtrVec geneDiagonals(const DiagHeaderPtrVec& header_ptrs,
 // Research log of the two passes (environment variable
 // TOPPIC_SECOND_ALIGN_LOG = file name): one tab-separated line per
 // geneResult call with a first alignment: stage, spectrum id, type, shift
-// number, protein, observed precursor, first score, first refined
-// precursor, first PrSM (start, end, matched theoretical fragments,
-// shifts), second score (- without a second alignment), second refined
-// precursor, second PrSM, and whether the first PrSM was kept.
+// number, protein, observed precursor, first score, refined precursor,
+// first PrSM (start, end, matched theoretical fragments, shifts), second
+// score (- without a second alignment), the precursor again, second PrSM,
+// and whether the first PrSM was kept.
 bool logEnabled();
 
 std::string prsmInfo(const PrsmPtr& prsm_ptr);

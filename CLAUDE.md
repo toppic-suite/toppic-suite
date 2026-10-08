@@ -2083,112 +2083,92 @@ merged). Facts to keep straight:
   window matches), the E-value's generating function (relaxed tolerance on
   the observed precursor), TopMG.
 
-## Second alignment of the shift searches (`search/diag/second_align_util`, `--second-align`, issue #614)
+## Second alignment of the shift searches (`search/diag/second_align_util`, `--disable-second-align`, issue #614)
 
-Branch `second_align` (toppic_test experiment 144, report 0144; not
-merged). toppic's hidden `--second-align <disabled|strict|relax>`
-(argument key `secondAlign`, default `disabled`; any other value is
-refused; `PrsmPara::getSecondAlignMode` / `useSecondAlign`; the parameter
-block prints "Second alignment at the refined precursor: strict" when it
-is on). Facts to keep straight:
+Branch `second_align` (toppic_test experiment 144, report 0144 and its
+amendment 1; merged into main on 2026-10-08 in the form below). On by
+default; toppic's hidden `--disable-second-align` (argument key
+`secondAlign` = "false"; `PrsmPara::useSecondAlign`; the parameter block
+prints "Second alignment at the refined precursor: false" only then)
+keeps the first alignment's PrSM, main's behaviour before the merge.
+Facts to keep straight:
 
 - **Why.** The one-shift and multiple-shift alignments (PsAlign,
   PsAlignMultiType) match the precursor-dependent ions with the fragment
   tolerance plus the precursor's (the previous section), and the PrSM's
   annotation matches them with the fragment tolerance at the refined
-  precursor, so the dynamic program counts ions the annotation does not
-  and can choose a diagonal set on their strength (report 0135 section 7:
-  "A second alignment on the refined precursor with the strict tolerance
-  would make the alignment and the annotation agree").
+  precursor, so the dynamic program counted ions the annotation did not
+  and could choose a diagonal set on their strength (report 0135 section
+  7: "A second alignment on the refined precursor with the strict
+  tolerance would make the alignment and the annotation agree").
 - **What it does** (`PsAlign::geneResult`, `PsAlignMultiType::geneResult`).
-  The first pass is main's result, factored into
+  The first pass is the former `geneResult`, factored into
   `second_align_util::genePrsm` (the precursor refined by the matched
   ions to P', the extended spectra at P', the ranges refined, the PrSM).
-  With the option, for every call with a first alignment: the PRM peaks
-  are rebuilt at P' (`genePrmPeaks`: `prm_ms_factory::geneMsSixPtrVec`
-  with the refined precursor, so the REVERSED peaks are P' - (m - C
-  shift), plus the zero and precursor peaks sized on P'; with `strict`
-  every fragment peak's N-strict-C-relax and N-relax-C-strict tolerances
-  are set to its strict tolerance ppo x m; with `relax` they stay the
-  first alignment's, which measures the precursor move alone); the first
-  alignment's headers are moved to P' (`moveHeaders`: an N-anchored
-  header keeps its N-terminal shift, a C-anchored one keeps its
-  C-terminal shift, so its N-terminal shift moves by P' - P; C-terminal
-  shifts and truncation positions from `DiagHeader::initHeader` at P');
-  the diagonals are rebuilt (`geneDiagonals`, headers without a pair
-  dropped); the same dynamic program runs on them (PsAlign for the type of
-  the last `compute()`, which it now remembers; PsAlignMultiType for the
-  types of the last `compute()` together, kept by P' in
-  `second_align_ptrs_` so the types whose first results refine to the same
-  mass share one second alignment); the second result for the same type
-  and shift number goes through `genePrsm` again (the refinement by
-  matched ions at P', T around P'; the range refinement; the PrSM). That
-  PrSM is returned; with no second alignment of positive score the first
-  PrSM is kept, so the method loses no candidate. The candidates are
-  ranked by the PrSM's matched fragments as before, and the E-values are
-  computed from the PrSM afterwards (the generating function is
-  unchanged). The zero-shift search, the variable PTM search and TopMG's
-  graph alignment are untouched; `--second-align disabled` runs main's
-  code path (the development subset gives main's 41 stage files byte for
-  byte).
-- **The second refinement is clamped only with `--second-align-clamp`**
-  (argument key `secondAlignClamp`, `PrsmPara::useSecondAlignClamp`; the
-  parameter block prints ", clamped"): the refinement at P' searches
-  [-T, T] around P', so without the clamp the final precursor can lie up
-  to 2T from P (14% of the one-shift and 16% of the multiple-shift calls
-  of 480_F3_02 end beyond T from P, none after the first pass; 68 of the
-  1,506 reported shift PrSMs, base 3). With the clamp
-  `second_align_util::genePrsm` passes `refinePrecursorByMatchedIons` the
-  delta range [P - T - P', P + T - P'] (its optional `delta_min` /
-  `delta_max`, infinite by default), so P'' stays within T of P.
-- **`--second-align-fixed`** (`secondAlignFixed`, `PrsmPara::useSecondAlignFixed`;
-  the parameter block prints ", fixed precursor"): the second pass keeps
-  P' (`genePrsm` is called with clamp_prec_mass -1, which gives the
-  refinement the delta range [0, 0]), so the PrSM is the second
-  alignment's result at the first pass's precursor and nothing is
-  re-estimated. On 480_F3_02 (toppic_test experiment 144, amendment 1):
-  3,356 / 1,996 / 439 with main's E-value cutoff, the second alignment
-  within 1 of the annotation for 98.4% of the one-shift and 98.3% of the
-  multiple-shift calls (the best of the variants), 14% and 19% of the
-  candidate PrSMs changed, no precursor beyond the tolerance, 66 shift
-  masses and 2 PrSMs apart from the clamped variant. The form to keep if
-  the second alignment is merged.
-- **The large-shift penalty differs between the two dynamic programs**
-  (found with the log): `PsAlign::dp` takes the penalty (3 per shift above
-  300 Da) off a predecessor's score only to choose the predecessor and
-  stores the score without it; `PsAlignMultiType::dp` stores the score
-  with the penalty subtracted. The paths chosen are mostly the same; the
-  scores are not comparable between the two. Not changed on this branch.
+  Then, for every call with a first alignment: the PRM peaks are rebuilt
+  at P' (`genePrmPeaks`: `prm_ms_factory::geneMsSixPtrVec` with the
+  refined precursor, so the REVERSED peaks are P' - (m - C shift), plus
+  the zero and precursor peaks sized on P'; every fragment peak's
+  N-strict-C-relax and N-relax-C-strict tolerances set to its strict
+  tolerance ppo x m); the first alignment's headers are moved to P'
+  (`moveHeaders`: an N-anchored header keeps its N-terminal shift, a
+  C-anchored one keeps its C-terminal shift, so its N-terminal shift
+  moves by P' - P; C-terminal shifts and truncation positions from
+  `DiagHeader::initHeader` at P'); the diagonals are rebuilt
+  (`geneDiagonals`, headers without a pair dropped); the same dynamic
+  program runs on them (PsAlign for the type of the last `compute()`,
+  which it now remembers; PsAlignMultiType for the types of the last
+  `compute()` together, kept by P' in `second_align_ptrs_` so the types
+  whose first results refine to the same mass share one second
+  alignment); the second result for the same type and shift number goes
+  through `genePrsm` with `keep_prec` (the refinement's delta range is
+  [0, 0], so P' is kept and the headers keep their shifts), the range
+  refinement and the PrSM. That PrSM is returned; with no second
+  alignment of positive score the first PrSM is kept, so no candidate is
+  lost. The candidates are ranked by the PrSM's matched fragments as
+  before, and the E-values are computed from the PrSM afterwards (the
+  generating function is unchanged). The zero-shift search, the variable
+  PTM search and TopMG's graph alignment are untouched. The precursor
+  never leaves the window of the first refinement (+-T around the
+  observed precursor).
+- **`refinePrecursorByMatchedIons` takes an optional delta range**
+  (`delta_min` / `delta_max`, infinite by default), which cuts its
+  [-T, T]; only the second pass uses it, with [0, 0].
 - **Research log.** `TOPPIC_SECOND_ALIGN_LOG=<file>` appends one
   tab-separated line per `geneResult` call with a first alignment: stage
   (`one` / `multi`), spectrum id, type, shift number, protein, P, the
   first score, P', the first PrSM (start, end, matched theoretical
   fragments, shifts as left:right:mass), the second score (`-` without a
-  second alignment), P'', the second PrSM, and `second` / `first` for the
-  PrSM kept. The alignment's score is the sum of the diagonal pairs'
-  scores (one per spectrum and ion type per matched cleavage) with the
-  zero and precursor peaks counted with the group's spectrum number each,
-  so score - 2 against the PrSM's matched fragments measures the agreement.
-- **Results on 480_F3_02** (toppic_test experiment 144, report 0144;
-  setting d, experiment 131's TopFD output, against main 7b5112c2):
-    - The second alignment's score is within 1 of the PrSM's matched
-      fragments for 98.0% of the 265,195 one-shift and 97.8% of the
-      41,712 multiple-shift candidate alignments (the first alignment:
-      81.9% and 69.3%; `relax` 83.7% and 71.3%, so the tolerance is the
-      gap, not the precursor). It changes the positions or shifts of 27%
-      and 33% of the candidate PrSMs (14% and 19% with the clamp), mostly
-      the shift mass through the precursor; 747 one-shift candidates gain
-      fragments (mostly +1) and 321 lose (mostly -1).
-    - 1% FDR: strict 3,359 PrSMs / 2,001 proteoforms / 438 proteins, relax
-      3,367 / 1,999 / 438, strict with the clamp 3,358 / 1,997 / 439,
-      against main's 3,355 / 1,997 / 438, the same E-value cutoff (2.49;
-      2.69 clamped) and decoys: within the data set's noise. Without the
-      clamp 68 of 1,506 reported shift PrSMs (main 3) have an adjusted
-      precursor beyond 10 ppm of the observed one, and one such move made
-      a STMN1 one-shift PrSM the best of a chimeric feature's cluster, so
-      the cluster protein correction dropped two ATIF1 oxidation PrSMs.
-    - The one-shift search takes 38.6 s instead of 22.7 s; the
-      multiple-shift search's 256 s are unchanged.
+  second alignment), P' again, the second PrSM, and `second` / `first`
+  for the PrSM kept. The alignment's score is the sum of the diagonal
+  pairs' scores (one per spectrum and ion type per matched cleavage) with
+  the zero and precursor peaks counted with the group's spectrum number
+  each, so score - 2 against the PrSM's matched fragments measures the
+  agreement (for the multiple-shift search add the large-shift penalty
+  back, 3 per shift above 300 Da).
+- **Variants tested and dropped** (experiment 144, branch commits
+  3dc127c4-26f7dbe3, kept in the branch's history): a second refinement
+  by the matched ions after the second alignment (+-T around P', so up to
+  2T from the observed precursor: 14% of the one-shift candidates and 68
+  reported shift PrSMs of 480_F3_02 ended beyond 10 ppm, and one such
+  move lost two ATIF1 oxidation PrSMs through the cluster protein
+  correction), the same clamped to the observed precursor's window, and
+  a second alignment with the first alignment's relaxed tolerances
+  (which left the alignment and the annotation apart: the tolerance is
+  the gap, not the precursor).
+- **Results on 480_F3_02** (setting d, experiment 131's TopFD output,
+  against main 7b5112c2): the second alignment's score is within 1 of the
+  PrSM's matched fragments for 98.4% of the 265,195 one-shift and 98.3%
+  of the 41,712 multiple-shift candidate alignments (the first alignment:
+  81.9% and 69.3%). It changes the positions or shifts of 14% and 19% of
+  the candidate PrSMs (the shift positions and diagonal sets; 695
+  one-shift candidates gain matched fragments, mostly +1, and 297 lose).
+  1% FDR: 3,356 PrSMs / 1,996 proteoforms / 439 proteins against 3,355 /
+  1,997 / 438, the same E-value cutoff (2.49) and decoys: within the data
+  set's noise, because the candidates that reach 1% FDR are chosen by the
+  annotation's fragments and the E-value either way, and the relaxed
+  window inflated targets and decoys alike. The one-shift search takes
+  38 s instead of 23 s; the multiple-shift search's 256 s are unchanged.
 
 ## Range of a variable PTM shift (`seq/mass_shift`, `search/varptmsearch/var_ptm_align`)
 
