@@ -63,6 +63,8 @@ topfd -T [options] peaks.txt           # one MS/MS spectrum as "m/z intensity" l
 ```
 
 Convert vendor files with `msconvert --mzML --filter "peakPicking true 1-"`.
+Bruker TOF `.d` folders (timsTOF / timsOmni TSF or TDF, maXis BAF) need their
+own conversion on Linux and their own TopFD settings: see the `bruker` skill.
 Outputs for `sample.mzML`: `sample_ms1.msalign`, `sample_ms2.msalign`
 (the search input), `sample_ms1.feature`, `sample_ms2.feature`,
 `sample_feature.xml`, `sample.sqlite`. FAIMS files give one set per
