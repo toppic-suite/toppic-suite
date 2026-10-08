@@ -79,11 +79,11 @@ class PrsmPara {
   // true; toppic hidden --disable-second-align keeps the first alignment.
   bool useSecondAlign() const { return use_second_align_; }
   // The tolerance of the REVERSED (complementary) PRM peaks in the
-  // generating function of the E-values (stat/tdgf/prob_peak, issue #616):
-  // true, their strict tolerance (the fragment tolerance on the fragment
-  // mass, as the PrSM's ions are matched); false, the relaxed one (the
-  // precursor's error added). Default true; toppic hidden
-  // --evalue-complement-tolerance relax restores the relaxed one.
+  // generating function of the E-values (stat/tdgf/prob_peak, issue #616,
+  // toppic_test experiment 146): false, the relaxed tolerance (the
+  // precursor's error added; the default, the behaviour before); true,
+  // their strict tolerance (the fragment tolerance on the fragment mass),
+  // toppic hidden --evalue-complement-tolerance strict.
   bool useEvalueStrictComplement() const {
     return use_evalue_strict_complement_;
   }
@@ -128,7 +128,7 @@ class PrsmPara {
 
   bool use_multi_type_align_ = true;
   bool use_second_align_ = true;
-  bool use_evalue_strict_complement_ = true;
+  bool use_evalue_strict_complement_ = false;
   bool use_evalue_separate_ = false;
 
   int topmg_shift_num_ = 1;

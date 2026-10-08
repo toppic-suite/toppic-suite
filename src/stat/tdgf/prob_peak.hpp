@@ -29,7 +29,7 @@ namespace toppic {
 // REVERSED peak (the complementary mass P - m of a y-ion, P the observed
 // precursor) - unless strict_complement, when a REVERSED peak gets its strict
 // tolerance too (PrsmPara::useEvalueStrictComplement, toppic hidden
-// --evalue-complement-tolerance, issue #616).
+// --evalue-complement-tolerance strict, issue #616; off by default).
 class ProbPeak {
  public:
   ProbPeak(const PrmPeakPtr& peak_ptr, int spectrum_id, int height, bool strict,

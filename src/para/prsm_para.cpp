@@ -148,10 +148,10 @@ PrsmPara::PrsmPara(const std::map<std::string, std::string>& arguments) {
   // toppic hidden --disable-second-align; default true (an absent key, as
   // in topmg, keeps it on, but only toppic's shift searches use it)
   use_second_align_ = (getArg(arguments, "secondAlign") != "false");
-  // toppic hidden --evalue-complement-tolerance <strict|relax>; default
-  // strict (an absent key, as in topmg, keeps it)
+  // toppic hidden --evalue-complement-tolerance <relax|strict|separate>;
+  // default relax (an absent key, as in topmg, keeps it)
   use_evalue_strict_complement_ =
-      (getArg(arguments, "evalueComplementTolerance") != "relax");
+      (getArg(arguments, "evalueComplementTolerance") == "strict");
   use_evalue_separate_ =
       (getArg(arguments, "evalueComplementTolerance") == "separate");
 

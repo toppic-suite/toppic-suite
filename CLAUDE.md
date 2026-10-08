@@ -2357,7 +2357,9 @@ threshold costs 3 points in the dynamic program. Facts to keep straight:
 ## Tolerance of the complementary PRM peaks in the E-values (`stat/tdgf/prob_peak`, `--evalue-complement-tolerance`, issue #616)
 
 Branch `evalue_strict_complement` (toppic_test experiment 146, report 0146;
-from main 90d744d7). Facts to keep straight:
+from main 90d744d7; merged into main on 2026-10-08 as a hidden option with
+the relaxed tolerance, main's behaviour, as the default). Facts to keep
+straight:
 
 - **The three tolerances of a PRM peak** (`prm_ms_factory::addSixMasses`,
   the fragment tolerance ppm): an ORIGINAL peak (a b-ion mass m) has
@@ -2376,19 +2378,20 @@ from main 90d744d7). Facts to keep straight:
   for an ORIGINAL peak and the relaxed one, about twice as wide, for a
   REVERSED peak, on the six-mass PRM spectra of the spectrum set at the
   observed precursor P (or P +- 1 isotope for the PrSMs found there).
-- **The branch**: `ProbPeak` takes the strict tolerance for a REVERSED peak
-  too (`PrsmPara::useEvalueStrictComplement`, default true, passed to
-  `CompProbValue` by `CompPValueArray`; the cluster protein correction's
-  recomputation goes through the same `PrsmPara`). The zero and precursor
-  peaks are ORIGINAL and unchanged, so the precursor peak's width, which
-  normalizes the shift E-values (`compPrecProbs`), stays the precursor
-  tolerance. toppic's hidden `--evalue-complement-tolerance <strict|relax>`
-  (argument `evalueComplementTolerance`, default `strict`; anything else
-  is rejected) restores the relaxed tolerance with `relax`; the parameter
-  block prints "E-value tolerance of complementary ions: relax" only then.
-  topmg has no option (its own E-values are the MCMC's; `--topmg` in
-  toppic follows the setting). With `relax` the run is main's byte for
-  byte (development subset: 63 files but the parameter line).
+- **The option**: toppic's hidden `--evalue-complement-tolerance
+  <relax|strict|separate>` (argument `evalueComplementTolerance`, default
+  `relax`; anything else is rejected). With `strict`, `ProbPeak` takes
+  the strict tolerance for a REVERSED peak too
+  (`PrsmPara::useEvalueStrictComplement`, passed to `CompProbValue` by
+  `CompPValueArray`; the cluster protein correction's recomputation goes
+  through the same `PrsmPara`); the zero and precursor peaks are ORIGINAL
+  and unchanged, so the precursor peak's width, which normalizes the
+  shift E-values (`compPrecProbs`), stays the precursor tolerance. The
+  parameter block prints "E-value tolerance of complementary ions:
+  strict" (or separate) only when set. topmg has no option (its own
+  E-values are the MCMC's; `--topmg` in toppic follows the setting).
+  Without the option the run is main's before the merge byte for byte
+  (development subset: 63 files but the time stamps).
   `separate` (6f612533) selects the code's separate mode instead
   (`PrsmPara::useEvalueSeparate`, `EValueProcessor::process(true)` in
   both E-value stages and the cluster protein correction): one
