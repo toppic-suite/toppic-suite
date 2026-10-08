@@ -1142,7 +1142,7 @@ level:</string>
         <x>10</x>
         <y>170</y>
         <width>381</width>
-        <height>105</height>
+        <height>70</height>
        </rect>
       </property>
       <layout class="QGridLayout" name="gridLayout_2">
@@ -1189,29 +1189,6 @@ level:</string>
          </property>
          <property name="readOnly">
           <bool>false</bool>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="0">
-        <widget class="QLabel" name="alignErrorToleranceLabel">
-         <property name="text">
-          <string>Alignment error tolerance (Da):</string>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="1">
-        <widget class="QLineEdit" name="alignErrorToleranceEdit">
-         <property name="maximumSize">
-          <size>
-           <width>110</width>
-           <height>16777215</height>
-          </size>
-         </property>
-         <property name="toolTip">
-          <string>Error tolerance (Da) for matching mass differences of the spectrum and proteoform graphs in the graph alignment (topmg --align-error-tolerance).</string>
-         </property>
-         <property name="text">
-          <string>0.1</string>
          </property>
         </widget>
        </item>

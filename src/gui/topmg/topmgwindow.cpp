@@ -60,8 +60,6 @@ TopmgWindow::TopmgWindow(QWidget* parent)
   ui->envCnnCutoffEdit->setValidator(new QDoubleValidator(0, 1, 4, this));
   ui->formErrorToleranceEdit->setValidator(
       new QDoubleValidator(0, 2147483647, 4, this));
-  ui->alignErrorToleranceEdit->setValidator(
-      new QDoubleValidator(0, 2147483647, 4, this));
 
   QFont font;
   QFont outputFont;
@@ -158,8 +156,6 @@ void TopmgWindow::on_defaultButton_clicked() {
       QString::fromStdString(arguments_["proteoGraphGap"]));
   ui->maxVarPTMGap->setText(
       QString::fromStdString(arguments_["varPtmNumInGap"]));
-  ui->alignErrorToleranceEdit->setText(
-      QString::fromStdString(arguments_["topmgAlignErrorTolerance"]));
   ui->keepDecoyCheckBox->setChecked(false);
   ui->keepTempCheckBox->setChecked(false);
 }
@@ -335,8 +331,6 @@ std::map<std::string, std::string> TopmgWindow::getArguments() {
   arguments_["topmgShiftNumber"] =
       ui->numUnknownShiftComboBox->currentText().toStdString();
   arguments_["varPtmNumInGap"] = ui->maxVarPTMGap->text().toStdString();
-  arguments_["topmgAlignErrorTolerance"] =
-      ui->alignErrorToleranceEdit->text().toStdString();
   arguments_["varModFileName"] = ui->modFileEdit->text().toStdString();
   arguments_["threadNumber"] = ui->threadNumberEdit->text().toStdString();
   if (ui->topfdFeatureCheckBox->isChecked()) {
@@ -465,7 +459,6 @@ void TopmgWindow::lockDialog() {
   ui->wholeProteinCheckBox->setEnabled(false);
   ui->maxGapLength->setEnabled(false);
   ui->maxVarPTMGap->setEnabled(false);
-  ui->alignErrorToleranceEdit->setEnabled(false);
   ui->keepDecoyCheckBox->setEnabled(false);
   ui->keepTempCheckBox->setEnabled(false);
   ui->asfDiagCheckBox->setEnabled(false);
@@ -513,7 +506,6 @@ void TopmgWindow::unlockDialog() {
   ui->wholeProteinCheckBox->setEnabled(true);
   ui->maxGapLength->setEnabled(true);
   ui->maxVarPTMGap->setEnabled(true);
-  ui->alignErrorToleranceEdit->setEnabled(true);
   ui->keepDecoyCheckBox->setEnabled(true);
   ui->keepTempCheckBox->setEnabled(true);
   ui->asfDiagCheckBox->setEnabled(true);
@@ -658,15 +650,6 @@ bool TopmgWindow::checkError() {
                          QMessageBox::Yes);
     return true;
   }
-  // the validator accepts 0, which topmg refuses
-  if (ui->alignErrorToleranceEdit->text().isEmpty() ||
-      ui->alignErrorToleranceEdit->text().toDouble() <= 0) {
-    QMessageBox::warning(
-        this, tr("Warning"),
-        tr("Alignment error tolerance should be a positive number!"),
-        QMessageBox::Yes);
-    return true;
-  }
   return false;
 }
 
@@ -718,8 +701,7 @@ void TopmgWindow::showArguments() {
        "\nproteoGraphGap:" + arguments_["proteoGraphGap"] +
        "\nuseAsfDiag:" + arguments_["useAsfDiag"] +
        "\nvarPtmNumber:" + arguments_["varPtmNumber"] +
-       "\nvarPtmNumInGap:" + arguments_["varPtmNumInGap"] +
-       "\ntopmgAlignErrorTolerance:" + arguments_["topmgAlignErrorTolerance"])
+       "\nvarPtmNumInGap:" + arguments_["varPtmNumInGap"])
           .c_str(),
       QMessageBox::Yes);
 }

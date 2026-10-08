@@ -1687,9 +1687,10 @@ units) by `graph_align.cpp` (distance matching and cutoffs),
 close are merged). It is the argument `topmgAlignErrorTolerance`, default
 0.1 Da (the former hard-coded `error_tolerance_`): topmg's hidden
 `--align-error-tolerance` (visible in `-h` until 2026-10-08, when it was
-moved to the hidden options; still a topmg_gui field, "Alignment error
-tolerance (Da)" on the Advanced Parameters tab, emitted by
-`gui/util/command.cpp`; the parameter block still prints it) and
+moved to the hidden options and topmg_gui's field "Alignment error
+tolerance (Da)" on the Advanced Parameters tab was removed, with its
+`--align-error-tolerance` entry in `gui/util/command.cpp`, so the GUI leaves
+topmg at 0.1 Da; the parameter block still prints it) and
 toppic's hidden `--topmg-align-error-tolerance` for `--topmg pipeline` /
 `topmg-only`, as `topmgShiftNumber` is `--num-shift` / `--topmg-num-shift`.
 Both parsers refuse a value that is not a positive number. It is

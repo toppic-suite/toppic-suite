@@ -83,8 +83,7 @@ is given; `sample_ms2.topmg_raw_prsm` is always kept.
    within 0.1 Da. The hidden option `--align-error-tolerance <number>`
    changes this tolerance (Da), which the post-processing also uses to merge
    modification masses; the MCMC E-value computation keeps its own 0.1 Da.
-   In `topmg_gui` it is "Alignment error tolerance (Da)" on the Advanced
-   Parameters tab.
+   `topmg_gui` does not offer it.
 5. **Graph alignment post-processing.** The aligned mass differences are
    converted into concrete modification assignments and mass shifts.
 6. **E-value computation using MCMC.** TopMCMC estimates a p-value for each
