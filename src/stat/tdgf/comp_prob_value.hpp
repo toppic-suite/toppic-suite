@@ -27,9 +27,11 @@ namespace toppic {
 
 class CompProbValue {
  public:
+  // strict_complement: the REVERSED (complementary) PRM peaks get their
+  // strict tolerance instead of the relaxed one (ProbPeak)
   CompProbValue(double convert_ratio, const ResFreqPtrVec& residue_ptrs,
                 double residue_avg_len, int max_layer_num, int max_table_height,
-                double max_sp_prec_mass);
+                double max_sp_prec_mass, bool strict_complement = false);
 
   ~CompProbValue();
 
@@ -54,6 +56,9 @@ class CompProbValue {
 
   // double to integer convert ratio
   double convert_ratio_;
+
+  // the strict tolerance for the REVERSED PRM peaks (ProbPeak)
+  bool strict_complement_;
 
   //**********************************************************
   // Amino acids

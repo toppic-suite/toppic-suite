@@ -146,6 +146,10 @@ std::map<std::string, std::string> ToppicArgument::initArguments() {
   // (hidden --second-align): disabled, strict (the fragment tolerance on
   // every peak) or relax (the first alignment's tolerances)
   arguments["secondAlign"] = "true";
+  // the tolerance of the complementary (REVERSED) PRM peaks in the E-values'
+  // generating function (hidden --evalue-complement-tolerance): strict or
+  // relax (PrsmPara::useEvalueStrictComplement)
+  arguments["evalueComplementTolerance"] = "strict";
   // the filters' mass list (hidden --filter-mass-list): merge, fragment or
   // single (SpPara::FilterMassListMode)
   arguments["filterMassList"] = "fragment";
@@ -284,6 +288,11 @@ void ToppicArgument::outputArguments(
     output << std::setw(gap) << std::left
            << "Second alignment at the refined precursor:" << sep << "false"
            << std::endl;
+  }
+  if (arguments["evalueComplementTolerance"] != "strict") {
+    output << std::setw(gap) << std::left
+           << "E-value tolerance of complementary ions:" << sep
+           << arguments["evalueComplementTolerance"] << std::endl;
   }
   if (arguments["precDaltonError"] != "") {
     output << std::setw(gap) << std::left
@@ -442,6 +451,7 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
   std::string multi_skip_evalue = "";
   std::string var_ptm_filter_cand_num = "";
   std::string filter_mass_list = "";
+  std::string evalue_complement_tolerance = "";
 
   /** Define and parse the program options*/
   try {
@@ -646,6 +656,8 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
         "multi-skip-evalue", po::value<std::string>(&multi_skip_evalue),
             "")("disable-multi-type-align", "")(
         "disable-second-align", "")(
+        "evalue-complement-tolerance",
+        po::value<std::string>(&evalue_complement_tolerance), "")(
         "filter-mass-list", po::value<std::string>(&filter_mass_list), "")(
         "topmg", po::value<std::string>(&topmg_mode), "")(
         "topmg-use-mcmc", "")(
@@ -865,6 +877,15 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
     // 144); --disable-second-align keeps the first alignment's PrSM.
     if (vm.count("disable-second-align")) {
       arguments_["secondAlign"] = "false";
+    }
+
+    // hidden: the tolerance of the complementary (REVERSED, P - m) PRM
+    // peaks in the generating function of the E-values: strict (the
+    // default, the fragment tolerance on the fragment mass) or relax (the
+    // precursor's error added, the tolerance before; issue #616,
+    // toppic_test experiment 146)
+    if (vm.count("evalue-complement-tolerance")) {
+      arguments_["evalueComplementTolerance"] = evalue_complement_tolerance;
     }
 
     // hidden: TopMG's identification - the ASF filtering with the variable
@@ -1387,6 +1408,13 @@ bool ToppicArgument::validateArguments() {
     }
   }
 
+  if (arguments_["evalueComplementTolerance"] != "strict" &&
+      arguments_["evalueComplementTolerance"] != "relax") {
+    LOG_ERROR("--evalue-complement-tolerance "
+              << arguments_["evalueComplementTolerance"]
+              << " is not strict or relax");
+    return false;
+  }
   if (!SpPara::isFilterMassListModeName(arguments_["filterMassList"])) {
     LOG_ERROR("--filter-mass-list " << arguments_["filterMassList"]
                                     << " error! The value should be merge, "

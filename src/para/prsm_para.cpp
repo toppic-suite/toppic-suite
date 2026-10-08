@@ -148,6 +148,10 @@ PrsmPara::PrsmPara(const std::map<std::string, std::string>& arguments) {
   // toppic hidden --disable-second-align; default true (an absent key, as
   // in topmg, keeps it on, but only toppic's shift searches use it)
   use_second_align_ = (getArg(arguments, "secondAlign") != "false");
+  // toppic hidden --evalue-complement-tolerance <strict|relax>; default
+  // strict (an absent key, as in topmg, keeps it)
+  use_evalue_strict_complement_ =
+      (getArg(arguments, "evalueComplementTolerance") != "relax");
 
   // the unexpected shifts of the proteoform-graph alignment: TopMG's own
   // number, not the shiftNumber of toppic's stages; an absent key keeps 1

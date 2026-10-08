@@ -78,6 +78,15 @@ class PrsmPara {
   // the fragment tolerance on every PRM peak, the precursor kept. Default
   // true; toppic hidden --disable-second-align keeps the first alignment.
   bool useSecondAlign() const { return use_second_align_; }
+  // The tolerance of the REVERSED (complementary) PRM peaks in the
+  // generating function of the E-values (stat/tdgf/prob_peak, issue #616):
+  // true, their strict tolerance (the fragment tolerance on the fragment
+  // mass, as the PrSM's ions are matched); false, the relaxed one (the
+  // precursor's error added). Default true; toppic hidden
+  // --evalue-complement-tolerance relax restores the relaxed one.
+  bool useEvalueStrictComplement() const {
+    return use_evalue_strict_complement_;
+  }
 
   // The number of unexpected mass shifts of TopMG's proteoform-graph
   // alignment, separate from toppic's --num-shift, which governs toppic's own
@@ -112,6 +121,7 @@ class PrsmPara {
 
   bool use_multi_type_align_ = true;
   bool use_second_align_ = true;
+  bool use_evalue_strict_complement_ = true;
 
   int topmg_shift_num_ = 1;
 };

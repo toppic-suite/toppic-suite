@@ -20,10 +20,12 @@
 namespace toppic {
 
 ProbPeak::ProbPeak(const PrmPeakPtr& peak_ptr, int spectrum_id, int height,
-                   bool strict, double convert_ratio) {
+                   bool strict, bool strict_complement, double convert_ratio) {
   mass_ = static_cast<int>(std::round(peak_ptr->getMonoMass() * convert_ratio));
-  // we use NStrict and CRelax tolerance
-  if (strict) {
+  // we use NStrict and CRelax tolerance, or the strict one for a REVERSED
+  // (complementary) peak with strict_complement
+  if (strict || (strict_complement &&
+                 peak_ptr->getBaseTypePtr() == BasePeakType::REVERSED)) {
     tolerance_ = std::ceil(peak_ptr->getStrictTolerance() * convert_ratio);
   } else {
     tolerance_ =
