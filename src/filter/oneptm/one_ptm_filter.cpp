@@ -158,14 +158,17 @@ OnePtmFilter::OnePtmFilter(const ProteoformPtrVec& proteo_ptrs,
 FilterSpecPtr OnePtmFilter::geneFilterSpec(
     const PrmMsPtrVec& prm_ms_ptr_vec, const PrmMsPtrVec& srm_ms_ptr_vec,
     const OnePtmFilterMngPtr& mng_ptr) {
-  PeakTolerancePtr tole_ptr =
-      mng_ptr->prsm_para_ptr_->getSpParaPtr()->getPrecTolerancePtr();
+  const SpParaPtr& sp_para_ptr = mng_ptr->prsm_para_ptr_->getSpParaPtr();
+  PeakTolerancePtr tole_ptr = sp_para_ptr->getPrecTolerancePtr();
+  SpPara::FilterMassListMode mode = sp_para_ptr->getFilterMassListMode();
   std::vector<std::pair<int, int>> pref_mass_errors =
       prm_ms_util::getIntMassErrorList(prm_ms_ptr_vec, tole_ptr,
-                                       mng_ptr->filter_scale_, true, false);
+                                       mng_ptr->filter_scale_, true, false,
+                                       mode);
   std::vector<std::pair<int, int>> suff_mass_errors =
       prm_ms_util::getIntMassErrorList(srm_ms_ptr_vec, tole_ptr,
-                                       mng_ptr->filter_scale_, false, true);
+                                       mng_ptr->filter_scale_, false, true,
+                                       mode);
   return std::make_shared<FilterSpec>(
       prm_ms_ptr_vec[0]->getMsHeaderPtr(),
       static_cast<int>(prm_ms_ptr_vec.size()), std::move(pref_mass_errors),

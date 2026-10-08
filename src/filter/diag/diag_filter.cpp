@@ -103,11 +103,12 @@ DiagFilter::DiagFilter(const ProteoformPtrVec& proteo_ptrs,
 
 DiagFilterSpectrumPtr DiagFilter::convert(const PrmMsPtrVec& ms_ptr_vec,
                                           const DiagFilterMngPtr& mng_ptr) {
-  PeakTolerancePtr tole_ptr =
-      mng_ptr->prsm_para_ptr_->getSpParaPtr()->getPrecTolerancePtr();
+  const SpParaPtr& sp_para_ptr = mng_ptr->prsm_para_ptr_->getSpParaPtr();
+  PeakTolerancePtr tole_ptr = sp_para_ptr->getPrecTolerancePtr();
   std::vector<std::pair<int, int> > mass_errors =
       prm_ms_util::getIntMassErrorList(ms_ptr_vec, tole_ptr,
-                                       mng_ptr->filter_scale_, true, false);
+                                       mng_ptr->filter_scale_, true, false,
+                                       sp_para_ptr->getFilterMassListMode());
   return std::make_shared<DiagFilterSpectrum>(
       ms_ptr_vec[0]->getMsHeaderPtr(), static_cast<int>(ms_ptr_vec.size()),
       std::move(mass_errors));

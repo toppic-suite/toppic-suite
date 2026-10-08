@@ -18,14 +18,20 @@
 
 #include "ms/spec/prm_ms.hpp"
 #include "para/peak_tolerance.hpp"
+#include "para/sp_para.hpp"
 
 namespace toppic {
 
 namespace prm_ms_util {
 
+// The filters' mass list: the integer masses round(x * scale) of the PRM
+// peaks of the spectra with their tolerances, plus a zero and a precursor
+// entry per spectrum, sorted by mass. mode decides which peaks of the same
+// integer mass share an entry (SpPara::FilterMassListMode).
 std::vector<std::pair<int, int> > getIntMassErrorList(
     const PrmMsPtrVec& prm_ms_ptr_vec, const PeakTolerancePtr& tole_ptr,
-    double scale, bool n_strict, bool c_strict);
+    double scale, bool n_strict, bool c_strict,
+    SpPara::FilterMassListMode mode);
 
 PrmPeakPtrVec getPrmPeakPtrs(const PrmMsPtrVec& prm_ms_ptr_vec,
                              const PeakTolerancePtr& tole_ptr);

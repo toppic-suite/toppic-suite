@@ -30,6 +30,7 @@
 #include "common/util/mem_check.hpp"
 #include "common/util/str_util.hpp"
 #include "common/util/version.hpp"
+#include "para/sp_para.hpp"
 #include "seq/fasta_util.hpp"
 
 namespace toppic {
@@ -98,6 +99,9 @@ std::map<std::string, std::string> TopmgArgument::initArguments() {
   arguments["varPtmNumber"] = "5";
   arguments["varPtmNumInGap"] = "5";
   arguments["keepDecoyResults"] = "false";
+  // the filters' mass list (hidden --filter-mass-list): merge, fragment or
+  // single (SpPara::FilterMassListMode)
+  arguments["filterMassList"] = "fragment";
   arguments["version"] = "";
   return arguments;
 }
@@ -219,6 +223,13 @@ void TopmgArgument::outputArguments(
   output << std::setw(gap) << std::left
          << "Error tolerance for graph alignment:" << sep
          << arguments["topmgAlignErrorTolerance"] << " Da" << std::endl;
+  // printed only when it is not the default, so that the default parameter
+  // block is unchanged
+  if (arguments["filterMassList"] != "" &&
+      arguments["filterMassList"] != "fragment") {
+    output << std::setw(gap) << std::left << "Filter mass list:" << sep
+           << arguments["filterMassList"] << std::endl;
+  }
 
   if (arguments["useFeatureFile"] == "true") {
     output << std::setw(gap) << std::left << "Use TopFD feature file:" << sep
@@ -286,6 +297,7 @@ bool TopmgArgument::parse(int argc, char* argv[]) {
   std::string var_ptm_num = "";
   std::string var_ptm_in_gap = "";
   std::string combined_output_name = "";
+  std::string filter_mass_list = "";
 
   // Define and parse the progra/m options
   try {
@@ -428,6 +440,7 @@ bool TopmgArgument::parse(int argc, char* argv[]) {
         "")("proteo-graph-gap,j", po::value<std::string>(&proteo_graph_gap),
             "")("var-ptm-in-gap,G", po::value<std::string>(&var_ptm_in_gap),
                 "")("use-asf-diagonal,D", "")(
+        "filter-mass-list", po::value<std::string>(&filter_mass_list), "")(
         "var-ptm,P", po::value<std::string>(&var_ptm_num), "")(
         "num-shift,s", po::value<std::string>(&shift_num), "")(
         "whole-protein-only,w", "")("keep-temp-files,k", "")("keep-decoy-ids,K",
@@ -586,6 +599,16 @@ bool TopmgArgument::parse(int argc, char* argv[]) {
       arguments_["useAsfDiag"] = "true";
     }
 
+    // hidden: the entries of the filters' mass list
+    // (prm_ms_util::getIntMassErrorList) of the one-shift filter (and the
+    // multi-shift filter with --use-asf-diagonal): "merge", one per integer
+    // mass (main up to 7b5112c2); "fragment", one per integer mass and base
+    // type (the default); "single", one per peak (toppic_test experiment
+    // 142)
+    if (vm.count("filter-mass-list")) {
+      arguments_["filterMassList"] = filter_mass_list;
+    }
+
     if (vm.count("var-ptm")) {
       arguments_["varPtmNumber"] = var_ptm_num;
     }
@@ -696,6 +719,13 @@ bool TopmgArgument::validateArguments() {
     LOG_ERROR(
         "Modification file is not set. Please use the -i argument to specify "
         "the modification file!");
+    return false;
+  }
+
+  if (!SpPara::isFilterMassListModeName(arguments_["filterMassList"])) {
+    LOG_ERROR("--filter-mass-list " << arguments_["filterMassList"]
+                                    << " error! The value should be merge, "
+                                       "fragment or single!");
     return false;
   }
 

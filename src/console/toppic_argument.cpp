@@ -32,6 +32,7 @@
 #include "common/util/str_util.hpp"
 #include "common/util/version.hpp"
 #include "common/xml/xml_dom_util.hpp"
+#include "para/sp_para.hpp"
 #include "prsm/prsm_post_mass_match.hpp"
 #include "seq/fasta_util.hpp"
 
@@ -136,6 +137,9 @@ std::map<std::string, std::string> ToppicArgument::initArguments() {
   arguments["fragMassDedup"] = "false";
   arguments["multiSkipEvalue"] = "";
   arguments["multiTypeAlign"] = "true";
+  // the filters' mass list (hidden --filter-mass-list): merge, fragment or
+  // single (SpPara::FilterMassListMode)
+  arguments["filterMassList"] = "fragment";
 
   arguments["version"] = "";
   return arguments;
@@ -285,6 +289,13 @@ void ToppicArgument::outputArguments(
          << "Fragment mass deduplication:" << sep
          << (arguments["fragMassDedup"] == "true" ? "True" : "False")
          << std::endl;
+  // printed only when it is not the default, so that the default parameter
+  // block is unchanged
+  if (arguments["filterMassList"] != "" &&
+      arguments["filterMassList"] != "fragment") {
+    output << std::setw(gap) << std::left << "Filter mass list:" << sep
+           << arguments["filterMassList"] << std::endl;
+  }
   if (arguments["postMassMatch"] == "true") {
     output << std::setw(gap) << std::left << "Post mass matching:" << sep
            << "True" << std::endl;
@@ -411,6 +422,7 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
   std::string prec_dalton_error = "";
   std::string multi_skip_evalue = "";
   std::string var_ptm_filter_cand_num = "";
+  std::string filter_mass_list = "";
 
   /** Define and parse the program options*/
   try {
@@ -613,6 +625,7 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
         "deamid-selector", "")("disable-var-ptm-evalue-mod-residues", "")(
         "multi-skip-evalue", po::value<std::string>(&multi_skip_evalue),
             "")("disable-multi-type-align", "")(
+        "filter-mass-list", po::value<std::string>(&filter_mass_list), "")(
         "topmg", po::value<std::string>(&topmg_mode), "")(
         "topmg-use-mcmc", "")(
         "topmg-num-shift", po::value<std::string>(&topmg_shift_num), "")(
@@ -915,6 +928,15 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
     }
     if (vm.count("multi-skip-evalue")) {
       arguments_["multiSkipEvalue"] = multi_skip_evalue;
+    }
+    // hidden: the entries of the filters' mass list
+    // (prm_ms_util::getIntMassErrorList), for the one-shift, variable PTM and
+    // multi-shift filters, the shift searches' diagonal finder and TopMG's
+    // one-shift filter: "merge", one per integer mass (main up to
+    // 7b5112c2); "fragment", one per integer mass and base type (the
+    // default); "single", one per peak (toppic_test experiment 142)
+    if (vm.count("filter-mass-list")) {
+      arguments_["filterMassList"] = filter_mass_list;
     }
 
     if (vm.count("filtering-result-number")) {
@@ -1322,6 +1344,13 @@ bool ToppicArgument::validateArguments() {
                    "(complete,prefix/suffix,internal).");
       return false;
     }
+  }
+
+  if (!SpPara::isFilterMassListModeName(arguments_["filterMassList"])) {
+    LOG_ERROR("--filter-mass-list " << arguments_["filterMassList"]
+                                    << " error! The value should be merge, "
+                                       "fragment or single!");
+    return false;
   }
 
   std::string topmg_mode = arguments_["topmgMode"];

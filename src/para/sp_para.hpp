@@ -27,6 +27,19 @@ namespace toppic {
 
 class SpPara {
  public:
+  // How prm_ms_util::getIntMassErrorList builds the filters' mass list from
+  // the PRM peaks of a spectrum (toppic and topmg hidden
+  // --filter-mass-list): kMerge, one entry per integer mass (main up to
+  // 7b5112c2); kFragment, one entry per integer mass and base type, so an
+  // ORIGINAL and a REVERSED peak of the same integer mass are two entries
+  // (the default, toppic_test experiment 142); kSingle, one entry per peak.
+  enum class FilterMassListMode { kMerge, kFragment, kSingle };
+
+  // The option values, in the order of FilterMassListMode.
+  static const std::vector<std::string>& getFilterMassListModeNames();
+
+  static bool isFilterMassListModeName(const std::string& name);
+
   SpPara(const std::string& activation_name, double n_term_mod_mass,
          double prec_ppm, double frag_ppm);
 
@@ -78,6 +91,14 @@ class SpPara {
     return frag_mass_dedup_ ? frag_tolerance_ptr_->getPpo() : 0.0;
   }
 
+  FilterMassListMode getFilterMassListMode() const {
+    return filter_mass_list_mode_;
+  }
+
+  // name: one of getFilterMassListModeNames(); returns false (and keeps the
+  // mode) for any other name
+  bool setFilterMassListMode(const std::string& name);
+
   void setEnvCnnCutoff(double cutoff) { env_cnn_cutoff_ = cutoff; }
 
   void setFragMassDedup(bool dedup) { frag_mass_dedup_ = dedup; }
@@ -119,6 +140,8 @@ class SpPara {
   // before database filtering, the search and the E-value computation; off by
   // default, so topmg and topdia, which have no such argument, are unchanged
   bool frag_mass_dedup_ = false;
+
+  FilterMassListMode filter_mass_list_mode_ = FilterMassListMode::kFragment;
 
   ActivationPtr activation_ptr_;
 
