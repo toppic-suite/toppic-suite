@@ -2278,8 +2278,11 @@ Facts to keep straight:
 
 ## Large-shift penalty of the shift alignments (`search/oneptmsearch/ps_align`, `search/ptmsearch/ps_align_multi_type`)
 
-Branch `ps_align_penalty` (toppic_test experiment 145, report 0145; not
-merged). `PsAlignPara` fixes `align_large_shift_thresh_` = 300 Da and
+Branch `ps_align_penalty` (toppic_test experiment 145, report 0145; merged
+into main on 2026-10-08 as 0bca905d, after `second_align` e61e339b; on the
+development subset the merged main with `--disable-second-align` differs
+from main c7f13d66 only in the one-shift stage files and what follows them,
+as the branch did from its base). `PsAlignPara` fixes `align_large_shift_thresh_` = 300 Da and
 `align_large_shift_panelty_` = 3: a shift between two diagonals above the
 threshold costs 3 points in the dynamic program. Facts to keep straight:
 
