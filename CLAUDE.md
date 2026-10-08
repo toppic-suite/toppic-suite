@@ -2429,7 +2429,7 @@ Facts to keep straight:
 ## PTM localization by a variable PTM search (`stat/local_align`, `--local-align`)
 
 Branch `local_align` (toppic_test experiment 140, report 0140; from main
-6eb40e97, not merged). toppic's hidden `--local-align` (argument
+6eb40e97, merged into main as 927e2da3 on 2026-10-08). toppic's hidden `--local-align` (argument
 `localAlign`) runs `LocalAlignProcessor` in place of `LocalProcessor` for
 the `-B` localization (the parameter block then prints "Localization
 method: Variable PTM search (local_align)"); without it the output is
