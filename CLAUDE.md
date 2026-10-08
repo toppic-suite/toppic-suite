@@ -2141,6 +2141,12 @@ is on). Facts to keep straight:
   `second_align_util::genePrsm` passes `refinePrecursorByMatchedIons` the
   delta range [P - T - P', P + T - P'] (its optional `delta_min` /
   `delta_max`, infinite by default), so P'' stays within T of P.
+- **`--second-align-fixed`** (`secondAlignFixed`, `PrsmPara::useSecondAlignFixed`;
+  the parameter block prints ", fixed precursor"): the second pass keeps
+  P' (`genePrsm` is called with clamp_prec_mass -1, which gives the
+  refinement the delta range [0, 0]), so the PrSM is the second
+  alignment's result at the first pass's precursor and nothing is
+  re-estimated. Results: toppic_test experiment 144, amendment 1.
 - **The large-shift penalty differs between the two dynamic programs**
   (found with the log): `PsAlign::dp` takes the penalty (3 per shift above
   300 Da) off a predecessor's score only to choose the predecessor and
