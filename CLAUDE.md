@@ -1069,7 +1069,8 @@ species at lower charges. Facts to keep straight:
 ## MS3 spectral deconvolution (`topfd/deconv/deconv_ms3_process`, `--disable-ms3`)
 
 Branch `ms3_deconv` (toppic_test experiment 146, report 0146; from main
-205dc03c). An MS3 scan is the dissociation of an MS2 fragment ion (a
+205dc03c, merged into main as ceab7362 on 2026-10-08). An MS3 scan is the
+dissociation of an MS2 fragment ion (a
 tryptic digest on an Orbitrap Fusion Lumos: CID MS2 of the peptide, CID
 MS3 of up to three of its fragments). TopFD read only the MS3 scans with a
 proton transfer stage (PTCR, above); the others were skipped. Since this
