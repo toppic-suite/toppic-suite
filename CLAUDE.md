@@ -2091,8 +2091,10 @@ merged). Facts to keep straight:
 
 ## Precursor refinement of TopMG's graph alignment (`search/graphalign/graph_align`, `search/diag/diagonal_util`)
 
-Branch `topmg_prec_matched_ions` (toppic_test experiment 143, report 0143; not
-merged). `GraphAlign::geneResult(s, m)`, shared by topmg and toppic `--topmg`,
+Branch `topmg_prec_matched_ions` (toppic_test experiment 143, report 0143;
+merged into main as 5c9e2e3d on 2026-10-07, after `filter_pairs`; on the first
+500 spectra of 480_F3_02 toppic in setting d writes the same files as main
+20d5895b, apart from the tables' start and end times). `GraphAlign::geneResult(s, m)`, shared by topmg and toppic `--topmg`,
 calls `refinePrecursorByMatchedIons` like `PsAlign` and `PsAlignMultiType`;
 `refinePrecursorAndHeaderShift`, its two helpers and
 `GraphAlignMng::refine_prec_step_width_` are removed. Facts to keep straight:
