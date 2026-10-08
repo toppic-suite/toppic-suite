@@ -94,7 +94,10 @@ class PsAlign {
   DpPairPtr getTruncPre(const DpPairPtr& cur_pair_ptr, int s,
                         const ProteoformTypePtr& type_ptr);
 
-  DpPairPtr getShiftPre(int p, int s);
+  // The best shift predecessor of pair p with s shifts and its score with
+  // the large-shift penalty taken off (shift_score), as PsAlignMultiType
+  // computes it; nullptr and -max without one.
+  DpPairPtr getShiftPre(int p, int s, double& shift_score);
 };
 
 using PsAlignPtr = std::shared_ptr<PsAlign>;

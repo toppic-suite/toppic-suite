@@ -218,13 +218,13 @@ inline DpPairPtr PsAlign::getTruncPre(const DpPairPtr& cur_pair_ptr, int s,
   return trunc_prev_ptr;
 }
 
-DpPairPtr PsAlign::getShiftPre(int p, int s) {
+DpPairPtr PsAlign::getShiftPre(int p, int s, double& shift_score) {
+  shift_score = -std::numeric_limits<double>::max();
   if (s < 1) {
     return nullptr;
   }
   // last pair can not shift, only trunc is allowed;
   DpPairPtr shift_prev = nullptr;
-  double shift_score = -std::numeric_limits<double>::max();
 
   // cur pair is not last pair
   // first pair can not shift, so q starts from 1
@@ -264,13 +264,12 @@ void PsAlign::dp(const ProteoformTypePtr& align_type_ptr) {
       } else {
         diag_score = -std::numeric_limits<double>::max();
       }
-      DpPairPtr shift_prev = getShiftPre(p, s);
+      // The shift predecessor's score with the large-shift penalty taken
+      // off, as PsAlignMultiType stores it. The penalty used to decide only
+      // which diagonal to shift from, and the stored score was the
+      // predecessor's without it (toppic_test experiment 145).
       double shift_score;
-      if (shift_prev == nullptr) {
-        shift_score = -std::numeric_limits<double>::max();
-      } else {
-        shift_score = shift_prev->getScore(s - 1);
-      }
+      DpPairPtr shift_prev = getShiftPre(p, s, shift_score);
       double new_score = dp_pair_ptrs_[p]->getPairScore();
       if (trunc_score >= diag_score && trunc_score >= shift_score) {
         if (trunc_score == -std::numeric_limits<double>::max()) {

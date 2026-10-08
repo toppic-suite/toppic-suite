@@ -2276,6 +2276,46 @@ Facts to keep straight:
   window inflated targets and decoys alike. The one-shift search takes
   38 s instead of 23 s; the multiple-shift search's 256 s are unchanged.
 
+## Large-shift penalty of the shift alignments (`search/oneptmsearch/ps_align`, `search/ptmsearch/ps_align_multi_type`)
+
+Branch `ps_align_penalty` (toppic_test experiment 145, report 0145; not
+merged). `PsAlignPara` fixes `align_large_shift_thresh_` = 300 Da and
+`align_large_shift_panelty_` = 3: a shift between two diagonals above the
+threshold costs 3 points in the dynamic program. Facts to keep straight:
+
+- **The two programs applied it differently until this branch.**
+  `PsAlignMultiType::dp` (the multiple-shift search since 4f845a6f)
+  compares the shift predecessor's score minus the penalty with the
+  diagonal and truncation alternatives and stores it, so the penalty
+  propagates and the end score is 3 lower per large shift. `PsAlign`
+  (the one-shift search; the multiple-shift search with
+  `--disable-multi-type-align`; the original TopPIC code) used the
+  penalty in `getShiftPre` only to choose which diagonal to shift from,
+  and `dp` then took the chosen predecessor's score without it: a large
+  shift was never discouraged against continuing without a shift, and
+  the stored and final scores carried no penalty. `ps_align_multi_type.hpp`
+  describes the two as the same recursion; they were not (toppic_test
+  report 0144 section 7, found by comparing the alignment scores with
+  the PrSMs' matched fragments).
+- **This branch makes PsAlign match PsAlignMultiType**: `getShiftPre`
+  returns the chosen predecessor's penalized score, and `dp` compares and
+  stores it. The predecessor choice is unchanged; what changes is that a
+  path through a large shift now competes with the no-shift and
+  truncation alternatives 3 points down, and the end score reflects it.
+- **Results on 480_F3_02** (toppic_test experiment 145, report 0145;
+  setting d, experiment 131's TopFD output, against main 7b5112c2): 3,354
+  PrSMs / 1,997 proteoforms / 437 proteins against 3,355 / 1,997 / 438,
+  the same E-value cutoff. 825 of the 14,670 best one-shift candidate
+  alignments change, 672 of them a shift above 300 Da replaced by a
+  smaller one (the same matched fragments in 593, 1-3 fewer in 206, more
+  in 26; targets and decoys alike); the multiple-shift stage files are
+  unchanged. 31 of 3,353 reported PrSMs get another proteoform, mostly a
+  large shift rewritten as a smaller one with the same or better
+  fragments and E-value; 2 MED9 PrSMs are lost when the feature's YBOX1
+  +14 Da PrSM takes the cluster (the penalty took 2905's -421 Da
+  alignment with 19 fragments down to a -49 Da one with 18) and SEM7A at
+  the protein cutoff; 1 gained. No time cost.
+
 ## Range of a variable PTM shift (`seq/mass_shift`, `search/varptmsearch/var_ptm_align`)
 
 Branch `var_ptm_narrow_range` (toppic_test experiment 122, report 0122;
