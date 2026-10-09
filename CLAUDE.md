@@ -3488,8 +3488,10 @@ tables therefore differ from those of main before the change;
 
 ## The second precursor search (`prsm/prsm_second_prec`, `--second-precursor`)
 
-Branch `second_precursor` (toppic_test experiment 151, report 0151 and its
-amendment 2; from main d31939d9). Off by default; toppic's hidden
+Branches `second_precursor` (toppic_test experiment 151, report 0151 and its
+amendment 2; from main d31939d9) and `second_precursor_id` (amendment 3: the
+units keyed by spectrum id and precursor id, the `Precursor ID` column; from
+main 2863fa08). Off by default; toppic's hidden
 `--second-precursor` (argument key `secondPrecursor`, "false"; the parameter
 block prints "Second precursor search: yes" only then) searches the spectra
 with two or more precursors a second time with the second precursor, and
@@ -3614,6 +3616,18 @@ with `-r` other than 1. Facts to keep straight:
   PrSMs of the second pass), and rescored 0.40%, 1.26% and 3.72% (4,459),
   the prototype's 0.96% and 0.80%; with 6-28 entrapment PrSMs the estimate
   has a standard error of about 0.3 percentage points at 1%.
+- **Results with the units keyed by (spectrum id, precursor id)** (branch
+  `second_precursor_id`, toppic_test experiment 151, amendment 3; the same
+  TopFD output): the same 4,100 / 2,382 / 529 accepted units with
+  `--disable-rescore` (825 of the second pass), rescored 4,519 / 2,563 /
+  568 against the raised-id run's 4,507 / 2,559 / 565 (4,493 units in
+  common; the folds are drawn over the spectrum ids, which a scan's two
+  units now share); 8,274 masses of the second pass's post mass matching
+  added to 1,831 scans; 25-26 min, 8.0-8.3 GB. Without the option the run
+  writes main 2863fa08's files but the `Precursor ID` column: on the first
+  500 spectra 57 of 63 files are identical, the 6 tables equal without the
+  column and the time lines, the SQLite tables equal without
+  `precursor_id` (0 in every row).
 
 ## Source layout
 
