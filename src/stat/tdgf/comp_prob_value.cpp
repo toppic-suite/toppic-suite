@@ -37,7 +37,6 @@ CompProbValue::CompProbValue(double convert_ratio,
   max_layer_num_ = max_layer_num;
   max_table_height_ = max_table_height;
 
-  page_len_ = ORI_PAGE_LEN * static_cast<int>(convert_ratio_);
   block_len_ = ORI_BLOCK_LEN * static_cast<int>(convert_ratio_);
 
   max_sp_len_ = static_cast<int>(std::round(max_sp_prec_mass * convert_ratio_));
@@ -360,13 +359,6 @@ void CompProbValue::setChunkVars() {
     chunk_block_cols_ = 1;
   }
   chunk_page_blocks_ = max_mass / chunk_block_cols_ + 3;
-  // the whole-height sweep clears the tail of its circular page once per
-  // computation, so a shift layer's first blocks read, through the wrap,
-  // what the previous layer left in the last max_mass columns of the page:
-  // kept here (the last pass of the previous layer over those page
-  // columns) and put before column 0 of each shift layer's page
-  chunk_tail_cols_ = max_mass;
-  tail_capture_.assign(static_cast<size_t>(chunk_tail_cols_) * height_, 0.0);
   chunk_table_.assign(static_cast<size_t>(chunk_page_blocks_) *
                           chunk_block_cols_ * kChunkRows,
                       0.0);
@@ -432,18 +424,8 @@ inline void CompProbValue::sweepChunk(
   const int prior_bgn = prob_peaks_[prec_index].mass_bgn_ - residue_avg_len_;
   const int prior_end = prob_peaks_[prec_index].mass_bgn_ - 1;
   std::vector<double> col_new(kChunkRows);
-  if (!is_first_layer) {
-    for (int j = 0; j < chunk_tail_cols_; j++) {
-      int c = j - chunk_tail_cols_;
-      int slot = ((c % page_cols) + page_cols) % page_cols;
-      double* dst = table + slot * kChunkRows;
-      const double* src = &tail_capture_[static_cast<size_t>(j) * height_];
-      for (int s = s0; s < s1; s++) {
-        dst[s - s0] = src[s];
-      }
-    }
-  }
-  const int tail_page_bgn = page_len_ - chunk_tail_cols_;
+  // the page is cleared above, so the reads before column 0 in the first
+  // blocks of every layer find zeros
   for (int c0 = 0; c0 < sp_len_; c0 += block_cols) {
     const int c1 = c0 + block_cols;
     const int block_idx = c0 / block_cols;
@@ -562,24 +544,6 @@ inline void CompProbValue::sweepChunk(
         }
       }
       peak_index++;
-    }
-    // the columns of this block that lie in the tail of the whole-height
-    // sweep's page (every pass; the last one stays), for the next layer
-    {
-      int p0 = c0 % page_len_;
-      for (int c = c0; c < c1; c++) {
-        int p = p0 + (c - c0);
-        if (p >= page_len_) {
-          p -= page_len_;
-        }
-        if (p >= tail_page_bgn) {
-          double* dst = &tail_capture_[static_cast<size_t>(p - tail_page_bgn) * height_];
-          const double* src = &cell(c, s0);
-          for (int s = s0; s < s1; s++) {
-            dst[s] = src[s - s0];
-          }
-        }
-      }
     }
     if (is_first_layer) {
       int from = std::max(prior_bgn, c0);
