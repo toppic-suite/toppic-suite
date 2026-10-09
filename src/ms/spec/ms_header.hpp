@@ -132,6 +132,12 @@ class MsHeader {
 
   PrecursorPtr getFirstPrecPtr() const;
 
+  // The precursor with the id prec_id (a PrSM's precursor_id: the position
+  // of the precursor in the scan's list as TopFD writes it; an msalign
+  // spectrum whose list is reordered carries the ids in PRECURSOR_ID), or
+  // the first precursor when none has it.
+  PrecursorPtr getPrecPtrById(int prec_id) const;
+
   const PrecursorPtrVec& getPrecPtrVec() const { return prec_ptr_vec_; }
 
   int getFirstPrecId() const;

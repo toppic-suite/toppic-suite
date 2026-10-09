@@ -19,6 +19,7 @@
 #include <string>
 
 #include "para/prsm_para.hpp"
+#include "para/sp_para.hpp"
 
 namespace toppic {
 
@@ -29,38 +30,45 @@ namespace toppic {
 // the masses the first pass's accepted PrSM explains (TopMPI's search of a
 // multiplexed spectrum: Wang, Xiong and Liu, Proteomics 2025), and the two
 // passes' PrSMs are reported together, a spectrum with up to one PrSM per
-// precursor.
+// precursor: a PrSM is the unit (spectrum id, precursor id), the precursor
+// id its precursor's position in the scan's list.
 namespace prsm_second_prec {
 
 // Writes the residual spectra: of the spectra of ori_sp_file_name (the
 // TopFD msalign file the first pass searched) with two or more precursors,
-// the precursor list with the second precursor first (ids renumbered), the
-// masses without those that the spectrum's accepted PrSM of the first pass
-// matches (record_file_name: the first pass's record PrSMs; accepted:
-// a target with fdr <= cutoff_value when cutoff_type is FDR, or with an
-// E-value <= cutoff_value otherwise; matched: within the fragment tolerance
-// of one of the proteoform's fragment masses, as it is or one isotope
-// lower or higher). Returns the number of spectra written.
+// the precursor list with the second precursor first (the ids of the scan's
+// list kept, so the file carries PRECURSOR_ID and the second pass's PrSMs
+// get precursor id 1), the masses without those that the spectrum's
+// accepted PrSM of the first pass matches (record_file_name: the first
+// pass's record PrSMs; accepted: a target with fdr <= cutoff_value when
+// cutoff_type is FDR, or with an E-value <= cutoff_value otherwise;
+// matched: within the fragment tolerance of one of the proteoform's
+// fragment masses, as it is or one isotope lower or higher). Returns the
+// number of spectra written.
 int writeResidualSpectra(const PrsmParaPtr& prsm_para_ptr,
                          const std::string& record_file_name,
                          const std::string& ori_sp_file_name,
                          const std::string& cutoff_type, double cutoff_value,
                          const std::string& resid_sp_file_name);
 
-// Writes the spectra of first_sp_file_name followed by those of
-// second_sp_file_name with their spectrum ids (and MS1 ids) raised by
-// SpPara::getMaxSpecNumPerFile(); the feature ids are kept.
-void mergeSpectra(const std::string& first_sp_file_name,
-                  const std::string& second_sp_file_name,
-                  const std::string& out_sp_file_name);
+// Writes the spectra of first_sp_file_name (the first pass's post-matched
+// spectra) with the masses of resid_sp_file_name (the second pass's
+// post-matched residual spectra) that they do not have within the strict
+// fragment tolerance: the masses the second pass's post mass matching
+// added, appended after the spectrum's masses with the next peak ids. One
+// spectrum per scan, with the scan's precursor list.
+void mergePostMatchedMasses(const std::string& first_sp_file_name,
+                            const std::string& resid_sp_file_name,
+                            const std::string& out_sp_file_name,
+                            const SpParaPtr& sp_para_ptr);
 
 // Merges the record PrSMs of the two passes into one set, one unit per
 // spectrum and precursor: a second-pass PrSM whose protein (decoy prefix
 // aside) or precursor feature a first-pass PrSM of the spectrum already has
 // is kept only when its E-value is better, in place of that PrSM. The
-// second-pass PrSMs get the spectrum ids of mergeSpectra, precursor id 1
-// and the merged spectrum file's name (sp_short_name); the first pass's
-// keep theirs. The output is in spectrum id order.
+// second-pass PrSMs keep their spectrum ids and precursor ids (1, from the
+// residual spectra) and get the merged spectrum file's name
+// (sp_short_name). The output is in spectrum id, then precursor id order.
 void mergePrsms(const std::string& first_prsm_file_name,
                 const std::string& second_prsm_file_name,
                 const std::string& out_prsm_file_name,

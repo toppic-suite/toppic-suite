@@ -1588,15 +1588,16 @@ std::string TopPIC_identifyAll(std::map<std::string, std::string>& arguments) {
 // the residual spectra <base>_resid_ms2.msalign are written (the second
 // precursor first, the masses of the accepted first-pass PrSM removed) and
 // searched and post-processed like the first pass (without the rescoring,
-// which runs on the merged set); then the second pass's post-matched
-// spectra are appended to the first pass's file with their ids raised by
-// SpPara::getMaxSpecNumPerFile(), the two passes' record PrSMs are merged
-// into one set of (spectrum, precursor) units, clustered again (no cluster
-// protein correction, recount or post mass matching: each pass did its
-// own), rescored (unless --disable-rescore), given one FDR and written as
-// the file's toppic_record_prsm (the first pass's is kept as
-// toppic_first_record_prsm), which TopPIC_report reads. The residual pass's
-// files are cleaned up as the first pass's.
+// which runs on the merged set); then the two passes' record PrSMs are
+// merged into one set of (spectrum id, precursor id) units, clustered again
+// (no cluster protein correction, recount or post mass matching: each pass
+// did its own), rescored (unless --disable-rescore; the second units with
+// their residual spectra), given one FDR and written as the file's
+// toppic_record_prsm (the first pass's is kept as toppic_first_record_prsm),
+// which TopPIC_report reads; the masses the second pass's post mass
+// matching added join the first pass's post-matched spectrum file, one
+// spectrum per scan. The residual pass's files are cleaned up as the first
+// pass's.
 int TopPIC_second_precursor(std::map<std::string, std::string>& arguments,
                             const std::string& ori_sp_file_name) {
   try {
@@ -1640,13 +1641,8 @@ int TopPIC_second_precursor(std::map<std::string, std::string>& arguments,
     std::string resid_post_sp_name = second_arguments["spectrumFileName"];
     std::string resid_post_base = file_util::basename(resid_post_sp_name);
 
-    // the merge
+    // the merge of the passes' PrSMs into (spectrum, precursor) units
     std::cout << "Second precursor search - merging the passes." << std::endl;
-    std::string merged_tmp_name = post_sp_name + "_second_tmp";
-    prsm_second_prec::mergeSpectra(post_sp_name, resid_post_sp_name,
-                                   merged_tmp_name);
-    std::filesystem::rename(merged_tmp_name, post_sp_name);
-    msalign_util::geneSpIndex(post_sp_name);
     file_util::copyFile(post_base + ".toppic_record_prsm",
                         post_base + ".toppic_first_record_prsm", true);
     prsm_second_prec::mergePrsms(
@@ -1682,8 +1678,10 @@ int TopPIC_second_precursor(std::map<std::string, std::string>& arguments,
     bool use_rescore = arguments["rescore"] == "true";
     if (arguments["searchType"] == "TARGET+DECOY" && use_rescore) {
       std::cout << "Rescoring - started." << std::endl;
+      // the second units with their residual spectra, the masses their
+      // search used
       prsm_rescore::process(prsm_para_ptr, cur_suffix,
-                            "toppic_second_rescore");
+                            "toppic_second_rescore", resid_post_sp_name);
       std::cout << "Rescoring - finished." << std::endl;
       cur_suffix = "toppic_second_rescore";
     }
@@ -1701,6 +1699,18 @@ int TopPIC_second_precursor(std::map<std::string, std::string>& arguments,
     }
     file_util::copyFile(post_base + "." + cur_suffix,
                         post_base + ".toppic_record_prsm", true);
+
+    // the output spectra: the first pass's post-matched file with the
+    // masses the second pass's post mass matching added (not with -D, when
+    // the spectrum file is the input file and nothing was added)
+    if (resid_post_sp_name != resid_sp_name) {
+      std::string merged_tmp_name = post_sp_name + "_second_tmp";
+      prsm_second_prec::mergePostMatchedMasses(post_sp_name, resid_post_sp_name,
+                                               merged_tmp_name,
+                                               prsm_para_ptr->getSpParaPtr());
+      std::filesystem::rename(merged_tmp_name, post_sp_name);
+      msalign_util::geneSpIndex(post_sp_name);
+    }
 
     // the residual pass's files: the intermediates as the first pass's,
     // and without -k the residual spectra too

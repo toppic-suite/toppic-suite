@@ -2860,7 +2860,7 @@ Facts to keep straight:
   `_protein.xml`), after `<proteo_db_seq>` and the truncation N-terminal
   modification. The column is last so that no existing column moves; the
   rows of a PrSM's other protein matches have no field for it (they end
-  before the q-values, 37 of the 41 fields before it). The element is
+  before the q-values, 39 of the 45 fields before it). The element is
   written and read only when set, so the PrSM files before the report are
   unchanged.
 - **What the rule leaves out.** Levels 2B and 2C never occur. An unexpected
@@ -3488,8 +3488,10 @@ tables therefore differ from those of main before the change;
 
 ## The second precursor search (`prsm/prsm_second_prec`, `--second-precursor`)
 
-Branch `second_precursor` (toppic_test experiment 151, report 0151 and its
-amendment 2; from main d31939d9). Off by default; toppic's hidden
+Branches `second_precursor` (toppic_test experiment 151, report 0151 and its
+amendment 2; from main d31939d9) and `second_precursor_id` (amendment 3: the
+units keyed by spectrum id and precursor id, the `Precursor ID` column; from
+main 2863fa08). Off by default; toppic's hidden
 `--second-precursor` (argument key `secondPrecursor`, "false"; the parameter
 block prints "Second precursor search: yes" only then) searches the spectra
 with two or more precursors a second time with the second precursor, and
@@ -3512,7 +3514,12 @@ with `-r` other than 1. Facts to keep straight:
   `prsm_second_prec::writeResidualSpectra` writes `<base>_resid_ms2.msalign`
   from the spectrum file the first pass searched: the spectra with two or
   more precursors, their precursor list with the second precursor first
-  (ids renumbered, the feature ids kept), without the masses that the
+  (the ids of the scan's list and the feature ids kept: `MsAlignWriter`
+  adds a `PRECURSOR_ID=1:0:...` line to a spectrum whose precursors are not
+  at the positions of their ids, `MsAlignReader` takes the ids from it, and
+  without the line numbers the precursors by position, so TopFD's files
+  and every other msalign file are unchanged; the second pass's PrSMs thus
+  carry `precursor_id` 1), without the masses that the
   spectrum's accepted first-pass PrSM (a target under the `-t` cutoff)
   explains: within the fragment tolerance of one of the proteoform's
   fragment masses (`theo_peak_util::geneProteoformTheoPeak`, so the shifts'
@@ -3525,30 +3532,52 @@ with `-r` other than 1. Facts to keep straight:
   `<base>_resid_post_ms2.*`: `prsm_post_mass_match::sqlFileName` strips
   `_resid` (and then `_mono`) to find `<base>.sqlite`, and `postBaseName`
   keeps `_resid` in the post-matched name.
-- **The merge.** The second pass's post-matched spectra are appended to the
-  first pass's spectrum file (`mergeSpectra`; the file keeps its name, so
-  the outputs keep theirs) with their spectrum ids and MS1 ids raised by
-  `SpPara::getMaxSpecNumPerFile()` (10,000,000; the feature ids are not
-  raised, unlike `msalign_frac_merge`'s), so that
-  `prsm_reader_util::readPrsmsWithSpectra`, which attaches spectra by
-  spectrum id, gives a second-pass PrSM its own residual spectrum (the
-  tables' `# Masses` and `Charge` are the unit's; a PrSM of a raised id is
-  a second precursor's, with `precursor_id` 1, the same scan). The first
-  pass's record is kept as `toppic_first_record_prsm`, and `mergePrsms`
-  writes the units to `toppic_second_merged`: every first-pass PrSM, and
-  every second-pass PrSM whose protein (decoy prefix aside) and precursor
-  feature no first-pass PrSM of the spectrum has; one that repeats a
-  first-pass PrSM's protein or feature is kept in its place only with a
-  better E-value (a truncated or modified form of the first proteoform is
-  not a second unit: the residual fragments can still be its). The units
-  are clustered as `TopPIC_postprocess` clusters (`prsm_feature_cluster`,
-  or `prsm_simple_cluster` with `-x`; `toppic_second_cluster`,
-  `toppic_second_prot`), without a cluster protein correction, recount or
-  post mass matching (each pass did its own), rescored (default with `-d`,
-  not with `--disable-rescore`; `toppic_second_rescore`) and given one FDR over all units
+- **The units.** A PrSM is the unit (spectrum id, precursor id), the
+  precursor id the position of its precursor in the scan's list (0 the
+  first pass's, 1 the second pass's); the spectrum ids are the scan's own
+  (until 2026-10-09 the second pass's spectra were appended to the
+  spectrum file with their ids raised by `SpPara::getMaxSpecNumPerFile()`,
+  10,000,000, and a raised id marked a second unit). The first pass's
+  record is kept as `toppic_first_record_prsm`, and `mergePrsms` writes
+  the units to `toppic_second_merged`: every first-pass PrSM, and every
+  second-pass PrSM whose protein (decoy prefix aside) and precursor feature
+  no first-pass PrSM of the spectrum has; one that repeats a first-pass
+  PrSM's protein or feature is kept in its place only with a better
+  E-value (a truncated or modified form of the first proteoform is not a
+  second unit: the residual fragments can still be its); in spectrum id,
+  then precursor id order. The units are clustered as `TopPIC_postprocess`
+  clusters (`prsm_feature_cluster`, or `prsm_simple_cluster` with `-x`;
+  `toppic_second_cluster`, `toppic_second_prot`), without a cluster
+  protein correction, recount or post mass matching (each pass did its
+  own), rescored (default with `-d`, not with `--disable-rescore`;
+  `toppic_second_rescore`) and given one FDR over all units
   (`toppic_second_fdr`; `--fdr-groups` applies), which becomes the file's
-  `toppic_record_prsm`. `TopPIC_report` then runs as usual, and the SQLite
-  PrSM tables get the raised spectrum ids.
+  `toppic_record_prsm`. `TopPIC_report` then runs as usual.
+- **The spectra of a unit.** `prsm_reader_util::readPrsmsWithSpectra`
+  attaches the spectra of a PrSM's spectrum id, every PrSM of the id from
+  the one spectrum file; with its `second_sp_file_name` (the residual
+  post-matched spectra, `<base>_resid_post_ms2.msalign`, whose first
+  precursor is the scan's second) a PrSM gets, from either file, the
+  spectrum whose first precursor has its precursor id, as
+  `prsm_util::isMatchMs` matches. The rescoring of the merged set reads
+  with the residual file, so a second unit's fragment features are
+  computed on the masses its search used, as its matched numbers were; the
+  report's tables read the one output file, so a second unit is shown on
+  the scan: `# Masses` is the scan's, the matched numbers the search's,
+  and `Charge` (`MsHeader::getPrecPtrById`, the first precursor when none
+  has the id) is the unit's precursor's. The output spectrum file is the
+  first pass's post-matched file with the masses the second pass's post
+  mass matching added (`mergePostMatchedMasses`: a residual mass the scan
+  does not have within the strict fragment tolerance, appended with the
+  next peak ids; not with `-D`), one spectrum per scan with the scan's
+  precursor list, so its spectrum ids are TopFD's and the SQLite `prsm`
+  rows join `ms2_spectrum`.
+- **The outputs name the unit.** `Precursor ID` after `Spectrum ID` in the
+  PrSM, proteoform and protein tables of `PrsmMatchTableWriter` (toppic
+  and topmg; 0 in every run without the option; the rows of a PrSM's other
+  protein matches have an empty field), `precursor_id` after `spectrum_id`
+  in the SQLite tables `prsm`, `proteoform` and `protein`, and
+  `<precursor_id>` in the PrSM XML, which it always had.
 - **Cleanup.** `cleanToppicDir(..., copy_outputs = false)` deletes the
   residual pass's intermediates (no XML outputs to copy), and without `-k`
   the residual spectrum, feature and index files too; the merge's files are
@@ -3587,6 +3616,18 @@ with `-r` other than 1. Facts to keep straight:
   PrSMs of the second pass), and rescored 0.40%, 1.26% and 3.72% (4,459),
   the prototype's 0.96% and 0.80%; with 6-28 entrapment PrSMs the estimate
   has a standard error of about 0.3 percentage points at 1%.
+- **Results with the units keyed by (spectrum id, precursor id)** (branch
+  `second_precursor_id`, toppic_test experiment 151, amendment 3; the same
+  TopFD output): the same 4,100 / 2,382 / 529 accepted units with
+  `--disable-rescore` (825 of the second pass), rescored 4,519 / 2,563 /
+  568 against the raised-id run's 4,507 / 2,559 / 565 (4,493 units in
+  common; the folds are drawn over the spectrum ids, which a scan's two
+  units now share); 8,274 masses of the second pass's post mass matching
+  added to 1,831 scans; 25-26 min, 8.0-8.3 GB. Without the option the run
+  writes main 2863fa08's files but the `Precursor ID` column: on the first
+  500 spectra 57 of 63 files are identical, the 6 tables equal without the
+  column and the time lines, the SQLite tables equal without
+  `precursor_id` (0 in every row).
 
 ## Source layout
 

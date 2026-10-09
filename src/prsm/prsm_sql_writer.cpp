@@ -62,6 +62,7 @@ void PrsmSqlWriter::createPrsmTable(const std::string& table_name) {
                                  "("
                                  "prsm_id INTEGER PRIMARY KEY,"
                                  "spectrum_id INT NOT NULL,"
+                                 "precursor_id INT NOT NULL,"
                                  "fragmentation TEXT NOT NULL,"
                                  "scans TEXT NOT NULL,"
                                  "retention_time REAL NOT NULL,"  // seconds
@@ -115,7 +116,7 @@ void PrsmSqlWriter::write(const std::string& input_file_ext,
       sql_db_, "INSERT INTO " + table_name +
                    " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, "
                    "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, "
-                   "?, ?, ?, ?, ?, ?, ?);");
+                   "?, ?, ?, ?, ?, ?, ?, ?);");
   sqlite3_stmt* shift_stmt = nullptr;
   sqlite3_stmt* match_stmt = nullptr;
   if (write_details) {
@@ -183,11 +184,17 @@ void PrsmSqlWriter::writePrsm(sqlite3_stmt* stmt, const PrsmPtr& prsm_ptr) {
   int idx = 1;
   sqlite3_bind_int(stmt, idx++, prsm_ptr->getPrsmId());
   sqlite3_bind_int(stmt, idx++, prsm_ptr->getSpectrumId());
+  sqlite3_bind_int(stmt, idx++, prsm_ptr->getPrecursorId());
   bindText(stmt, idx++, activations);
   bindText(stmt, idx++, scans);
   sqlite3_bind_double(stmt, idx++, first_header_ptr->getRetentionTime());
   sqlite3_bind_int(stmt, idx++, mass_num);
-  sqlite3_bind_int(stmt, idx++, first_header_ptr->getFirstPrecCharge());
+  // the charge of the PrSM's precursor (the scan's first, or with
+  // --second-precursor the one of its precursor id)
+  sqlite3_bind_int(
+      stmt, idx++,
+      first_header_ptr->getPrecPtrById(prsm_ptr->getPrecursorId())
+          ->getCharge());
   sqlite3_bind_double(stmt, idx++, prsm_ptr->getOriPrecMass());
   sqlite3_bind_double(stmt, idx++, prsm_ptr->getAdjustedPrecMass());
   sqlite3_bind_double(stmt, idx++, prsm_ptr->getNTermLabelMass());
