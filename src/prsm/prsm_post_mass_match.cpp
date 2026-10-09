@@ -489,18 +489,41 @@ void writeSqlEnvs(sqlite3* db,
 
 }  // namespace
 
+namespace {
+
+std::string stripSuffix(const std::string& name, const std::string& suffix) {
+  if (str_util::endsWith(name, suffix)) {
+    return name.substr(0, name.size() - suffix.size());
+  }
+  return name;
+}
+
+}  // namespace
+
 std::string sqlFileName(const std::string& sp_file_name) {
-  std::string sql_base = file_util::basename(sp_file_name);
-  if (str_util::endsWith(sql_base, "_ms2")) {
-    sql_base = sql_base.substr(0, sql_base.size() - 4);
-  }
-  // <base>_mono_ms2.msalign, the monoisotopic-mass copy TopPIC writes for
-  // an average-mass file (--average-mass), shares the database of
-  // <base>_ms2.msalign
-  if (str_util::endsWith(sql_base, "_mono")) {
-    sql_base = sql_base.substr(0, sql_base.size() - 5);
-  }
+  std::string sql_base =
+      stripSuffix(file_util::basename(sp_file_name), "_ms2");
+  // <base>_resid_ms2.msalign, the residual spectra of the second precursor
+  // search (--second-precursor), and <base>_mono_ms2.msalign, the
+  // monoisotopic-mass copy TopPIC writes for an average-mass file
+  // (--average-mass), share the database of <base>_ms2.msalign
+  sql_base = stripSuffix(sql_base, "_resid");
+  sql_base = stripSuffix(sql_base, "_mono");
   return sql_base + ".sqlite";
+}
+
+std::string postBaseName(const std::string& sp_file_name) {
+  // the database's base name, with the _resid suffix of the second
+  // precursor search kept: <base>_post_ms2 for <base>_ms2.msalign and
+  // <base>_mono_ms2.msalign, <base>_resid_post_ms2 for
+  // <base>_resid_ms2.msalign
+  std::string base = stripSuffix(file_util::basename(sp_file_name), "_ms2");
+  bool resid = str_util::endsWith(base, "_resid");
+  base = stripSuffix(stripSuffix(base, "_resid"), "_mono");
+  if (resid) {
+    base += "_resid";
+  }
+  return base + "_post_ms2";
 }
 
 std::string process(const PrsmParaPtr& prsm_para_ptr,
@@ -508,8 +531,7 @@ std::string process(const PrsmParaPtr& prsm_para_ptr,
                     const std::string& output_file_ext, int min_peak_num) {
   std::string sp_file_name = prsm_para_ptr->getSpectrumFileName();
   std::string sql_file_name = sqlFileName(sp_file_name);
-  std::string post_base_name =
-      sql_file_name.substr(0, sql_file_name.size() - 7) + "_post_ms2";
+  std::string post_base_name = postBaseName(sp_file_name);
   std::string post_sp_file_name = post_base_name + ".msalign";
   SpParaPtr sp_para_ptr = prsm_para_ptr->getSpParaPtr();
 
