@@ -244,13 +244,69 @@ double median(std::vector<double> v) {
   return (lo + hi) / 2.0;
 }
 
+bool addPrecCalibrant(int scan, double rt_min, int charge, double prec_mass,
+                      double form_mass, MassCalibrantSet* set) {
+  double d = prec_mass - form_mass;
+  if (std::nearbyint(d / kIsotopeSpacing) != 0.0 || charge <= 0) {
+    return false;
+  }
+  MassCalibrant p;
+  p.scan = scan;
+  p.mass = prec_mass;
+  p.charge = charge;
+  p.mz = (prec_mass + charge * mass_constant::getProtonMass()) / charge;
+  p.rt_min = rt_min;
+  p.ppm = d / form_mass * 1e6;
+  set->prec.push_back(p);
+  return true;
+}
+
+int addFragCalibrants(int scan, double rt_min,
+                      const std::vector<double>& theo_masses,
+                      const std::vector<std::pair<double, int>>& masses,
+                      double tol_ppm, MassCalibrantSet* set) {
+  double proton = mass_constant::getProtonMass();
+  int num = 0;
+  for (const auto& mc : masses) {
+    double m = mc.first;
+    size_t pos = std::lower_bound(theo_masses.begin(), theo_masses.end(), m) -
+                 theo_masses.begin();
+    // the nearest of the two neighbours, the lighter one on a tie
+    bool found = false;
+    double best = 0.0;
+    size_t cand[2] = {pos - 1, pos};
+    for (int t = 0; t < 2; t++) {
+      if (t == 0 && pos == 0) continue;
+      size_t j = cand[t];
+      if (j >= theo_masses.size()) continue;
+      double e = (m - theo_masses[j]) / theo_masses[j] * 1e6;
+      if (std::fabs(e) <= tol_ppm &&
+          (!found || std::fabs(e) < std::fabs(best))) {
+        best = e;
+        found = true;
+      }
+    }
+    if (found && mc.second > 0) {
+      MassCalibrant f;
+      f.scan = scan;
+      f.mass = m;
+      f.charge = mc.second;
+      f.mz = (m + mc.second * proton) / mc.second;
+      f.rt_min = rt_min;
+      f.ppm = best;
+      set->frag.push_back(f);
+      num++;
+    }
+  }
+  return num;
+}
+
 MassCalibrantSet readCalibrants(const std::string& prsm_tsv_file,
                                 const std::string& ms2_msalign_file,
                                 double max_evalue, double tol_ppm) {
   MassCalibrantSet set;
   std::vector<PrsmRow> rows = readTable(prsm_tsv_file, &set.prsm_num);
   auto masses = readMsAlignMasses(ms2_msalign_file);
-  double proton = mass_constant::getProtonMass();
   double acetyl_mass = PtmBase::getPtmPtr_Acetylation()->getMonoMass();
   std::vector<double> res;
   for (const PrsmRow& r : rows) {
@@ -259,17 +315,8 @@ MassCalibrantSet readCalibrants(const std::string& prsm_tsv_file,
     }
     set.used_prsm_num++;
     // the precursor: only the PrSMs at the monoisotopic peak
-    double d = r.prec_mass - r.form_mass;
-    if (std::nearbyint(d / kIsotopeSpacing) == 0.0 && r.charge > 0) {
-      MassCalibrant p;
-      p.scan = r.scan;
-      p.mass = r.prec_mass;
-      p.charge = r.charge;
-      p.mz = (r.prec_mass + r.charge * proton) / r.charge;
-      p.rt_min = r.rt_min;
-      p.ppm = d / r.form_mass * 1e6;
-      set.prec.push_back(p);
-    }
+    addPrecCalibrant(r.scan, r.rt_min, r.charge, r.prec_mass, r.form_mass,
+                     &set);
     // the fragments
     bool acetyl = false;
     if (!parseProteoform(r.proteoform, &res, &acetyl)) continue;
@@ -291,33 +338,7 @@ MassCalibrantSet readCalibrants(const std::string& prsm_tsv_file,
       theo.push_back(sum + c_shift);
     }
     std::sort(theo.begin(), theo.end());
-    for (const auto& mc : it->second) {
-      double m = mc.first;
-      size_t pos = std::lower_bound(theo.begin(), theo.end(), m) - theo.begin();
-      bool found = false;
-      double best = 0.0;
-      size_t cand[2] = {pos - 1, pos};
-      for (int t = 0; t < 2; t++) {
-        if (t == 0 && pos == 0) continue;
-        size_t j = cand[t];
-        if (j >= theo.size()) continue;
-        double e = (m - theo[j]) / theo[j] * 1e6;
-        if (std::fabs(e) <= tol_ppm && (!found || std::fabs(e) < std::fabs(best))) {
-          best = e;
-          found = true;
-        }
-      }
-      if (found && mc.second > 0) {
-        MassCalibrant f;
-        f.scan = r.scan;
-        f.mass = m;
-        f.charge = mc.second;
-        f.mz = (m + mc.second * proton) / mc.second;
-        f.rt_min = r.rt_min;
-        f.ppm = best;
-        set.frag.push_back(f);
-      }
-    }
+    addFragCalibrants(r.scan, r.rt_min, theo, it->second, tol_ppm, &set);
   }
   return set;
 }

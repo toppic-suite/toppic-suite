@@ -136,6 +136,14 @@ std::map<std::string, std::string> ToppicArgument::initArguments() {
   // searched again with the second one, without the first pass's matched
   // masses, and the two passes are reported together (prsm_second_prec)
   arguments["secondPrecursor"] = "false";
+  // hidden --mass-calib: the two-pass m/z recalibration (ms/calib,
+  // prsm/prsm_mass_calib): a zero-shift calibration search, the MS1 and MS/MS
+  // error models fitted on its confident PrSMs, the search on the corrected
+  // spectra (<base>_calib_ms2.msalign) and the post mass matching on the
+  // corrected peaks. massCalibModelFile is set per file by
+  // TopPICProgress_multi_file (the model the post mass matching applies).
+  arguments["massCalib"] = "false";
+  arguments["massCalibModelFile"] = "";
   arguments["combineResultOnly"] = "false";
   arguments["outputRawPrsmTable"] = "false";
   arguments["outputPrsmCoverage"] = "false";
@@ -250,6 +258,12 @@ void ToppicArgument::outputArguments(
     output << std::setw(gap) << std::left << "FDR computation:" << sep
            << "rescored PrSMs (linear SVM, 3-fold cross-validation)"
            << std::endl;
+  }
+  // printed only when set, so that the default parameter block is unchanged
+  if (arguments.count("massCalib") > 0 &&
+      arguments.at("massCalib") == "true") {
+    output << std::setw(gap) << std::left << "Mass calibration:" << sep
+           << "two-pass (zero-shift calibration search)" << std::endl;
   }
 
   if (arguments["variablePtmFileName"] != "" &&
@@ -702,6 +716,7 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
         "average-mass,g", "")("disable-zero-shift-prec-error", "")(
         "enable-one-shift-prec-error", "")("enable-var-ptm-prec-error", "")(
         "fdr-groups", "")("disable-rescore", "")("second-precursor", "")(
+        "mass-calib", "")(
         "local-align", "")(
         "local-original", "")(
         "disable-frag-mass-extension", "")(
@@ -926,6 +941,9 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
     }
     if (vm.count("second-precursor")) {
       arguments_["secondPrecursor"] = "true";
+    }
+    if (vm.count("mass-calib")) {
+      arguments_["massCalib"] = "true";
     }
     // hidden: by default, the multiple-unexpected-shift search computes
     // COMPLETE/PREFIX/SUFFIX/INTERNAL with one fused dynamic program instead

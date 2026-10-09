@@ -17,6 +17,7 @@
 #define TOPPIC_MS_CALIB_MASS_CALIB_FIT_HPP_
 
 #include <string>
+#include <utility>
 #include <vector>
 
 #include "ms/calib/mass_calib_model.hpp"
@@ -43,6 +44,22 @@ struct MassCalibrantSet {
 };
 
 namespace mass_calib_fit {
+
+// The precursor calibrant of a PrSM: the error (ppm of the proteoform mass)
+// of the precursor mass against the proteoform mass, added to set->prec when
+// the difference rounds to 0 isotopes of 1.00235 Da (and the charge is
+// positive); returns whether it was added.
+bool addPrecCalibrant(int scan, double rt_min, int charge, double prec_mass,
+                      double form_mass, MassCalibrantSet* set);
+
+// The fragment calibrants of a PrSM's spectrum: every mass (with its charge)
+// within tol_ppm of a theoretical fragment mass (theo_masses sorted
+// increasingly), with the error to the nearest one, added to set->frag;
+// returns the number added.
+int addFragCalibrants(int scan, double rt_min,
+                      const std::vector<double>& theo_masses,
+                      const std::vector<std::pair<double, int>>& masses,
+                      double tol_ppm, MassCalibrantSet* set);
 
 // The calibrants of a TopPIC PrSM table (a *_toppic_prsm_single.tsv file of a
 // zero-shift search) and the MS/MS msalign file it searched: the PrSMs with
