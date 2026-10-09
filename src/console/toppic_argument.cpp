@@ -128,9 +128,10 @@ std::map<std::string, std::string> ToppicArgument::initArguments() {
   arguments["keepTempFiles"] = "false";
   arguments["keepDecoyResults"] = "false";
   arguments["useFdrGroups"] = "false";
-  // hidden --rescore: the FDR ranks the PrSMs by a semi-supervised rescoring
-  // (stat/rescore/prsm_rescore) instead of the E-value
-  arguments["rescore"] = "false";
+  // the FDR ranks the PrSMs by a semi-supervised rescoring
+  // (stat/rescore/prsm_rescore) instead of the E-value; on by default in a
+  // target-decoy search (-d), off with the hidden --disable-rescore
+  arguments["rescore"] = "true";
   // hidden --second-precursor: the spectra with two or more precursors are
   // searched again with the second one, without the first pass's matched
   // masses, and the two passes are reported together (prsm_second_prec)
@@ -238,6 +239,19 @@ void ToppicArgument::outputArguments(
   output << std::setw(gap) << std::left << "Allowed proteoform types:" << sep
          << arguments["allowProtType"] << std::endl;
 
+  // the FDR computation, with or without a variable PTM file
+  if (arguments.at("useFdrGroups") == "true") {
+    output << std::setw(gap) << std::left << "FDR computation:" << sep
+           << "separate PrSM groups" << std::endl;
+  }
+  if (arguments.count("rescore") > 0 && arguments.at("rescore") == "true" &&
+      arguments.at("searchType") == "TARGET+DECOY" &&
+      arguments.at("useFdrGroups") != "true") {
+    output << std::setw(gap) << std::left << "FDR computation:" << sep
+           << "rescored PrSMs (linear SVM, 3-fold cross-validation)"
+           << std::endl;
+  }
+
   if (arguments["variablePtmFileName"] != "" &&
       arguments["variablePtmNum"] != "0") {
     output << std::setw(gap) << std::left
@@ -246,15 +260,6 @@ void ToppicArgument::outputArguments(
     output << std::setw(gap) << std::left
            << "Use approximate spectra in protein filtering:" << sep
            << arguments["useApproxSpectra"] << std::endl;
-    if (arguments.at("useFdrGroups") == "true") {
-      output << std::setw(gap) << std::left << "FDR computation:" << sep
-             << "separate PrSM groups" << std::endl;
-    }
-    if (arguments.count("rescore") > 0 && arguments.at("rescore") == "true") {
-      output << std::setw(gap) << std::left << "FDR computation:" << sep
-             << "rescored PrSMs (linear SVM, 3-fold cross-validation)"
-             << std::endl;
-    }
     if (arguments.count("secondPrecursor") > 0 &&
         arguments.at("secondPrecursor") == "true") {
       output << std::setw(gap) << std::left << "Second precursor search:"
@@ -696,7 +701,7 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
         "post-min-peak-num,I", po::value<std::string>(&post_min_peak_num), "")(
         "average-mass,g", "")("disable-zero-shift-prec-error", "")(
         "enable-one-shift-prec-error", "")("enable-var-ptm-prec-error", "")(
-        "fdr-groups", "")("rescore", "")("second-precursor", "")(
+        "fdr-groups", "")("disable-rescore", "")("second-precursor", "")(
         "local-align", "")(
         "local-original", "")(
         "disable-frag-mass-extension", "")(
@@ -916,8 +921,8 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
     if (vm.count("fdr-groups")) {
       arguments_["useFdrGroups"] = "true";
     }
-    if (vm.count("rescore")) {
-      arguments_["rescore"] = "true";
+    if (vm.count("disable-rescore")) {
+      arguments_["rescore"] = "false";
     }
     if (vm.count("second-precursor")) {
       arguments_["secondPrecursor"] = "true";
@@ -1199,16 +1204,11 @@ bool ToppicArgument::validateArguments() {
     return false;
   }
 
-  if (arguments_["rescore"] == "true") {
-    // the rescoring trains on the decoys and replaces the E-value in the FDR
-    if (search_type != "TARGET+DECOY") {
-      LOG_ERROR("--rescore needs a target-decoy search (-d)!");
-      return false;
-    }
-    if (arguments_["useFdrGroups"] == "true") {
-      LOG_ERROR("--rescore cannot be combined with --fdr-groups!");
-      return false;
-    }
+  // the rescoring trains on the decoys and replaces the E-value in the FDR:
+  // off without a target-decoy search (-d) and with --fdr-groups, whose
+  // separate FDRs rank by the E-value
+  if (search_type != "TARGET+DECOY" || arguments_["useFdrGroups"] == "true") {
+    arguments_["rescore"] = "false";
   }
 
   if (arguments_["secondPrecursor"] == "true") {

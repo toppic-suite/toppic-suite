@@ -122,25 +122,42 @@ the result files are named after `sample_mono_ms2`.
     spectrum, scored by EnvCNN. The spectra with the added masses are
     written to `sample_post_ms2.msalign`, **the steps below and the result
     files use that name**, and the added envelopes are also stored in the
-    database. The E-values and the clusters are not changed, so the
-    FDRs, the cutoffs and the identifications are those of a run with
-    `--disable-post-match`; only the matched masses and fragments grow.
+    database. The E-values and the clusters are not changed, so without
+    `--decoy` the cutoffs and the identifications are those of a run with
+    `--disable-post-match` and only the matched masses and fragments grow;
+    with `--decoy` the rescoring (step 13) uses the matched masses and
+    fragments, so the FDRs can differ slightly.
 12. **PTM characterization** (only with `--local-ptm-file-name`). Each
     unexpected mass shift is compared with the listed common modifications,
     and the modification and its site are reported when the MIScore reaches
     `--miscore-threshold`.
-13. **FDR computation** (only with `--decoy`). Spectrum-, proteoform- and
-    protein-level false discovery rates are estimated from the decoy hits.
-14. **Record file and decoy removal.** The PrSMs with their FDRs are
+13. **Rescoring** (only with `--decoy`). The best PrSM of every spectrum,
+    target or decoy, gets a score from a linear support vector machine
+    trained to separate the targets at 1% FDR from the decoys (the method
+    of Percolator, Kall et al., Nat. Methods 2007), with 3-fold
+    cross-validation: the spectra are split into three parts, and the PrSMs
+    of each part are scored by a model trained on the other two. The
+    features describe the PrSM and its spectrum: the E-value, the matched
+    masses and fragments, the unexpected shifts and variable PTMs, the
+    N-terminal form, the proteoform's length and mass, the precursor, the
+    TopFD feature, the fragment mass errors, the cleavage sites covered and
+    the retention time against a value predicted from the sequence. The
+    E-values are not changed. When a part has fewer than 10 targets at 1%
+    FDR to train on, every PrSM keeps its E-value as the score.
+14. **FDR computation** (only with `--decoy`). Spectrum-, proteoform- and
+    protein-level false discovery rates are estimated from the decoy hits,
+    with the PrSMs ranked by the score of step 13, so the `FDR` cutoffs
+    apply to it; the `EVALUE` cutoffs still compare E-values.
+15. **Record file and decoy removal.** The PrSMs with their FDRs are
     kept as `sample_post_ms2.toppic_record_prsm`, decoy identifications
     included. Unless `--keep-decoy-ids` is given, the decoy identifications
     are then removed from the PrSMs.
-15. **Filtering and output at three levels.** The PrSMs passing the
+16. **Filtering and output at three levels.** The PrSMs passing the
     spectrum-level cutoff are written to the PrSM tables; the best PrSM per
     proteoform passing the proteoform-level cutoff to the proteoform tables;
     the best PrSM per protein passing the protein-level cutoff to the
     protein tables.
-16. **Writing identifications to the SQLite database**, for visualization.
+17. **Writing identifications to the SQLite database**, for visualization.
 
 ## 3. Output files
 
@@ -238,7 +255,7 @@ Cutoffs and output:
 | `-t`, `--spectrum-cutoff-type <EVALUE\|FDR>`, `-v`, `--spectrum-cutoff-value <number>` | EVALUE, 0.01 | Cutoff for PrSMs. |
 | `-T`, `--proteoform-cutoff-type <EVALUE\|FDR>`, `-V`, `--proteoform-cutoff-value <number>` | EVALUE, 0.01 | Cutoff for proteoforms. |
 | `-y`, `--protein-cutoff-type <EVALUE\|FDR>`, `-Y`, `--protein-cutoff-value <number>` | EVALUE, 0.01 | Cutoff for proteins; with `FDR` a protein is represented by its best proteoform. |
-| `-c`, `--combined-file-name <name>` | none | Combine several fractions: after the files are searched, their spectra and best PrSMs per spectrum are merged under `<name>_ms2`, and the clustering (by protein, precursor mass and sequence overlap), FDR computation, decoy removal, cutoffs and tables are repeated on the merged data; the files' results are then written with the proteoform ids of the combined results. A relative `<name>` is placed in the directory of the first spectrum file and must differ from the input file names. See the note below. |
+| `-c`, `--combined-file-name <name>` | none | Combine several fractions: after the files are searched, their spectra and best PrSMs per spectrum are merged under `<name>_ms2`, and the clustering (by protein, precursor mass and sequence overlap), rescoring, FDR computation, decoy removal, cutoffs and tables are repeated on the merged data; the files' results are then written with the proteoform ids of the combined results. A relative `<name>` is placed in the directory of the first spectrum file and must differ from the input file names. See the note below. |
 | `-u`, `--thread-number <int>` | 1 | Number of threads; must not exceed the number of hardware threads. Each protein filtering step may use fewer: it fits its thread number to the memory available when it starts (about 1.25 GiB per thread for zero-shift filtering, 1 GiB for variable-PTM and one-shift filtering, 0.5 GiB for multiple-shift filtering). The run starts with a warning listing the filtering steps that will use fewer threads and how many, and a step prints its number again if the memory available when it starts gives a different one. All other steps use the full number. |
 | `-k`, `--keep-temp-files` | off | Keep the intermediate files. |
 | `-K`, `--keep-decoy-ids` | off | Keep decoy identifications in the result tables. |
@@ -254,7 +271,7 @@ fraction's FDR computation
 `<fraction>_ms2.toppic_record_prsm`; decoy identifications included). The
 merged PrSMs are clustered again into proteoforms and proteins across the
 fractions, by protein and precursor mass as with `-x` (the feature files
-are not merged), and given one set of FDRs (steps 8 and 13), and the decoy
+are not merged), rescored and given one set of FDRs (steps 8, 13 and 14), and the decoy
 removal, the cutoffs and the output steps are repeated on them; the
 recount, post mass matching and PTM characterization of the fractions are
 kept. The combined results are always named `<name>_ms2_toppic_*`, the

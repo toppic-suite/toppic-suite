@@ -3393,16 +3393,23 @@ XML). Facts to keep straight:
   binary-search shift predecessors in the alignments (the quadratic loop
   was 1% of the search), per-class table heights in the E-value.
 
-## Rescoring of the PrSMs (`stat/rescore`, `--rescore`)
+## Rescoring of the PrSMs (`stat/rescore`, default with `-d`)
 
 Branch `prsm_rescore` (toppic_test experiment 151, report 0151 and its
-amendment 1; from main 3b8041dd, merged into main on 2026-10-09). Off by
-default; toppic's hidden `--rescore` (argument key `rescore`, "false"; the
-parameter block prints "FDR computation: rescored PrSMs (linear SVM, 3-fold
-cross-validation)" only then) gives the best PrSM of every spectrum a score
-of a semi-supervised linear model, and the FDRs rank by it instead of the
-E-value. Refused without `-d` and together with `--fdr-groups`. Facts to
-keep straight:
+amendment 1; from main 3b8041dd, merged into main on 2026-10-09 as the
+hidden `--rescore`, off by default). **On by default in a target-decoy
+search (`-d`) since 2026-10-09**: argument key `rescore`, "true"; the hidden
+`--disable-rescore` sets "false" (`--rescore` is gone), and
+`validateArguments` sets it to "false" without `-d` and with
+`--fdr-groups` (both were errors with `--rescore`), so a run without `-d`
+is unchanged; the parameter block prints "FDR computation: rescored PrSMs
+(linear SVM, 3-fold cross-validation)" only when it runs (this line and
+`--fdr-groups`' "FDR computation: separate PrSM groups" are printed with or
+without a variable PTM file; before, only with `-b`). It gives the best
+PrSM of every spectrum a score of a semi-supervised linear model, and the
+FDRs rank by it instead of the E-value. A `-d` run's FDRs, cutoffs and
+tables therefore differ from those of main before the change;
+`--disable-rescore` reproduces them. Facts to keep straight:
 
 - **Where it runs.** `TopPIC_postprocess` keeps its order (clustering,
   cluster protein correction, recount, post mass matching, PTM
@@ -3513,7 +3520,7 @@ with `-r` other than 1. Facts to keep straight:
   isotope (`mass_constant::getIsotopeMass`) lower or higher. The feature
   file is copied to `<base>_resid_ms2.feature`. The second pass runs the
   same identification stages and post-processing on that file with its own
-  copy of the arguments (`--rescore` off: the merged set is rescored
+  copy of the arguments (`rescore` "false": the merged set is rescored
   instead), so its files are `<base>_resid_ms2.toppic_*` and, post-matched,
   `<base>_resid_post_ms2.*`: `prsm_post_mass_match::sqlFileName` strips
   `_resid` (and then `_mono`) to find `<base>.sqlite`, and `postBaseName`
@@ -3537,8 +3544,8 @@ with `-r` other than 1. Facts to keep straight:
   are clustered as `TopPIC_postprocess` clusters (`prsm_feature_cluster`,
   or `prsm_simple_cluster` with `-x`; `toppic_second_cluster`,
   `toppic_second_prot`), without a cluster protein correction, recount or
-  post mass matching (each pass did its own), rescored with `--rescore`
-  (`toppic_second_rescore`) and given one FDR over all units
+  post mass matching (each pass did its own), rescored (default with `-d`,
+  not with `--disable-rescore`; `toppic_second_rescore`) and given one FDR over all units
   (`toppic_second_fdr`; `--fdr-groups` applies), which becomes the file's
   `toppic_record_prsm`. `TopPIC_report` then runs as usual, and the SQLite
   PrSM tables get the raised spectrum ids.
@@ -3568,7 +3575,7 @@ with `-r` other than 1. Facts to keep straight:
   2,004 / 440 (825 PrSMs of the second pass), the prototype's combination
   of two runs (toppic_test report 0151, `resid_prec.py` + `combine.py`)
   giving 4,107 / 2,394 / 528 with 4,098 accepted units in common; with
-  `--rescore` (the first pass rescored too, so the residual spectra follow
+  `--rescore` (now the default with `-d`; the first pass rescored too, so the residual spectra follow
   the rescored acceptance) 4,507 / 2,559 / 565 (prototype 4,517 / 2,565 /
   554). 25.5 min against 12.5 (the second pass is a full search of 2,440
   spectra), 7-8.6 GB. Without the option the 62 output files equal main's
@@ -3754,8 +3761,8 @@ above it, never the reverse:
   carry the thread number from the toppic `-u` option.
 - `src/stat` — E-value/p-value estimation (`count`/`local`/`mcmc`/`tdgf`),
   the PTM localization (`local`, and its alternative `local_align`, see
-  its section) and the rescoring of `--rescore` (`rescore`, see its
-  section);
+  its section) and the rescoring of the PrSMs before the FDR (`rescore`, default with `-d`,
+  see its section);
   `tdgf/cluster_prot_corrector` (see the post mass matching section) is
   here rather than in `prsm` because it recomputes E-values.
 - `src/merge` — the topdiff feature-merge backend (`feature_prsm`,

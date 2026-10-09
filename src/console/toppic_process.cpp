@@ -1278,7 +1278,8 @@ int TopPIC_postprocess(std::map<std::string, std::string>& arguments,
 
     bool use_rescore = arguments["rescore"] == "true";
     if (arguments["searchType"] == "TARGET+DECOY" && use_rescore) {
-      // hidden option --rescore: the best PrSM of every spectrum, targets and
+      // the rescoring (default with -d; off with the hidden
+      // --disable-rescore): the best PrSM of every spectrum, targets and
       // decoys, after the recount, the post mass matching and the PTM
       // characterization, gets a score of a linear SVM trained with
       // cross-validation, which the FDR ranks by instead of the E-value
@@ -1360,7 +1361,7 @@ int TopPIC_multi_postprocess(std::map<std::string, std::string>& arguments) {
     std::cout << "Finding PrSM protein clusters - finished." << std::endl;
     std::string cur_suffix = "toppic_cluster";
 
-    // --rescore: the merged PrSMs are rescored together on the merged
+    // the rescoring: the merged PrSMs are rescored together on the merged
     // spectra, as in TopPIC_postprocess
     bool use_rescore = arguments["rescore"] == "true";
     if (arguments["searchType"] == "TARGET+DECOY" && use_rescore) {
@@ -1586,16 +1587,16 @@ std::string TopPIC_identifyAll(std::map<std::string, std::string>& arguments) {
 // its post-matched spectrum file; ori_sp_file_name the file it searched):
 // the residual spectra <base>_resid_ms2.msalign are written (the second
 // precursor first, the masses of the accepted first-pass PrSM removed) and
-// searched and post-processed like the first pass (without --rescore, which
-// runs on the merged set); then the second pass's post-matched spectra are
-// appended to the first pass's file with their ids raised by
+// searched and post-processed like the first pass (without the rescoring,
+// which runs on the merged set); then the second pass's post-matched
+// spectra are appended to the first pass's file with their ids raised by
 // SpPara::getMaxSpecNumPerFile(), the two passes' record PrSMs are merged
 // into one set of (spectrum, precursor) units, clustered again (no cluster
 // protein correction, recount or post mass matching: each pass did its
-// own), rescored with --rescore, given one FDR and written as the file's
-// toppic_record_prsm (the first pass's is kept as toppic_first_record_prsm),
-// which TopPIC_report reads. The residual pass's files are cleaned up as
-// the first pass's.
+// own), rescored (unless --disable-rescore), given one FDR and written as
+// the file's toppic_record_prsm (the first pass's is kept as
+// toppic_first_record_prsm), which TopPIC_report reads. The residual pass's
+// files are cleaned up as the first pass's.
 int TopPIC_second_precursor(std::map<std::string, std::string>& arguments,
                             const std::string& ori_sp_file_name) {
   try {
