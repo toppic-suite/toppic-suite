@@ -594,7 +594,7 @@ void MassMatch::compScores(
 
 void MassMatch::compScores(
     const std::vector<std::pair<int, int>>& pref_mass_errors, int start,
-    double shift, std::vector<short>& scores) {
+    double shift, std::vector<short>& scores, int col_limit) {
   // The column bounds (40 MB per index) and the row ids (hundreds of MB)
   // are touched at the masses' positions only, so every window misses the
   // cache; the bounds of the window a few masses ahead and the first row
@@ -604,7 +604,8 @@ void MassMatch::compScores(
   const int* entries = col_indexes_.data();
   short* s = scores.data();
   const int n = static_cast<int>(pref_mass_errors.size());
-  const int col_num = col_num_;
+  const int col_num =
+      col_limit >= 0 && col_limit < col_num_ ? col_limit : col_num_;
   const int pf_bound = 8;  // masses ahead for the column bound prefetch
   const int pf_entry = 3;  // masses ahead for the row id prefetch
   for (int i = start; i < n; i++) {
@@ -837,6 +838,12 @@ void MassMatch::compMatchScores(
     const std::vector<std::pair<int, int>>& prec_minus_water_mass_errors,
     std::vector<short>& scores, std::vector<int>& prec_rows) {
   compScores(pref_mass_errors, 0, 0.0, scores);
+  compPrecScores(prec_minus_water_mass_errors, scores, prec_rows);
+}
+
+void MassMatch::compPrecScores(
+    const std::vector<std::pair<int, int>>& prec_minus_water_mass_errors,
+    std::vector<short>& scores, std::vector<int>& prec_rows) {
   for (size_t i = 0; i < prec_minus_water_mass_errors.size(); i++) {
     updatePrecScoreImpl<true>(prec_minus_water_mass_errors[i], scores,
                               &prec_rows);

@@ -51,8 +51,19 @@ class MassMatch {
   void compScores(const std::vector<std::pair<int, int>>& pref_mass_errors,
                   std::vector<short>& scores);
 
+  // With col_limit (a column number below this index's), the windows are
+  // cut at it, which gives the scores of the index truncated to col_limit
+  // columns (truncateColumns): the one-shift filter scores the zero-shift
+  // filter's index of a block this way (toppic_test experiment 150).
   void compScores(const std::vector<std::pair<int, int>>& pref_mass_errors,
-                  int start, double shift, std::vector<short>& scores);
+                  int start, double shift, std::vector<short>& scores,
+                  int col_limit = -1);
+
+  // The precursor bonus of compMatchScores alone: the rows whose mass
+  // matches one of prec_minus_water_mass_errors, appended to prec_rows.
+  void compPrecScores(
+      const std::vector<std::pair<int, int>>& prec_minus_water_mass_errors,
+      std::vector<short>& scores, std::vector<int>& prec_rows);
 
   void compMatchScores(const std::vector<std::pair<int, int>>& pref_mass_errors,
                        const std::pair<int, int>& prec_minus_water_mass_error,

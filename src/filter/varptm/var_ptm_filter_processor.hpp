@@ -29,6 +29,15 @@ namespace var_ptm_filter_processor {
 // N-terminal modification rounds), converted once
 FilterSpecPtrVec readSpectra(const VarPtmFilterMngPtr& mng_ptr);
 
+// the candidates of the filter's last computeBestMatch into the combiner
+void addCands(const VarPtmFilterPtr& filter_ptr,
+              const PrsmParaPtr& prsm_para_ptr, int block_idx, int add_idx,
+              SimplePrsmMemMerge* combiner);
+
+// the stage's progress line after spectrum i of the block's spectra
+void reportProgress(const VarPtmFilterMngPtr& mng_ptr, int block_idx,
+                    size_t i, size_t spectra_num);
+
 // scores the spectra against one block's filter and adds the candidates to
 // the combiner (also used by zero_var_ptm_filter_processor)
 void scoreBlock(const VarPtmFilterPtr& filter_ptr, int block_idx,

@@ -144,17 +144,65 @@ OnePtmFilter::OnePtmFilter(const ProteoformPtrVec& proteo_ptrs,
         proteo_ptrs, n_term_acet_2d, mng_ptr->max_proteoform_mass_,
         mng_ptr->filter_scale_);
   };
+  initRows();
+}
+
+OnePtmFilter::OnePtmFilter(const ProteoformPtrVec& proteo_ptrs,
+                           const OnePtmFilterMngPtr& mng_ptr,
+                           MassMatchPtr term_index_ptr,
+                           MassMatchPtr diag_index_ptr,
+                           MassMatchPtr rev_term_index_ptr,
+                           MassMatchPtr rev_diag_index_ptr)
+    : mng_ptr_(mng_ptr),
+      proteo_ptrs_(proteo_ptrs),
+      diag_index_ptr_(std::move(diag_index_ptr)),
+      rev_diag_index_ptr_(std::move(rev_diag_index_ptr)),
+      term_index_ptr_(std::move(term_index_ptr)),
+      rev_term_index_ptr_(std::move(rev_term_index_ptr)) {
+  int col_num = mng_ptr->max_proteoform_mass_ * mng_ptr->filter_scale_;
+  MassMatchPtr index_ptrs[] = {term_index_ptr_, diag_index_ptr_,
+                               rev_term_index_ptr_, rev_diag_index_ptr_};
+  for (size_t t = 0; t < 4; t++) {
+    if (index_ptrs[t]->getScale() != mng_ptr->filter_scale_ ||
+        index_ptrs[t]->getColNum() < col_num) {
+      LOG_ERROR("The shared index does not cover the one-shift filter's "
+                "columns");
+      exit(EXIT_FAILURE);
+    }
+    if (index_ptrs[t]->getColNum() > col_num) {
+      col_limit_ = col_num;
+    }
+  }
+  initRows();
+}
+
+void OnePtmFilter::initRows() {
   term_nonincr_shifts_ =
       mass_match_util::compNonincreasingShifts(term_index_ptr_);
   diag_nonincr_shifts_ =
       mass_match_util::compNonincreasingShifts(diag_index_ptr_);
   std::vector<int> proteo_lens;
-  for (size_t i = 0; i < proteo_ptrs.size(); i++) {
-    proteo_lens.push_back(proteo_ptrs[i]->getResSeqPtr()->getLen());
+  for (size_t i = 0; i < proteo_ptrs_.size(); i++) {
+    proteo_lens.push_back(proteo_ptrs_[i]->getResSeqPtr()->getLen());
   }
   row_ranges_.init(proteo_lens, term_index_ptr_, diag_index_ptr_,
                    rev_term_index_ptr_, rev_diag_index_ptr_,
-                   prsm_para_ptr->getProtModPtrVec());
+                   mng_ptr_->prsm_para_ptr_->getProtModPtrVec());
+}
+
+bool OnePtmFilter::fitsColumns(const FilterSpecPtr& spec_ptr) const {
+  if (col_limit_ < 0) {
+    return true;
+  }
+  for (const std::vector<std::pair<int, int>>* list :
+       {&spec_ptr->getPrefMassErrors(), &spec_ptr->getSuffMassErrors()}) {
+    for (const std::pair<int, int>& mass_error : *list) {
+      if (mass_error.first + mass_error.second >= col_limit_) {
+        return false;
+      }
+    }
+  }
+  return true;
 }
 
 FilterSpecPtr OnePtmFilter::geneFilterSpec(
@@ -183,28 +231,51 @@ void OnePtmFilter::computeBestMatch(const PrmMsPtrVec& prm_ms_ptr_vec,
 }
 
 void OnePtmFilter::computeBestMatch(const FilterSpecPtr& spec_ptr) {
-  PeakTolerancePtr tole_ptr =
-      mng_ptr_->prsm_para_ptr_->getSpParaPtr()->getPrecTolerancePtr();
+  scoreIndexes(spec_ptr);
+  findCandidates(spec_ptr);
+}
+
+void OnePtmFilter::computeBestMatch(const FilterSpecPtr& spec_ptr,
+                                    const std::vector<short>& term_scores,
+                                    const std::vector<short>& diag_scores,
+                                    const std::vector<short>& rev_term_scores,
+                                    const std::vector<short>& rev_diag_scores) {
+  {
+    stage_profile::Timer copy_timer("one.copy");
+    term_scores_ = term_scores;
+    diag_scores_ = diag_scores;
+    rev_term_scores_ = rev_term_scores;
+    rev_diag_scores_ = rev_diag_scores;
+  }
+  findCandidates(spec_ptr);
+}
+
+void OnePtmFilter::scoreIndexes(const FilterSpecPtr& spec_ptr) {
   const std::vector<std::pair<int, int>>& pref_mass_errors =
       spec_ptr->getPrefMassErrors();
   const std::vector<std::pair<int, int>>& suff_mass_errors =
       spec_ptr->getSuffMassErrors();
-
-  std::unique_ptr<stage_profile::Timer> score_timer =
-      std::make_unique<stage_profile::Timer>("one.score");
+  stage_profile::Timer score_timer("one.score");
   term_scores_.assign(term_index_ptr_->getRowNum(), 0);
-  term_index_ptr_->compScores(pref_mass_errors, term_scores_);
+  term_index_ptr_->compScores(pref_mass_errors, 0, 0.0, term_scores_,
+                              col_limit_);
 
   diag_scores_.assign(diag_index_ptr_->getRowNum(), 0);
-  diag_index_ptr_->compScores(pref_mass_errors, diag_scores_);
+  diag_index_ptr_->compScores(pref_mass_errors, 0, 0.0, diag_scores_,
+                              col_limit_);
 
   rev_term_scores_.assign(rev_term_index_ptr_->getRowNum(), 0);
-  rev_term_index_ptr_->compScores(suff_mass_errors, rev_term_scores_);
+  rev_term_index_ptr_->compScores(suff_mass_errors, 0, 0.0, rev_term_scores_,
+                                  col_limit_);
 
   rev_diag_scores_.assign(rev_diag_index_ptr_->getRowNum(), 0);
-  rev_diag_index_ptr_->compScores(suff_mass_errors, rev_diag_scores_);
+  rev_diag_index_ptr_->compScores(suff_mass_errors, 0, 0.0, rev_diag_scores_,
+                                  col_limit_);
+}
 
-  score_timer = nullptr;
+void OnePtmFilter::findCandidates(const FilterSpecPtr& spec_ptr) {
+  PeakTolerancePtr tole_ptr =
+      mng_ptr_->prsm_para_ptr_->getSpParaPtr()->getPrecTolerancePtr();
   stage_profile::Timer find_timer("one.find");
   // the best row score of each proteoform in each index, computed once and
   // shared by the four proteoform types below

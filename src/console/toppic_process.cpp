@@ -334,9 +334,17 @@ std::string TopPIC_identify(std::map<std::string, std::string>& arguments) {
       }
     };
 
+    // with one unexpected shift allowed, the one-shift filter joins the
+    // combined pass too (its index files are the zero-shift ones cut at its
+    // column limit)
+    bool combined_one_filter = combined_filter && shift_num >= 1;
+    const std::string combined_stage_name =
+        combined_one_filter
+            ? "Zero unexpected shift, variable PTM and one unexpected shift "
+              "filtering"
+            : "Zero unexpected shift and variable PTM filtering";
     if (combined_filter) {
-      std::cout << "Zero unexpected shift and variable PTM filtering - started."
-                << std::endl;
+      std::cout << combined_stage_name << " - started." << std::endl;
     } else {
       std::cout << "Zero unexpected shift filtering - started." << std::endl;
     }
@@ -357,11 +365,16 @@ std::string TopPIC_identify(std::map<std::string, std::string>& arguments) {
                                            "toppic_zero_filter");
     if (combined_filter) {
       makeVarFilterMng(zero_filter_thread_num);
+      OnePtmFilterMngPtr combined_one_filter_mng_ptr;
+      if (combined_one_filter) {
+        combined_one_filter_mng_ptr = std::make_shared<OnePtmFilterMng>(
+            prsm_para_ptr, index_file_para, "toppic_one_filter",
+            zero_filter_thread_num, min_shift_mass, max_shift_mass);
+      }
       zero_var_ptm_filter_processor::process(zero_filter_mng_ptr,
-                                             var_filter_mng_ptr);
-      std::cout
-          << "Zero unexpected shift and variable PTM filtering - finished."
-          << std::endl;
+                                             var_filter_mng_ptr,
+                                             combined_one_filter_mng_ptr);
+      std::cout << combined_stage_name << " - finished." << std::endl;
     } else {
       zero_ptm_filter_processor::process(zero_filter_mng_ptr);
       std::cout << "Zero unexpected shift filtering - finished." << std::endl;
@@ -412,16 +425,19 @@ std::string TopPIC_identify(std::map<std::string, std::string>& arguments) {
     }
 
     if (shift_num >= 1) {
-      std::cout << "One unexpected shift filtering - started." << std::endl;
-      int one_filter_thread_num = mem_check::getStageThreadNum(
-          "One unexpected shift filtering", thread_num);
-      LOG_DEBUG("One-shift filter thread number " << one_filter_thread_num);
-      OnePtmFilterMngPtr one_ptm_filter_mng_ptr =
-          std::make_shared<OnePtmFilterMng>(
-              prsm_para_ptr, index_file_para, "toppic_one_filter",
-              one_filter_thread_num, min_shift_mass, max_shift_mass);
-      one_ptm_filter_processor::process(one_ptm_filter_mng_ptr);
-      std::cout << "One unexpected shift filtering - finished." << std::endl;
+      if (!combined_one_filter) {
+        std::cout << "One unexpected shift filtering - started." << std::endl;
+        int one_filter_thread_num = mem_check::getStageThreadNum(
+            "One unexpected shift filtering", thread_num);
+        LOG_DEBUG("One-shift filter thread number " << one_filter_thread_num);
+        OnePtmFilterMngPtr one_ptm_filter_mng_ptr =
+            std::make_shared<OnePtmFilterMng>(
+                prsm_para_ptr, index_file_para, "toppic_one_filter",
+                one_filter_thread_num, min_shift_mass, max_shift_mass);
+        one_ptm_filter_processor::process(one_ptm_filter_mng_ptr);
+        std::cout << "One unexpected shift filtering - finished."
+                  << std::endl;
+      }
 
       std::cout << "One unexpected shift search - started." << std::endl;
       int search_shift_num = 1;

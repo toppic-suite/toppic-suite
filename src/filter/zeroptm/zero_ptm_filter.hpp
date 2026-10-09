@@ -61,6 +61,15 @@ class ZeroPtmFilter {
 
   // the rows of each index that received the precursor bonus, by proteoform,
   // reused by the spectra of the block
+  // The N-terminal side scores before the precursor bonus, and the mass
+  // list they were computed for: the lists of the three precursor offsets
+  // of a spectrum are the same (the N-terminal masses do not depend on the
+  // precursor), so the two index scorings are done once per spectrum and
+  // copied for the other offsets (toppic_test experiment 150).
+  std::vector<std::pair<int, int>> base_pref_mass_errors_;
+  std::vector<short> term_base_scores_;
+  std::vector<short> diag_base_scores_;
+  bool has_base_scores_ = false;
   std::vector<int> term_prec_rows_;
   std::vector<int> diag_prec_rows_;
   std::vector<int> rev_term_prec_rows_;

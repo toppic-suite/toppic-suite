@@ -17,6 +17,7 @@
 #define TOPPIC_FILTER_VARPTM_VAR_PTM_FILTER_HPP_
 
 #include <array>
+#include <functional>
 #include <memory>
 #include <string>
 #include <vector>
@@ -58,7 +59,22 @@ class VarPtmFilter {
   // SimplePrsm::getTruncNTermModShifts), so that the many weak pairs a round
   // with the precursor mass less the PTM mass finds do not displace the
   // candidates of the first round.
-  void computeBestMatch(const FilterSpecPtr& spec_ptr);
+  // base_scores_hook, if given, runs after the four indexes are scored with
+  // the mass lists and before the precursor bonus: the combined filter
+  // stage hands the scores to the one-shift filter there (getTermScores
+  // and the others; toppic_test experiment 150).
+  void computeBestMatch(const FilterSpecPtr& spec_ptr,
+                        const std::function<void()>& base_scores_hook =
+                            std::function<void()>());
+
+  const std::vector<short>& getTermScores() const { return term_scores_; }
+  const std::vector<short>& getDiagScores() const { return diag_scores_; }
+  const std::vector<short>& getRevTermScores() const {
+    return rev_term_scores_;
+  }
+  const std::vector<short>& getRevDiagScores() const {
+    return rev_diag_scores_;
+  }
 
   SimplePrsmPtrVec getCompMatchPtrs() { return comp_match_ptrs_; }
   SimplePrsmPtrVec getPrefMatchPtrs() { return pref_match_ptrs_; }
@@ -122,7 +138,9 @@ class VarPtmFilter {
   void scoreIndexes(const FilterSpecPtr& spec_ptr,
                     const std::vector<std::pair<int, int>>&
                         prec_minus_water_mass_errors,
-                    bool score_term);
+                    bool score_term,
+                    const std::function<void()>& base_scores_hook =
+                        std::function<void()>());
 
   // The candidates of the four proteoform types (complete, prefix, suffix,
   // internal) from the scores of scoreIndexes: the pairs whose range mass

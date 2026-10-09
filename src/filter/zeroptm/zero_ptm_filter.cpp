@@ -180,19 +180,23 @@ void ZeroPtmFilter::computeBestMatch(const FilterSpecPtr& spec_ptr) {
 
   std::unique_ptr<stage_profile::Timer> score_timer =
       std::make_unique<stage_profile::Timer>("zero.score");
-  int term_row_num = term_index_ptr_->getRowNum();
-  std::vector<short> term_scores(term_row_num, 0);
+  if (!has_base_scores_ || pref_mass_errors != base_pref_mass_errors_) {
+    base_pref_mass_errors_ = pref_mass_errors;
+    term_base_scores_.assign(term_index_ptr_->getRowNum(), 0);
+    term_index_ptr_->compScores(pref_mass_errors, term_base_scores_);
+    diag_base_scores_.assign(diag_index_ptr_->getRowNum(), 0);
+    diag_index_ptr_->compScores(pref_mass_errors, diag_base_scores_);
+    has_base_scores_ = true;
+  }
+  std::vector<short> term_scores = term_base_scores_;
   term_prec_rows_.clear();
-  term_index_ptr_->compMatchScores(pref_mass_errors,
-                                   prec_minus_water_mass_errors, term_scores,
-                                   term_prec_rows_);
+  term_index_ptr_->compPrecScores(prec_minus_water_mass_errors, term_scores,
+                                  term_prec_rows_);
 
-  int diag_row_num = diag_index_ptr_->getRowNum();
-  std::vector<short> diag_scores(diag_row_num, 0);
+  std::vector<short> diag_scores = diag_base_scores_;
   diag_prec_rows_.clear();
-  diag_index_ptr_->compMatchScores(pref_mass_errors,
-                                   prec_minus_water_mass_errors, diag_scores,
-                                   diag_prec_rows_);
+  diag_index_ptr_->compPrecScores(prec_minus_water_mass_errors, diag_scores,
+                                  diag_prec_rows_);
 
   int rev_term_row_num = rev_term_index_ptr_->getRowNum();
   std::vector<short> rev_term_scores(rev_term_row_num, 0);

@@ -41,7 +41,7 @@ namespace one_ptm_filter_processor {
 // Reads the msalign file once and converts every spectrum set into the block
 // independent form the filter scores, so that the blocks share the conversion
 // instead of repeating it.
-inline FilterSpecPtrVec readSpectra(const OnePtmFilterMngPtr& mng_ptr) {
+FilterSpecPtrVec readSpectra(const OnePtmFilterMngPtr& mng_ptr) {
   PrsmParaPtr prsm_para_ptr = mng_ptr->prsm_para_ptr_;
   SpParaPtr sp_para_ptr = prsm_para_ptr->getSpParaPtr();
   int group_spec_num = prsm_para_ptr->getGroupSpecNum();
@@ -137,6 +137,67 @@ inline FilterSpecPtrVec readSpectrumVariants(
   return spectra;
 }
 
+void addCands(const OnePtmFilterPtr& filter_ptr,
+              const PrsmParaPtr& prsm_para_ptr, int block_idx, int add_idx,
+              SimplePrsmMemMerge* combiner) {
+  if (prsm_para_ptr->allowCompleteProt()) {
+    combiner->add(0, block_idx, add_idx, filter_ptr->getCompMatchPtrs());
+  }
+  if (prsm_para_ptr->allowPrefixProt()) {
+    combiner->add(1, block_idx, add_idx, filter_ptr->getPrefMatchPtrs());
+  }
+  if (prsm_para_ptr->allowSuffixProt()) {
+    combiner->add(2, block_idx, add_idx, filter_ptr->getSuffMatchPtrs());
+  }
+  if (prsm_para_ptr->allowInternalProt()) {
+    combiner->add(3, block_idx, add_idx, filter_ptr->getInternalMatchPtrs());
+  }
+}
+
+void reportProgress(const OnePtmFilterMngPtr& mng_ptr, int block_idx,
+                    size_t i, size_t spectra_num) {
+  const size_t report_step = 100;
+  if ((i + 1) % report_step != 0 && i + 1 != spectra_num) {
+    return;
+  }
+  int group_spec_num = mng_ptr->prsm_para_ptr_->getGroupSpecNum();
+  int block_num = static_cast<int>(mng_ptr->cnts_.size());
+  int spec_num = mng_ptr->n_spec_block_ / block_num;
+  // the count covers the spectra without precursor as well; with
+  // variants (var_num_ > 0) an entry is a part of a spectrum
+  if (i + 1 == spectra_num) {
+    mng_ptr->cnts_[block_idx] = spec_num;
+  } else if (mng_ptr->var_num_ == 0) {
+    mng_ptr->cnts_[block_idx] = static_cast<int>((i + 1) * group_spec_num);
+  } else {
+    mng_ptr->cnts_[block_idx] = static_cast<int>(
+        (i + 1) * static_cast<double>(spec_num) / spectra_num);
+  }
+  int cnt_sum = 0;
+  for (size_t k = 0; k < mng_ptr->cnts_.size(); k++) {
+    cnt_sum = cnt_sum + mng_ptr->cnts_[k];
+  }
+  double perc = cnt_sum * 100.0 / mng_ptr->n_spec_block_;
+  std::stringstream msg;
+  msg << std::flush << "One unexpected shift filtering - processing "
+      << std::setprecision(3) << perc << "%.     \r";
+  mng_ptr->mutex_.lock();
+  std::cout << msg.str();
+  mng_ptr->mutex_.unlock();
+}
+
+void scoreBlock(const OnePtmFilterPtr& filter_ptr, int block_idx,
+                const OnePtmFilterMngPtr& mng_ptr,
+                const FilterSpecPtrVec& spectra, SimplePrsmMemMerge* combiner) {
+  PrsmParaPtr prsm_para_ptr = mng_ptr->prsm_para_ptr_;
+  for (size_t i = 0; i < spectra.size(); i++) {
+    filter_ptr->computeBestMatch(spectra[i]);
+    addCands(filter_ptr, prsm_para_ptr, block_idx, static_cast<int>(i),
+             combiner);
+    reportProgress(mng_ptr, block_idx, i, spectra.size());
+  }
+}
+
 inline void filterBlockCached(const ProteoformPtrVec& raw_forms, int block_idx,
                               const OnePtmFilterMngPtr& mng_ptr,
                               const FilterSpecPtrVec& spectra,
@@ -144,53 +205,7 @@ inline void filterBlockCached(const ProteoformPtrVec& raw_forms, int block_idx,
   std::string block_str = std::to_string(block_idx);
   OnePtmFilterPtr filter_ptr =
       std::make_shared<OnePtmFilter>(raw_forms, mng_ptr, block_str);
-
-  PrsmParaPtr prsm_para_ptr = mng_ptr->prsm_para_ptr_;
-  int group_spec_num = prsm_para_ptr->getGroupSpecNum();
-  int block_num = static_cast<int>(mng_ptr->cnts_.size());
-  int spec_num = mng_ptr->n_spec_block_ / block_num;
-  size_t report_step = 100;
-  for (size_t i = 0; i < spectra.size(); i++) {
-    filter_ptr->computeBestMatch(spectra[i]);
-    int add_idx = static_cast<int>(i);
-    if (prsm_para_ptr->allowCompleteProt()) {
-      combiner->add(0, block_idx, add_idx, filter_ptr->getCompMatchPtrs());
-    }
-    if (prsm_para_ptr->allowPrefixProt()) {
-      combiner->add(1, block_idx, add_idx, filter_ptr->getPrefMatchPtrs());
-    }
-    if (prsm_para_ptr->allowSuffixProt()) {
-      combiner->add(2, block_idx, add_idx, filter_ptr->getSuffMatchPtrs());
-    }
-    if (prsm_para_ptr->allowInternalProt()) {
-      combiner->add(3, block_idx, add_idx, filter_ptr->getInternalMatchPtrs());
-    }
-
-    if ((i + 1) % report_step == 0 || i + 1 == spectra.size()) {
-      // the count covers the spectra without precursor as well; with
-      // variants (var_num_ > 0) an entry is a part of a spectrum
-      if (i + 1 == spectra.size()) {
-        mng_ptr->cnts_[block_idx] = spec_num;
-      } else if (mng_ptr->var_num_ == 0) {
-        mng_ptr->cnts_[block_idx] = static_cast<int>((i + 1) * group_spec_num);
-      } else {
-        mng_ptr->cnts_[block_idx] =
-            static_cast<int>((i + 1) * static_cast<double>(spec_num) /
-                             spectra.size());
-      }
-      int cnt_sum = 0;
-      for (size_t k = 0; k < mng_ptr->cnts_.size(); k++) {
-        cnt_sum = cnt_sum + mng_ptr->cnts_[k];
-      }
-      double perc = cnt_sum * 100.0 / mng_ptr->n_spec_block_;
-      std::stringstream msg;
-      msg << std::flush << "One unexpected shift filtering - processing "
-          << std::setprecision(3) << perc << "%.     \r";
-      mng_ptr->mutex_.lock();
-      std::cout << msg.str();
-      mng_ptr->mutex_.unlock();
-    }
-  }
+  scoreBlock(filter_ptr, block_idx, mng_ptr, spectra, combiner);
 }
 
 std::function<void()> geneTask(int block_idx,
