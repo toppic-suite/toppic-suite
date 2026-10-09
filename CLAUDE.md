@@ -3279,6 +3279,108 @@ byte for byte (toppic_test experiment 112, in 2.5 s against `emass.py`'s
   mass minus k 32S masses (at least 0, so the lightest entries are S_k
   alone) and k S are added.
 
+## Index files version 2, the combined filter pass and the E-value stage (toppic_test experiment 150)
+
+Branch `speedup_four_ptm_s2` (toppic_test experiment 150, report 0150;
+from main 915bb387, merged into main on 2026-10-09). `toppic -u 16 -f C57
+-d -t FDR -T FDR -y FDR -s 2 -b topmg_var_mods.txt` on 480_F3_02 takes
+543 s instead of 816 s (-33%) with every output file byte-identical to
+main 915bb387's (the `-k` stage files, the record PrSM file, the PrSM
+XML). Facts to keep straight:
+
+- **Index files version 2** (`MassMatch::serializeMassMatchV2`): the
+  header `TPMMIDX2` (scale, proteoform / column / row numbers), then the
+  seven arrays as zstd -1 frames, the column bounds stored once
+  (`col_index_bounds_`, col_num + 1 ints) instead of the begins and ends.
+  `deserializeMassMatch` probes the magic and reads a version 1 Boost
+  archive or a version 2 file (one `read` into a thread-local buffer,
+  `posix_fadvise DONTNEED` after it). `topindex --index-format <1|2>`
+  (hidden, default 2). The human reviewed database with decoys takes 93 GB
+  instead of 172 GB. Version 1 index directories stay readable; the file
+  names (`filter/mng/index_file_name`) are unchanged, so the format is
+  known only by reading a file. `MassMatch::compScores` prefetches the
+  column bounds and row ids a few masses ahead (no measurable change).
+- **One pass for the zero-shift, variable PTM and one-shift filters**
+  (`filter/varptm/zero_var_ptm_filter_processor`): with a variable PTM
+  file and no approximate spectra, `toppic_process` runs one stage, "Zero
+  unexpected shift, variable PTM and one unexpected shift filtering" ("Zero
+  unexpected shift and variable PTM filtering" with `-s 0`), that loads
+  each block's four zero-shift index files once and scores them with the
+  `ZeroPtmFilter`, a `VarPtmFilter` built on the loaded indexes (a new
+  constructor) and, with `-s` of at least 1, the `OnePtmFilter`. The
+  one-shift filter's index files are the zero-shift ones cut at its column
+  limit (`truncateColumns`), so it scores the loaded indexes with its
+  windows cut there (`MassMatch::compScores(..., col_limit)`), and where a
+  spectrum's mass lists equal the variable PTM filter's (both
+  `getIntMassErrorList` at precursor offset 0) and every window lies below
+  the limit, it finds its candidates on the variable PTM filter's score
+  arrays in place (`VarPtmFilter::computeBestMatch`'s `base_scores_hook`,
+  called before the precursor bonus is added). The three stages' output
+  files are unchanged (`toppic_zero_filter_*`, `toppic_var_filter_*`,
+  `toppic_one_filter_*`), so the searches and the tag filter's hooks read
+  them as before; the one-shift index files are not read in this mode
+  (topindex still writes them for the separate stages and topmg). Hidden
+  `--separate-var-ptm-filter` runs the separate stages; without a variable
+  PTM file the zero-shift stage runs alone as before. The zero-shift
+  filter computes its N-terminal index scores once per spectrum and copies
+  them for the three precursor offsets (the N-terminal mass lists do not
+  depend on the precursor); the stage's three spectrum readings run in
+  parallel threads. Copying the score arrays between the filters was
+  tried and cost more than it saved (cache eviction); read them in place.
+- **The multiple-shift search's diagonal finder**
+  (`CompShiftLowMem::findBestShift`, `findBestShiftChunked`) counts the
+  mass differences in chunks of 65,536 bins from the top of the range
+  down, keeps the count events of at least a threshold (4, then 3, then 2)
+  in the original loop's order per spectrum mass (a window across a
+  chunk's lower edge waits in a pending buffer until the lower chunk has
+  emitted its part) and replays them through `checkShift`; when the
+  replay does not fill the 20-shift list the next threshold is tried, and
+  last the original loop runs. The lists are the original's (an event
+  below the final list's smallest count never changes it; checked on a
+  dump of 5,046 calls, `TOPPIC_SHIFT_DUMP=<file>`); the search went from
+  157 to 35 s, because the original loop touched a random cache line per
+  mass pair in a buffer of up to 770 MB.
+- **The E-value stages** (`stat/tdgf`): a PrSM with at most
+  `comp_evalue_min_match_theo_frag_num_` (4) matched fragments gets the
+  maximum E-value without a table and is left out of its spectrum's
+  groups; a spectrum whose PrSMs are all such skips the generating
+  function. `CountTestNum` is built in a background thread started before
+  the filters (`EValueProcessor::prepareCountTestNum`, joined when the
+  stage starts). The PrSMs are written in spectrum order through the
+  `OrderedTaskRunner` (16 pending tasks per thread; fewer let one slow
+  spectrum idle the others) with `PrsmXmlWriter::writeTrimmedLines`, the
+  bytes the former per-thread files and merge produced.
+- **The generating function in score slices** (`CompProbValue`): the
+  table (height = the group's best score + 1, at most 128, x the mass in
+  units of 1/27.4 Da) is swept in slices of 8 rows (`kChunkRows`), each a
+  sweep over all columns in blocks of 1,350 columns through a circular
+  page of 6 blocks, which needs the slice below only at the columns with
+  a position score (`saved_rows_`); the look-back window of the residues
+  stays in L2, where the whole-height sweep (a page of 5,000 Da x 128
+  rows, 138 MB per thread) streamed the table through memory and the stage
+  was bound by memory bandwidth. The per-cell operations and their order
+  are the old sweep's, so the probabilities are bit-identical, **including
+  the old sweep's page-tail carry-over**: it cleared the tail of its page
+  once per computation, so for precursors whose table wraps the page
+  (above about 4.7 kDa) a shift layer's first blocks read, through the
+  wrap, the last 5,105 columns the previous layer left there;
+  `tail_capture_` keeps those columns and puts them before column 0 of the
+  next layer. Every one-shift and two-shift E-value of such precursors
+  contains that carry-over. The clean sweep (do not fill the capture) is
+  the intended computation: on 356 spectra of 480 it lowers the shift
+  E-values by a median of 10^-0.0001 and up to 10^-4.25 and would move a
+  few identifications at the cutoffs; it is not done, to be decided.
+- **Research aids**: `TOPPIC_PROFILE=<file>` (`common/util/
+  stage_profile`: thread-seconds per named part and stage; the output
+  files do not change) and `TOPPIC_SHIFT_DUMP=<file>` (the diagonal
+  finder's inputs).
+- **Results** (480_F3_02, toppic_test report 0150, one run at a time):
+  main 820 / 812 s -> 542 / 543 s, user time 10,880 -> 7,510 s, system
+  time 529 -> 128 s, peak memory 18.9 -> 18.4 GB; 3,412 PrSMs, 2,016
+  proteoforms, 447 proteins at 1% FDR in every run. Not kept:
+  binary-search shift predecessors in the alignments (the quadratic loop
+  was 1% of the search), per-class table heights in the E-value.
+
 ## Source layout
 
 `src` is the include root, so headers are included by their path from `src`

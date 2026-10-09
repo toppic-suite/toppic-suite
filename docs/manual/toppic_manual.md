@@ -76,6 +76,12 @@ the result files are named after `sample_mono_ms2`.
 3. **One unexpected shift filtering and search** (with `--num-shift` of at
    least 1): alignment allowing one unexpected mass shift between
    `--min-shift` and `--max-shift`.
+
+   With `--variable-ptm-file-name` the filters of steps 1-3 run as one step
+   over the index files, printed as `Zero unexpected shift, variable PTM and
+   one unexpected shift filtering` (or `Zero unexpected shift and variable
+   PTM filtering` with `--num-shift 0`), and the searches follow in the order
+   above; the candidates are the same as with separate filters.
 4. **Merging PrSMs.** The proteoform-spectrum matches (PrSMs) of the
    searches above are merged.
 5. **E-value computation.** A generating-function method estimates the

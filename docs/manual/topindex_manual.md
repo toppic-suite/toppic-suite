@@ -74,11 +74,15 @@ Indexes built with other settings are ignored silently, and the search
 builds its own in memory. TopIndex skips database files that already exist,
 so several parameter sets can be indexed into the same `_idx` directory.
 
-The index files are large: roughly seven thousand times the size of the
+The index files are large: roughly three thousand times the size of the
 FASTA file, spread over the two families, and about twice as much with
-`--decoy` (184 GB for the 14 MB human SwissProt database with `--decoy`). A few-megabyte database can produce tens of gigabytes of index
-files. Delete the `_idx` directory to reclaim the space; the searches then
-fall back to in-memory indexes.
+`--decoy` (93 GB for the 14 MB human SwissProt database with `--decoy`). A
+few-megabyte database can produce tens of gigabytes of index files. The
+files are compressed (zstd) since October 2026; index directories written
+by earlier versions (twice as large) are still read, and running TopIndex
+again after deleting them gives the smaller files. Delete the `_idx`
+directory to reclaim the space; the searches then fall back to in-memory
+indexes.
 
 ## 4. Options
 
