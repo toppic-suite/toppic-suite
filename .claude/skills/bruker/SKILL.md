@@ -91,18 +91,40 @@ TopPIC):
   ECD spectra show the precursor's charge directly: the charge-reduced species
   (M+zH)^(z-1)+. , (z-2)+. ... dominate the spectrum; the largest deconvoluted mass
   is the precursor (23,466.61 Da at 8+, 7+, 9+ in experiment 148).
-- **Other parameters matter little.** `-e` (0.005-0.05), `-s` (0.5-5) and
-  `--mass-group-boundary` (2000-8000) changed the real fragments by about 10% at most
-  (`-c 10 -s 5` gave the best coverage); `-n` only reorders the masses;
+- **Use a high MS/MS S/N ratio, `-s` 50-100.** `-s` (`--ms-two-sn-ratio`, default 1)
+  is the factor over the spectrum's noise level (the most crowded intensity bin) that a
+  peak needs to seed an isotopic envelope; the other peaks of an envelope only need the
+  noise level. On the summed timsOmni spectrum (all frames, `-c 10`) raising it removed
+  noise, not fragments: 33,269 masses at `-s 1`, 9,992 at 40, 7,100 at 60, 5,522 at 80,
+  4,616 at 100, with 107-112 real fragment masses above random throughout, the random
+  share of the matches 25% -> 6%, the bonds covered 86 -> 89-92, TopFD 20 s -> 3 s, and
+  TopPIC's E-values better (tagged construct 9.0e-29 -> 2.9e-38). Above 100 real
+  fragments are lost (85 at 200, 50 at 1000, 17 at 5000), the weaker C-terminal z ions
+  first. Measured on the sum of all frames; on spectra of 100 summed frames `-s 5`
+  already lost TopPIC identifications to the KRAS4A isoform, so check a lower `-s` for
+  shorter sums.
+- **`-v` (EnvCNN cutoff, default 0) at about 0.4** keeps only the masses that TopPIC's
+  own filter keeps (`toppic -F`, default 0.4): with `-c 10 -s 100`, `-v 0.4` leaves 313
+  of 4,616 masses, 0.2% random matches, and the same TopPIC E-values as `-v 0` (TopPIC
+  searched nearly the same masses, 313 against 314), so the msalign holds nearly only
+  real fragments. It costs
+  the low-scoring real fragments in the file: 64 instead of 108.5 above random (z ions
+  17 of 40, c ions 35 of 43), which TopPIC's recount and tables then miss (post mass
+  matching recovers part of them from TopFD's raw peaks, which `-v` keeps). Do not go
+  above 0.4: from `-v 0.5` the z ions that distinguish KRAS4B from KRAS4A were gone and
+  TopPIC reported the wrong isoform.
+- **Other parameters matter little.** `-e` (0.005-0.05) and `--mass-group-boundary`
+  (2000-8000) changed the real fragments by about 10% at most; `-n` only reorders the
+  masses;
   `--max-miss-peak-num` and `--disable-filter-by-mz` changed nothing with the greedy
   MS/MS deconvolution (the default), which does not read `--ms2-rank-peak-distance` or
   `--disable-ms2-harmonic-check` (those act with `-q msdeconv`).
-- **The noise filters trade fragments for purity:** `-v 0.1` kept 12% of the masses
-  and 70% of the fragments, `-g` 3% and 47%, `-q msdeconv` 17% and 80%,
-  `-q flashdeconv` 0.3% and 41% (no random match; the best TopPIC E-values when the
-  sequence is in the database, too few masses for a search with unknown shifts).
-  TopPIC filters masses at EnvCNN 0.4 itself (`-F`), so `topfd -v` below 0.4 does not
-  change TopPIC's results.
+- **The other noise filters trade fragments for purity:** at the default `-s 1`,
+  `-v 0.1` kept 12% of the masses and 70% of the fragments, `-g` 3% and 47%,
+  `-q msdeconv` 17% and 80%, `-q flashdeconv` 0.3% and 41% (no random match; the best
+  TopPIC E-values when the sequence is in the database, too few masses for a search
+  with unknown shifts). TopPIC filters masses at EnvCNN 0.4 itself (`-F`), so
+  `topfd -v` below 0.4 does not change TopPIC's results.
 - Mass accuracy of the fragments: median +0.4 to +0.7 ppm, interquartile range about
   3 ppm, so `-e 0.02` and TopPIC's 10 ppm tolerance are adequate.
 
@@ -110,11 +132,13 @@ Recommended for a timsOmni ECD run of one precursor:
 
 ```sh
 python3 .claude/skills/bruker/tsf2mzml.py run.d run.mzML --mode profsum --sum 0 --activation ECD
-topfd -o -a ETD -c 10 -s 5 run.mzML                 # -c = precursor charge + 1
+topfd -o -a ETD -c 10 -s 80 -v 0.4 run.mzML         # -c = precursor charge + 1; -s 50-100; -v about 0.4
 ```
 
-(`--sum 100`, about 12 s of acquisition per spectrum, gave the best single TopPIC
-E-values for a search with two unknown shifts, 16 of 20 spectra at the TopFD defaults.)
+Leave out `-v 0.4` to keep the low-scoring real fragments in the msalign (TopPIC's
+search is the same either way). (`--sum 100`, about 12 s of acquisition per spectrum,
+gave the best single TopPIC E-values for a search with two unknown shifts at the TopFD
+defaults, 16 of 20 spectra.)
 
 ## 4. TopPIC on spectra deconvoluted with `-o`
 
@@ -126,8 +150,17 @@ E-values for a search with two unknown shifts, 16 of 20 spectra at the TopFD def
       -e 's/^PRECURSOR_MZ=.*/PRECURSOR_MZ=2608.408/' run_ms2.msalign > run_fixed_ms2.msalign
   ```
 
-- `-a ETD` for ECD; `-x` (no feature file without MS1) and `-D` (no post mass matching,
-  which reads the TopFD SQLite database by spectrum) when the msalign is edited.
+- `-a ETD` for ECD and `-x` (no feature file without MS1). Post mass matching (on by
+  default) reads TopFD's SQLite database `<base>.sqlite` next to `<base>_ms2.msalign` by
+  spectrum id, so keep the edited file's name (or copy the database to the new base
+  name) and it works; TopPIC writes its result tables into that database. Use `-D`
+  otherwise.
+- **`-s 2` on one strong spectrum: add `--multi-skip-evalue 0`.** TopPIC's
+  multiple-shift stage skips spectra whose one-shift E-value is already below 0.01
+  (without `-d`; with `-d` below the smallest first-pass decoy E-value). In experiment
+  148 a one-shift approximation (tag + GDP as one +2,353 Da shift) reached E 5e-5 to
+  5e-8, so the right two-shift form (tag + GDP, E 1e-9 to 6e-15) was never searched;
+  the hidden `--multi-skip-evalue 0` searches every spectrum in the multiple-shift stage.
 - Shift ranges: a tag or a bound ligand can exceed TopPIC's default +-500 Da (`-m` /
   `-M`); in experiment 148 a 1,910 Da His tag and GDP (443 Da) needed `-s 2 -M 5000`
   against the bare sequence, or the construct's sequence in the database and `-s 1`.
