@@ -20,6 +20,7 @@
 #include "common/thread/simple_thread_pool.hpp"
 #include "common/util/file_util.hpp"
 #include "common/util/logger.hpp"
+#include "common/util/stage_profile.hpp"
 #include "filter/massmatch/filter_spec.hpp"
 #include "filter/zeroptm/zero_ptm_filter.hpp"
 #include "ms/factory/spectrum_set_factory.hpp"
@@ -38,7 +39,7 @@ namespace zero_ptm_filter_processor {
 // Reads the msalign file once and converts every spectrum set into the block
 // independent form the filter scores, so that the blocks share the conversion
 // instead of repeating it.
-inline FilterSpecPtrVec readSpectra(const ZeroPtmFilterMngPtr& mng_ptr) {
+FilterSpecPtrVec readSpectra(const ZeroPtmFilterMngPtr& mng_ptr) {
   PrsmParaPtr prsm_para_ptr = mng_ptr->prsm_para_ptr_;
   SpParaPtr sp_para_ptr = prsm_para_ptr->getSpParaPtr();
   int group_spec_num = prsm_para_ptr->getGroupSpecNum();
@@ -69,14 +70,9 @@ inline FilterSpecPtrVec readSpectra(const ZeroPtmFilterMngPtr& mng_ptr) {
   return spectra;
 }
 
-inline void filterBlock(const ProteoformPtrVec& raw_forms, int block_idx,
-                        const ZeroPtmFilterMngPtr& mng_ptr,
-                        const FilterSpecPtrVec& spectra,
-                        SimplePrsmMemMerge* combiner) {
-  std::string block_str = std::to_string(block_idx);
-  ZeroPtmFilterPtr filter_ptr =
-      std::make_shared<ZeroPtmFilter>(raw_forms, mng_ptr, block_str);
-
+void scoreBlock(const ZeroPtmFilterPtr& filter_ptr, int block_idx,
+                const ZeroPtmFilterMngPtr& mng_ptr,
+                const FilterSpecPtrVec& spectra, SimplePrsmMemMerge* combiner) {
   PrsmParaPtr prsm_para_ptr = mng_ptr->prsm_para_ptr_;
   int group_spec_num = prsm_para_ptr->getGroupSpecNum();
   int block_num = static_cast<int>(mng_ptr->cnts_.size());
@@ -124,8 +120,9 @@ std::function<void()> geneTask(int block_idx,
     ProteoformPtrVec raw_forms =
         proteoform_factory::readFastaToProteoformPtrVec(
             db_block_file_name, prsm_para_ptr->getFixModPtrVec());
-
-    filterBlock(raw_forms, block_idx, mng_ptr, *spectra, combiner);
+    ZeroPtmFilterPtr filter_ptr = std::make_shared<ZeroPtmFilter>(
+        raw_forms, mng_ptr, std::to_string(block_idx));
+    scoreBlock(filter_ptr, block_idx, mng_ptr, *spectra, combiner);
   };
 }
 
@@ -162,6 +159,7 @@ void process(const ZeroPtmFilterMngPtr& mng_ptr) {
                                &spectra, &combiner));
   }
   pool_ptr->shutDown();
+  stage_profile::report("zero_filter");
   std::cout << std::endl;
   std::cout << "Zero unexpected shift filtering - combining blocks started."
             << std::endl;

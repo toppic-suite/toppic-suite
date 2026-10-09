@@ -17,6 +17,7 @@
 #define TOPPIC_FILTER_VARPTM_VAR_PTM_FILTER_HPP_
 
 #include <array>
+#include <functional>
 #include <memory>
 #include <string>
 #include <vector>
@@ -35,6 +36,16 @@ class VarPtmFilter {
   VarPtmFilter(const ProteoformPtrVec& proteo_ptrs,
                const VarPtmFilterMngPtr& mng_ptr, std::string block_str);
 
+  // The filter on indexes another filter has loaded: the zero-shift
+  // filter's four indexes of the same block are this filter's (the same
+  // files), so the combined zero-shift / variable PTM stage
+  // (zero_var_ptm_filter_processor) loads each block once (toppic_test
+  // experiment 150).
+  VarPtmFilter(const ProteoformPtrVec& proteo_ptrs,
+               const VarPtmFilterMngPtr& mng_ptr, MassMatchPtr term_index_ptr,
+               MassMatchPtr diag_index_ptr, MassMatchPtr rev_term_index_ptr,
+               MassMatchPtr rev_diag_index_ptr);
+
   // the block independent part of a spectrum set, computed once per stage
   static FilterSpecPtr geneFilterSpec(const PrmMsPtrVec& prm_ms_ptr_vec,
                                      const PrmMsPtrVec& srm_ms_ptr_vec,
@@ -48,7 +59,22 @@ class VarPtmFilter {
   // SimplePrsm::getTruncNTermModShifts), so that the many weak pairs a round
   // with the precursor mass less the PTM mass finds do not displace the
   // candidates of the first round.
-  void computeBestMatch(const FilterSpecPtr& spec_ptr);
+  // base_scores_hook, if given, runs after the four indexes are scored with
+  // the mass lists and before the precursor bonus: the combined filter
+  // stage hands the scores to the one-shift filter there (getTermScores
+  // and the others; toppic_test experiment 150).
+  void computeBestMatch(const FilterSpecPtr& spec_ptr,
+                        const std::function<void()>& base_scores_hook =
+                            std::function<void()>());
+
+  const std::vector<short>& getTermScores() const { return term_scores_; }
+  const std::vector<short>& getDiagScores() const { return diag_scores_; }
+  const std::vector<short>& getRevTermScores() const {
+    return rev_term_scores_;
+  }
+  const std::vector<short>& getRevDiagScores() const {
+    return rev_diag_scores_;
+  }
 
   SimplePrsmPtrVec getCompMatchPtrs() { return comp_match_ptrs_; }
   SimplePrsmPtrVec getPrefMatchPtrs() { return pref_match_ptrs_; }
@@ -97,6 +123,9 @@ class VarPtmFilter {
   // the sequence ranges of the index rows
   mass_match_util::IndexRowRanges row_ranges_;
 
+  // the row ranges and the N-terminal masks, from the four indexes
+  void initRows();
+
   // For each truncation N-terminal modification mass of the manager, the
   // rows of the diagonal index whose first residue can carry the PTM: 1 if
   // the row starts at the third residue of the protein or later and the
@@ -109,7 +138,9 @@ class VarPtmFilter {
   void scoreIndexes(const FilterSpecPtr& spec_ptr,
                     const std::vector<std::pair<int, int>>&
                         prec_minus_water_mass_errors,
-                    bool score_term);
+                    bool score_term,
+                    const std::function<void()>& base_scores_hook =
+                        std::function<void()>());
 
   // The candidates of the four proteoform types (complete, prefix, suffix,
   // internal) from the scores of scoreIndexes: the pairs whose range mass

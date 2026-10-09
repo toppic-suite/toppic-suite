@@ -339,6 +339,12 @@ target_link_libraries(toppic_common PUBLIC pwiz)
 # its header exposes boost::serialization::access, so link it PUBLIC.
 target_link_libraries(toppic_common PUBLIC Boost::serialization)
 
+# filter/massmatch/mass_match reads and writes the version 2 index files
+# with zstd frames (toppic_test experiment 150); the include path and
+# library found above for pwiz
+target_include_directories(toppic_common SYSTEM PRIVATE ${ZSTD_INCLUDE_DIR})
+target_link_libraries(toppic_common PRIVATE ${ZSTD_LIBRARY})
+
 # ONNX Runtime: topfd/envcnn and topfd/ecscore/score run the EnvCNN / ECScore
 # neural-network models via the ONNX Runtime C++ API. The C/C++ API headers are
 # vendored under ext/onnx (the sources include it as "onnx/onnxruntime_cxx_api.h",

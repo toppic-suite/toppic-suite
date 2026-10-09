@@ -155,6 +155,28 @@ void PsAlignMultiType::initDpPair() {
       }
     }
   }
+  // The shift predecessor of pair i on diagonal d is the last pair j of d
+  // (in the position order, y then x) with x_j < x_i and y_j < y_i. Along a
+  // diagonal y never decreases and x increases (two positions of one
+  // diagonal cannot share a peak: their masses differ by a residue, far
+  // more than the tolerance), so the pairs of d that qualify are a prefix
+  // of d's list, cut by y and by x, and its last element is found by two
+  // binary searches. This replaces a scan of every earlier pair for every
+  // pair (quadratic in the pair number; toppic_test experiment 150) with
+  // the same result.
+  std::vector<std::vector<int>> diag_idx(diag_num);
+  std::vector<std::vector<int>> diag_x(diag_num);
+  std::vector<std::vector<int>> diag_y(diag_num);
+  for (size_t i = 0; i < pair_num; i++) {
+    int d = pair_diags[i];
+    if (d >= 0) {
+      diag_idx[d].push_back(static_cast<int>(i));
+      diag_x[d].push_back(pair_xs[i]);
+      diag_y[d].push_back(pair_ys[i]);
+    }
+  }
+  idxes_.reserve(pair_num);
+  penalties_.reserve(pair_num);
   for (size_t i = 0; i < pair_num; i++) {
     std::vector<int> ends(diag_num, -1);
     std::vector<bool> large_shifts(diag_num, false);
@@ -166,15 +188,22 @@ void PsAlignMultiType::initDpPair() {
     }
     int cur_x = pair_xs[i];
     int cur_y = pair_ys[i];
-    for (size_t j = 1; j < i; j++) {
-      int prev_diag = pair_diags[j];
-      if (prev_diag < 0 || pair_xs[j] >= cur_x || pair_ys[j] >= cur_y ||
-          !shift_allowed[prev_diag][cur_diag]) {
+    for (size_t d = 0; d < diag_num; d++) {
+      if (!shift_allowed[d][cur_diag] || diag_idx[d].empty()) {
         continue;
       }
-      ends[prev_diag] = j;
-      if (shift_large[prev_diag][cur_diag]) {
-        large_shifts[prev_diag] = true;
+      // the number of pairs of d with y < cur_y, and with x < cur_x
+      size_t n_y = std::lower_bound(diag_y[d].begin(), diag_y[d].end(), cur_y) -
+                   diag_y[d].begin();
+      size_t n_x = std::lower_bound(diag_x[d].begin(), diag_x[d].end(), cur_x) -
+                   diag_x[d].begin();
+      size_t n = n_y < n_x ? n_y : n_x;
+      if (n == 0) {
+        continue;
+      }
+      ends[d] = diag_idx[d][n - 1];
+      if (shift_large[d][cur_diag]) {
+        large_shifts[d] = true;
       }
     }
     idxes_.push_back(ends);

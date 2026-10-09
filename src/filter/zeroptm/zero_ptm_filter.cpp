@@ -20,6 +20,7 @@
 #include <mutex>
 
 #include "common/util/file_util.hpp"
+#include "common/util/stage_profile.hpp"
 #include "common/util/logger.hpp"
 #include "filter/massmatch/mass_match_factory.hpp"
 #include "filter/massmatch/index_load_gate.hpp"
@@ -85,6 +86,7 @@ ZeroPtmFilter::ZeroPtmFilter(const ProteoformPtrVec& proteo_ptrs,
           lock.unlock();
         }
       }
+      stage_profile::Timer load_timer("zero.load");
       IndexLoadGate::Slot load_slot(index_load_gate);
       term_index_ptr_->deserializeMassMatch(
           mng_ptr->zero_ptm_file_vec_[0] + suffix, index_dir);
@@ -176,19 +178,25 @@ void ZeroPtmFilter::computeBestMatch(const FilterSpecPtr& spec_ptr) {
   const std::vector<std::pair<int, int> > prec_minus_water_mass_errors(
       1, spec_ptr->getPrecMinusWaterMassError());
 
-  int term_row_num = term_index_ptr_->getRowNum();
-  std::vector<short> term_scores(term_row_num, 0);
+  std::unique_ptr<stage_profile::Timer> score_timer =
+      std::make_unique<stage_profile::Timer>("zero.score");
+  if (!has_base_scores_ || pref_mass_errors != base_pref_mass_errors_) {
+    base_pref_mass_errors_ = pref_mass_errors;
+    term_base_scores_.assign(term_index_ptr_->getRowNum(), 0);
+    term_index_ptr_->compScores(pref_mass_errors, term_base_scores_);
+    diag_base_scores_.assign(diag_index_ptr_->getRowNum(), 0);
+    diag_index_ptr_->compScores(pref_mass_errors, diag_base_scores_);
+    has_base_scores_ = true;
+  }
+  std::vector<short> term_scores = term_base_scores_;
   term_prec_rows_.clear();
-  term_index_ptr_->compMatchScores(pref_mass_errors,
-                                   prec_minus_water_mass_errors, term_scores,
-                                   term_prec_rows_);
+  term_index_ptr_->compPrecScores(prec_minus_water_mass_errors, term_scores,
+                                  term_prec_rows_);
 
-  int diag_row_num = diag_index_ptr_->getRowNum();
-  std::vector<short> diag_scores(diag_row_num, 0);
+  std::vector<short> diag_scores = diag_base_scores_;
   diag_prec_rows_.clear();
-  diag_index_ptr_->compMatchScores(pref_mass_errors,
-                                   prec_minus_water_mass_errors, diag_scores,
-                                   diag_prec_rows_);
+  diag_index_ptr_->compPrecScores(prec_minus_water_mass_errors, diag_scores,
+                                  diag_prec_rows_);
 
   int rev_term_row_num = rev_term_index_ptr_->getRowNum();
   std::vector<short> rev_term_scores(rev_term_row_num, 0);
@@ -204,6 +212,8 @@ void ZeroPtmFilter::computeBestMatch(const FilterSpecPtr& spec_ptr) {
                                        prec_minus_water_mass_errors,
                                        rev_diag_scores, rev_diag_prec_rows_);
 
+  score_timer = nullptr;
+  stage_profile::Timer find_timer("zero.find");
   int threshold = MassMatch::getPrecursorMatchScore() * 2 + 4;
   int group_spec_num = spec_ptr->getGroupSpecNum();
   // The candidates are sequence ranges (issue #348): the pairs of rows that

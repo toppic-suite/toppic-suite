@@ -15,7 +15,10 @@
 
 #include "stat/tdgf/comp_prob_value.hpp"
 
+#include <algorithm>
 #include <cmath>
+#include <cstring>
+#include <vector>
 
 #include "common/util/logger.hpp"
 #include "ms/factory/prm_peak_factory.hpp"
@@ -36,7 +39,6 @@ CompProbValue::CompProbValue(double convert_ratio,
 
   page_len_ = ORI_PAGE_LEN * static_cast<int>(convert_ratio_);
   block_len_ = ORI_BLOCK_LEN * static_cast<int>(convert_ratio_);
-  page_table_ = new double[page_len_ * max_table_height_];
 
   max_sp_len_ = static_cast<int>(std::round(max_sp_prec_mass * convert_ratio_));
   pos_scores_ = new short[max_sp_len_ + block_len_];
@@ -58,9 +60,6 @@ void CompProbValue::setResidues(const ResFreqPtrVec& residue_ptrs,
 }
 
 CompProbValue::~CompProbValue() {
-  if (page_table_ != nullptr) {
-    delete[] page_table_;
-  }
   if (pos_scores_ != nullptr) {
     delete[] pos_scores_;
   }
@@ -87,8 +86,6 @@ inline void CompProbValue::clearVar() {
   // we do not need to clear residue_masses and residue_frequencies
 
   prob_peaks_.clear();
-
-  acid_dists_.clear();  // acidMass * height;
 
   results_.clear();  // nLayer peak number, height;
 
@@ -153,24 +150,7 @@ void CompProbValue::compute(const ResFreqPtrVec& n_residue_ptrs,
     LOG_ERROR("Number of unexpected PTMs is too large " << shift_num);
     return;
   }
-  // Every block of the circular page table is zeroed (runClear) before it
-  // is written, so only the cells a wrap-around read can reach before they
-  // are written need to be cleared: the reads of runAddProb go back at most
-  // the largest residue distance from the current block, and the first
-  // blocks wrap to the end of the page. The rest of the table is written
-  // before it is read, or never read.
-  int tail_size = 0;
-  for (size_t i = 0; i < acid_dists_.size(); i++) {
-    if (acid_dists_[i] > tail_size) {
-      tail_size = acid_dists_[i];
-    }
-  }
-  tail_size += block_table_size_;
-  if (tail_size > page_table_size_) {
-    tail_size = page_table_size_;
-  }
-  memset(page_table_ + (page_table_size_ - tail_size), 0,
-         tail_size * sizeof(double));
+  setChunkVars();
   shift_num_ = shift_num;
   comp();
 }
@@ -258,33 +238,16 @@ inline void CompProbValue::setVars(int thresh) {
   int last_peak_index = prob_peaks_.size() - 1;
   int max_peak_mass = prob_peaks_[last_peak_index].mass_end_;
   sp_len_ = max_peak_mass + residue_avg_len_ + 2;
-  sp_table_size_ = sp_len_ * height_;
-  page_table_size_ = page_len_ * height_;
-  block_table_size_ = block_len_ * height_;
-  for (size_t i = 0; i < residue_masses_.size(); i++) {
-    acid_dists_.push_back(residue_masses_[i] * height_);
-  }
 }
 
+// The probability of the prior columns of the precursor peak (the
+// residue_avg_len_ columns before it) in layer 0: per row the columns in
+// order (summed during the layer-0 sweep), then the rows in order, as the
+// whole-height sweep summed its page.
 inline double CompProbValue::getShiftProb() {
-  std::vector<double> probs(height_, 0);
-  size_t peak_index = prob_peaks_.size() - 1;
-
-  int prior_mass_bgn = prob_peaks_[peak_index].mass_bgn_ - residue_avg_len_;
-  int prior_mass_end = prob_peaks_[peak_index].mass_bgn_ - 1;
-  for (int i = prior_mass_bgn; i <= prior_mass_end; i++) {
-    for (int j = 0; j < height_; j++) {
-      int pos = (i * height_ + j) % page_table_size_;
-      if (pos < 0) {
-        pos = pos + page_table_size_;
-      }
-
-      probs[j] += page_table_[pos];
-    }
-  }
   double prob = 0;
   for (int i = 0; i < height_; i++) {
-    prob += probs[i];
+    prob += shift_probs_[i];
   }
   return prob;
 }
@@ -342,167 +305,6 @@ void CompProbValue::compPrecProbs() {
   }
 }
 
-inline void CompProbValue::runClear(int page_pos) {
-  std::memset(&page_table_[page_pos], 0, block_table_size_ * sizeof(double));
-}
-
-inline void CompProbValue::runFirstLayerInit(int win_table_bgn,
-                                             int win_table_end) {
-  for (size_t i = 0; i < n_term_acid_masses_.size(); i++) {
-    if (n_term_acid_frequencies_[i] <= 0) {
-      continue;
-    }
-    int pos = n_term_acid_masses_[i];
-    int score = pos_scores_[pos];
-    int k = pos * height_ + score;
-    if (k >= win_table_bgn && k <= win_table_end) {
-      page_table_[k % page_table_size_] += n_term_acid_frequencies_[i];
-    }
-  }
-}
-
-inline void CompProbValue::runInit(std::vector<std::vector<double>>& results,
-                                   int win_table_bgn, int win_table_end) {
-  // zero
-  double base_prob = 1.0;
-  for (size_t i = 0; i < n_term_acid_masses_.size(); i++) {
-    if (n_term_acid_frequencies_[i] <= 0) {
-      continue;
-    }
-    int pos = n_term_acid_masses_[i];
-    for (int cur_pos = pos; cur_pos < pos + residue_avg_len_; cur_pos++) {
-      int score = pos_scores_[cur_pos];
-      int k = cur_pos * height_ + score;
-      if (k >= win_table_bgn && k <= win_table_end) {
-        page_table_[k % page_table_size_] +=
-            base_prob * n_term_acid_frequencies_[i];
-      }
-      if (k > win_table_end) {
-        break;
-      }
-    }
-  }
-
-  // results
-  for (size_t i = 0; i < prob_peaks_.size(); i++) {
-    if (prob_peaks_[i].table_end_ >= win_table_end) {
-      break;
-    }
-    if (prob_peaks_[i].table_end_ + residue_avg_len_ * height_ >
-        win_table_bgn) {
-      for (int k = prob_peaks_[i].table_end_ + 1;
-           k < prob_peaks_[i].table_end_ + residue_avg_len_ * height_;
-           k += height_) {
-        if (k >= win_table_bgn && k <= win_table_end) {
-          for (int h = 0; h < height_; h++) {
-            page_table_[(k + h) % page_table_size_] += results[i][h];
-          }
-        }
-        if (k > win_table_end) {
-          break;
-        }
-      }
-    }
-  }
-}
-
-inline void CompProbValue::runAddProb(int page_pos, int prev_pos, int size,
-                                      double f) {
-  for (int i = page_pos; i < page_pos + size; i++) {
-    page_table_[i] = page_table_[i] + page_table_[prev_pos] * f;
-    prev_pos++;
-  }
-}
-
-inline void CompProbValue::updateCol(int col_end, int scr) {
-  int col_bgn = col_end - height_ + 1;
-  int j, pre;
-  for (j = 1; j <= scr; j++) {
-    pre = col_end - j;
-    if (pre >= col_bgn) {
-      page_table_[col_end] += page_table_[pre];
-    }
-  }
-  for (j = col_end - scr - 1; j >= col_bgn; j--) {
-    page_table_[j + scr] = page_table_[j];
-  }
-  for (j = col_bgn; j < col_bgn + scr; j++) {
-    if (j <= col_end) {
-      page_table_[j] = 0;
-    }
-  }
-}
-
-inline void CompProbValue::runUpdate(int page_end, int scr_bgn, int scr_end) {
-  int col_end = page_end;
-  for (int i = scr_end; i >= scr_bgn; i--) {
-    int scr = pos_scores_[i];
-    if (scr > 0) {
-      updateCol(col_end, scr);
-    }
-    col_end = col_end - height_;
-  }
-}
-
-inline void CompProbValue::compOneLayer(
-    std::vector<std::vector<double>>& prev_results, bool is_first_layer,
-    std::vector<std::vector<double>>& cur_results) {
-  cur_results.clear();
-  for (size_t i = 0; i < prob_peaks_.size(); i++) {
-    std::vector<double> tmp(height_, 0.0);
-    cur_results.push_back(tmp);
-  }
-  size_t peak_index = 0;
-  for (int win_table_bgn = 0; win_table_bgn < sp_table_size_;
-       win_table_bgn = win_table_bgn + block_table_size_) {
-    // clear result block
-    int win_table_end = win_table_bgn + block_table_size_ - 1;
-    int page_pos = win_table_bgn % page_table_size_;
-    runClear(page_pos);
-    if (is_first_layer) {
-      runFirstLayerInit(win_table_bgn, win_table_end);
-    } else {
-      runInit(prev_results, win_table_bgn, win_table_end);
-    }
-    for (size_t i = 0; i < acid_dists_.size(); i++) {
-      if (residue_frequencies_[i] <= 0) {
-        continue;
-      }
-      int prev_block_bgn = page_pos - acid_dists_[i];
-      if (prev_block_bgn < 0) {
-        prev_block_bgn += page_table_size_;
-      }
-      int prev_block_end = prev_block_bgn + block_table_size_;
-      if (prev_block_end < page_table_size_) {
-        runAddProb(page_pos, prev_block_bgn, block_table_size_,
-                   residue_frequencies_[i]);
-      } else {
-        int first_part_size = page_table_size_ - prev_block_bgn;
-        runAddProb(page_pos, prev_block_bgn, first_part_size,
-                   residue_frequencies_[i]);
-        runAddProb(page_pos + first_part_size, 0,
-                   block_table_size_ - first_part_size,
-                   residue_frequencies_[i]);
-      }
-    }
-    int sp_bgn = win_table_bgn / height_;
-    int sp_end = win_table_bgn / height_ + block_len_ - 1;
-    runUpdate(page_pos + block_table_size_ - 1, sp_bgn, sp_end);
-    // update peakPnt and get probs
-    while (peak_index < prob_peaks_.size() &&
-           prob_peaks_[peak_index].table_end_ <= win_table_end) {
-      for (int i = prob_peaks_[peak_index].mass_bgn_;
-           i <= prob_peaks_[peak_index].mass_end_; i++) {
-        for (int j = 0; j < height_; j++) {
-          int pos = (i * height_ + j) % page_table_size_;
-          cur_results[peak_index][j] += page_table_[pos];
-        }
-      }
-      peak_index++;
-    }
-  }
-}
-
 double CompProbValue::getCondProb(int shift, int thresh) {
   double prob_sum = 0;
   if (results_.size() == 0) {
@@ -540,6 +342,257 @@ double CompProbValue::getCondProbOneValue(int shift, int value) {
   // normalization
   double norm_cond_prob = cond_prob * factors_[shift];
   return norm_cond_prob;
+}
+
+// The geometry of the sliced table (see the header)
+void CompProbValue::setChunkVars() {
+  int min_mass = block_len_;
+  int max_mass = 1;
+  for (size_t i = 0; i < residue_masses_.size(); i++) {
+    if (residue_frequencies_[i] <= 0) {
+      continue;
+    }
+    min_mass = std::min(min_mass, residue_masses_[i]);
+    max_mass = std::max(max_mass, residue_masses_[i]);
+  }
+  chunk_block_cols_ = std::min(block_len_, min_mass);
+  if (chunk_block_cols_ < 1) {
+    chunk_block_cols_ = 1;
+  }
+  chunk_page_blocks_ = max_mass / chunk_block_cols_ + 3;
+  // the whole-height sweep clears the tail of its circular page once per
+  // computation, so a shift layer's first blocks read, through the wrap,
+  // what the previous layer left in the last max_mass columns of the page:
+  // kept here (the last pass of the previous layer over those page
+  // columns) and put before column 0 of each shift layer's page
+  chunk_tail_cols_ = max_mass;
+  tail_capture_.assign(static_cast<size_t>(chunk_tail_cols_) * height_, 0.0);
+  chunk_table_.assign(static_cast<size_t>(chunk_page_blocks_) *
+                          chunk_block_cols_ * kChunkRows,
+                      0.0);
+  score_cols_.clear();
+  max_pos_score_ = 0;
+  for (int i = 0; i < pos_len_; i++) {
+    if (pos_scores_[i] > 0) {
+      score_cols_.push_back(i);
+      max_pos_score_ =
+          std::max(max_pos_score_, static_cast<int>(pos_scores_[i]));
+    }
+  }
+  saved_rows_.assign(score_cols_.size() * std::max(max_pos_score_, 1), 0.0);
+}
+
+// One layer of the table: the slices of kChunkRows rows, each a sweep
+// over the columns (sweepChunk). The per-peak results and, in layer 0, the
+// prior-column sums of the precursor are accumulated slice by slice.
+inline void CompProbValue::compOneLayer(
+    std::vector<std::vector<double>>& prev_results, bool is_first_layer,
+    std::vector<std::vector<double>>& cur_results) {
+  cur_results.clear();
+  for (size_t i = 0; i < prob_peaks_.size(); i++) {
+    std::vector<double> tmp(height_, 0.0);
+    cur_results.push_back(tmp);
+  }
+  if (is_first_layer) {
+    shift_probs_.assign(height_, 0.0);
+  }
+  for (int s0 = 0; s0 < height_; s0 += kChunkRows) {
+    int s1 = std::min(s0 + kChunkRows, height_);
+    sweepChunk(prev_results, is_first_layer, cur_results, s0, s1);
+  }
+}
+
+// The rows [s0, s1) of a layer's table over all columns, block by block in
+// a circular page of chunk_page_blocks_ blocks of chunk_block_cols_
+// columns, a column's rows contiguous (kChunkRows per column). For every
+// block, in the order of the whole-height sweep: the block is zeroed, the
+// initial probabilities are added (the N-terminal residues; in the shift
+// layers also the previous layer's results spread over the columns after
+// each peak), every residue adds its frequency times the cells one residue
+// mass earlier (earlier blocks only), the columns with a position score
+// move their values up by the score (the top row collecting what moves
+// past it; the rows that come from the slice below were saved by that
+// slice's sweep), and the peaks that end in the block collect their
+// columns.
+inline void CompProbValue::sweepChunk(
+    std::vector<std::vector<double>>& prev_results, bool is_first_layer,
+    std::vector<std::vector<double>>& cur_results, int s0, int s1) {
+  const int rows = s1 - s0;
+  const int block_cols = chunk_block_cols_;
+  const int page_cols = chunk_page_blocks_ * block_cols;
+  const int block_cells = block_cols * kChunkRows;
+  const int page_cells = page_cols * kChunkRows;
+  double* table = chunk_table_.data();
+  std::fill(chunk_table_.begin(), chunk_table_.end(), 0.0);
+  const int scr_max = std::max(max_pos_score_, 1);
+  const int save_rows = s1 < height_ ? std::min(scr_max, rows) : 0;
+  size_t peak_index = 0;
+  size_t score_q = 0;
+  const size_t prec_index = prob_peaks_.size() - 1;
+  const int prior_bgn = prob_peaks_[prec_index].mass_bgn_ - residue_avg_len_;
+  const int prior_end = prob_peaks_[prec_index].mass_bgn_ - 1;
+  std::vector<double> col_new(kChunkRows);
+  if (!is_first_layer) {
+    for (int j = 0; j < chunk_tail_cols_; j++) {
+      int c = j - chunk_tail_cols_;
+      int slot = ((c % page_cols) + page_cols) % page_cols;
+      double* dst = table + slot * kChunkRows;
+      const double* src = &tail_capture_[static_cast<size_t>(j) * height_];
+      for (int s = s0; s < s1; s++) {
+        dst[s - s0] = src[s];
+      }
+    }
+  }
+  const int tail_page_bgn = page_len_ - chunk_tail_cols_;
+  for (int c0 = 0; c0 < sp_len_; c0 += block_cols) {
+    const int c1 = c0 + block_cols;
+    const int block_idx = c0 / block_cols;
+    double* block = table + (block_idx % chunk_page_blocks_) * block_cells;
+    std::memset(block, 0, block_cells * sizeof(double));
+    auto cell = [&](int c, int s) -> double& {
+      return block[(c - c0) * kChunkRows + (s - s0)];
+    };
+    if (is_first_layer) {
+      for (size_t i = 0; i < n_term_acid_masses_.size(); i++) {
+        if (n_term_acid_frequencies_[i] <= 0) {
+          continue;
+        }
+        int pos = n_term_acid_masses_[i];
+        if (pos < c0 || pos >= c1) {
+          continue;
+        }
+        int score = pos_scores_[pos];
+        if (score >= s0 && score < s1) {
+          cell(pos, score) += n_term_acid_frequencies_[i];
+        }
+      }
+    } else {
+      double base_prob = 1.0;
+      for (size_t i = 0; i < n_term_acid_masses_.size(); i++) {
+        if (n_term_acid_frequencies_[i] <= 0) {
+          continue;
+        }
+        int pos = n_term_acid_masses_[i];
+        int from = std::max(pos, c0);
+        int to = std::min(pos + residue_avg_len_, c1);
+        for (int cur_pos = from; cur_pos < to; cur_pos++) {
+          int score = pos_scores_[cur_pos];
+          if (score >= s0 && score < s1) {
+            cell(cur_pos, score) += base_prob * n_term_acid_frequencies_[i];
+          }
+        }
+      }
+      for (size_t i = 0; i < prob_peaks_.size(); i++) {
+        if (prob_peaks_[i].mass_end_ >= c1 - 1) {
+          break;
+        }
+        int from = std::max(prob_peaks_[i].mass_end_ + 1, c0);
+        int to = std::min(prob_peaks_[i].mass_end_ + residue_avg_len_ + 1, c1);
+        for (int c = from; c < to; c++) {
+          for (int h = s0; h < s1; h++) {
+            cell(c, h) += prev_results[i][h];
+          }
+        }
+      }
+    }
+    for (size_t r = 0; r < residue_masses_.size(); r++) {
+      if (residue_frequencies_[r] <= 0) {
+        continue;
+      }
+      const double f = residue_frequencies_[r];
+      int src_col = c0 - residue_masses_[r];
+      int src_slot = ((src_col % page_cols) + page_cols) % page_cols;
+      int src = src_slot * kChunkRows;
+      int first = std::min(block_cells, page_cells - src);
+      for (int k = 0; k < first; k++) {
+        block[k] = block[k] + table[src + k] * f;
+      }
+      for (int k = first; k < block_cells; k++) {
+        block[k] = block[k] + table[k - first] * f;
+      }
+    }
+    while (score_q < score_cols_.size() && score_cols_[score_q] < c0) {
+      score_q++;
+    }
+    for (; score_q < score_cols_.size() && score_cols_[score_q] < c1;
+         score_q++) {
+      const int c = score_cols_[score_q];
+      const int scr = pos_scores_[c];
+      double* col = &cell(c, s0);
+      const double* saved = &saved_rows_[score_q * scr_max];
+      auto value = [&](int s) -> double {
+        return s >= s0 ? col[s - s0] : saved[s - (s0 - scr_max)];
+      };
+      for (int s = s0; s < s1; s++) {
+        double v;
+        if (s == height_ - 1) {
+          v = col[s - s0];
+          for (int j = 1; j <= scr; j++) {
+            int pre = s - j;
+            if (pre >= 0) {
+              v += value(pre);
+            }
+          }
+        } else if (s < scr) {
+          v = 0;
+        } else {
+          v = value(s - scr);
+        }
+        col_new[s - s0] = v;
+      }
+      if (save_rows > 0) {
+        double* save = &saved_rows_[score_q * scr_max];
+        for (int t = 0; t < scr_max; t++) {
+          int s = s1 - scr_max + t;
+          save[t] = s >= s0 ? col[s - s0] : 0.0;
+        }
+      }
+      for (int s = s0; s < s1; s++) {
+        col[s - s0] = col_new[s - s0];
+      }
+    }
+    while (peak_index < prob_peaks_.size() &&
+           prob_peaks_[peak_index].mass_end_ <= c1 - 1) {
+      for (int i = prob_peaks_[peak_index].mass_bgn_;
+           i <= prob_peaks_[peak_index].mass_end_; i++) {
+        int slot = ((i % page_cols) + page_cols) % page_cols;
+        const double* src = table + slot * kChunkRows;
+        for (int s = s0; s < s1; s++) {
+          cur_results[peak_index][s] += src[s - s0];
+        }
+      }
+      peak_index++;
+    }
+    // the columns of this block that lie in the tail of the whole-height
+    // sweep's page (every pass; the last one stays), for the next layer
+    {
+      int p0 = c0 % page_len_;
+      for (int c = c0; c < c1; c++) {
+        int p = p0 + (c - c0);
+        if (p >= page_len_) {
+          p -= page_len_;
+        }
+        if (p >= tail_page_bgn) {
+          double* dst = &tail_capture_[static_cast<size_t>(p - tail_page_bgn) * height_];
+          const double* src = &cell(c, s0);
+          for (int s = s0; s < s1; s++) {
+            dst[s] = src[s - s0];
+          }
+        }
+      }
+    }
+    if (is_first_layer) {
+      int from = std::max(prior_bgn, c0);
+      int to = std::min(prior_end, c1 - 1);
+      for (int i = from; i <= to; i++) {
+        int slot = ((i % page_cols) + page_cols) % page_cols;
+        const double* src = table + slot * kChunkRows;
+        for (int s = s0; s < s1; s++) {
+          shift_probs_[s] += src[s - s0];
+        }
+      }
+    }
+  }
 }
 
 }  // namespace toppic

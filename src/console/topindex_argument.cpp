@@ -47,6 +47,7 @@ std::map<std::string, std::string> TopIndexArgument::initArguments() {
   arguments["executiveDir"] = ".";
   arguments["resourceDir"] = "";
   arguments["threadNumber"] = "1";
+  arguments["indexFormat"] = "2";
   arguments["version"] = "";
 
   // the following two arguments are used for the initializatio of prsm para
@@ -112,6 +113,7 @@ bool TopIndexArgument::parse(int argc, char* argv[]) {
   std::string frag_error_tole = "";
   std::string prec_error_tole = "";
   std::string thread_number = "";
+  std::string index_format = "";
 
   /** Define and parse the program options*/
   try {
@@ -157,6 +159,7 @@ bool TopIndexArgument::parse(int argc, char* argv[]) {
                        po::value<std::string>(&frag_error_tole), "")(
         "prec-error-tolerance,E", po::value<std::string>(&prec_error_tole), "")(
         "thread-number,u", po::value<std::string>(&thread_number), "")(
+        "index-format", po::value<std::string>(&index_format), "")(
         "database-file-name",
         po::value<std::string>(&database_file_name)->required(),
         "Database file name with its path.");
@@ -228,6 +231,16 @@ bool TopIndexArgument::parse(int argc, char* argv[]) {
 
     if (vm.count("thread-number")) {
       arguments_["threadNumber"] = thread_number;
+    }
+    // hidden: the index file format, 2 (zstd frames, the column bounds once;
+    // the default) or 1 (the Boost binary archive of the earlier versions);
+    // toppic and topmg read both (toppic_test experiment 150)
+    if (vm.count("index-format")) {
+      if (index_format != "1" && index_format != "2") {
+        LOG_ERROR("The index format must be 1 or 2: " << index_format);
+        return false;
+      }
+      arguments_["indexFormat"] = index_format;
     }
   } catch (std::exception& e) {
     std::cerr << "Unhandled Exception in parsing command line" << e.what()

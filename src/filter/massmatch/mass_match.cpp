@@ -15,15 +15,24 @@
 
 #include "filter/massmatch/mass_match.hpp"
 
-#include <boost/archive/binary_iarchive.hpp>
-#include <boost/archive/binary_oarchive.hpp>
-#include <boost/serialization/vector.hpp>
 #include <algorithm>
 #include <cmath>
 #include <cstdint>
+#include <cstdlib>
 #include <cstring>
 #include <fstream>
 #include <iostream>
+
+#ifndef _WIN32
+#include <fcntl.h>
+#include <sys/stat.h>
+#include <unistd.h>
+#endif
+
+#include <boost/archive/binary_iarchive.hpp>
+#include <boost/archive/binary_oarchive.hpp>
+#include <boost/serialization/vector.hpp>
+#include <zstd.h>
 
 #include "common/util/file_util.hpp"
 #include "common/util/logger.hpp"
@@ -61,12 +70,151 @@ MassMatch::MassMatch(std::vector<double>& proteo_minus_water_masses,
   initColIndexBounds();
 }
 
+int MassMatch::write_version_ = 2;
+
+namespace {
+
+// The version 2 index file (toppic_test experiment 150): the magic string,
+// the scalars, then the seven arrays, each as its element count, its
+// zstd frame size and the frame. The column bounds are stored once (col_num
+// + 1 entries) instead of the begins and ends of version 1 (80 MB of the
+// 400 MB of a zero-shift diagonal file of the human database); the row ids
+// compress by about 1.15 and the bounds by about 30.
+const char kIndexMagicV2[8] = {'T', 'P', 'M', 'M', 'I', 'D', 'X', '2'};
+const int kZstdLevel = 1;
+
+void writeRaw(std::ofstream& out, const void* data, size_t size) {
+  out.write(static_cast<const char*>(data), static_cast<std::streamsize>(size));
+}
+
+template <typename T>
+void writeArrayV2(std::ofstream& out, const std::vector<T>& vec,
+                  std::vector<char>& buffer) {
+  uint64_t count = vec.size();
+  size_t raw_size = count * sizeof(T);
+  size_t bound = ZSTD_compressBound(raw_size);
+  if (buffer.size() < bound) {
+    buffer.resize(bound);
+  }
+  size_t comp_size = 0;
+  if (raw_size > 0) {
+    comp_size = ZSTD_compress(buffer.data(), bound, vec.data(), raw_size,
+                              kZstdLevel);
+    if (ZSTD_isError(comp_size)) {
+      LOG_ERROR("Index compression failed: " << ZSTD_getErrorName(comp_size));
+      exit(EXIT_FAILURE);
+    }
+  }
+  uint64_t comp_size64 = comp_size;
+  writeRaw(out, &count, sizeof(count));
+  writeRaw(out, &comp_size64, sizeof(comp_size64));
+  if (comp_size > 0) {
+    writeRaw(out, buffer.data(), comp_size);
+  }
+}
+
+template <typename T>
+void readArrayV2(const char* data, size_t data_size, size_t& pos,
+                 std::vector<T>& vec, const std::string& file_path) {
+  if (pos + 16 > data_size) {
+    LOG_ERROR("Truncated index file: " << file_path);
+    exit(EXIT_FAILURE);
+  }
+  uint64_t count, comp_size;
+  std::memcpy(&count, data + pos, 8);
+  std::memcpy(&comp_size, data + pos + 8, 8);
+  pos += 16;
+  if (pos + comp_size > data_size) {
+    LOG_ERROR("Truncated index file: " << file_path);
+    exit(EXIT_FAILURE);
+  }
+  vec.resize(count);
+  if (count > 0) {
+    size_t raw_size = count * sizeof(T);
+    size_t got = ZSTD_decompress(vec.data(), raw_size, data + pos, comp_size);
+    if (ZSTD_isError(got) || got != raw_size) {
+      LOG_ERROR("Index decompression failed: " << file_path);
+      exit(EXIT_FAILURE);
+    }
+  }
+  pos += comp_size;
+}
+
+// Reads the whole file into buffer with read(2) (not the C++ stream, so that
+// the page cache can be told to drop the file afterwards) and returns the
+// bytes read; the index files stream through the page cache once per stage,
+// 100 GB and more for the human database, and without the release the
+// kernel evicts under pressure for the whole stage (free memory at 0.3 GB,
+// 13-19% system time in toppic_test experiment 99).
+size_t readWholeFile(const std::string& file_path, std::vector<char>& buffer) {
+#ifndef _WIN32
+  int fd = ::open(file_path.c_str(), O_RDONLY);
+  if (fd < 0) {
+    return 0;
+  }
+  struct stat st;
+  if (::fstat(fd, &st) != 0) {
+    ::close(fd);
+    return 0;
+  }
+  size_t size = static_cast<size_t>(st.st_size);
+  if (buffer.size() < size) {
+    buffer.resize(size);
+  }
+  size_t pos = 0;
+  while (pos < size) {
+    ssize_t got = ::read(fd, buffer.data() + pos, size - pos);
+    if (got <= 0) {
+      break;
+    }
+    pos += static_cast<size_t>(got);
+  }
+#ifdef POSIX_FADV_DONTNEED
+  ::posix_fadvise(fd, 0, 0, POSIX_FADV_DONTNEED);
+#endif
+  ::close(fd);
+  return pos;
+#else
+  std::ifstream in(file_path, std::ifstream::binary | std::ifstream::ate);
+  if (!in.is_open()) {
+    return 0;
+  }
+  size_t size = static_cast<size_t>(in.tellg());
+  in.seekg(0);
+  if (buffer.size() < size) {
+    buffer.resize(size);
+  }
+  in.read(buffer.data(), static_cast<std::streamsize>(size));
+  return static_cast<size_t>(in.gcount());
+#endif
+}
+
+}  // namespace
+
 void MassMatch::serializeMassMatch(std::string file_name,
                                    std::string dir_name) {
   std::string file_path = dir_name + file_util::getFileSeparator() + file_name;
+  if (write_version_ == 2) {
+    serializeMassMatchV2(file_path);
+  } else {
+    serializeMassMatchV1(file_path);
+  }
+}
+
+void MassMatch::serializeMassMatchV1(const std::string& file_path) {
   std::ofstream new_file(file_path, std::ofstream::binary);
 
   if (new_file.is_open()) {
+    // the begins and ends of the archive, from the bounds (initColIndexBounds
+    // freed them)
+    if (col_index_begins_.empty() && col_num_ > 0) {
+      col_index_begins_.resize(col_num_);
+      col_index_ends_.resize(col_num_);
+      for (int i = 0; i < col_num_; i++) {
+        col_index_begins_[i] = col_index_bounds_[i];
+        col_index_ends_[i] = col_index_bounds_[i + 1] - 1;
+      }
+    }
     boost::archive::binary_oarchive oa(new_file, std::ios::binary);
     oa << scale_;
     oa << proteo_num_;
@@ -84,8 +232,35 @@ void MassMatch::serializeMassMatch(std::string file_name,
     oa << col_indexes_;
 
     new_file.close();
+    std::vector<int>().swap(col_index_begins_);
+    std::vector<int>().swap(col_index_ends_);
   } else {
     LOG_ERROR("Failed to open the index file:" << file_path);
+    exit(EXIT_FAILURE);
+  }
+}
+
+void MassMatch::serializeMassMatchV2(const std::string& file_path) {
+  std::ofstream out(file_path, std::ofstream::binary);
+  if (!out.is_open()) {
+    LOG_ERROR("Failed to open the index file:" << file_path);
+    exit(EXIT_FAILURE);
+  }
+  writeRaw(out, kIndexMagicV2, sizeof(kIndexMagicV2));
+  writeRaw(out, &scale_, sizeof(scale_));
+  int32_t scalars[3] = {proteo_num_, col_num_, row_num_};
+  writeRaw(out, scalars, sizeof(scalars));
+  std::vector<char> buffer;
+  writeArrayV2(out, proteo_row_begins_, buffer);
+  writeArrayV2(out, proteo_row_ends_, buffer);
+  writeArrayV2(out, proteo_minus_water_masses_, buffer);
+  writeArrayV2(out, row_proteo_ids_, buffer);
+  writeArrayV2(out, trunc_shifts_, buffer);
+  writeArrayV2(out, col_index_bounds_, buffer);
+  writeArrayV2(out, col_indexes_, buffer);
+  out.close();
+  if (!out) {
+    LOG_ERROR("Failed to write the index file:" << file_path);
     exit(EXIT_FAILURE);
   }
 }
@@ -93,6 +268,24 @@ void MassMatch::serializeMassMatch(std::string file_name,
 void MassMatch::deserializeMassMatch(std::string new_file,
                                      std::string dir_name) {
   std::string file_path = dir_name + file_util::getFileSeparator() + new_file;
+  // the format: the version 2 magic string, else the version 1 archive
+  char head[sizeof(kIndexMagicV2)] = {0};
+  {
+    std::ifstream probe(file_path, std::ifstream::binary);
+    if (!probe.is_open()) {
+      LOG_ERROR("Failed to open the index file:" << file_path);
+      exit(EXIT_FAILURE);
+    }
+    probe.read(head, sizeof(head));
+  }
+  if (std::memcmp(head, kIndexMagicV2, sizeof(kIndexMagicV2)) == 0) {
+    deserializeMassMatchV2(file_path);
+  } else {
+    deserializeMassMatchV1(file_path);
+  }
+}
+
+void MassMatch::deserializeMassMatchV1(const std::string& file_path) {
   std::ifstream file_to_read(file_path, std::ifstream::binary);
 
   if (file_to_read.is_open()) {
@@ -117,6 +310,39 @@ void MassMatch::deserializeMassMatch(std::string new_file,
     initColIndexBounds();
   } else {
     LOG_ERROR("Failed to open the index file:" << file_path);
+    exit(EXIT_FAILURE);
+  }
+}
+
+void MassMatch::deserializeMassMatchV2(const std::string& file_path) {
+  // one buffer per thread: the files of a stage are read one after another
+  // by the same thread
+  static thread_local std::vector<char> buffer;
+  size_t size = readWholeFile(file_path, buffer);
+  size_t header_size = sizeof(kIndexMagicV2) + sizeof(double) + 3 * 4;
+  if (size < header_size) {
+    LOG_ERROR("Failed to read the index file:" << file_path);
+    exit(EXIT_FAILURE);
+  }
+  const char* data = buffer.data();
+  size_t pos = sizeof(kIndexMagicV2);
+  std::memcpy(&scale_, data + pos, sizeof(double));
+  pos += sizeof(double);
+  int32_t scalars[3];
+  std::memcpy(scalars, data + pos, sizeof(scalars));
+  pos += sizeof(scalars);
+  proteo_num_ = scalars[0];
+  col_num_ = scalars[1];
+  row_num_ = scalars[2];
+  readArrayV2(data, size, pos, proteo_row_begins_, file_path);
+  readArrayV2(data, size, pos, proteo_row_ends_, file_path);
+  readArrayV2(data, size, pos, proteo_minus_water_masses_, file_path);
+  readArrayV2(data, size, pos, row_proteo_ids_, file_path);
+  readArrayV2(data, size, pos, trunc_shifts_, file_path);
+  readArrayV2(data, size, pos, col_index_bounds_, file_path);
+  readArrayV2(data, size, pos, col_indexes_, file_path);
+  if (static_cast<int>(col_index_bounds_.size()) != col_num_ + 1) {
+    LOG_ERROR("Bad column bounds in the index file:" << file_path);
     exit(EXIT_FAILURE);
   }
 }
@@ -333,8 +559,11 @@ void MassMatch::initIndexes(std::vector<std::vector<int>>& mass_2d,
 }
 
 void MassMatch::initColIndexBounds() {
-  col_index_bounds_ = col_index_begins_;
+  col_index_bounds_ = std::move(col_index_begins_);
   col_index_bounds_.push_back(static_cast<int>(col_indexes_.size()));
+  // the ends are the next column's begins; the scoring reads the bounds
+  std::vector<int>().swap(col_index_begins_);
+  std::vector<int>().swap(col_index_ends_);
 }
 
 bool MassMatch::canTruncateColumns(double max_proteoform_mass) const {
@@ -352,11 +581,9 @@ void MassMatch::truncateColumns(double max_proteoform_mass) {
   int col_num = max_proteoform_mass * scale_;
   // the entries of the columns below col_num come first
   int entry_num = col_index_bounds_[col_num];
-  col_index_begins_.resize(col_num);
-  col_index_ends_.resize(col_num);
+  col_index_bounds_.resize(col_num + 1);
   col_indexes_.resize(entry_num);
   col_num_ = col_num;
-  initColIndexBounds();
 }
 
 void MassMatch::compScores(
@@ -367,12 +594,47 @@ void MassMatch::compScores(
 
 void MassMatch::compScores(
     const std::vector<std::pair<int, int>>& pref_mass_errors, int start,
-    double shift, std::vector<short>& scores) {
-  int begin_index;
-  int end_index;
-  int m;
-  for (size_t i = start; i < pref_mass_errors.size(); i++) {
-    m = pref_mass_errors[i].first + shift;
+    double shift, std::vector<short>& scores, int col_limit) {
+  // The column bounds (40 MB per index) and the row ids (hundreds of MB)
+  // are touched at the masses' positions only, so every window misses the
+  // cache; the bounds of the window a few masses ahead and the first row
+  // ids of the next window are prefetched, as the diagonal filter's
+  // compDiagMaxScoresImpl does (toppic_test experiments 16 and 150).
+  const int* bounds = col_index_bounds_.data();
+  const int* entries = col_indexes_.data();
+  short* s = scores.data();
+  const int n = static_cast<int>(pref_mass_errors.size());
+  const int col_num =
+      col_limit >= 0 && col_limit < col_num_ ? col_limit : col_num_;
+  const int pf_bound = 8;  // masses ahead for the column bound prefetch
+  const int pf_entry = 3;  // masses ahead for the row id prefetch
+  for (int i = start; i < n; i++) {
+    if (i + pf_bound < n) {
+      int m2 = pref_mass_errors[i + pf_bound].first + shift;
+      int left2 = m2 - pref_mass_errors[i + pf_bound].second;
+      int right2 = m2 + pref_mass_errors[i + pf_bound].second;
+      if (left2 < 0) {
+        left2 = 0;
+      }
+      if (right2 >= 0 && right2 < col_num) {
+        __builtin_prefetch(bounds + left2);
+        __builtin_prefetch(bounds + right2 + 1);
+      }
+    }
+    if (i + pf_entry < n) {
+      int m2 = pref_mass_errors[i + pf_entry].first + shift;
+      int left2 = m2 - pref_mass_errors[i + pf_entry].second;
+      int right2 = m2 + pref_mass_errors[i + pf_entry].second;
+      if (left2 < 0) {
+        left2 = 0;
+      }
+      if (right2 >= 0 && right2 < col_num) {
+        int begin2 = bounds[left2];
+        __builtin_prefetch(entries + begin2);
+        __builtin_prefetch(entries + begin2 + 16);
+      }
+    }
+    int m = pref_mass_errors[i].first + shift;
     // m - errors[i] performs better than m - errors[i] -  errors[bgn_pos]
     int left = m - pref_mass_errors[i].second;
     if (left < 0) {
@@ -381,15 +643,15 @@ void MassMatch::compScores(
 
     int right = m + pref_mass_errors[i].second;
 
-    if (right < 0 || right >= col_num_) {
+    if (right < 0 || right >= col_num) {
       continue;
     }
 
-    begin_index = col_index_begins_[left];
-    end_index = col_index_ends_[right];
+    int begin_index = bounds[left];
+    int end_index = bounds[right + 1];
 
-    for (int j = begin_index; j <= end_index; j++) {
-      scores[col_indexes_[j]]++;
+    for (int j = begin_index; j < end_index; j++) {
+      s[entries[j]]++;
     }
   }
 }
@@ -532,8 +794,8 @@ void MassMatch::updatePrecScoreImpl(const std::pair<int, int>& mass_error,
 
   if (left <= right) {
     // update scores
-    begin_index = col_index_begins_[left];
-    end_index = col_index_ends_[right];
+    begin_index = col_index_bounds_[left];
+    end_index = col_index_bounds_[right + 1] - 1;
     for (int j = begin_index; j <= end_index; j++) {
       int row = col_indexes_[j];
       if (scores[row] < getPrecursorMatchScore()) {
@@ -576,6 +838,12 @@ void MassMatch::compMatchScores(
     const std::vector<std::pair<int, int>>& prec_minus_water_mass_errors,
     std::vector<short>& scores, std::vector<int>& prec_rows) {
   compScores(pref_mass_errors, 0, 0.0, scores);
+  compPrecScores(prec_minus_water_mass_errors, scores, prec_rows);
+}
+
+void MassMatch::compPrecScores(
+    const std::vector<std::pair<int, int>>& prec_minus_water_mass_errors,
+    std::vector<short>& scores, std::vector<int>& prec_rows) {
   for (size_t i = 0; i < prec_minus_water_mass_errors.size(); i++) {
     updatePrecScoreImpl<true>(prec_minus_water_mass_errors[i], scores,
                               &prec_rows);

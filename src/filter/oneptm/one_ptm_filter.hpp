@@ -32,6 +32,17 @@ class OnePtmFilter {
  public:
   OnePtmFilter(const ProteoformPtrVec& proteo_ptrs,
                const OnePtmFilterMngPtr& mng_ptr, std::string block_str);
+
+  // The filter on indexes another filter has loaded: the zero-shift
+  // filter's four indexes of a block have this filter's rows (this
+  // filter's files are those indexes cut at its column limit), so the
+  // combined filter stage (zero_var_ptm_filter_processor) scores them with
+  // the windows cut at the limit and loads no file for this filter
+  // (toppic_test experiment 150).
+  OnePtmFilter(const ProteoformPtrVec& proteo_ptrs,
+               const OnePtmFilterMngPtr& mng_ptr, MassMatchPtr term_index_ptr,
+               MassMatchPtr diag_index_ptr, MassMatchPtr rev_term_index_ptr,
+               MassMatchPtr rev_diag_index_ptr);
   void computeBestMatch(const PrmMsPtrVec& prm_ms_ptr_vec,
                         const PrmMsPtrVec& srm_ms_ptr_vec);
 
@@ -41,6 +52,20 @@ class OnePtmFilter {
                                      const OnePtmFilterMngPtr& mng_ptr);
 
   void computeBestMatch(const FilterSpecPtr& spec_ptr);
+
+  // The candidates from scores another filter computed for the same four
+  // indexes and the same mass lists (the variable PTM filter's, without
+  // its precursor bonus), when fitsColumns(spec_ptr).
+  void computeBestMatch(const FilterSpecPtr& spec_ptr,
+                        const std::vector<short>& term_scores,
+                        const std::vector<short>& diag_scores,
+                        const std::vector<short>& rev_term_scores,
+                        const std::vector<short>& rev_diag_scores);
+
+  // whether every window of the spectrum's mass lists lies below the
+  // column limit, so that scores of the shared (uncut) indexes are this
+  // filter's
+  bool fitsColumns(const FilterSpecPtr& spec_ptr) const;
 
   SimplePrsmPtrVec getCompMatchPtrs() { return comp_match_ptrs_; }
   SimplePrsmPtrVec getPrefMatchPtrs() { return pref_match_ptrs_; }
@@ -55,6 +80,19 @@ class OnePtmFilter {
   MassMatchPtr rev_diag_index_ptr_;
   MassMatchPtr term_index_ptr_;
   MassMatchPtr rev_term_index_ptr_;
+  // the column limit of the shared indexes' scoring (-1: the indexes are
+  // this filter's own, no cut)
+  int col_limit_ = -1;
+
+  void initRows();
+  void scoreIndexes(const FilterSpecPtr& spec_ptr);
+  // the candidates from the four score arrays (this filter's own, or
+  // another filter's read in place)
+  void findCandidates(const FilterSpecPtr& spec_ptr,
+                      const std::vector<short>& term_scores,
+                      const std::vector<short>& diag_scores,
+                      const std::vector<short>& rev_term_scores,
+                      const std::vector<short>& rev_diag_scores);
 
   // mass_match_util::compNonincreasingShifts of the two N-terminal side
   // indexes, computed once for the block

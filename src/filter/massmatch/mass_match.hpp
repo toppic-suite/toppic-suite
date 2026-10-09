@@ -18,6 +18,7 @@
 
 #include <boost/serialization/vector.hpp>
 #include <memory>
+#include <string>
 #include <vector>
 
 namespace toppic {
@@ -25,6 +26,14 @@ namespace toppic {
 class MassMatch {
  public:
   MassMatch() {};
+
+  // The index file format serializeMassMatch writes (toppic_test experiment
+  // 150): 1 is the Boost binary archive (col_index_begins_ and
+  // col_index_ends_, uncompressed), 2 the format below (the column bounds
+  // once, every array a zstd frame). deserializeMassMatch reads both,
+  // telling them apart by the version 2 magic string.
+  static void setWriteVersion(int version) { write_version_ = version; }
+  static int getWriteVersion() { return write_version_; }
 
   /*
    * proteo_minus_water_masses[i]: the mass (minus water) of the ith proteoform
@@ -42,8 +51,19 @@ class MassMatch {
   void compScores(const std::vector<std::pair<int, int>>& pref_mass_errors,
                   std::vector<short>& scores);
 
+  // With col_limit (a column number below this index's), the windows are
+  // cut at it, which gives the scores of the index truncated to col_limit
+  // columns (truncateColumns): the one-shift filter scores the zero-shift
+  // filter's index of a block this way (toppic_test experiment 150).
   void compScores(const std::vector<std::pair<int, int>>& pref_mass_errors,
-                  int start, double shift, std::vector<short>& scores);
+                  int start, double shift, std::vector<short>& scores,
+                  int col_limit = -1);
+
+  // The precursor bonus of compMatchScores alone: the rows whose mass
+  // matches one of prec_minus_water_mass_errors, appended to prec_rows.
+  void compPrecScores(
+      const std::vector<std::pair<int, int>>& prec_minus_water_mass_errors,
+      std::vector<short>& scores, std::vector<int>& prec_rows);
 
   void compMatchScores(const std::vector<std::pair<int, int>>& pref_mass_errors,
                        const std::pair<int, int>& prec_minus_water_mass_error,
@@ -130,14 +150,26 @@ class MassMatch {
   std::vector<int> row_proteo_ids_;
   std::vector<double> trunc_shifts_;
 
+  // the column begins and ends of the construction and of the version 1
+  // archive; initColIndexBounds moves them into col_index_bounds_ and frees
+  // them, so after construction or deserialization they are empty (the
+  // version 1 writer rebuilds them)
   std::vector<int> col_index_begins_;
   std::vector<int> col_index_ends_;
   std::vector<int> col_indexes_;
 
-  // col_index_begins_ followed by the end of the last column, so that the
-  // entries of columns [left, right] are [begins[left], begins[right + 1]);
-  // built after construction or deserialization, not serialized.
+  // col_index_begins_ followed by the end of the last column (col_num_ + 1
+  // entries), so that the entries of columns [left, right] are
+  // [bounds[left], bounds[right + 1]); the array the scoring reads and the
+  // version 2 file stores.
   std::vector<int> col_index_bounds_;
+
+  static int write_version_;
+
+  void serializeMassMatchV1(const std::string& file_path);
+  void serializeMassMatchV2(const std::string& file_path);
+  void deserializeMassMatchV1(const std::string& file_path);
+  void deserializeMassMatchV2(const std::string& file_path);
 
   // whether every proteoform's masses were nondecreasing at construction
   // (see canTruncateColumns); not serialized

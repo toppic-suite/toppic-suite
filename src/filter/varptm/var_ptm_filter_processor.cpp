@@ -21,6 +21,7 @@
 #include "common/thread/simple_thread_pool.hpp"
 #include "common/util/file_util.hpp"
 #include "common/util/logger.hpp"
+#include "common/util/stage_profile.hpp"
 #include "filter/massmatch/filter_spec.hpp"
 #include "filter/varptm/var_ptm_filter.hpp"
 #include "ms/factory/prm_ms_factory.hpp"
@@ -72,9 +73,9 @@ inline FilterSpecPtr geneFilterSpec(const DeconvMsPtrVec& deconv_ms_ptr_vec,
 // The candidates of the last spectrum set of the filter, by proteoform
 // type: the first round's in group 0, those of the N-terminal round k in
 // group k + 1.
-inline void addCands(const VarPtmFilterPtr& filter_ptr,
-                     const PrsmParaPtr& prsm_para_ptr, int block_idx,
-                     int add_idx, SimplePrsmMemMerge* combiner) {
+void addCands(const VarPtmFilterPtr& filter_ptr,
+              const PrsmParaPtr& prsm_para_ptr, int block_idx, int add_idx,
+              SimplePrsmMemMerge* combiner) {
   if (prsm_para_ptr->allowCompleteProt()) {
     combiner->add(0, block_idx, add_idx, filter_ptr->getCompMatchPtrs());
   }
@@ -182,7 +183,7 @@ inline void filterBlockVariants(const ProteoformPtrVec& raw_forms,
 // Reads the msalign file once and converts every spectrum set into the block
 // independent form the filter scores, so that the blocks share the conversion
 // instead of repeating it.
-inline FilterSpecPtrVec readSpectra(const VarPtmFilterMngPtr& mng_ptr) {
+FilterSpecPtrVec readSpectra(const VarPtmFilterMngPtr& mng_ptr) {
   PrsmParaPtr prsm_para_ptr = mng_ptr->prsm_para_ptr_;
   SpParaPtr sp_para_ptr = prsm_para_ptr->getSpParaPtr();
   int group_spec_num = prsm_para_ptr->getGroupSpecNum();
@@ -218,42 +219,41 @@ inline FilterSpecPtrVec readSpectra(const VarPtmFilterMngPtr& mng_ptr) {
   return spectra;
 }
 
-inline void filterBlockCached(const ProteoformPtrVec& raw_forms, int block_idx,
-                              const VarPtmFilterMngPtr& mng_ptr,
-                              const FilterSpecPtrVec& spectra,
-                              SimplePrsmMemMerge* combiner) {
-  std::string block_str = std::to_string(block_idx);
-  VarPtmFilterPtr filter_ptr =
-      std::make_shared<VarPtmFilter>(raw_forms, mng_ptr, block_str);
-
-  PrsmParaPtr prsm_para_ptr = mng_ptr->prsm_para_ptr_;
-  int group_spec_num = prsm_para_ptr->getGroupSpecNum();
+void reportProgress(const VarPtmFilterMngPtr& mng_ptr, int block_idx,
+                    size_t i, size_t spectra_num) {
+  const size_t report_step = 100;
+  if ((i + 1) % report_step != 0 && i + 1 != spectra_num) {
+    return;
+  }
+  int group_spec_num = mng_ptr->prsm_para_ptr_->getGroupSpecNum();
   int block_num = static_cast<int>(mng_ptr->cnts_.size());
   int spec_num = mng_ptr->n_spec_block_ / block_num;
-  size_t report_step = 100;
+  // the count covers the spectra without precursor as well
+  mng_ptr->cnts_[block_idx] =
+      i + 1 == spectra_num ? spec_num
+                           : static_cast<int>((i + 1) * group_spec_num);
+  int cnt_sum = 0;
+  for (size_t k = 0; k < mng_ptr->cnts_.size(); k++) {
+    cnt_sum = cnt_sum + mng_ptr->cnts_[k];
+  }
+  double perc = cnt_sum * 100.0 / mng_ptr->n_spec_block_;
+  std::stringstream msg;
+  msg << std::flush << "Variable PTM filtering - processing "
+      << std::setprecision(3) << perc << "%.    \r";
+  mng_ptr->mutex_.lock();
+  std::cout << msg.str();
+  mng_ptr->mutex_.unlock();
+}
+
+void scoreBlock(const VarPtmFilterPtr& filter_ptr, int block_idx,
+                const VarPtmFilterMngPtr& mng_ptr,
+                const FilterSpecPtrVec& spectra, SimplePrsmMemMerge* combiner) {
+  PrsmParaPtr prsm_para_ptr = mng_ptr->prsm_para_ptr_;
   for (size_t i = 0; i < spectra.size(); i++) {
     filter_ptr->computeBestMatch(spectra[i]);
-    int add_idx = static_cast<int>(i);
-    addCands(filter_ptr, prsm_para_ptr, block_idx, add_idx, combiner);
-
-    if ((i + 1) % report_step == 0 || i + 1 == spectra.size()) {
-      // the count covers the spectra without precursor as well
-      mng_ptr->cnts_[block_idx] = i + 1 == spectra.size()
-                                      ? spec_num
-                                      : static_cast<int>((i + 1) *
-                                                         group_spec_num);
-      int cnt_sum = 0;
-      for (size_t k = 0; k < mng_ptr->cnts_.size(); k++) {
-        cnt_sum = cnt_sum + mng_ptr->cnts_[k];
-      }
-      double perc = cnt_sum * 100.0 / mng_ptr->n_spec_block_;
-      std::stringstream msg;
-      msg << std::flush << "Variable PTM filtering - processing "
-          << std::setprecision(3) << perc << "%.    \r";
-      mng_ptr->mutex_.lock();
-      std::cout << msg.str();
-      mng_ptr->mutex_.unlock();
-    }
+    addCands(filter_ptr, prsm_para_ptr, block_idx, static_cast<int>(i),
+             combiner);
+    reportProgress(mng_ptr, block_idx, i, spectra.size());
   }
 }
 
@@ -274,7 +274,9 @@ std::function<void()> geneTask(int block_idx,
     if (mng_ptr->use_approx_spec_) {
       filterBlockVariants(raw_forms, block_idx, mng_ptr, combiner);
     } else {
-      filterBlockCached(raw_forms, block_idx, mng_ptr, *spectra, combiner);
+      VarPtmFilterPtr filter_ptr = std::make_shared<VarPtmFilter>(
+          raw_forms, mng_ptr, std::to_string(block_idx));
+      scoreBlock(filter_ptr, block_idx, mng_ptr, *spectra, combiner);
     }
   };
 }
@@ -318,6 +320,7 @@ void process(const VarPtmFilterMngPtr& mng_ptr) {
                                &spectra, &combiner));
   }
   pool_ptr->shutDown();
+  stage_profile::report("var_filter");
   std::cout << std::endl;
   std::cout << "Variable PTM filtering - combining blocks started."
             << std::endl;

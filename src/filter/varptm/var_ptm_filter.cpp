@@ -26,6 +26,7 @@
 
 #include "common/base/amino_acid.hpp"
 #include "common/util/file_util.hpp"
+#include "common/util/stage_profile.hpp"
 #include "common/util/logger.hpp"
 #include "filter/massmatch/mass_match_factory.hpp"
 #include "filter/massmatch/index_load_gate.hpp"
@@ -136,6 +137,7 @@ VarPtmFilter::VarPtmFilter(const ProteoformPtrVec& proteo_ptrs,
           lock.unlock();
         }
       }
+      stage_profile::Timer load_timer("var.load");
       IndexLoadGate::Slot load_slot(index_load_gate);
       term_index_ptr_->deserializeMassMatch(
           mng_ptr->var_ptm_file_vec_[0] + suffix, index_dir);
@@ -182,17 +184,36 @@ VarPtmFilter::VarPtmFilter(const ProteoformPtrVec& proteo_ptrs,
         proteo_ptrs, n_term_acet_2d, mng_ptr->max_proteoform_mass_,
         mng_ptr->filter_scale_);
   }
+  initRows();
+}
+
+VarPtmFilter::VarPtmFilter(const ProteoformPtrVec& proteo_ptrs,
+                           const VarPtmFilterMngPtr& mng_ptr,
+                           MassMatchPtr term_index_ptr,
+                           MassMatchPtr diag_index_ptr,
+                           MassMatchPtr rev_term_index_ptr,
+                           MassMatchPtr rev_diag_index_ptr)
+    : mng_ptr_(mng_ptr),
+      proteo_ptrs_(proteo_ptrs),
+      diag_index_ptr_(std::move(diag_index_ptr)),
+      rev_diag_index_ptr_(std::move(rev_diag_index_ptr)),
+      term_index_ptr_(std::move(term_index_ptr)),
+      rev_term_index_ptr_(std::move(rev_term_index_ptr)) {
+  initRows();
+}
+
+void VarPtmFilter::initRows() {
   std::vector<int> proteo_lens;
-  for (size_t i = 0; i < proteo_ptrs.size(); i++) {
-    proteo_lens.push_back(proteo_ptrs[i]->getResSeqPtr()->getLen());
+  for (size_t i = 0; i < proteo_ptrs_.size(); i++) {
+    proteo_lens.push_back(proteo_ptrs_[i]->getResSeqPtr()->getLen());
   }
   row_ranges_.init(proteo_lens, term_index_ptr_, diag_index_ptr_,
                    rev_term_index_ptr_, rev_diag_index_ptr_,
-                   mng_ptr->prsm_para_ptr_->getProtModPtrVec());
-  for (size_t k = 0; k < mng_ptr->n_term_shift_list_.size(); k++) {
+                   mng_ptr_->prsm_para_ptr_->getProtModPtrVec());
+  for (size_t k = 0; k < mng_ptr_->n_term_shift_list_.size(); k++) {
     n_term_diag_masks_.push_back(
         compNTermRowMask(diag_index_ptr_, row_ranges_.diag_starts_,
-                         proteo_ptrs, mng_ptr->n_term_res_ptr_vec_2d_[k]));
+                         proteo_ptrs_, mng_ptr_->n_term_res_ptr_vec_2d_[k]));
   }
 }
 
@@ -224,37 +245,46 @@ FilterSpecPtr VarPtmFilter::geneFilterSpec(
 void VarPtmFilter::scoreIndexes(
     const FilterSpecPtr& spec_ptr,
     const std::vector<std::pair<int, int>>& prec_minus_water_mass_errors,
-    bool score_term) {
+    bool score_term, const std::function<void()>& base_scores_hook) {
   const std::vector<std::pair<int, int>>& pref_mass_errors =
       spec_ptr->getPrefMassErrors();
   const std::vector<std::pair<int, int>>& suff_mass_errors =
       spec_ptr->getSuffMassErrors();
 
-  if (score_term) {
-    term_scores_.assign(term_index_ptr_->getRowNum(), 0);
-    term_prec_rows_.clear();
-    term_index_ptr_->compMatchScores(pref_mass_errors,
-                                     prec_minus_water_mass_errors,
-                                     term_scores_, term_prec_rows_);
+  // the mass list scores (compMatchScores = compScores + compPrecScores)
+  {
+    stage_profile::Timer score_timer("var.score");
+    if (score_term) {
+      term_scores_.assign(term_index_ptr_->getRowNum(), 0);
+      term_index_ptr_->compScores(pref_mass_errors, term_scores_);
+    }
+    diag_scores_.assign(diag_index_ptr_->getRowNum(), 0);
+    diag_index_ptr_->compScores(pref_mass_errors, diag_scores_);
+    rev_term_scores_.assign(rev_term_index_ptr_->getRowNum(), 0);
+    rev_term_index_ptr_->compScores(suff_mass_errors, rev_term_scores_);
+    rev_diag_scores_.assign(rev_diag_index_ptr_->getRowNum(), 0);
+    rev_diag_index_ptr_->compScores(suff_mass_errors, rev_diag_scores_);
+  }
+  if (base_scores_hook) {
+    base_scores_hook();
   }
 
-  diag_scores_.assign(diag_index_ptr_->getRowNum(), 0);
+  // the precursor bonus
+  stage_profile::Timer prec_timer("var.prec");
+  if (score_term) {
+    term_prec_rows_.clear();
+    term_index_ptr_->compPrecScores(prec_minus_water_mass_errors,
+                                    term_scores_, term_prec_rows_);
+  }
   diag_prec_rows_.clear();
-  diag_index_ptr_->compMatchScores(pref_mass_errors,
-                                   prec_minus_water_mass_errors, diag_scores_,
-                                   diag_prec_rows_);
-
-  rev_term_scores_.assign(rev_term_index_ptr_->getRowNum(), 0);
+  diag_index_ptr_->compPrecScores(prec_minus_water_mass_errors, diag_scores_,
+                                  diag_prec_rows_);
   rev_term_prec_rows_.clear();
-  rev_term_index_ptr_->compMatchScores(suff_mass_errors,
-                                       prec_minus_water_mass_errors,
-                                       rev_term_scores_, rev_term_prec_rows_);
-
-  rev_diag_scores_.assign(rev_diag_index_ptr_->getRowNum(), 0);
+  rev_term_index_ptr_->compPrecScores(prec_minus_water_mass_errors,
+                                      rev_term_scores_, rev_term_prec_rows_);
   rev_diag_prec_rows_.clear();
-  rev_diag_index_ptr_->compMatchScores(suff_mass_errors,
-                                       prec_minus_water_mass_errors,
-                                       rev_diag_scores_, rev_diag_prec_rows_);
+  rev_diag_index_ptr_->compPrecScores(prec_minus_water_mass_errors,
+                                      rev_diag_scores_, rev_diag_prec_rows_);
 
   // the bonus rows of each proteoform, collected once and shared by the four
   // proteoform types
@@ -273,6 +303,7 @@ void VarPtmFilter::scoreIndexes(
 std::array<ProtCandidatePtrVec, 4> VarPtmFilter::findTypeCands(
     const FilterSpecPtr& spec_ptr, std::vector<double>& ptm_shifts,
     const std::vector<char>* diag_mask) {
+  stage_profile::Timer find_timer("var.find");
   PeakTolerancePtr tole_ptr =
       mng_ptr_->prsm_para_ptr_->getSpParaPtr()->getPrecTolerancePtr();
   double prec_minus_water_mass =
@@ -332,11 +363,13 @@ std::array<ProtCandidatePtrVec, 4> VarPtmFilter::findTypeCands(
   return cands;
 }
 
-void VarPtmFilter::computeBestMatch(const FilterSpecPtr& spec_ptr) {
+void VarPtmFilter::computeBestMatch(
+    const FilterSpecPtr& spec_ptr,
+    const std::function<void()>& base_scores_hook) {
   scoreIndexes(spec_ptr,
                getShiftedMassErrors(spec_ptr->getPrecMinusWaterMassError(),
                                     mng_ptr_->int_shift_list_, false),
-               true);
+               true, base_scores_hook);
   std::array<ProtCandidatePtrVec, 4> cands =
       findTypeCands(spec_ptr, mng_ptr_->shift_list_, nullptr);
 

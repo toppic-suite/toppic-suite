@@ -15,8 +15,11 @@
 
 #include "search/ptmsearch/ptm_slow_match.hpp"
 
+#include <memory>
+
 #include "ms/factory/prm_ms_util.hpp"
 #include "search/diag/diag_header_util.hpp"
+#include "common/util/stage_profile.hpp"
 #include "search/diag/diag_pair_util.hpp"
 #include "search/ptmsearch/comp_shift_low_mem.hpp"
 
@@ -172,14 +175,28 @@ DiagHeaderPtrVec PtmSlowMatch::geneNTermShiftHeaders() {
 
 // initialize ps_align
 void PtmSlowMatch::init() {
+  std::unique_ptr<stage_profile::Timer> part_timer =
+      std::make_unique<stage_profile::Timer>("msearch.headers");
   DiagHeaderPtrVec n_term_shift_header_ptrs = geneNTermShiftHeaders();
   PeakTolerancePtr tole_ptr =
       mng_ptr_->prsm_para_ptr_->getSpParaPtr()->getPrecTolerancePtr();
   PrmPeakPtrVec prm_peaks =
       prm_ms_util::getPrmPeakPtrs(ms_six_ptr_vec_, tole_ptr);
   int group_spec_num = ms_six_ptr_vec_.size();
+  part_timer = std::make_unique<stage_profile::Timer>("msearch.diagonals");
   DiagonalPtrVec diagonal_ptrs = diag_pair_util::geneDiagonalsWithoutEmptyList(
       n_term_shift_header_ptrs, prm_peaks, group_spec_num, proteo_ptr_);
+  if (stage_profile::enabled()) {
+    long pairs = 0;
+    for (size_t i = 0; i < diagonal_ptrs.size(); i++) {
+      pairs += static_cast<long>(diagonal_ptrs[i]->size());
+    }
+    stage_profile::add("msearch.diagonal_num", 0,
+                       static_cast<long>(diagonal_ptrs.size()));
+    stage_profile::add("msearch.pair_num", 0, pairs);
+    stage_profile::add("msearch.pair_num_sq", 0, pairs * pairs);
+  }
+  part_timer = std::make_unique<stage_profile::Timer>("msearch.align_init");
 
   std::vector<double> seq_masses = proteo_ptr_->getBpSpecPtr()->getPrmMasses();
   std::vector<double> ms_masses(prm_peaks.size());
@@ -203,7 +220,10 @@ void PtmSlowMatch::compute(const ProteoformTypePtrVec& type_ptrs,
                            std::vector<PrsmPtrVec>& prsm_ptr_2d) {
   int max_shift_num = mng_ptr_->align_para_ptr_->getUnknownShiftNum();
   if (multi_align_ptr_ != nullptr) {
+    std::unique_ptr<stage_profile::Timer> part_timer =
+        std::make_unique<stage_profile::Timer>("msearch.dp");
     multi_align_ptr_->compute(type_ptrs);
+    part_timer = std::make_unique<stage_profile::Timer>("msearch.result");
     for (size_t i = 0; i < type_ptrs.size(); i++) {
       PrsmPtrVec prsm_ptrs;
       for (int s = 2; s <= max_shift_num; s++) {

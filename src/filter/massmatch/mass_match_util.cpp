@@ -25,6 +25,7 @@
 
 #include "common/util/file_util.hpp"
 #include "common/util/logger.hpp"
+#include "common/util/stage_profile.hpp"
 #include "seq/prot_score.hpp"
 
 namespace toppic {
@@ -160,7 +161,7 @@ RangeRows IndexRowRanges::getRangeRows(bool term_start, bool term_end,
 }
 
 void addTruncShifts(ProtCandidatePtrVec& prot_ptrs,
-                    const MassMatchPtr& index_ptr, std::vector<short>& scores,
+                    const MassMatchPtr& index_ptr, const std::vector<short>& scores,
                     int term_shift_num, bool is_n_term) {
   const std::vector<int>& row_begins = index_ptr->getProteoRowBegins();
   const std::vector<int>& row_ends = index_ptr->getProteoRowEnds();
@@ -267,7 +268,7 @@ void addTruncShiftsWithRestriction(
     ProtCandidatePtrVec& prot_ptrs, const MassMatchPtr& index_ptr,
     const MassMatchPtr& rev_index_ptr,
     const std::vector<double>& proteo_minus_water_masses,
-    std::vector<short>& scores, std::vector<short>& rev_scores,
+    const std::vector<short>& scores, const std::vector<short>& rev_scores,
     const std::vector<int>& rev_max_scores, double min_mass, double max_mass,
     int term_group_num, const std::vector<char>* nonincr_shifts) {
   const std::vector<int>& row_begins = index_ptr->getProteoRowBegins();
@@ -512,8 +513,8 @@ inline bool isAllowedRange(const RangeRows& range_rows, int id, int start,
   return true;
 }
 
-ProtCandidatePtrVec findZeroShiftTopProteins(std::vector<short>& scores,
-                                             std::vector<short>& rev_scores,
+ProtCandidatePtrVec findZeroShiftTopProteins(const std::vector<short>& scores,
+                                             const std::vector<short>& rev_scores,
                                              const MassMatchPtr& index_ptr,
                                              const MassMatchPtr& rev_index_ptr,
                                              double prec_minus_water_mass,
@@ -621,7 +622,7 @@ inline int findBestRow(const std::vector<short>& scores,
 }
 
 inline ProtCandidatePtrVec findOneShiftTopProteinsWithoutRestrict(
-    std::vector<short>& scores, std::vector<short>& rev_scores,
+    const std::vector<short>& scores, const std::vector<short>& rev_scores,
     const std::vector<int>& max_scores, const std::vector<int>& rev_max_scores,
     const MassMatchPtr& index_ptr, const MassMatchPtr& rev_index_ptr,
     int term_shift_num, int threshold, int top_num,
@@ -730,7 +731,7 @@ inline void sortProteoIdsByBound(const std::vector<int>& max_scores,
 // because the kept candidates are ordered with the comparator of
 // ProtCandidate::geneResults.
 inline ProtCandidatePtrVec findOneShiftTopProteinsWithRestrict(
-    std::vector<short>& scores, std::vector<short>& rev_scores,
+    const std::vector<short>& scores, const std::vector<short>& rev_scores,
     const std::vector<int>& max_scores, const std::vector<int>& rev_max_scores,
     const MassMatchPtr& index_ptr, const MassMatchPtr& rev_index_ptr,
     double prec_minus_water_mass, double prec_error_tole, double min_shift,
@@ -755,6 +756,7 @@ inline ProtCandidatePtrVec findOneShiftTopProteinsWithRestrict(
   cands.reserve(top_num + 1);
   int bgn, end, rev_bgn, rev_end;
   int k_start, k_end;
+  long visited = 0, rows_moved = 0, rows_scanned = 0, pair_tests = 0;
   for (size_t idx = 0; idx < order.size(); idx++) {
     int i = order[idx];
     int rev_max_score = rev_max_scores[i];
@@ -764,6 +766,7 @@ inline ProtCandidatePtrVec findOneShiftTopProteinsWithRestrict(
     if (bound < cutoff) {
       break;
     }
+    visited++;
 
     double proteo_mass = proteo_minus_water_masses[i];
     bgn = row_begins[i];
@@ -798,9 +801,12 @@ inline ProtCandidatePtrVec findOneShiftTopProteinsWithRestrict(
       double n_trunc_shift = trunc_shifts[j];
       moveTruncWindow(proteo_mass, n_trunc_shift, rev_trunc_shifts, rev_bgn,
                       min_mass, max_mass, k_start, k_end);
+      rows_moved++;
       if (scores[j] < row_cutoff) {
         continue;
       }
+      rows_scanned++;
+      pair_tests += k_start - k_end + 1;
 
       for (int k = k_start; k >= k_end; k--) {
         double c_trunc_shift = rev_trunc_shifts[k];
@@ -830,6 +836,16 @@ inline ProtCandidatePtrVec findOneShiftTopProteinsWithRestrict(
     }
   }
 
+  if (stage_profile::enabled()) {
+    stage_profile::add("one.find.proteo_total", 0,
+                       static_cast<long>(max_scores.size()));
+    stage_profile::add("one.find.proteo_ordered", 0,
+                       static_cast<long>(order.size()));
+    stage_profile::add("one.find.proteo_visited", 0, visited);
+    stage_profile::add("one.find.rows_moved", 0, rows_moved);
+    stage_profile::add("one.find.rows_scanned", 0, rows_scanned);
+    stage_profile::add("one.find.pair_tests", 0, pair_tests);
+  }
   ProtCandidatePtrVec proteins;
   for (size_t i = 0; i < cands.size(); i++) {
     ProtScorePtr proteo_score = std::make_shared<ProtScore>(
@@ -842,15 +858,18 @@ inline ProtCandidatePtrVec findOneShiftTopProteinsWithRestrict(
     proteins.push_back(cand_ptr);
   }
   // add trunc shifts
-  addTruncShiftsWithRestriction(proteins, index_ptr, rev_index_ptr,
-                                proteo_minus_water_masses, scores, rev_scores,
-                                rev_max_scores, min_mass, max_mass,
-                                term_shift_num, nonincr_shifts);
+  {
+    stage_profile::Timer shifts_timer("one.find.trunc_shifts");
+    addTruncShiftsWithRestriction(proteins, index_ptr, rev_index_ptr,
+                                  proteo_minus_water_masses, scores,
+                                  rev_scores, rev_max_scores, min_mass,
+                                  max_mass, term_shift_num, nonincr_shifts);
+  }
   return proteins;
 }
 
 ProtCandidatePtrVec findOneShiftTopProteins(
-    std::vector<short>& scores, std::vector<short>& rev_scores,
+    const std::vector<short>& scores, const std::vector<short>& rev_scores,
     const std::vector<int>& max_scores, const std::vector<int>& rev_max_scores,
     const MassMatchPtr& index_ptr, const MassMatchPtr& rev_index_ptr,
     double prec_minus_water_mass, double prec_error_tole, double min_shift,
@@ -897,7 +916,7 @@ ProtCandidatePtrVec findOneShiftTopProteins(
 // range; a row whose score with the best C-terminal row of its proteoform
 // cannot reach it adds nothing either.
 inline ProtCandidatePtrVec findOneShiftTopRangesWithRestrict(
-    std::vector<short>& scores, std::vector<short>& rev_scores,
+    const std::vector<short>& scores, const std::vector<short>& rev_scores,
     const std::vector<int>& max_scores, const std::vector<int>& rev_max_scores,
     const MassMatchPtr& index_ptr, const MassMatchPtr& rev_index_ptr,
     const RangeRows& range_rows, double prec_minus_water_mass,
@@ -966,7 +985,7 @@ inline ProtCandidatePtrVec findOneShiftTopRangesWithRestrict(
 }
 
 ProtCandidatePtrVec findOneShiftTopRanges(
-    std::vector<short>& scores, std::vector<short>& rev_scores,
+    const std::vector<short>& scores, const std::vector<short>& rev_scores,
     const std::vector<int>& max_scores, const std::vector<int>& rev_max_scores,
     const MassMatchPtr& index_ptr, const MassMatchPtr& rev_index_ptr,
     const RangeRows& range_rows, double prec_minus_water_mass,
@@ -1002,7 +1021,7 @@ ProtCandidatePtrVec findOneShiftTopRanges(
 }
 
 ProtCandidatePtrVec findVarPtmTopProteins(
-    std::vector<short>& scores, std::vector<short>& rev_scores,
+    const std::vector<short>& scores, const std::vector<short>& rev_scores,
     const MassMatchPtr& index_ptr, const MassMatchPtr& rev_index_ptr,
     double prec_minus_water_mass, double prec_error_tole,
     std::vector<double>& ptm_shifts, int threshold, int top_num) {

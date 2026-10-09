@@ -15,6 +15,7 @@
 
 #include "stat/tdgf/evalue_processor.hpp"
 
+#include <algorithm>
 #include <cmath>
 #include <cstddef>
 #include <limits>
@@ -24,6 +25,8 @@
 #include "common/thread/simple_thread_pool.hpp"
 #include "common/util/file_util.hpp"
 #include "common/util/logger.hpp"
+#include "common/thread/ordered_task_runner.hpp"
+#include "common/util/stage_profile.hpp"
 #include "ms/factory/spectrum_set_factory.hpp"
 #include "ms/spec/msalign_util.hpp"
 #include "prsm/prsm.hpp"
@@ -68,6 +71,23 @@ std::string countTestNumKey(const TdgfMngPtr& mng_ptr) {
 }
 }  // namespace
 
+void EValueProcessor::prepareCountTestNum(const TdgfMngPtr& mng_ptr) {
+  const std::string key = countTestNumKey(mng_ptr);
+  {
+    std::lock_guard<std::mutex> lock(count_test_num_cache_mutex);
+    if (count_test_num_cache.count(key) > 0) {
+      return;
+    }
+  }
+  CountTestNumPtr test_num_ptr = std::make_shared<CountTestNum>(
+      mng_ptr->convert_ratio_, mng_ptr->max_ptm_mass_, mng_ptr->max_prec_mass_,
+      mng_ptr->prsm_para_ptr_);
+  std::lock_guard<std::mutex> lock(count_test_num_cache_mutex);
+  if (count_test_num_cache.count(key) == 0) {
+    count_test_num_cache[key] = test_num_ptr;
+  }
+}
+
 void EValueProcessor::init() {
   const std::string key = countTestNumKey(mng_ptr_);
   {
@@ -89,14 +109,17 @@ void EValueProcessor::init() {
   comp_pvalue_ptr_ = std::make_shared<CompPValueArray>(test_num_ptr_, mng_ptr_);
 }
 
-std::function<void()> geneTask(const SpectrumSetPtr& spec_set_ptr,
-                               const PrsmPtrVec& sele_prsm_ptrs,
-                               bool is_separate, const TdgfMngPtr& mng_ptr,
-                               const CountTestNumPtr& test_num_ptr,
-                               const SimpleThreadPoolPtr& pool_ptr,
-                               const PrsmXmlWriterPtrVec& writer_ptr_vec) {
-  return [spec_set_ptr, sele_prsm_ptrs, is_separate, mng_ptr, test_num_ptr,
-          pool_ptr, writer_ptr_vec]() {
+// The E-values of one spectrum's PrSMs on a pool thread; the PrSMs are
+// returned to the submitting thread, which writes them in spectrum order
+// (OrderedTaskRunner), as the merge of the per-thread files used to order
+// them (toppic_test experiment 150).
+std::function<PrsmPtrVec()> geneTask(const SpectrumSetPtr& spec_set_ptr,
+                                     const PrsmPtrVec& sele_prsm_ptrs,
+                                     bool is_separate,
+                                     const TdgfMngPtr& mng_ptr,
+                                     const CountTestNumPtr& test_num_ptr) {
+  return [spec_set_ptr, sele_prsm_ptrs, is_separate, mng_ptr,
+          test_num_ptr]() {
     PrsmPtrVec prsm_vec;  // copy sele_prsm_ptrs
     for (size_t i = 0; i < sele_prsm_ptrs.size(); i++) {
       prsm_vec.push_back(std::make_shared<Prsm>(*sele_prsm_ptrs[i].get()));
@@ -109,7 +132,24 @@ std::function<void()> geneTask(const SpectrumSetPtr& spec_set_ptr,
       comp_pvalue_ptr = std::make_shared<CompPValueArray>(test_num_ptr,
                                                           mng_ptr);
     }
-    comp_pvalue_ptr->process(spec_set_ptr, prsm_vec, is_separate);
+    // A PrSM with at most comp_evalue_min_match_theo_frag_num_ matched
+    // fragments gets the maximum E-value below whatever the generating
+    // function says, so a spectrum with no other PrSM needs no generating
+    // function (toppic_test experiment 150).
+    bool evalue_needed = false;
+    for (size_t i = 0; i < prsm_vec.size(); i++) {
+      if (std::round(prsm_vec[i]->getMatchTheoFragNum()) >
+          std::round(mng_ptr->comp_evalue_min_match_theo_frag_num_)) {
+        evalue_needed = true;
+        break;
+      }
+    }
+    if (evalue_needed) {
+      stage_profile::Timer table_timer("evalue.table");
+      comp_pvalue_ptr->process(spec_set_ptr, prsm_vec, is_separate);
+    } else {
+      stage_profile::add("evalue.skipped", 0);
+    }
 
     for (unsigned i = 0; i < prsm_vec.size(); i++) {
       if (std::round(prsm_vec[i]->getMatchTheoFragNum()) <=
@@ -123,11 +163,7 @@ std::function<void()> geneTask(const SpectrumSetPtr& spec_set_ptr,
       }
     }
 
-    std::thread::id thread_id = std::this_thread::get_id();
-    int writer_id = pool_ptr->getId(thread_id);
-    for (size_t i = 0; i < prsm_vec.size(); i++) {
-      writer_ptr_vec[writer_id]->write(prsm_vec[i]);
-    }
+    return prsm_vec;
   };
 }
 
@@ -157,11 +193,10 @@ void EValueProcessor::process(bool is_separate) {
       sp_para_ptr->getEnvCnnCutoff(),
         sp_para_ptr->getFragDedupPpo());
 
-  PrsmXmlWriterPtrVec writer_ptr_vec = prsm_xml_writer_util::geneWriterPtrVec(
-      output_file_name, mng_ptr_->thread_num_);
-
   SimpleThreadPoolPtr pool_ptr =
       std::make_shared<SimpleThreadPool>(mng_ptr_->thread_num_);
+  OrderedTaskRunner<PrsmPtrVec> runner(
+      pool_ptr, static_cast<std::size_t>(mng_ptr_->thread_num_) * 16);
 
   int cnt = 0;
   DeconvMsPtrVec deconv_ms_ptr_vec = reader_ptr->getNextMsPtrVec();
@@ -182,13 +217,17 @@ void EValueProcessor::process(bool is_separate) {
           prsm_ptr = prsm_reader.readOnePrsm(seq_reader, fix_mod_ptr_vec);
         }
         if (checkPrsms(selected_prsm_ptrs)) {
-          while (pool_ptr->getQueueSize() >=
-                 static_cast<std::size_t>(mng_ptr_->thread_num_) + 2) {
-            std::this_thread::sleep_for(std::chrono::milliseconds(100));
-          }
-          pool_ptr->enqueue(geneTask(spec_set_ptr, selected_prsm_ptrs,
-                                     is_separate, mng_ptr_, test_num_ptr_,
-                                     pool_ptr, writer_ptr_vec));
+          runner.submit(geneTask(spec_set_ptr, selected_prsm_ptrs,
+                                 is_separate, mng_ptr_, test_num_ptr_),
+                        [&writer](PrsmPtrVec& prsm_vec) {
+                          // the merge's order of a spectrum's PrSMs
+                          std::sort(
+                              prsm_vec.begin(), prsm_vec.end(),
+                              Prsm::cmpMatchTheoFragDecMatchExpFragDecProtInc);
+                          for (size_t i = 0; i < prsm_vec.size(); i++) {
+                            writer.writeTrimmedLines(prsm_vec[i]);
+                          }
+                        });
         }
       }
     }
@@ -206,27 +245,12 @@ void EValueProcessor::process(bool is_separate) {
     std::cout << std::flush << "E-value computation - processing "
               << spectrum_num << " of " << spectrum_num << " spectra.\r";
   }
+  runner.finish();
   pool_ptr->shutDown();
+  stage_profile::report("evalue");
   std::cout << std::endl;
   prsm_reader.close();
-  prsm_xml_writer_util::closeWriterPtrVec(writer_ptr_vec);
   writer.close();
-
-  int prsm_top_num = std::numeric_limits<int>::max();
-  bool norm = false;
-  bool remove_dup = false;
-  std::vector<std::string> input_exts;
-  for (int t = 0; t < mng_ptr_->thread_num_; t++) {
-    input_exts.push_back(mng_ptr_->output_file_ext_ + "_" + std::to_string(t));
-  }
-  PrsmStrMergePtr merge_ptr = std::make_shared<PrsmStrMerge>(
-      sp_file_name, input_exts, mng_ptr_->output_file_ext_, prsm_top_num, norm,
-      remove_dup);
-  merge_ptr->process();
-  merge_ptr = nullptr;
-
-  // remove temporary files
-  file_util::cleanTempFiles(sp_file_name, mng_ptr_->output_file_ext_ + "_");
 }
 
 bool EValueProcessor::checkPrsms(const PrsmPtrVec& prsm_ptrs) {

@@ -24,6 +24,7 @@
 #include "common/util/version.hpp"
 #include "console/topindex_argument.hpp"
 #include "filter/index/joint_index.hpp"
+#include "filter/massmatch/mass_match.hpp"
 #include "filter/mng/index_file_name.hpp"
 #include "filter/mng/one_ptm_filter_mng.hpp"
 #include "filter/mng/zero_ptm_filter_mng.hpp"
@@ -70,6 +71,8 @@ void TopIndexProcess(std::map<std::string, std::string>& arguments) {
     OnePtmFilterMngPtr one_ptm_filter_mng_ptr =
         std::make_shared<OnePtmFilterMng>(prsm_para_ptr, index_file_para,
                                           "toppic_one_filter", thread_num);
+    // the index file format (hidden --index-format; 2 by default)
+    MassMatch::setWriteVersion(std::stoi(arguments["indexFormat"]));
     // one pass over the blocks writes both index families; the one-shift
     // family's diagonal file also serves the multiple-shift filter
     joint_index::process(zero_filter_mng_ptr, one_ptm_filter_mng_ptr);

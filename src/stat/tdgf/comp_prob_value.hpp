@@ -92,11 +92,6 @@ class CompProbValue {
   // table height
   int height_;
 
-  int sp_table_size_;     // spLen * height
-  int page_table_size_;   // pageLen * height
-  int block_table_size_;  // blockLen * height
-
-  std::vector<int> acid_dists_;  // acidMass * height;
   std::vector<double> factors_;  // normalization factors;
 
   int shift_num_;
@@ -108,7 +103,6 @@ class CompProbValue {
   // the prob that a randam protein has the same precursor to the spectrum
   std::vector<double> prec_probs_;
 
-  double* page_table_;
   short* pos_scores_;
   short* tmp_pos_scores_;
 
@@ -133,16 +127,49 @@ class CompProbValue {
   double getShiftProb();
   void comp();
   void compPrecProbs();
-  void runClear(int page_pos);
-  void runFirstLayerInit(int win_table_bgn, int win_table_end);
-  void runInit(std::vector<std::vector<double>>& results, int win_table_bgn,
-               int win_table_end);
-  void runAddProb(int page_pos, int prev_pos, int size, double f);
-  void updateCol(int col_end, int scr);
-  void runUpdate(int page_end, int scr_bgn, int scr_end);
+
+  // The sliced table (toppic_test experiment 150). A layer's table is
+  // swept in slices of kChunkRows score rows: the recursion along the mass
+  // axis stays within a row (a residue moves the mass, not the score) and
+  // only the position score moves a column's values up, by at most the
+  // position score, so a slice needs the slice below it only at the
+  // columns with a position score (saved_rows_). A slice's working set,
+  // the residue look-back window of kChunkRows rows, stays in a core's
+  // cache, where the whole-height sweep (one page of 5,000 Da x the table
+  // height, 138 MB per thread) streamed the table through memory and the
+  // E-value stage was bound by the memory bandwidth of the machine. The
+  // per-cell operations and their order are those of the whole-height
+  // sweep, so the probabilities are the same bit for bit, including one
+  // habit of that sweep: it cleared the tail of its circular page once per
+  // computation, so for precursors whose table wrapped the page (above
+  // about 4.7 kDa) a shift layer's first blocks read, through the wrap,
+  // the last max residue mass columns the previous layer left in the page;
+  // tail_capture_ keeps those columns and puts them before column 0 of the
+  // next layer.
+  static const int kChunkRows = 8;
+  int chunk_block_cols_ = 0;   // columns per block (at most the smallest
+                               // residue mass, so a block never reads
+                               // itself)
+  int chunk_page_blocks_ = 0;  // blocks in the circular page
+  std::vector<double> chunk_table_;
+  std::vector<int> score_cols_;     // the columns with a position score
+  int max_pos_score_ = 0;
+  std::vector<double> saved_rows_;  // per score column, the slice below's
+                                    // last max_pos_score_ rows before the
+                                    // column update
+  std::vector<double> shift_probs_;  // layer 0's sums over the prior
+                                     // columns of the precursor, per row
+  int chunk_tail_cols_ = 0;          // the largest residue mass
+  std::vector<double> tail_capture_;  // the previous layer's last pass
+                                      // over the page tail (see above)
+  void setChunkVars();
   void compOneLayer(std::vector<std::vector<double>>& prev_results,
                     bool is_first_layer,
                     std::vector<std::vector<double>>& cur_results);
+  void sweepChunk(std::vector<std::vector<double>>& prev_results,
+                  bool is_first_layer,
+                  std::vector<std::vector<double>>& cur_results, int s0,
+                  int s1);
 };
 
 using CompProbValuePtr = std::shared_ptr<CompProbValue>;

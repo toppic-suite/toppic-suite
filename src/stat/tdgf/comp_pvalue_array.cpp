@@ -67,8 +67,26 @@ bool CompPValueArray::useModResidues(const PrsmPtr& prsm_ptr) {
 
 // set alignment
 void CompPValueArray::compMultiExpectedValues(const PrmMsPtrVec& ms_six_ptr_vec,
-                                              PrsmPtrVec& prsm_ptrs,
+                                              PrsmPtrVec& all_prsm_ptrs,
                                               bool strict, bool mod_residues) {
+  // A PrSM with at most comp_evalue_min_match_theo_frag_num_ matched
+  // fragments gets the maximum E-value from every caller (EValueProcessor's
+  // fixupEvalues and geneTask) whatever the generating function says, so it
+  // gets it here and stays out of the table: it could only add shift layers
+  // (the table height is the largest score, which is another PrSM's), and a
+  // group of such PrSMs alone computes no table (toppic_test experiment 150).
+  PrsmPtrVec prsm_ptrs;
+  for (size_t i = 0; i < all_prsm_ptrs.size(); i++) {
+    if (std::round(all_prsm_ptrs[i]->getMatchTheoFragNum()) <=
+        std::round(mng_ptr_->comp_evalue_min_match_theo_frag_num_)) {
+      all_prsm_ptrs[i]->setExpectedValuePtr(ExpectedValue::getMaxEvaluePtr());
+    } else {
+      prsm_ptrs.push_back(all_prsm_ptrs[i]);
+    }
+  }
+  if (prsm_ptrs.empty()) {
+    return;
+  }
   PrmPeakPtrVec2D prm_ptr_2d;
   for (size_t i = 0; i < ms_six_ptr_vec.size(); i++) {
     PrmPeakPtrVec prm_peak_ptrs = ms_six_ptr_vec[i]->getPeakPtrVec();
