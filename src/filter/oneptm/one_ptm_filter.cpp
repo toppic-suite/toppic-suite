@@ -232,22 +232,20 @@ void OnePtmFilter::computeBestMatch(const PrmMsPtrVec& prm_ms_ptr_vec,
 
 void OnePtmFilter::computeBestMatch(const FilterSpecPtr& spec_ptr) {
   scoreIndexes(spec_ptr);
-  findCandidates(spec_ptr);
+  findCandidates(spec_ptr, term_scores_, diag_scores_, rev_term_scores_,
+                 rev_diag_scores_);
 }
 
+// The other filter's arrays are read in place: copies cost as much as the
+// scoring they save, and the two filters' arrays together fall out of the
+// cache (toppic_test experiment 150, run b4).
 void OnePtmFilter::computeBestMatch(const FilterSpecPtr& spec_ptr,
                                     const std::vector<short>& term_scores,
                                     const std::vector<short>& diag_scores,
                                     const std::vector<short>& rev_term_scores,
                                     const std::vector<short>& rev_diag_scores) {
-  {
-    stage_profile::Timer copy_timer("one.copy");
-    term_scores_ = term_scores;
-    diag_scores_ = diag_scores;
-    rev_term_scores_ = rev_term_scores;
-    rev_diag_scores_ = rev_diag_scores;
-  }
-  findCandidates(spec_ptr);
+  findCandidates(spec_ptr, term_scores, diag_scores, rev_term_scores,
+                 rev_diag_scores);
 }
 
 void OnePtmFilter::scoreIndexes(const FilterSpecPtr& spec_ptr) {
@@ -273,20 +271,27 @@ void OnePtmFilter::scoreIndexes(const FilterSpecPtr& spec_ptr) {
                                   col_limit_);
 }
 
-void OnePtmFilter::findCandidates(const FilterSpecPtr& spec_ptr) {
+void OnePtmFilter::findCandidates(const FilterSpecPtr& spec_ptr,
+                                  const std::vector<short>& term_scores,
+                                  const std::vector<short>& diag_scores,
+                                  const std::vector<short>& rev_term_scores,
+                                  const std::vector<short>& rev_diag_scores) {
   PeakTolerancePtr tole_ptr =
       mng_ptr_->prsm_para_ptr_->getSpParaPtr()->getPrecTolerancePtr();
   stage_profile::Timer find_timer("one.find");
   // the best row score of each proteoform in each index, computed once and
   // shared by the four proteoform types below
-  mass_match_util::compProteoMaxScores(term_scores_, term_index_ptr_,
-                                       term_max_);
-  mass_match_util::compProteoMaxScores(diag_scores_, diag_index_ptr_,
-                                       diag_max_);
-  mass_match_util::compProteoMaxScores(rev_term_scores_, rev_term_index_ptr_,
-                                       rev_term_max_);
-  mass_match_util::compProteoMaxScores(rev_diag_scores_, rev_diag_index_ptr_,
-                                       rev_diag_max_);
+  {
+    stage_profile::Timer max_timer("one.find.max");
+    mass_match_util::compProteoMaxScores(term_scores, term_index_ptr_,
+                                         term_max_);
+    mass_match_util::compProteoMaxScores(diag_scores, diag_index_ptr_,
+                                         diag_max_);
+    mass_match_util::compProteoMaxScores(rev_term_scores, rev_term_index_ptr_,
+                                         rev_term_max_);
+    mass_match_util::compProteoMaxScores(rev_diag_scores, rev_diag_index_ptr_,
+                                         rev_diag_max_);
+  }
 
   double prec_minus_water_mass =
       spec_ptr->getHeaderPtr()->getFirstPrecMonoMassMinusWater();
@@ -299,8 +304,8 @@ void OnePtmFilter::findCandidates(const FilterSpecPtr& spec_ptr) {
   // ranges, each with the two shifts of its range; otherwise the best
   // proteins, each with the range of its best pair and the shifts of its
   // best pairs.
-  auto findCands = [&](std::vector<short>& scores,
-                       std::vector<short>& rev_scores,
+  auto findCands = [&](const std::vector<short>& scores,
+                       const std::vector<short>& rev_scores,
                        const std::vector<int>& max_scores,
                        const std::vector<int>& rev_max_scores,
                        const MassMatchPtr& index_ptr,
@@ -340,7 +345,7 @@ void OnePtmFilter::findCandidates(const FilterSpecPtr& spec_ptr) {
   };
 
   ProtCandidatePtrVec comp_prots =
-      findCands(term_scores_, rev_term_scores_, term_max_, rev_term_max_,
+      findCands(term_scores, rev_term_scores, term_max_, rev_term_max_,
                 term_index_ptr_, rev_term_index_ptr_, true, true,
                 mng_ptr_->comp_cand_shift_num_, mng_ptr_->comp_num_,
                 &term_nonincr_shifts_);
@@ -350,7 +355,7 @@ void OnePtmFilter::findCandidates(const FilterSpecPtr& spec_ptr) {
   }
 
   ProtCandidatePtrVec pref_prots =
-      findCands(term_scores_, rev_diag_scores_, term_max_, rev_diag_max_,
+      findCands(term_scores, rev_diag_scores, term_max_, rev_diag_max_,
                 term_index_ptr_, rev_diag_index_ptr_, true, false,
                 mng_ptr_->cand_shift_num_, mng_ptr_->pref_suff_num_,
                 &term_nonincr_shifts_);
@@ -360,7 +365,7 @@ void OnePtmFilter::findCandidates(const FilterSpecPtr& spec_ptr) {
   }
 
   ProtCandidatePtrVec suff_prots =
-      findCands(diag_scores_, rev_term_scores_, diag_max_, rev_term_max_,
+      findCands(diag_scores, rev_term_scores, diag_max_, rev_term_max_,
                 diag_index_ptr_, rev_term_index_ptr_, false, true,
                 mng_ptr_->cand_shift_num_, mng_ptr_->pref_suff_num_,
                 &diag_nonincr_shifts_);
@@ -370,7 +375,7 @@ void OnePtmFilter::findCandidates(const FilterSpecPtr& spec_ptr) {
   }
 
   ProtCandidatePtrVec internal_prots =
-      findCands(diag_scores_, rev_diag_scores_, diag_max_, rev_diag_max_,
+      findCands(diag_scores, rev_diag_scores, diag_max_, rev_diag_max_,
                 diag_index_ptr_, rev_diag_index_ptr_, false, false,
                 mng_ptr_->cand_shift_num_, mng_ptr_->inte_num_,
                 &diag_nonincr_shifts_);

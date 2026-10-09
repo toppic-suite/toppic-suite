@@ -246,28 +246,31 @@ void VarPtmFilter::scoreIndexes(
     const FilterSpecPtr& spec_ptr,
     const std::vector<std::pair<int, int>>& prec_minus_water_mass_errors,
     bool score_term, const std::function<void()>& base_scores_hook) {
-  stage_profile::Timer score_timer("var.score");
   const std::vector<std::pair<int, int>>& pref_mass_errors =
       spec_ptr->getPrefMassErrors();
   const std::vector<std::pair<int, int>>& suff_mass_errors =
       spec_ptr->getSuffMassErrors();
 
   // the mass list scores (compMatchScores = compScores + compPrecScores)
-  if (score_term) {
-    term_scores_.assign(term_index_ptr_->getRowNum(), 0);
-    term_index_ptr_->compScores(pref_mass_errors, term_scores_);
+  {
+    stage_profile::Timer score_timer("var.score");
+    if (score_term) {
+      term_scores_.assign(term_index_ptr_->getRowNum(), 0);
+      term_index_ptr_->compScores(pref_mass_errors, term_scores_);
+    }
+    diag_scores_.assign(diag_index_ptr_->getRowNum(), 0);
+    diag_index_ptr_->compScores(pref_mass_errors, diag_scores_);
+    rev_term_scores_.assign(rev_term_index_ptr_->getRowNum(), 0);
+    rev_term_index_ptr_->compScores(suff_mass_errors, rev_term_scores_);
+    rev_diag_scores_.assign(rev_diag_index_ptr_->getRowNum(), 0);
+    rev_diag_index_ptr_->compScores(suff_mass_errors, rev_diag_scores_);
   }
-  diag_scores_.assign(diag_index_ptr_->getRowNum(), 0);
-  diag_index_ptr_->compScores(pref_mass_errors, diag_scores_);
-  rev_term_scores_.assign(rev_term_index_ptr_->getRowNum(), 0);
-  rev_term_index_ptr_->compScores(suff_mass_errors, rev_term_scores_);
-  rev_diag_scores_.assign(rev_diag_index_ptr_->getRowNum(), 0);
-  rev_diag_index_ptr_->compScores(suff_mass_errors, rev_diag_scores_);
   if (base_scores_hook) {
     base_scores_hook();
   }
 
   // the precursor bonus
+  stage_profile::Timer prec_timer("var.prec");
   if (score_term) {
     term_prec_rows_.clear();
     term_index_ptr_->compPrecScores(prec_minus_water_mass_errors,

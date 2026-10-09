@@ -86,7 +86,13 @@ class OnePtmFilter {
 
   void initRows();
   void scoreIndexes(const FilterSpecPtr& spec_ptr);
-  void findCandidates(const FilterSpecPtr& spec_ptr);
+  // the candidates from the four score arrays (this filter's own, or
+  // another filter's read in place)
+  void findCandidates(const FilterSpecPtr& spec_ptr,
+                      const std::vector<short>& term_scores,
+                      const std::vector<short>& diag_scores,
+                      const std::vector<short>& rev_term_scores,
+                      const std::vector<short>& rev_diag_scores);
 
   // mass_match_util::compNonincreasingShifts of the two N-terminal side
   // indexes, computed once for the block

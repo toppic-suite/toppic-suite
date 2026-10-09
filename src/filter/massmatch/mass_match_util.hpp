@@ -104,8 +104,8 @@ struct IndexRowRanges {
                          bool proper_end) const;
 };
 
-ProtCandidatePtrVec findZeroShiftTopProteins(std::vector<short>& scores,
-                                             std::vector<short>& rev_scores,
+ProtCandidatePtrVec findZeroShiftTopProteins(const std::vector<short>& scores,
+                                             const std::vector<short>& rev_scores,
                                              const MassMatchPtr& index_ptr,
                                              const MassMatchPtr& rev_index_ptr,
                                              double prec_minus_water_mass,
@@ -135,7 +135,7 @@ std::vector<char> compNonincreasingShifts(const MassMatchPtr& index_ptr);
 // range_rows, when given, sets each candidate's range to that of its best
 // pair.
 ProtCandidatePtrVec findOneShiftTopProteins(
-    std::vector<short>& scores, std::vector<short>& rev_scores,
+    const std::vector<short>& scores, const std::vector<short>& rev_scores,
     const std::vector<int>& max_scores, const std::vector<int>& rev_max_scores,
     const MassMatchPtr& index_ptr, const MassMatchPtr& rev_index_ptr,
     double prec_minus_water_mass, double prec_error_tole, double min_shift,
@@ -153,7 +153,7 @@ ProtCandidatePtrVec findOneShiftTopProteins(
 // candidate's shift lists hold the N- and the C-terminal shift of its own
 // pair.
 ProtCandidatePtrVec findOneShiftTopRanges(
-    std::vector<short>& scores, std::vector<short>& rev_scores,
+    const std::vector<short>& scores, const std::vector<short>& rev_scores,
     const std::vector<int>& max_scores, const std::vector<int>& rev_max_scores,
     const MassMatchPtr& index_ptr, const MassMatchPtr& rev_index_ptr,
     const RangeRows& range_rows, double prec_minus_water_mass,
@@ -162,7 +162,7 @@ ProtCandidatePtrVec findOneShiftTopRanges(
     const std::vector<char>* nonincr_shifts = nullptr);
 
 ProtCandidatePtrVec findVarPtmTopProteins(
-    std::vector<short>& scores, std::vector<short>& rev_scores,
+    const std::vector<short>& scores, const std::vector<short>& rev_scores,
     const MassMatchPtr& index_ptr, const MassMatchPtr& rev_index_ptr,
     double prec_minus_water_mass, double prec_error_tole,
     std::vector<double>& ptm_shifts, int threshold, int top_num);
