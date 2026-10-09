@@ -3370,9 +3370,10 @@ XML). Facts to keep straight:
   some mass near the end of the table, placed at mass 0 of layer 1, which
   then collect the spectrum's matches a second time. Only the one-shift
   and two-shift probabilities of such precursors were raised (the
-  zero-shift layer and the variable PTM PrSMs are layer 0), by about
-  1/3,000 at low scores and by up to 10^8.7 for PrSMs with 40 or more
-  matched fragments; decoys by at most 10^0.02. Main 3b8041dd
+  zero-shift layer and the variable PTM PrSMs are layer 0): by a median
+  of 10^0.00002 at 5-9 matched fragments and 10^0.0001 at 10-19, but by
+  up to 10^8.7 for PrSMs with 20 or more (one-shift targets of the first
+  pass above 4.6 kDa); decoys by at most 10^0.02. Main 3b8041dd
   reproduced it (`tail_capture_`) to keep main 915bb387's output; on
   480_F3_02 (setting d with the four variable PTMs) the clean sweep gives
   the same 3,412 PrSMs / 2,016 proteoforms / 447 proteins and cutoffs,
