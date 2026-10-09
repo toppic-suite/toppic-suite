@@ -196,7 +196,7 @@ void EValueProcessor::process(bool is_separate) {
   SimpleThreadPoolPtr pool_ptr =
       std::make_shared<SimpleThreadPool>(mng_ptr_->thread_num_);
   OrderedTaskRunner<PrsmPtrVec> runner(
-      pool_ptr, static_cast<std::size_t>(mng_ptr_->thread_num_) + 2);
+      pool_ptr, static_cast<std::size_t>(mng_ptr_->thread_num_) * 16);
 
   int cnt = 0;
   DeconvMsPtrVec deconv_ms_ptr_vec = reader_ptr->getNextMsPtrVec();
