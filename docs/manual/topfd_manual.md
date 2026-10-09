@@ -306,8 +306,8 @@ An MGF file holding one spectrum can be used as it is: its `BEGIN IONS` and
 and comments do not start with a number and are skipped, and the charge
 column some peak lines carry is ignored. The precursor information of the
 MGF file is not used. An MGF file with several spectra is read as one
-spectrum with the peaks of all of them, so split it into one file per
-spectrum first.
+spectrum with the peaks of all of them (TopFD warns when the file has more
+than one `BEGIN IONS` line), so split it into one file per spectrum first.
 
 ```text
 BEGIN IONS

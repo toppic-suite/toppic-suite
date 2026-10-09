@@ -3699,7 +3699,8 @@ above it, never the reverse:
   deconvolutes one MS/MS spectrum from a text peak list (`m/z intensity` per
   line, separated by spaces or a tab; `readPeakFile` skips the lines that
   do not start with a digit, so an MGF file of one spectrum is read as
-  one, and the peaks of all spectra of a longer MGF file would be merged)
+  one, and the peaks of all spectra of a longer MGF file are merged, with
+  a warning when it has more than one `BEGIN IONS` line)
   with `DeconvSingleSp`, writing `<input>_ms2.msalign`,
   `<input>_ms2.env` and `<input>.sqlite`. **Both** name their outputs through
   `TopfdPara::setMzmlFileNameAndFaims` (base name = input path minus
