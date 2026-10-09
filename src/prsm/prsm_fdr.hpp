@@ -30,6 +30,18 @@ inline bool isDecoy(const PrsmStrPtr& prsm_ptr) {
   return prsm_ptr->getSeqName().find("DECOY_") == 0;
 }
 
+// The score the FDRs rank PrSMs by, smaller is better: the E-value, or with
+// --rescore the rescoring step's score negated (prsm/prsm_rescore).
+using FdrKey = double (*)(const PrsmStrPtr&);
+
+inline double eValueKey(const PrsmStrPtr& prsm_ptr) {
+  return prsm_ptr->getEValue();
+}
+
+inline double rescoreKey(const PrsmStrPtr& prsm_ptr) {
+  return -prsm_ptr->getRescore();
+}
+
 // PrSMs (sorted by E-value) grouped by proteoform cluster, groups ordered by
 // their best E-value
 PrsmStrPtrVec2D getProteoformGroups(const PrsmStrPtrVec& prsm_ptrs);
@@ -45,19 +57,24 @@ void splitTargetDecoyProteoforms(const PrsmStrPtrVec2D& all_proteoforms,
                                  PrsmStrPtrVec2D& decoy_proteoforms);
 
 // spectrum-, proteoform- and protein-level FDRs; the inputs are sorted /
-// ordered by E-value
-void computePrsmFdr(PrsmStrPtrVec& target_prsms, PrsmStrPtrVec& decoy_prsms);
+// ordered by the key (the E-value by default)
+void computePrsmFdr(PrsmStrPtrVec& target_prsms, PrsmStrPtrVec& decoy_prsms,
+                    FdrKey key = eValueKey);
 void computeProteoformFdr(PrsmStrPtrVec2D& target_proteoforms,
-                          PrsmStrPtrVec2D& decoy_proteoforms);
+                          PrsmStrPtrVec2D& decoy_proteoforms,
+                          FdrKey key = eValueKey);
 void computeProteinFdr(PrsmStrPtrVec2D& target_proteins,
-                       PrsmStrPtrVec2D& decoy_proteins);
+                       PrsmStrPtrVec2D& decoy_proteins,
+                       FdrKey key = eValueKey);
 
 // Writes every PrSM (targets and decoys) with its spectrum-, proteoform- and
 // protein-level FDRs to <base>.<output_file_ext>; the decoys are removed
-// later (prsm_decoy_filter) when they are not wanted.
+// later (prsm_decoy_filter) when they are not wanted. use_rescore: the
+// PrSMs are ranked by the rescoring step's score (--rescore,
+// prsm/prsm_rescore) instead of the E-value; every PrSM must have one.
 void process(const std::string& spec_file_name,
              const std::string& input_file_ext,
-             const std::string& output_file_ext);
+             const std::string& output_file_ext, bool use_rescore = false);
 
 }  // namespace prsm_fdr
 

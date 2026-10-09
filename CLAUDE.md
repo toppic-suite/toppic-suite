@@ -3381,6 +3381,92 @@ XML). Facts to keep straight:
   binary-search shift predecessors in the alignments (the quadratic loop
   was 1% of the search), per-class table heights in the E-value.
 
+## Rescoring of the PrSMs (`stat/rescore`, `--rescore`)
+
+Branch `prsm_rescore` (toppic_test experiment 151, report 0151 and its
+amendment 1; from main 3b8041dd, merged into main on 2026-10-09). Off by
+default; toppic's hidden `--rescore` (argument key `rescore`, "false"; the
+parameter block prints "FDR computation: rescored PrSMs (linear SVM, 3-fold
+cross-validation)" only then) gives the best PrSM of every spectrum a score
+of a semi-supervised linear model, and the FDRs rank by it instead of the
+E-value. Refused without `-d` and together with `--fdr-groups`. Facts to
+keep straight:
+
+- **Where it runs.** `TopPIC_postprocess` keeps its order (clustering,
+  cluster protein correction, recount, post mass matching, PTM
+  characterization) and runs `prsm_rescore::process` on the result
+  (`toppic_rescore`) just before the FDR; `TopPIC_multi_postprocess` (`-c`)
+  does the same on the merged PrSMs and spectra (not tested). The E-values
+  are not changed; `prsm_fdr::process(..., use_rescore)` sorts by
+  `PrsmStr::cmpRescoreDecProtInc` and its three FDR functions compare the
+  key `rescoreKey` (the score negated; `eValueKey` by default), so the
+  cutoffs (`-t FDR`, `-T FDR`, `-y FDR`) apply to the rescored FDRs.
+  `-t EVALUE` cutoffs still compare E-values.
+- **The score** (`stat/rescore/rescore_model`): Percolator's algorithm
+  (Kall et al., Nat. Methods 2007). The spectra are split into 3 folds at
+  random (`std::mt19937` with seed 1 on the spectrum ids in increasing
+  order, `rng() % 3`); for each fold a linear SVM
+  (`stat/rescore/linear_svm`: L2 penalty, squared hinge loss, C = 0.1,
+  "balanced" class weights, dual coordinate descent, the bias as a
+  penalized feature; scikit-learn's `LinearSVC` defaults) is trained on the
+  other two folds 5 times, each time with the targets at 1% FDR of the
+  current score (TopPIC's ratio, `passFdr`) as the positives and every
+  decoy as a negative, the first iteration ranking by -log10 E-value; the
+  features are standardized on the training folds. The held-out fold's
+  scores are put on one scale (the training folds' 1% threshold -> 0, their
+  median decoy -> -1). A fold with fewer than 10 positives gives every PrSM
+  of the search its -log10 E-value (the FDR is then the E-value's). The
+  searches (`<tool>` toppic, topmg) are rescored apart, as the FDR counts
+  them apart. The `<rescore>` element of the PrSM XML (after
+  `<protein_fdr>`, written and read only when set: `Prsm::getRescore`,
+  `PrsmStr::getRescore`, NaN without) carries the score to the FDR and
+  the outputs; the TSV tables do not show it.
+- **The features** (`prsm_rescore::compFeatures`, names in
+  `getFeatureNames`): -log10 E-value (clipped to [-5, 100]), log10 test
+  number, -log10 one-protein probability, matched fragments and masses (the
+  record's, after the recount and the post mass matching), matched masses
+  per spectrum mass and fragments per residue, log10 masses of the
+  spectrum, 0 or 2 unexpected shifts, variable PTMs, log10(1 + total
+  |shift|), a shift within 0.02 Da of a common modification mass, NME,
+  acetylated N-terminal form, start <= residue 1, end at the protein's
+  last residue, log10 length and mass, precursor charge, log10 intensity,
+  intensity / the largest precursor's, precursor number, log10 feature
+  intensity, ECScore; and from the b / y (c / z) pairs of
+  `peak_ion_pair_util::genePeakIonPairs` on the spectra read with the
+  EnvCNN cutoff of `-F` (the masses the search used): matched intensity
+  fraction, median and median absolute deviation of the ppm errors (pairs
+  at an isotope offset left out), |median|, isotope-offset share,
+  cleavage-site coverage, the longest run of covered sites, complementary
+  sites. One more: |RT - predicted RT|, the prediction a ridge regression
+  (alpha 1) on the amino acid composition, log10 length and log10 mass,
+  fitted in each fold on the training folds' targets at 1% FDR by E-value.
+  The console prints, per search, the PrSMs, decoys and the targets at 1%
+  FDR by E-value and rescored, and the 8 largest standardized weights.
+- **The FDR caveat** (toppic_test report 0151's follow-up): with this
+  order the cluster protein correction has already given some spectra the
+  proteoform of their cluster's best PrSM (on 480_F3_02 331 records, 140 of
+  them decoys before the correction, 192 at E = 1e300), so the decoy count
+  does not check those records, and a rescored PrSM among them is accepted
+  on the cluster's identification (feature-level propagation) rather than
+  on its own spectrum. Rescoring the PrSMs before the correction keeps the
+  decoys valid (+2.4% PrSMs instead of +6.3% in the Python prototype).
+- **Results on 480_F3_02** (setting d of toppic_test report 0062, TopFD
+  main 915bb387 output of experiment 151; toppic_test experiment 151,
+  amendment 1): 3,573 PrSMs / 2,041 proteoforms / 447 proteins at 1% FDR
+  against main 3b8041dd's 3,374 / 2,004 / 440 (the toppic_test Python
+  prototype, `rescore.py` with the same features: 3,588 +- 4 / 2,045 / 443
+  over 5 seeds); 242 spectra gained and 43 lost, 98 of the accepted PrSMs
+  with E = 1e300 (cluster-corrected records, the caveat above). The step
+  takes a few seconds (12:26 against 12:53 for the run, the same memory).
+  Without the option the branch writes main's 62 files (56 equal, 6 but for
+  the time lines). On the human + 0.5x shuffled entrapment
+  database of experiment 151 (`ENTRAP_` proteins, indexed by this
+  topindex in 3:19, 140 GB) the estimated false discovery proportion
+  (entrapment PrSMs x (1 + 1 / 0.5) / accepted PrSMs) is 0.84%, 1.66% and
+  2.86% at 1%, 2% and 5% FDR (3,557 PrSMs at 1%), against the E-value's
+  0.98%, 1.41% and 3.56% (3,353); with 8-20 entrapment PrSMs the estimate
+  has a standard error of about 0.3 percentage points at 1%.
+
 ## Source layout
 
 `src` is the include root, so headers are included by their path from `src`
@@ -3551,9 +3637,10 @@ above it, never the reverse:
   per thread and merge them with `PrsmStrMerge`. Use the runner for a new
   stage whose output order matters; `ZeroPtmSearchMng` and `PtmSearchMng`
   carry the thread number from the toppic `-u` option.
-- `src/stat` — E-value/p-value estimation (`count`/`local`/`mcmc`/`tdgf`)
-  and the PTM localization (`local`, and its alternative `local_align`, see
-  its section);
+- `src/stat` — E-value/p-value estimation (`count`/`local`/`mcmc`/`tdgf`),
+  the PTM localization (`local`, and its alternative `local_align`, see
+  its section) and the rescoring of `--rescore` (`rescore`, see its
+  section);
   `tdgf/cluster_prot_corrector` (see the post mass matching section) is
   here rather than in `prsm` because it recomputes E-values.
 - `src/merge` — the topdiff feature-merge backend (`feature_prsm`,
