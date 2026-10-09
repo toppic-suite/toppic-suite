@@ -29,6 +29,12 @@ class EValueProcessor {
 
   void init();
 
+  // Builds the CountTestNum of mng_ptr's parameters into the cache that
+  // init() reads (a database scan of about 9 s on one thread), so that the
+  // scan can run in a background thread during the filter stages instead
+  // of at the start of the E-value stage (toppic_test experiment 150).
+  static void prepareCountTestNum(const TdgfMngPtr& mng_ptr);
+
   void process(bool is_separate);
 
   void compEvalues(const SpectrumSetPtr& spectrum_set_ptr,

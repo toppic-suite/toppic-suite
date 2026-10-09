@@ -209,14 +209,23 @@ void process(const ZeroPtmFilterMngPtr& zero_mng_ptr,
         sp_file_name, one_mng_ptr->output_file_ext_, one_top_nums, sp_ids);
   }
 
-  // the spectra of the stages, read and converted once
-  FilterSpecPtrVec zero_spectra =
-      zero_ptm_filter_processor::readSpectra(zero_mng_ptr);
-  FilterSpecPtrVec var_spectra =
-      var_ptm_filter_processor::readSpectra(var_mng_ptr);
+  // the spectra of the stages, read and converted once; the three
+  // readings (each 3-5 s on one thread) run at the same time
+  FilterSpecPtrVec zero_spectra;
+  FilterSpecPtrVec var_spectra;
   FilterSpecPtrVec one_spectra;
-  if (one_mng_ptr != nullptr) {
-    one_spectra = one_ptm_filter_processor::readSpectra(one_mng_ptr);
+  {
+    std::thread var_thread([&]() {
+      var_spectra = var_ptm_filter_processor::readSpectra(var_mng_ptr);
+    });
+    std::thread one_thread([&]() {
+      if (one_mng_ptr != nullptr) {
+        one_spectra = one_ptm_filter_processor::readSpectra(one_mng_ptr);
+      }
+    });
+    zero_spectra = zero_ptm_filter_processor::readSpectra(zero_mng_ptr);
+    var_thread.join();
+    one_thread.join();
   }
 
   SimpleThreadPoolPtr pool_ptr =

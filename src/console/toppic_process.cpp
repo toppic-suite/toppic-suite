@@ -25,6 +25,7 @@
 #include <map>
 #include <set>
 #include <string>
+#include <thread>
 #include <vector>
 
 #include "common/base/base_data.hpp"
@@ -307,6 +308,18 @@ std::string TopPIC_identify(std::map<std::string, std::string>& arguments) {
 
     bool use_var_ptm = var_ptm_num >= 1 && var_ptm_file_name != "";
     bool use_approx_spec = arguments["useApproxSpectra"] == "true";
+    // The E-value stage's CountTestNum (a 9 s database scan on one thread,
+    // cached for the later E-value stages) is built in a background thread
+    // during the filter stages; its parameters do not depend on the
+    // variable PTM type number (EValueProcessor::prepareCountTestNum,
+    // toppic_test experiment 150).
+    std::thread count_test_num_thread([&]() {
+      TdgfMngPtr early_tdgf_mng_ptr = std::make_shared<TdgfMng>(
+          prsm_para_ptr, shift_num,
+          std::max(std::abs(max_shift_mass), std::abs(min_shift_mass)), 0,
+          thread_num, "toppic_combined", "toppic_evalue");
+      EValueProcessor::prepareCountTestNum(early_tdgf_mng_ptr);
+    });
     // The zero-shift and variable PTM filters score the same four index
     // files of every block, so by default they run as one pass over the
     // blocks (zero_var_ptm_filter_processor, toppic_test experiment 150);
@@ -474,6 +487,7 @@ std::string TopPIC_identify(std::map<std::string, std::string>& arguments) {
     std::cout << "Merging PrSMs - finished." << std::endl;
 
     std::cout << "E-value computation - started." << std::endl;
+    count_test_num_thread.join();
     TdgfMngPtr tdgf_mng_ptr = std::make_shared<TdgfMng>(
         prsm_para_ptr, shift_num,
         std::max(std::abs(max_shift_mass), std::abs(min_shift_mass)),
