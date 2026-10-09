@@ -165,8 +165,10 @@ bool Argument::parse(int argc, char* argv[]) {
         "Add the MS1 peaks for 3D visualization to the SQLite database.")(
         "text-peak-list,T",
         "Deconvolute a single MS/MS spectrum given as a text peak list: one "
-        "peak per line, m/z and intensity separated by a space. The output "
-        "files are named after the input file.")(
+        "peak per line, m/z and intensity separated by a space or a tab. "
+        "Lines that do not start with a number are skipped, so an MGF file "
+        "of one spectrum can be used. The output files are named after the "
+        "input file.")(
         "deconv-ms1,p", po::value<std::string>(&deconv_ms1),
         "<greedy|msdeconv>. Set the deconvolution method of MS1 spectra: "
         "greedy, a greedy search that decides the charge state of the most "

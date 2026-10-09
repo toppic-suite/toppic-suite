@@ -156,9 +156,10 @@ std::vector<std::string> TopFDDialog::getSpecFileList() {
 }
 
 void TopFDDialog::on_addButton_clicked() {
-  // a text peak list may have any extension (topfd --text-peak-list)
+  // a text peak list may have any extension (topfd --text-peak-list); an
+  // MGF file of one spectrum is read as one
   QString filter = ui->textPeakListCheckBox->isChecked()
-                       ? "Text peak lists (*.txt);;All files (*)"
+                       ? "Text peak lists (*.txt *.mgf);;All files (*)"
                        : "Spectra files (*.mzXML *.mzML *.mzxml *.mzml)";
   QStringList spfiles = QFileDialog::getOpenFileNames(
       this, "Select spectrum files", lastDir_, filter);
@@ -214,8 +215,9 @@ void TopFDDialog::on_delButton_clicked() {
 }
 
 void TopFDDialog::on_startButton_clicked() {
-  // topfd --text-peak-list reads every input file as a peak list and stops
-  // on an mzML/mzXML file, so refuse the run here.
+  // topfd --text-peak-list reads every input file as a peak list; an
+  // mzML/mzXML file has no line that starts with a number and would give an
+  // empty spectrum, so refuse the run here.
   if (ui->textPeakListCheckBox->isChecked()) {
     for (int i = 0; i < ui->listWidget->count(); i++) {
       QString spfile = ui->listWidget->item(i)->text();
