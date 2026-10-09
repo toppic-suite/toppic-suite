@@ -69,6 +69,7 @@
 #include "prsm/prsm_prot_cluster.hpp"
 #include "prsm/prsm_prot_filter.hpp"
 #include "prsm/prsm_reader_util.hpp"
+#include "prsm/prsm_second_prec.hpp"
 #include "prsm/prsm_simple_cluster.hpp"
 #include "prsm/simple_prsm_str_merge.hpp"
 #include "prsm/prsm_sql_output.hpp"
@@ -104,8 +105,11 @@ namespace toppic {
 // post_sp_name is the spectrum file written by the post mass matching (on by
 // default; --disable-post-match turns it off), whose name the result files
 // carry; "" if it did not run. toppic_record_prsm is never deleted.
+// copy_outputs: the cutoff files become the XML outputs (false for the
+// residual spectra of --second-precursor, which have no report)
 void cleanToppicDir(const std::string& fa_name, const std::string& sp_name,
-                    bool keep_temp_files, const std::string& post_sp_name) {
+                    bool keep_temp_files, const std::string& post_sp_name,
+                    bool copy_outputs = true) {
   std::string abs_sp_name = file_util::absoluteName(sp_name);
   std::string sp_base = file_util::basename(abs_sp_name);
   std::replace(sp_base.begin(), sp_base.end(), '\\', '/');
@@ -114,16 +118,18 @@ void cleanToppicDir(const std::string& fa_name, const std::string& sp_name,
     out_base = file_util::basename(file_util::absoluteName(post_sp_name));
     std::replace(out_base.begin(), out_base.end(), '\\', '/');
   }
-  file_util::delFile(out_base + "_toppic_proteoform.xml");
-  bool overwrite = true;
-  file_util::copyFile(out_base + ".toppic_form_cutoff_form",
-                      out_base + "_toppic_proteoform.xml", overwrite);
-  file_util::delFile(out_base + "_toppic_prsm.xml");
-  file_util::copyFile(out_base + "." + "toppic_prsm_cutoff",
-                      out_base + "_toppic_prsm.xml", overwrite);
-  file_util::delFile(out_base + "_toppic_protein.xml");
-  file_util::copyFile(out_base + ".toppic_prot_cutoff_prot",
-                      out_base + "_toppic_protein.xml", overwrite);
+  if (copy_outputs) {
+    file_util::delFile(out_base + "_toppic_proteoform.xml");
+    bool overwrite = true;
+    file_util::copyFile(out_base + ".toppic_form_cutoff_form",
+                        out_base + "_toppic_proteoform.xml", overwrite);
+    file_util::delFile(out_base + "_toppic_prsm.xml");
+    file_util::copyFile(out_base + "." + "toppic_prsm_cutoff",
+                        out_base + "_toppic_prsm.xml", overwrite);
+    file_util::delFile(out_base + "_toppic_protein.xml");
+    file_util::copyFile(out_base + ".toppic_prot_cutoff_prot",
+                        out_base + "_toppic_protein.xml", overwrite);
+  }
   if (!keep_temp_files && post_sp_name != "") {
     file_util::delFile(file_util::absoluteName(post_sp_name) + "_index");
     file_util::delFile(out_base + ".feature");
@@ -134,6 +140,13 @@ void cleanToppicDir(const std::string& fa_name, const std::string& sp_name,
     file_util::delFile(out_base + ".toppic_cluster_local");
     file_util::delFile(out_base + ".toppic_rescore");
     file_util::delFile(out_base + ".toppic_cluster_prot");
+    // the second precursor search's merge (--second-precursor)
+    file_util::delFile(out_base + ".toppic_first_record_prsm");
+    file_util::delFile(out_base + ".toppic_second_merged");
+    file_util::delFile(out_base + ".toppic_second_cluster");
+    file_util::delFile(out_base + ".toppic_second_prot");
+    file_util::delFile(out_base + ".toppic_second_rescore");
+    file_util::delFile(out_base + ".toppic_second_fdr");
     file_util::delFile(out_base + ".toppic_prsm_target");
     file_util::delFile(out_base + ".toppic_prsm_cutoff");
     file_util::delFile(out_base + ".toppic_form_cutoff");
@@ -181,6 +194,12 @@ void cleanToppicDir(const std::string& fa_name, const std::string& sp_name,
     file_util::delFile(sp_base + ".toppic_cluster_local");
     file_util::delFile(sp_base + ".toppic_rescore");
     file_util::delFile(sp_base + ".toppic_cluster_prot");
+    file_util::delFile(sp_base + ".toppic_first_record_prsm");
+    file_util::delFile(sp_base + ".toppic_second_merged");
+    file_util::delFile(sp_base + ".toppic_second_cluster");
+    file_util::delFile(sp_base + ".toppic_second_prot");
+    file_util::delFile(sp_base + ".toppic_second_rescore");
+    file_util::delFile(sp_base + ".toppic_second_fdr");
     file_util::delFile(sp_base + ".toppic_prsm_target");
     file_util::delFile(sp_base + ".toppic_prsm_cutoff");
     file_util::delFile(sp_base + ".toppic_form_cutoff");
@@ -1504,14 +1523,18 @@ int TopPIC_report(std::map<std::string, std::string>& arguments) {
   return 0;
 }
 
-int TopPICProgress(std::map<std::string, std::string>& arguments) {
+// The identification stages of one spectrum file: toppic's own
+// (TopPIC_identify, the multiple-shift stage) or the hosted TopMG's, as
+// --topmg says. Returns the extension of the raw PrSM file they leave,
+// empty on an error.
+std::string TopPIC_identifyAll(std::map<std::string, std::string>& arguments) {
   std::string raw_prsm_ext;
   if (arguments["topmgMode"] == "topmg-only") {
     // --topmg topmg-only: TopMG's identification is the only database
     // search, and toppic's own identification stages (TopPIC_identify and
     // TopPIC_multi_ptm_search) are skipped
     if (!TopPIC_init(arguments)) {
-      return 1;
+      return "";
     }
     // The variable PTM type number by which the generating function (the
     // hosted stage's E-values and the cluster protein correction) multiplies
@@ -1545,7 +1568,7 @@ int TopPICProgress(std::map<std::string, std::string>& arguments) {
   } else {
     raw_prsm_ext = TopPIC_identify(arguments);
     if (raw_prsm_ext.empty()) {
-      return 1;
+      return "";
     }
     // the multiple unexpected shifts stage is the -s 2 stage
     if (std::stoi(arguments["shiftNumber"]) >= 2) {
@@ -1555,10 +1578,166 @@ int TopPICProgress(std::map<std::string, std::string>& arguments) {
       raw_prsm_ext = TopPIC_topmg_identify(arguments, raw_prsm_ext);
     }
   }
+  return raw_prsm_ext;
+}
+
+// The second precursor search (hidden --second-precursor; prsm_second_prec).
+// After the first pass's post-processing (arguments["spectrumFileName"] is
+// its post-matched spectrum file; ori_sp_file_name the file it searched):
+// the residual spectra <base>_resid_ms2.msalign are written (the second
+// precursor first, the masses of the accepted first-pass PrSM removed) and
+// searched and post-processed like the first pass (without --rescore, which
+// runs on the merged set); then the second pass's post-matched spectra are
+// appended to the first pass's file with their ids raised by
+// SpPara::getMaxSpecNumPerFile(), the two passes' record PrSMs are merged
+// into one set of (spectrum, precursor) units, clustered again (no cluster
+// protein correction, recount or post mass matching: each pass did its
+// own), rescored with --rescore, given one FDR and written as the file's
+// toppic_record_prsm (the first pass's is kept as toppic_first_record_prsm),
+// which TopPIC_report reads. The residual pass's files are cleaned up as
+// the first pass's.
+int TopPIC_second_precursor(std::map<std::string, std::string>& arguments,
+                            const std::string& ori_sp_file_name) {
+  try {
+    std::string post_sp_name = arguments["spectrumFileName"];
+    std::string post_base = file_util::basename(post_sp_name);
+    std::string ori_base = file_util::basename(ori_sp_file_name);
+    if (str_util::endsWith(ori_base, "_ms2")) {
+      ori_base = ori_base.substr(0, ori_base.size() - 4);
+    }
+    std::string resid_sp_name = ori_base + "_resid_ms2.msalign";
+    std::string resid_base = file_util::basename(resid_sp_name);
+    bool keep_temp_files = (arguments["keepTempFiles"] == "true");
+    std::string ori_db_file_name = arguments["oriDatabaseFileName"];
+
+    std::cout << "Second precursor search - started." << std::endl;
+    PrsmParaPtr prsm_para_ptr = std::make_shared<PrsmPara>(arguments);
+    int spec_num = prsm_second_prec::writeResidualSpectra(
+        prsm_para_ptr, post_base + ".toppic_record_prsm", ori_sp_file_name,
+        arguments["cutoffSpectralType"],
+        std::stod(arguments["cutoffSpectralValue"]), resid_sp_name);
+    if (arguments["useFeatureFile"] == "true") {
+      file_util::copyFile(file_util::basename(ori_sp_file_name) + ".feature",
+                          resid_base + ".feature", true);
+    }
+    if (spec_num == 0) {
+      std::cout << "Second precursor search - finished (no spectrum with a "
+                   "second precursor)."
+                << std::endl;
+      return 0;
+    }
+
+    // the second pass, on its own copy of the arguments
+    std::map<std::string, std::string> second_arguments = arguments;
+    second_arguments["spectrumFileName"] = resid_sp_name;
+    second_arguments["rescore"] = "false";
+    std::string raw_prsm_ext = TopPIC_identifyAll(second_arguments);
+    if (raw_prsm_ext.empty()) {
+      return 1;
+    }
+    TopPIC_postprocess(second_arguments, raw_prsm_ext);
+    std::string resid_post_sp_name = second_arguments["spectrumFileName"];
+    std::string resid_post_base = file_util::basename(resid_post_sp_name);
+
+    // the merge
+    std::cout << "Second precursor search - merging the passes." << std::endl;
+    std::string merged_tmp_name = post_sp_name + "_second_tmp";
+    prsm_second_prec::mergeSpectra(post_sp_name, resid_post_sp_name,
+                                   merged_tmp_name);
+    std::filesystem::rename(merged_tmp_name, post_sp_name);
+    msalign_util::geneSpIndex(post_sp_name);
+    file_util::copyFile(post_base + ".toppic_record_prsm",
+                        post_base + ".toppic_first_record_prsm", true);
+    prsm_second_prec::mergePrsms(
+        post_base + ".toppic_first_record_prsm",
+        resid_post_base + ".toppic_record_prsm",
+        post_base + ".toppic_second_merged",
+        file_util::filenameFromEntirePath(post_sp_name));
+
+    // the clusters of the merged set, as TopPIC_postprocess builds them
+    std::string db_file_name =
+        ori_db_file_name + "_idx" + file_util::getFileSeparator() +
+        file_util::filenameFromEntirePath(arguments["databaseFileName"]);
+    bool is_proteoform_ppm_error = (arguments["proteoformPpmError"] == "true");
+    double proteoform_error_tole =
+        std::stod(arguments["proteoformErrorTolerance"]);
+    if (is_proteoform_ppm_error) {
+      proteoform_error_tole = proteoform_error_tole / 1000000;
+    }
+    if (arguments["useFeatureFile"] == "true") {
+      prsm_feature_cluster::process(
+          post_sp_name, "toppic_second_merged", "toppic_second_cluster",
+          is_proteoform_ppm_error, proteoform_error_tole);
+    } else {
+      prsm_simple_cluster::process(
+          db_file_name, post_sp_name, "toppic_second_merged",
+          prsm_para_ptr->getFixModPtrVec(), "toppic_second_cluster",
+          is_proteoform_ppm_error, proteoform_error_tole);
+    }
+    prsm_prot_cluster::process(post_sp_name, "toppic_second_cluster",
+                               "toppic_second_prot");
+    std::string cur_suffix = "toppic_second_prot";
+
+    bool use_rescore = arguments["rescore"] == "true";
+    if (arguments["searchType"] == "TARGET+DECOY" && use_rescore) {
+      std::cout << "Rescoring - started." << std::endl;
+      prsm_rescore::process(prsm_para_ptr, cur_suffix,
+                            "toppic_second_rescore");
+      std::cout << "Rescoring - finished." << std::endl;
+      cur_suffix = "toppic_second_rescore";
+    }
+    if (arguments["searchType"] == "TARGET+DECOY") {
+      std::cout << "FDR computation - started. " << std::endl;
+      if (arguments["useFdrGroups"] == "true") {
+        prsm_fdr_groups::process(post_sp_name, cur_suffix,
+                                 "toppic_second_fdr");
+      } else {
+        prsm_fdr::process(post_sp_name, cur_suffix, "toppic_second_fdr",
+                          use_rescore);
+      }
+      std::cout << "FDR computation - finished." << std::endl;
+      cur_suffix = "toppic_second_fdr";
+    }
+    file_util::copyFile(post_base + "." + cur_suffix,
+                        post_base + ".toppic_record_prsm", true);
+
+    // the residual pass's files: the intermediates as the first pass's,
+    // and without -k the residual spectra too
+    std::string resid_post_arg =
+        resid_post_sp_name == resid_sp_name ? "" : resid_post_sp_name;
+    cleanToppicDir(ori_db_file_name, resid_sp_name, keep_temp_files,
+                   resid_post_arg, false);
+    if (!keep_temp_files) {
+      file_util::delFile(resid_sp_name);
+      file_util::delFile(resid_base + ".feature");
+      file_util::delFile(resid_sp_name + "_index");
+      if (resid_post_arg != "") {
+        file_util::delFile(resid_post_sp_name);
+        file_util::delFile(resid_post_base + ".feature");
+        file_util::delFile(resid_post_sp_name + "_index");
+      }
+    }
+    std::cout << "Second precursor search - finished." << std::endl;
+  } catch (const char* e) {
+    std::cout << "[Exception]" << std::endl;
+    std::cout << e << std::endl;
+    return 1;
+  }
+  return 0;
+}
+
+int TopPICProgress(std::map<std::string, std::string>& arguments) {
+  std::string ori_sp_file_name = arguments["spectrumFileName"];
+  std::string raw_prsm_ext = TopPIC_identifyAll(arguments);
   if (raw_prsm_ext.empty()) {
     return 1;
   }
   TopPIC_postprocess(arguments, raw_prsm_ext);
+  if (arguments["secondPrecursor"] == "true") {
+    if (TopPIC_second_precursor(arguments, ori_sp_file_name) != 0) {
+      return 1;
+    }
+  }
   // In a combined run (-c) the file is reported after the combined result,
   // with its proteoform ids (TopPICProgress_multi_file).
   if (arguments["combinedOutputName"] == "") {

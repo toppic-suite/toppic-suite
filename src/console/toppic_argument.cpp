@@ -131,6 +131,10 @@ std::map<std::string, std::string> ToppicArgument::initArguments() {
   // hidden --rescore: the FDR ranks the PrSMs by a semi-supervised rescoring
   // (stat/rescore/prsm_rescore) instead of the E-value
   arguments["rescore"] = "false";
+  // hidden --second-precursor: the spectra with two or more precursors are
+  // searched again with the second one, without the first pass's matched
+  // masses, and the two passes are reported together (prsm_second_prec)
+  arguments["secondPrecursor"] = "false";
   arguments["combineResultOnly"] = "false";
   arguments["outputRawPrsmTable"] = "false";
   arguments["outputPrsmCoverage"] = "false";
@@ -250,6 +254,11 @@ void ToppicArgument::outputArguments(
       output << std::setw(gap) << std::left << "FDR computation:" << sep
              << "rescored PrSMs (linear SVM, 3-fold cross-validation)"
              << std::endl;
+    }
+    if (arguments.count("secondPrecursor") > 0 &&
+        arguments.at("secondPrecursor") == "true") {
+      output << std::setw(gap) << std::left << "Second precursor search:"
+             << sep << "yes" << std::endl;
     }
     // printed only when set, so that the default parameter block is
     // unchanged
@@ -687,7 +696,8 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
         "post-min-peak-num,I", po::value<std::string>(&post_min_peak_num), "")(
         "average-mass,g", "")("disable-zero-shift-prec-error", "")(
         "enable-one-shift-prec-error", "")("enable-var-ptm-prec-error", "")(
-        "fdr-groups", "")("rescore", "")("local-align", "")(
+        "fdr-groups", "")("rescore", "")("second-precursor", "")(
+        "local-align", "")(
         "local-original", "")(
         "disable-frag-mass-extension", "")(
         "frag-mass-dedup", "")(
@@ -908,6 +918,9 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
     }
     if (vm.count("rescore")) {
       arguments_["rescore"] = "true";
+    }
+    if (vm.count("second-precursor")) {
+      arguments_["secondPrecursor"] = "true";
     }
     // hidden: by default, the multiple-unexpected-shift search computes
     // COMPLETE/PREFIX/SUFFIX/INTERNAL with one fused dynamic program instead
@@ -1194,6 +1207,19 @@ bool ToppicArgument::validateArguments() {
     }
     if (arguments_["useFdrGroups"] == "true") {
       LOG_ERROR("--rescore cannot be combined with --fdr-groups!");
+      return false;
+    }
+  }
+
+  if (arguments_["secondPrecursor"] == "true") {
+    // the second pass runs on one spectrum per set and its PrSMs are
+    // merged with the first pass's before the report of the file
+    if (arguments_["combinedOutputName"] != "") {
+      LOG_ERROR("--second-precursor cannot be combined with -c!");
+      return false;
+    }
+    if (arguments_["groupSpectrumNumber"] != "1") {
+      LOG_ERROR("--second-precursor needs one spectrum per set (-r 1)!");
       return false;
     }
   }
