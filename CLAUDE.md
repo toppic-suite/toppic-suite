@@ -3697,7 +3697,10 @@ above it, never the reverse:
   mzML/mzXML files (MS1 deconvolution → feature detection → MS/MS
   deconvolution, one fraction per FAIMS voltage), and `topfd_single_process`
   deconvolutes one MS/MS spectrum from a text peak list (`m/z intensity` per
-  line, space-separated) with `DeconvSingleSp`, writing `<input>_ms2.msalign`,
+  line, separated by spaces or a tab; `readPeakFile` skips the lines that
+  do not start with a digit, so an MGF file of one spectrum is read as
+  one, and the peaks of all spectra of a longer MGF file would be merged)
+  with `DeconvSingleSp`, writing `<input>_ms2.msalign`,
   `<input>_ms2.env` and `<input>.sqlite`. **Both** name their outputs through
   `TopfdPara::setMzmlFileNameAndFaims` (base name = input path minus
   extension, `_<voltage>` appended for FAIMS; it also creates the SQLite
@@ -3705,8 +3708,9 @@ above it, never the reverse:
   `createSqlDb` call in a driver. In topfd_gui the checkbox "Text peak list
   input" (`textPeakListCheckBox`, Additional settings, third column, row 3)
   sets `setTextPeakList` and `gui/util/command.cpp` emits `-T`; the Add
-  button then offers `*.txt` or all files, and Start refuses a list holding
-  an mzML/mzXML file (`readPeakFile`'s `std::stod` would throw on it).
+  button then offers `*.txt` and `*.mgf` or all files, and Start refuses a
+  list holding an mzML/mzXML file (none of its lines starts with a digit,
+  so `readPeakFile` would return an empty spectrum).
 - `src/topdia` — the TopDIA pseudo-spectrum layer built on `topfd`/`ms`:
   `common` (`topdia_para` + `topdia_process`) and `pseudo_spec`
   (`mzrt_feature`, `pseudo_peak`, `pseudo_spectrum`, `generate_pseudo_spectrum`).

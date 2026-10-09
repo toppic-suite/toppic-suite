@@ -233,7 +233,7 @@ Parameters that apply to both MS1 and MS/MS deconvolution:
 | `-N`, `--no-sql` | off | Do not write the `.sqlite` database. **Do not use it if TopPIC will search the spectra**: TopPIC's post mass matching, which is on by default, reads the centroided MS/MS peaks from this database and stops with an error when it is missing (see the [TopPIC manual](toppic_manual.md); `toppic --disable-post-match` is the alternative). |
 | `-A`, `--average-mass` | off | Report average masses instead of monoisotopic masses for the precursor and fragment ions in `sample_ms2.msalign` (section 1.3). The MS1 msalign file, the feature files and the SQLite database keep monoisotopic masses. Search such a file with `toppic --average-mass`. Also applies to `-T`. |
 | `-D`, `--sql-3d` | off | Also store the raw MS1 peaks for 3D visualisation in the `.sqlite` database: `PEAKS0` holds every MS1 peak and `PEAKS1`, `PEAKS2`, ... progressively down-sampled copies, with one `CONFIG` row per table. Cannot be combined with `--no-sql`; has no effect with `-T` or `-o`. In `topfd_gui`, the checkbox "MS1 3D visualization data" under "Additional settings" turns this on (it is greyed out while "Do not generate SQLite database" is checked). |
-| `-T`, `--text-peak-list` | off | The input is a text peak list (one MS/MS spectrum), not an mzML file; see section 2. In `topfd_gui`, the checkbox "Text peak list input" under "Additional settings" turns this on; the Add button then lists `.txt` files (or all files), and Start refuses to run while an mzML or mzXML file is in the list. |
+| `-T`, `--text-peak-list` | off | The input is a text peak list (one MS/MS spectrum), not an mzML file; lines that do not start with a number are skipped, so an MGF file of one spectrum can be used; see section 2. In `topfd_gui`, the checkbox "Text peak list input" under "Additional settings" turns this on; the Add button then lists `.txt` and `.mgf` files (or all files), and Start refuses to run while an mzML or mzXML file is in the list. |
 
 MS1 deconvolution and proteoform feature detection:
 
@@ -283,10 +283,12 @@ feature files in the same directory) is passed to TopPIC or TopMG.
 ### 2.1 Input
 
 The input is a plain-text file with one **centroided** peak per line: the
-m/z value and the intensity, separated by a space. Blank lines are ignored,
-and the peaks need not be sorted: TopFD sorts them by increasing m/z before
-deconvolution. The file describes a single MS/MS spectrum; TopFD treats it as
-an MS level 2 spectrum without precursor information.
+m/z value and the intensity, separated by spaces or a tab; further columns
+are ignored. Blank lines and lines that do not start with a number are
+skipped (TopFD prints how many), and the peaks need not be sorted: TopFD
+sorts them by increasing m/z before deconvolution. The file describes a
+single MS/MS spectrum; TopFD treats it as an MS level 2 spectrum without
+precursor information.
 
 ```text
 500.2513 12034.5
@@ -296,8 +298,27 @@ an MS level 2 spectrum without precursor information.
 826.3891 8032.1
 ```
 
-Use a space, not a tab or a comma, between the two columns. Any extension
+Use a space or a tab, not a comma, between the two columns. Any extension
 may be used for the file name.
+
+An MGF file holding one spectrum can be used as it is: its `BEGIN IONS` and
+`END IONS` lines, its parameter lines (`TITLE=`, `PEPMASS=`, `CHARGE=`, ...)
+and comments do not start with a number and are skipped, and the charge
+column some peak lines carry is ignored. The precursor information of the
+MGF file is not used. An MGF file with several spectra is read as one
+spectrum with the peaks of all of them, so split it into one file per
+spectrum first.
+
+```text
+BEGIN IONS
+TITLE=scan=1817
+PEPMASS=1000.5123
+CHARGE=6+
+500.2513 12034.5
+500.5857 25311.0
+826.3891 8032.1
+END IONS
+```
 
 ### 2.2 Usage
 
