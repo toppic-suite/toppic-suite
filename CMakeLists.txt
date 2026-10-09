@@ -424,6 +424,8 @@ toppic_console_exe(toplib_build
 toppic_console_exe(toplib_search
   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/toplib_search.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/toplib_search_argument.cpp)
+toppic_console_exe(topcalib
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topcalib.cpp)
 # theo_patt_gen writes TopFD's averagine table res/base_data/theo_patt.txt
 # (common/emass). A developer tool: not part of the default target (build it
 # with `make theo_patt_gen`) and not in TOPPIC_EXECUTABLES, so not installed.
@@ -494,6 +496,7 @@ toppic_gui_exe(topdia_gui   topdia   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/top
 # ---------------------------------------------------------------------------
 set(TOPPIC_EXECUTABLES
   topfd topdia topindex toppic topmg topdiff toplib_build toplib_search
+  topcalib
   topfd_gui topdia_gui topindex_gui toppic_gui topmg_gui topdiff_gui)
 
 install(TARGETS ${TOPPIC_EXECUTABLES}
