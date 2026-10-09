@@ -128,6 +128,9 @@ std::map<std::string, std::string> ToppicArgument::initArguments() {
   arguments["keepTempFiles"] = "false";
   arguments["keepDecoyResults"] = "false";
   arguments["useFdrGroups"] = "false";
+  // hidden --rescore: the FDR ranks the PrSMs by a semi-supervised rescoring
+  // (stat/rescore/prsm_rescore) instead of the E-value
+  arguments["rescore"] = "false";
   arguments["combineResultOnly"] = "false";
   arguments["outputRawPrsmTable"] = "false";
   arguments["outputPrsmCoverage"] = "false";
@@ -242,6 +245,11 @@ void ToppicArgument::outputArguments(
     if (arguments.at("useFdrGroups") == "true") {
       output << std::setw(gap) << std::left << "FDR computation:" << sep
              << "separate PrSM groups" << std::endl;
+    }
+    if (arguments.count("rescore") > 0 && arguments.at("rescore") == "true") {
+      output << std::setw(gap) << std::left << "FDR computation:" << sep
+             << "rescored PrSMs (linear SVM, 3-fold cross-validation)"
+             << std::endl;
     }
     // printed only when set, so that the default parameter block is
     // unchanged
@@ -679,7 +687,8 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
         "post-min-peak-num,I", po::value<std::string>(&post_min_peak_num), "")(
         "average-mass,g", "")("disable-zero-shift-prec-error", "")(
         "enable-one-shift-prec-error", "")("enable-var-ptm-prec-error", "")(
-        "fdr-groups", "")("local-align", "")("local-original", "")(
+        "fdr-groups", "")("rescore", "")("local-align", "")(
+        "local-original", "")(
         "disable-frag-mass-extension", "")(
         "frag-mass-dedup", "")(
         "frag-extend-min-mass", po::value<std::string>(&frag_extend_min_mass),
@@ -896,6 +905,9 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
     }
     if (vm.count("fdr-groups")) {
       arguments_["useFdrGroups"] = "true";
+    }
+    if (vm.count("rescore")) {
+      arguments_["rescore"] = "true";
     }
     // hidden: by default, the multiple-unexpected-shift search computes
     // COMPLETE/PREFIX/SUFFIX/INTERNAL with one fused dynamic program instead
@@ -1172,6 +1184,18 @@ bool ToppicArgument::validateArguments() {
               << search_type
               << " error! The value should be TARGET|TARGET+DECOY!");
     return false;
+  }
+
+  if (arguments_["rescore"] == "true") {
+    // the rescoring trains on the decoys and replaces the E-value in the FDR
+    if (search_type != "TARGET+DECOY") {
+      LOG_ERROR("--rescore needs a target-decoy search (-d)!");
+      return false;
+    }
+    if (arguments_["useFdrGroups"] == "true") {
+      LOG_ERROR("--rescore cannot be combined with --fdr-groups!");
+      return false;
+    }
   }
 
   std::string shift_number = arguments_["shiftNumber"];

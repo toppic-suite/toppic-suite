@@ -93,6 +93,7 @@
 #include "stat/local_align/local_align_processor.hpp"
 #include "stat/mcmc/mcmc_dpr_processor.hpp"
 #include "stat/mcmc/mcmc_mng.hpp"
+#include "stat/rescore/prsm_rescore.hpp"
 #include "stat/tdgf/cluster_prot_corrector.hpp"
 #include "stat/tdgf/evalue_processor.hpp"
 #include "stat/tdgf/tdgf_mng.hpp"
@@ -131,6 +132,7 @@ void cleanToppicDir(const std::string& fa_name, const std::string& sp_name,
     file_util::delFile(out_base + ".toppic_cluster");
     file_util::delFile(out_base + ".toppic_cluster_fdr");
     file_util::delFile(out_base + ".toppic_cluster_local");
+    file_util::delFile(out_base + ".toppic_rescore");
     file_util::delFile(out_base + ".toppic_cluster_prot");
     file_util::delFile(out_base + ".toppic_prsm_target");
     file_util::delFile(out_base + ".toppic_prsm_cutoff");
@@ -177,6 +179,7 @@ void cleanToppicDir(const std::string& fa_name, const std::string& sp_name,
     file_util::delFile(sp_base + ".toppic_cluster");
     file_util::delFile(sp_base + ".toppic_cluster_fdr");
     file_util::delFile(sp_base + ".toppic_cluster_local");
+    file_util::delFile(sp_base + ".toppic_rescore");
     file_util::delFile(sp_base + ".toppic_cluster_prot");
     file_util::delFile(sp_base + ".toppic_prsm_target");
     file_util::delFile(sp_base + ".toppic_prsm_cutoff");
@@ -1254,6 +1257,18 @@ int TopPIC_postprocess(std::map<std::string, std::string>& arguments,
       cur_suffix = "toppic_cluster_local";
     }
 
+    bool use_rescore = arguments["rescore"] == "true";
+    if (arguments["searchType"] == "TARGET+DECOY" && use_rescore) {
+      // hidden option --rescore: the best PrSM of every spectrum, targets and
+      // decoys, after the recount, the post mass matching and the PTM
+      // characterization, gets a score of a linear SVM trained with
+      // cross-validation, which the FDR ranks by instead of the E-value
+      std::cout << "Rescoring - started." << std::endl;
+      prsm_rescore::process(prsm_para_ptr, cur_suffix, "toppic_rescore");
+      std::cout << "Rescoring - finished." << std::endl;
+      cur_suffix = "toppic_rescore";
+    }
+
     if (arguments["searchType"] == "TARGET+DECOY") {
       std::cout << "FDR computation - started. " << std::endl;
       // the FDR step keeps the decoys so that toppic_record_prsm carries
@@ -1264,7 +1279,8 @@ int TopPIC_postprocess(std::map<std::string, std::string>& arguments,
         prsm_fdr_groups::process(sp_file_name, cur_suffix,
                                  "toppic_cluster_fdr");
       } else {
-        prsm_fdr::process(sp_file_name, cur_suffix, "toppic_cluster_fdr");
+        prsm_fdr::process(sp_file_name, cur_suffix, "toppic_cluster_fdr",
+                          use_rescore);
       }
       std::cout << "FDR computation - finished." << std::endl;
       cur_suffix = "toppic_cluster_fdr";
@@ -1325,6 +1341,16 @@ int TopPIC_multi_postprocess(std::map<std::string, std::string>& arguments) {
     std::cout << "Finding PrSM protein clusters - finished." << std::endl;
     std::string cur_suffix = "toppic_cluster";
 
+    // --rescore: the merged PrSMs are rescored together on the merged
+    // spectra, as in TopPIC_postprocess
+    bool use_rescore = arguments["rescore"] == "true";
+    if (arguments["searchType"] == "TARGET+DECOY" && use_rescore) {
+      std::cout << "Rescoring - started." << std::endl;
+      prsm_rescore::process(prsm_para_ptr, cur_suffix, "toppic_rescore");
+      std::cout << "Rescoring - finished." << std::endl;
+      cur_suffix = "toppic_rescore";
+    }
+
     if (arguments["searchType"] == "TARGET+DECOY") {
       std::cout << "FDR computation - started. " << std::endl;
       // decoys kept, as in TopPIC_postprocess; TopPIC_report removes them
@@ -1332,7 +1358,8 @@ int TopPIC_multi_postprocess(std::map<std::string, std::string>& arguments) {
         prsm_fdr_groups::process(sp_file_name, cur_suffix,
                                  "toppic_cluster_fdr");
       } else {
-        prsm_fdr::process(sp_file_name, cur_suffix, "toppic_cluster_fdr");
+        prsm_fdr::process(sp_file_name, cur_suffix, "toppic_cluster_fdr",
+                          use_rescore);
       }
       std::cout << "FDR computation - finished." << std::endl;
       cur_suffix = "toppic_cluster_fdr";

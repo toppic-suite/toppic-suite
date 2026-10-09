@@ -16,6 +16,7 @@
 #ifndef TOPPIC_PRSM_PRSM_HPP_
 #define TOPPIC_PRSM_PRSM_HPP_
 
+#include <limits>
 #include <string>
 #include <utility>
 #include <vector>
@@ -89,6 +90,10 @@ class Prsm {
 
   double getProteinFdr() { return protein_fdr_; }
 
+  // the score of the rescoring step (--rescore, prsm/prsm_rescore); NaN
+  // when the PrSM was not rescored
+  double getRescore() { return rescore_; }
+
   DeconvMsPtrVec getDeconvMsPtrVec() { return deconv_ms_ptr_vec_; }
 
   ExtendMsPtrVec getRefineMsPtrVec() { return refine_ms_three_vec_; }
@@ -149,6 +154,8 @@ class Prsm {
   }
 
   void setProteinFdr(double protein_fdr) { protein_fdr_ = protein_fdr; }
+
+  void setRescore(double rescore) { rescore_ = rescore; }
 
   void setDeconvMsPtrVec(DeconvMsPtrVec ms_vec) {
     deconv_ms_ptr_vec_ = std::move(ms_vec);
@@ -245,6 +252,9 @@ class Prsm {
   double fdr_ = -1;
   double proteoform_fdr_ = -1;
   double protein_fdr_ = -1;
+  // written to the XML only when set (Prsm::toXmlElement), so that the
+  // files of a run without --rescore are unchanged
+  double rescore_ = std::numeric_limits<double>::quiet_NaN();
   int hit_cnt_ = 0;
 
   /* The following are not saved in xml */

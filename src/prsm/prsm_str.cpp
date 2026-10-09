@@ -77,6 +77,11 @@ PrsmStr::PrsmStr(const std::vector<std::string>& str_vec) {
   proteoform_fdr_ = std::stod(prsm_util::getValueStr(line));
   line = prsm_util::getXmlLine(str_vec_, "<protein_fdr>");
   protein_fdr_ = std::stod(prsm_util::getValueStr(line));
+  // written only by the rescoring step (--rescore)
+  line = prsm_util::getXmlLine(str_vec_, "<rescore>");
+  if (line != "") {
+    rescore_ = std::stod(prsm_util::getValueStr(line));
+  }
   line = prsm_util::getXmlLine(str_vec_, "<start_pos>");
   proteoform_start_pos_ = std::stoi(prsm_util::getValueStr(line));
   line = prsm_util::getXmlLine(str_vec_, "<end_pos>");
@@ -290,6 +295,16 @@ bool PrsmStr::cmpEValueIncProtInc(const PrsmStrPtr& a, const PrsmStrPtr& b) {
   if (a->getEValue() < b->getEValue()) {
     return true;
   } else if (a->getEValue() > b->getEValue()) {
+    return false;
+  } else {
+    return a->getSeqName() < b->getSeqName();
+  }
+}
+
+bool PrsmStr::cmpRescoreDecProtInc(const PrsmStrPtr& a, const PrsmStrPtr& b) {
+  if (a->getRescore() > b->getRescore()) {
+    return true;
+  } else if (a->getRescore() < b->getRescore()) {
     return false;
   } else {
     return a->getSeqName() < b->getSeqName();

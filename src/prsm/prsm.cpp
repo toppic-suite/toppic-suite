@@ -16,6 +16,7 @@
 #include "prsm/prsm.hpp"
 
 #include <algorithm>
+#include <cmath>
 
 #include "common/util/logger.hpp"
 #include "common/util/str_util.hpp"
@@ -150,6 +151,10 @@ XmlDOMElement Prsm::toXmlElement(XmlDOMDocument* xml_doc,
   xml_doc->addElement(element, "proteoform_fdr", str.c_str());
   str = str_util::toString(protein_fdr_);
   xml_doc->addElement(element, "protein_fdr", str.c_str());
+  if (!std::isnan(rescore_)) {
+    str = str_util::toString(rescore_);
+    xml_doc->addElement(element, "rescore", str.c_str());
+  }
   str = str_util::toString(frac_feature_inte_);
   xml_doc->addElement(element, "frac_feature_inte", str.c_str());
   str = str_util::toString(frac_feature_score_);
@@ -212,6 +217,9 @@ void Prsm::parseXml(XmlDOMElement element) {
   proteoform_fdr_ =
       xml_dom_util::getDoubleChildValue(element, "proteoform_fdr", 0);
   protein_fdr_ = xml_dom_util::getDoubleChildValue(element, "protein_fdr", 0);
+  if (xml_dom_util::getChildCount(element, "rescore") > 0) {
+    rescore_ = xml_dom_util::getDoubleChildValue(element, "rescore", 0);
+  }
   match_exp_frag_num_ =
       xml_dom_util::getDoubleChildValue(element, "match_exp_frag_num", 0);
   match_theo_frag_num_ =

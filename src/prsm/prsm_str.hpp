@@ -16,6 +16,7 @@
 #ifndef TOPPIC_PRSM_PRSM_STR_HPP_
 #define TOPPIC_PRSM_PRSM_STR_HPP_
 
+#include <limits>
 #include <string>
 #include <vector>
 
@@ -91,6 +92,9 @@ class PrsmStr {
 
   double getProteinFdr() { return protein_fdr_; }
 
+  // the score of the rescoring step (Prsm::getRescore); NaN without one
+  double getRescore() { return rescore_; }
+
   double getOriPrecMass() { return ori_prec_mass_; }
 
   double getAdjustedPrecMass() { return adjusted_prec_mass_; }
@@ -130,6 +134,10 @@ class PrsmStr {
   void setProteinFdr(double protein_fdr);
 
   static bool cmpEValueIncProtInc(const PrsmStrPtr& a, const PrsmStrPtr& b);
+
+  // the rescoring step's order (prsm_fdr with --rescore): decreasing score,
+  // then increasing protein name, as cmpEValueIncProtInc
+  static bool cmpRescoreDecProtInc(const PrsmStrPtr& a, const PrsmStrPtr& b);
 
   static bool cmpMatchTheoFragDecMatchExpFragDecProtInc(const PrsmStrPtr& a,
                                                         const PrsmStrPtr& b);
@@ -226,6 +234,8 @@ class PrsmStr {
   double proteoform_fdr_;
 
   double protein_fdr_;
+
+  double rescore_ = std::numeric_limits<double>::quiet_NaN();
 };
 
 using PrsmStrPtrVec = std::vector<PrsmStrPtr>;
