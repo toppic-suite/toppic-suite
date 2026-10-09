@@ -2417,6 +2417,31 @@ the filter is on. Facts to keep straight:
 - **Without the option** the run is main d56ebc44's (the first 500 spectra
   of 480_F3_02, setting d: every file; the toppic manual is unchanged, the
   options being hidden).
+- **Results on 480_F3_02** (toppic_test experiment 150, report 0150; the
+  branch's TopFD, setting d `-s 2 -b var_mods.txt`, 1% FDR, 16 threads; base
+  3,374 PrSMs / 2,004 proteoforms / 440 proteins in 19:28): `--tag-filter
+  var` 3,376 / 2,006 / 441 (+44 s; 1,578 proteoform candidates for 1,197
+  spectra, 1.0% decoys), `one` 3,386 / 2,012 / 441 (+4:09: 24,774 proteins
+  for 2,649 spectra, 33% decoys, the one-shift search 120 s against 51 s,
+  and a one-shift decoy at E 4.2e-4 lowered the multiple-shift stage's skip
+  threshold from 0.0215, so it searched 1,337 spectra instead of 1,112),
+  `multi` 3,382 / 2,013 / 441 (+1:02), `var,one,multi` 3,389 / 2,015 / 443
+  (+6:11): 23 spectra gained, 17 of them through proteins only the tag
+  filter listed (HMGN3 59-99 with 38 fragments at E 1.3e-12, PFD1 42-66,
+  TM263 1-37, RL12 124-165, ...), 8 lost at the cutoff (2.41 against 2.50),
+  217 PrSMs of the same protein re-explained (112 better E-values, 57
+  worse; RL38 2-70 from E 5.2e-5 to 6.2e-46). The hosted TopMG search
+  (`--topmg topmg-only`, oxidation, phospho, N-terminal acetyl): 2,996 /
+  1,764 / 407 against 2,979 / 1,751 / 406, 17 gained and none lost, but
+  35:04 against 16:40, the graph alignment taking 1,482 s against 420 s on
+  the 16,537 tag candidates above its score 10 (whole, long proteins). A
+  tag filter stage costs 50 s on 4,085 spectra (about 180 tags, 85 k
+  occurrences per spectrum). The tag filter lists the protein of about half
+  of base's final PrSMs (53% var, 54% one, 48% multi, 60% TopMG; three
+  quarters of those with 30 or more matched fragments, a tenth of those
+  with 10-19): tags need five consecutive matched cleavage sites, so the
+  filter complements the mass filters on strong spectra whose protein the
+  index misses and cannot replace them.
 
 ## Second alignment of the shift searches (`search/diag/second_align_util`, `--disable-second-align`, issue #614)
 
