@@ -49,7 +49,6 @@ class CompProbValue {
   double getCondProbOneValue(int shift, int value);
 
  private:
-  static int const ORI_PAGE_LEN = 5000;
   static int const ORI_BLOCK_LEN = 50;
   static double K1() { return 0.1; }
   static double K2() { return 0.01; }
@@ -77,8 +76,7 @@ class CompProbValue {
   // Maximum score
   int max_table_height_ = 0;
 
-  // Page length in integer
-  int page_len_ = 0;
+  // Block length in integer
   int block_len_ = 0;
 
   // Spectrum
@@ -139,13 +137,12 @@ class CompProbValue {
   // height, 138 MB per thread) streamed the table through memory and the
   // E-value stage was bound by the memory bandwidth of the machine. The
   // per-cell operations and their order are those of the whole-height
-  // sweep, so the probabilities are the same bit for bit, including one
-  // habit of that sweep: it cleared the tail of its circular page once per
-  // computation, so for precursors whose table wrapped the page (above
-  // about 4.7 kDa) a shift layer's first blocks read, through the wrap,
-  // the last max residue mass columns the previous layer left in the page;
-  // tail_capture_ keeps those columns and puts them before column 0 of the
-  // next layer.
+  // sweep. Every slice of every layer starts from a cleared page, so the
+  // columns before column 0 hold zeros; the whole-height sweep cleared the
+  // tail of its page once per computation, and for precursors whose table
+  // wrapped the page (above about 4.7 kDa) a shift layer's first blocks
+  // read the columns the previous layer left there, which raised the
+  // one-shift and two-shift E-values (toppic_test experiment 152).
   static const int kChunkRows = 8;
   int chunk_block_cols_ = 0;   // columns per block (at most the smallest
                                // residue mass, so a block never reads
@@ -159,9 +156,6 @@ class CompProbValue {
                                     // column update
   std::vector<double> shift_probs_;  // layer 0's sums over the prior
                                      // columns of the precursor, per row
-  int chunk_tail_cols_ = 0;          // the largest residue mass
-  std::vector<double> tail_capture_;  // the previous layer's last pass
-                                      // over the page tail (see above)
   void setChunkVars();
   void compOneLayer(std::vector<std::vector<double>>& prev_results,
                     bool is_first_layer,

@@ -3359,17 +3359,27 @@ XML). Facts to keep straight:
   stays in L2, where the whole-height sweep (a page of 5,000 Da x 128
   rows, 138 MB per thread) streamed the table through memory and the stage
   was bound by memory bandwidth. The per-cell operations and their order
-  are the old sweep's, so the probabilities are bit-identical, **including
-  the old sweep's page-tail carry-over**: it cleared the tail of its page
-  once per computation, so for precursors whose table wraps the page
-  (above about 4.7 kDa) a shift layer's first blocks read, through the
-  wrap, the last 5,105 columns the previous layer left there;
-  `tail_capture_` keeps those columns and puts them before column 0 of the
-  next layer. Every one-shift and two-shift E-value of such precursors
-  contains that carry-over. The clean sweep (do not fill the capture) is
-  the intended computation: on 356 spectra of 480 it lowers the shift
-  E-values by a median of 10^-0.0001 and up to 10^-4.25 and would move a
-  few identifications at the cutoffs; it is not done, to be decided.
+  are the old sweep's, but every slice of every layer starts from a
+  cleared page, so the columns before column 0 hold zeros (branch
+  `evalue_clean_sweep`, toppic_test experiment 152). **The old sweep
+  carried a layer's last pass into the next layer**: it cleared the tail
+  of its page once per computation, so for precursors whose table wraps
+  the page (above about 4.6 kDa) a shift layer's first blocks read,
+  through the wrap, the last 5,105 columns (the largest residue mass) the
+  previous layer left there: random sequences with layer 0's scores at
+  some mass near the end of the table, placed at mass 0 of layer 1, which
+  then collect the spectrum's matches a second time. Only the one-shift
+  and two-shift probabilities of such precursors were raised (the
+  zero-shift layer and the variable PTM PrSMs are layer 0): by a median
+  of 10^0.00002 at 5-9 matched fragments and 10^0.0001 at 10-19, but by
+  up to 10^8.7 for PrSMs with 20 or more (one-shift targets of the first
+  pass above 4.6 kDa); decoys by at most 10^0.02. Main 3b8041dd
+  reproduced it (`tail_capture_`) to keep main 915bb387's output; on
+  480_F3_02 (setting d with the four variable PTMs) the clean sweep gives
+  the same 3,412 PrSMs / 2,016 proteoforms / 447 proteins and cutoffs,
+  and 5 spectra report another PrSM of the same protein (a one-shift
+  explanation that now beats a zero-shift PrSM at a +-1 isotope offset
+  or an isobaric variable PTM, in 4 of them with more matched fragments).
 - **Research aids**: `TOPPIC_PROFILE=<file>` (`common/util/
   stage_profile`: thread-seconds per named part and stage; the output
   files do not change) and `TOPPIC_SHIFT_DUMP=<file>` (the diagonal
