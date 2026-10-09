@@ -260,8 +260,9 @@ copied or symlinked to run from `bin/`), then the compiled-in shared dir
 `CMAKE_INSTALL_PREFIX` (default `/usr/local`), so `DESTDIR` staging and a
 custom prefix both work:
 
-- `install(TARGETS ${TOPPIC_EXECUTABLES} ...)` puts the seven CLI tools and
-  the six `*_gui` counterparts (toplib_build and toplib_search have none) in `<prefix>/bin`. **When you add a new executable
+- `install(TARGETS ${TOPPIC_EXECUTABLES} ...)` puts the nine CLI tools and
+  the six `*_gui` counterparts (toplib_build, toplib_search and topcalib have
+  none) in `<prefix>/bin`. **When you add a new executable
   target, append it to the `TOPPIC_EXECUTABLES` list** (end of the file) so it
   is installed and gets the rpath below — nothing else is needed. The one
   exception is a developer tool outside the default target, such as
@@ -321,7 +322,8 @@ docs are hand-written and nothing checks them against the build.
 One manual per command-line tool, linked from README.md's "Manuals" section:
 `topfd_manual.md`, `topdia_manual.md`, `topindex_manual.md`,
 `toppic_manual.md`, `topmg_manual.md`, `topdiff_manual.md`,
-`toplib_build_manual.md`, `toplib_search_manual.md`. Each follows the
+`toplib_build_manual.md`, `toplib_search_manual.md`,
+`topcalib_manual.md`. Each follows the
 same layout: overview and usage line, input (including the companion files a
 tool needs, e.g. TopPIC's `_ms2.feature` and `.sqlite`), the pipeline steps
 as the console prints them, the output files with their columns, option
@@ -3588,6 +3590,68 @@ with `-r` other than 1. Facts to keep straight:
   the prototype's 0.96% and 0.80%; with 6-28 entrapment PrSMs the estimate
   has a standard error of about 0.3 percentage points at 1%.
 
+## Two-pass m/z recalibration (`ms/calib`, `topcalib`)
+
+Branch `mass_calib` (toppic_test experiment 152, report 0152 and its
+amendment 2; from main 2863fa08, not merged). `topcalib` is the C++ form of
+the experiment's `calib.py` and `recal_msalign.py`
+(`tests/202610/scripts/two_pass_recal/` of toppic_test); the manual is
+`docs/manual/topcalib_manual.md`. Facts to keep straight:
+
+- **The method.** A zero-shift search (`toppic -s 0`, `-D` is enough) gives
+  the calibrants: PrSMs with E-value <= 1e-5, no unexpected shift, no
+  variable PTM (`mass_calib_fit::readCalibrants`). Precursor errors
+  (precursor mass - proteoform mass, ppm of the proteoform mass) of the
+  PrSMs whose difference rounds to 0 isotopes of 1.00235 Da; fragment
+  errors of the spectrum's masses within 20 ppm of the proteoform's N- and
+  C-terminal ion masses (the activation's ion types, the nearest one). Two
+  models fitted apart by robust least squares (`fitModel`, `robustFit`: 10
+  rounds of weights sqrt(min(1, 1.5 s / |r|)), s = 1.4826 median |r|,
+  weighted normal equations): MS1 e = c0 + c_rt (rt - rt0) / 60 on the
+  precursors, MS/MS e = c0 + c_mz (m/z - 800) / 1000 + c_rt (rt - rt0) /
+  60 on the fragments; rt in minutes, rt0 the median of all calibrants.
+  The two levels are fitted apart because their offsets differ: on the
+  Bruker maXis run of experiments 151 and 152 MS1 -3.16 ppm, MS/MS -4.17
+  ppm.
+- **The shortcut** (`msalign_mass_calib::process`): the correction is
+  applied to TopFD's msalign masses, not to the raw peaks: m/z' = m/z (1 -
+  e 1e-6), so a neutral mass M of charge z becomes M - e 1e-6 (M + z
+  proton). Precursors with the MS1 model at their m/z, fragment masses with
+  the MS/MS model at (M + z proton) / z, both at the spectrum's
+  `RETENTION_TIME`; six decimals; every other line copied. Experiment 152
+  found it equal to recalibrating the raw peaks and rerunning TopFD at
+  `-e 5` (shortcut against raw peaks: Bruker 851 / 850 PrSMs, 480 3,308 /
+  3,310, the same targets at E <= 1e-5). The SQLite peaks that TopPIC's post mass matching reads are
+  not corrected.
+- **The model file** (`MassCalibModel::write`/`read`) has calib.py's keys
+  (`mz0`, `rt0_min`, `ms1` / `ms2` with `c0`, `c_mz`, `c_rt_per_hour`, the
+  calibrant numbers, the robust SDs); it is written by hand with `%.17g`
+  (Boost's property tree writes numbers as strings) and read with Boost's
+  JSON parser, so either tool reads the other's file. `apply` needs only
+  `mz0`, `rt0_min`, `ms1`, `ms2`.
+- **Masses.** topcalib takes the residue, PTM and ion type masses from
+  `res/base_data` (AME2020 masses) and the proton from `mass_constant`;
+  calib.py has its own table (M 4.4e-7 Da lighter, from the sulphur mass).
+  The fragment errors therefore differ by about 1e-4 ppm, and so do the
+  MS/MS coefficients (480: c0 0.47366 against 0.47349 ppm); with
+  TopPIC's masses put into calib.py the two fits agree to 1e-14. The
+  proteoform string is parsed for single-residue fixed modifications
+  (`(C)[Carbamidomethyl]`, found with `PtmBase::containsAbbrName`) and an
+  `[Acetyl]-` prefix; any other PrSM gives no fragment calibrants.
+- **Results** (toppic_test experiment 152, amendment 2; 9b4adfda):
+  `topcalib apply` with calib.py's models writes recal_msalign.py's files
+  byte for byte (480_F3_02 4,323 spectra, Bruker 4,337); `topcalib fit` on
+  the zero-shift searches has calib.py's calibrant numbers (480 1,252
+  precursors, 51,894 fragments of 1,381 PrSMs; Bruker 224 / 3,657 / 238)
+  and MS1 coefficients to 1e-14; the corrected files of the C++ chain
+  differ from the Python chain's by at most 5e-6 Da (0.006 ppm) in 40% /
+  53% of the fragment lines, precursor lines identical. toppic main
+  915bb387 at `-e 5` on the C++-corrected files: 480_F3_02 setting d 3,493
+  PrSMs / 2,090 proteoforms / 448 proteins against the Python chain's
+  3,492 / 2,089 / 448, Bruker 848 / 115 / 79 against 851 / 117 / 79 (the
+  same targets at E <= 1e-5; the differences are spectra near the cutoff).
+  fit 0.24 s (calib.py 1.7 s), apply 0.7 s (recal_msalign.py 1.1 s).
+
 ## Source layout
 
 `src` is the include root, so headers are included by their path from `src`
@@ -3611,7 +3675,8 @@ above it, never the reverse:
 - `src/para` — analysis parameters (`sp_para`, `peak_tolerance`, `prsm_para`).
 - `src/seq` — sequence/proteoform layer.
 - `src/ms` — mass-spectrum layer: `spec` (peaks/spectra/msalign), `msmap`,
-  `factory`, `env` (envelope detection), `feature`, `mzml`.
+  `factory`, `env` (envelope detection), `feature`, `mzml`, `calib` (the
+  two-pass m/z recalibration of topcalib, see its section).
   `MsAlignReader` has a four-argument constructor taking an EnvCNN score
   cutoff (`SpPara::getEnvCnnCutoff()`, whose own default is 0.2, but both
   toppic and topmg set the key from their `-F`, which defaults to 0.4 in
@@ -3777,7 +3842,8 @@ NOT in `COMMON_SRCS`; each is its own `add_executable` that links
 
 - `src/console` — the command-line tools. Each is a `main()` (`topfd.cpp`,
   `topdia.cpp`, `topindex.cpp`, `toppic.cpp`, `topmg.cpp`, `topdiff.cpp`,
-  `toplib_build.cpp`, `toplib_search.cpp`; plus the developer tool
+  `toplib_build.cpp`, `toplib_search.cpp`; plus `topcalib.cpp`, a single
+  file with its options in it, and the developer tool
   `theo_patt_gen.cpp`, a single file outside the default target) plus
   its `<tool>_argument.cpp` parser (`boost::program_options`) plus, for the four
   multi-step tools, its `<tool>_process.cpp` orchestrator. topfd/topdia have no

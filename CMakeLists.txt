@@ -484,7 +484,7 @@ toppic_gui_exe(topdia_gui   topdia   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/top
 # ---------------------------------------------------------------------------
 # Install the executables
 #
-# All twelve command-line and GUI executables go to <prefix>/bin. Every one of
+# All fifteen command-line and GUI executables go to <prefix>/bin. Every one of
 # them links the ONNX Runtime shared library (through toppic_common). On Linux
 # that is the vendored .so, so it is installed to <prefix>/${CMAKE_INSTALL_LIBDIR}
 # (lib/toppic) and the executables get an $ORIGIN-relative rpath pointing at
