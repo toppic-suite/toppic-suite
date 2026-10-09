@@ -126,6 +126,27 @@ void MsAlignWriter::writeMs(const DeconvMsPtr& ms_ptr) {
       }
     }
     output_ << std::endl;
+    // the precursor ids, only when a precursor is not at the position of
+    // its id (the residual spectra of toppic --second-precursor list the
+    // second precursor first and keep the ids of the scan's list); the
+    // reader numbers the precursors by position without the line
+    bool reordered = false;
+    for (size_t i = 0; i < prec_ptrs.size(); i++) {
+      if (prec_ptrs[i]->getPrecId() >= 0 &&
+          prec_ptrs[i]->getPrecId() != static_cast<int>(i)) {
+        reordered = true;
+      }
+    }
+    if (reordered) {
+      output_ << "PRECURSOR_ID=";
+      for (size_t i = 0; i < prec_ptrs.size(); i++) {
+        output_ << prec_ptrs[i]->getPrecId();
+        if (i < prec_ptrs.size() - 1) {
+          output_ << ":";
+        }
+      }
+      output_ << std::endl;
+    }
     output_ << "DECONVOLUTED_MASS_NUMBER=" << ms_ptr->size() << std::endl;
   }
   for (size_t i = 0; i < ms_ptr->size(); i++) {

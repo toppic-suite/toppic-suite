@@ -141,7 +141,13 @@ std::vector<double> compFeatures(const PrsmPtr& prsm_ptr,
   for (const auto& prec_ptr : precs) {
     max_inte = std::max(max_inte, prec_ptr->getInte());
   }
-  double first_inte = precs.empty() ? 0.0 : precs[0]->getInte();
+  // the PrSM's precursor: the spectrum's first, or the one of its
+  // precursor id in the scan's list
+  PrecursorPtr prec_ptr =
+      precs.empty() ? nullptr
+                    : header_ptr->getPrecPtrById(prsm_ptr->getPrecursorId());
+  double prec_inte = prec_ptr == nullptr ? 0.0 : prec_ptr->getInte();
+  int prec_charge = prec_ptr == nullptr ? 0 : prec_ptr->getCharge();
 
   // the fragment matches on the masses the search used
   double int_frac = 0;
@@ -251,9 +257,9 @@ std::vector<double> compFeatures(const PrsmPtr& prsm_ptr,
       proteoform_ptr->getEndPos() >= prot_len - 1 ? 1.0 : 0.0,
       std::log10(static_cast<double>(len)),
       log10Floor(prsm_ptr->getAdjustedPrecMass(), 100.0),
-      static_cast<double>(header_ptr->getFirstPrecCharge()),
-      std::log10(1.0 + std::max(first_inte, 0.0)),
-      max_inte > 0 ? first_inte / max_inte : 1.0,
+      static_cast<double>(prec_charge),
+      std::log10(1.0 + std::max(prec_inte, 0.0)),
+      max_inte > 0 ? prec_inte / max_inte : 1.0,
       static_cast<double>(std::max<size_t>(precs.size(), 1)),
       std::log10(1.0 + std::max(prsm_ptr->getFracFeatureInte(), 0.0)),
       std::max(prsm_ptr->getFracFeatureScore(), 0.0),
@@ -270,14 +276,16 @@ std::vector<double> compFeatures(const PrsmPtr& prsm_ptr,
 
 void process(const PrsmParaPtr& prsm_para_ptr,
              const std::string& input_file_ext,
-             const std::string& output_file_ext) {
+             const std::string& output_file_ext,
+             const std::string& second_sp_file_name) {
   SpParaPtr sp_para_ptr = prsm_para_ptr->getSpParaPtr();
   // every PrSM with the full spectra (as the recount and the tables read
   // them), and the masses the search used for the fragment features
-  PrsmPtrVec prsm_ptrs =
-      prsm_reader_util::readPrsmsWithSpectra(prsm_para_ptr, input_file_ext);
+  PrsmPtrVec prsm_ptrs = prsm_reader_util::readPrsmsWithSpectra(
+      prsm_para_ptr, input_file_ext, 0.0, second_sp_file_name);
   PrsmPtrVec filtered_ptrs = prsm_reader_util::readPrsmsWithSpectra(
-      prsm_para_ptr, input_file_ext, sp_para_ptr->getEnvCnnCutoff());
+      prsm_para_ptr, input_file_ext, sp_para_ptr->getEnvCnnCutoff(),
+      second_sp_file_name);
   std::map<std::pair<int, int>, PrsmPtr> filtered_map;
   for (const auto& p : filtered_ptrs) {
     filtered_map[prsmKey(p)] = p;

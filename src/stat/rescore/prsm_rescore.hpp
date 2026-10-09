@@ -47,10 +47,13 @@ std::vector<double> compFeatures(const PrsmPtr& prsm_ptr,
 // (toppic, topmg) are rescored apart, as the FDR counts them apart; a
 // search whose model cannot be trained gets the -log10 E-value as its
 // score. The spectra are read with the EnvCNN cutoff of -F, the masses the
-// search used.
+// search used; with second_sp_file_name (the residual spectra of toppic
+// --second-precursor) a PrSM of a second precursor gets its residual
+// spectrum from it (prsm_reader_util::readPrsmsWithSpectra).
 void process(const PrsmParaPtr& prsm_para_ptr,
              const std::string& input_file_ext,
-             const std::string& output_file_ext);
+             const std::string& output_file_ext,
+             const std::string& second_sp_file_name = "");
 
 }  // namespace prsm_rescore
 

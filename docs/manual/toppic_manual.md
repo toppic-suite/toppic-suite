@@ -173,7 +173,7 @@ after `<name>_ms2`:
 | `sample_post_ms2_toppic_proteoform.tsv`, `..._proteoform_single.tsv` | One PrSM per identified proteoform (the best one), passing the proteoform-level cutoff. |
 | `sample_post_ms2_toppic_protein.tsv`, `..._protein_single.tsv` | One PrSM per identified protein (the best one), passing the protein-level cutoff. |
 | `sample_post_ms2_toppic_prsm.xml`, `..._proteoform.xml`, `..._protein.xml` | The same three sets of PrSMs in XML, read by TopDiff and the visualization tools. Every PrSM records the TopPIC Suite version that wrote it, and TopDiff reads only the files of its own version. Every proteoform element has its classification, `<classification>` (the `Proteoform classification` column). |
-| `sample.sqlite` | Updated with the tables `prsm`, `proteoform`, `protein`, `prsm_mass_shift`, `prsm_protein_match` and `fasta_seq`, for visualization. The first three hold the PrSMs of the tables below, with a `proforma` column for `ProForma`. |
+| `sample.sqlite` | Updated with the tables `prsm`, `proteoform`, `protein`, `prsm_mass_shift`, `prsm_protein_match` and `fasta_seq`, for visualization. The first three hold the PrSMs of the tables below, with the columns `precursor_id` and `proforma` for `Precursor ID` and `ProForma`. |
 | `sample_post_ms2.toppic_record_prsm` | The best PrSM of every spectrum after the FDR computation and before the cutoffs, decoy identifications included. Always kept. |
 
 The `_single` tables have one line per PrSM. The tables without `_single`
@@ -187,7 +187,7 @@ columns are:
 | Column | Meaning |
 |---|---|
 | `Data file name` | The spectrum file. |
-| `Prsm ID`, `Spectrum ID`, `Fragmentation`, `Scan(s)`, `Retention time` | The PrSM and its spectrum (several values when spectra are combined, see `--num-combined-spectra`); retention time in minutes. |
+| `Prsm ID`, `Spectrum ID`, `Precursor ID`, `Fragmentation`, `Scan(s)`, `Retention time` | The PrSM and its spectrum (several values when spectra are combined, see `--num-combined-spectra`); `Precursor ID` is the position of the PrSM's precursor in the spectrum's precursor list of the msalign file (0, the first); retention time in minutes. |
 | `# Masses`, `Charge`, `Precursor mass`, `Adjusted precursor mass` | Number of deconvoluted masses, precursor charge, precursor mass, and the precursor mass adjusted to the proteoform. |
 | `N-terminal label mass` | The mass of the N-terminal label (`-N`, for example TMT) that the search assumed on every proteoform, 0 without a label. The adjusted precursor mass, the proteoform and its mass leave the label out; the precursor mass includes it. |
 | `Proteoform ID`, `Proteoform intensity` | The proteoform cluster and its abundance. |

@@ -17,7 +17,6 @@
 
 #include <algorithm>
 #include <cstddef>
-#include <fstream>
 #include <iostream>
 #include <map>
 #include <set>
@@ -25,11 +24,12 @@
 
 #include "common/base/mass_constant.hpp"
 #include "ms/spec/deconv_ms.hpp"
+#include "ms/spec/deconv_peak.hpp"
 #include "ms/spec/msalign_reader.hpp"
 #include "ms/spec/msalign_util.hpp"
 #include "ms/spec/msalign_writer.hpp"
 #include "ms/spec/precursor.hpp"
-#include "para/sp_para.hpp"
+#include "para/peak_tolerance.hpp"
 #include "prsm/prsm.hpp"
 #include "prsm/prsm_reader.hpp"
 #include "prsm/prsm_reader_util.hpp"
@@ -127,18 +127,13 @@ int writeResidualSpectra(const PrsmParaPtr& prsm_para_ptr,
     const PrecursorPtrVec& precs = header_ptr->getPrecPtrVec();
     if (precs.size() >= 2) {
       // the second precursor first, then the first and the others, with
-      // new precursor ids
+      // the ids of the scan's list (the writer adds PRECURSOR_ID)
       MsHeaderPtr new_header_ptr = std::make_shared<MsHeader>(*header_ptr);
-      std::vector<size_t> order = {1, 0};
-      for (size_t i = 2; i < precs.size(); i++) {
-        order.push_back(i);
-      }
       PrecursorPtrVec new_precs;
-      for (size_t k = 0; k < order.size(); k++) {
-        const PrecursorPtr& p = precs[order[k]];
-        new_precs.push_back(std::make_shared<Precursor>(
-            static_cast<int>(k), p->getFeatureId(), p->getMonoMz(),
-            p->getCharge(), p->getInte()));
+      new_precs.push_back(precs[1]);
+      new_precs.push_back(precs[0]);
+      for (size_t i = 2; i < precs.size(); i++) {
+        new_precs.push_back(precs[i]);
       }
       new_header_ptr->setPrecPtrVec(new_precs);
       DeconvPeakPtrVec peaks = ms_ptr->getPeakPtrVec();
@@ -170,35 +165,65 @@ int writeResidualSpectra(const PrsmParaPtr& prsm_para_ptr,
   return written;
 }
 
-void mergeSpectra(const std::string& first_sp_file_name,
-                  const std::string& second_sp_file_name,
-                  const std::string& out_sp_file_name) {
-  std::ofstream outfile(out_sp_file_name);
-  outfile << msalign_util::readParaStr(first_sp_file_name) << std::endl;
-  const std::string names[] = {first_sp_file_name, second_sp_file_name};
-  for (int i = 0; i < 2; i++) {
-    int offset = i * SpPara::getMaxSpecNumPerFile();
-    MsAlignReader sp_reader(names[i]);
-    std::vector<std::string> ms_lines = sp_reader.readOneStrSpectrum();
-    while (ms_lines.size() > 0) {
-      for (size_t k = 0; k < ms_lines.size(); k++) {
-        if (ms_lines[k].substr(0, 12) == "SPECTRUM_ID=") {
-          outfile << "SPECTRUM_ID="
-                  << (offset + std::stoi(ms_lines[k].substr(12)))
-                  << std::endl;
-        } else if (ms_lines[k].substr(0, 10) == "MS_ONE_ID=") {
-          outfile << "MS_ONE_ID="
-                  << (offset + std::stoi(ms_lines[k].substr(10)))
-                  << std::endl;
-        } else {
-          outfile << ms_lines[k] << std::endl;
-        }
-      }
-      outfile << std::endl;
-      ms_lines = sp_reader.readOneStrSpectrum();
-    }
+void mergePostMatchedMasses(const std::string& first_sp_file_name,
+                            const std::string& resid_sp_file_name,
+                            const std::string& out_sp_file_name,
+                            const SpParaPtr& sp_para_ptr) {
+  // the residual spectra by spectrum id
+  std::map<int, DeconvMsPtr> resid_ms;
+  MsAlignReader resid_reader(resid_sp_file_name, 1,
+                             sp_para_ptr->getActivationPtr());
+  DeconvMsPtr ms_ptr = resid_reader.getNextMsPtr();
+  while (ms_ptr != nullptr) {
+    resid_ms[ms_ptr->getMsHeaderPtr()->getSpecId()] = ms_ptr;
+    ms_ptr = resid_reader.getNextMsPtr();
   }
-  outfile.close();
+  PeakTolerancePtr tole_ptr = sp_para_ptr->getFragTolerancePtr();
+  MsAlignReader reader(first_sp_file_name, 1, sp_para_ptr->getActivationPtr());
+  MsAlignWriter writer(out_sp_file_name);
+  writer.writePara(msalign_util::readParaStr(first_sp_file_name));
+  int added_mass_num = 0;
+  int added_spec_num = 0;
+  ms_ptr = reader.getNextMsPtr();
+  while (ms_ptr != nullptr) {
+    int sp_id = ms_ptr->getMsHeaderPtr()->getSpecId();
+    auto it = resid_ms.find(sp_id);
+    if (it != resid_ms.end()) {
+      DeconvPeakPtrVec peaks = ms_ptr->getPeakPtrVec();
+      std::vector<double> masses;
+      for (const DeconvPeakPtr& peak_ptr : peaks) {
+        masses.push_back(peak_ptr->getMonoMass());
+      }
+      std::sort(masses.begin(), masses.end());
+      int added = 0;
+      for (const DeconvPeakPtr& peak_ptr : it->second->getPeakPtrVec()) {
+        // the residual masses are the scan's own; a mass the scan has
+        // within the tolerance is not added again
+        double mass = peak_ptr->getMonoMass();
+        double err = tole_ptr->compStrictErrorTole(mass);
+        auto lower = std::lower_bound(masses.begin(), masses.end(),
+                                      mass - err);
+        if (lower != masses.end() && *lower <= mass + err) {
+          continue;
+        }
+        peaks.push_back(std::make_shared<DeconvPeak>(
+            sp_id, static_cast<int>(peaks.size()), mass,
+            peak_ptr->getIntensity(), peak_ptr->getCharge(),
+            peak_ptr->getScore()));
+        added++;
+      }
+      if (added > 0) {
+        ms_ptr->setPeakPtrVec(peaks);
+        added_mass_num += added;
+        added_spec_num++;
+      }
+    }
+    writer.writeMs(ms_ptr);
+    ms_ptr = reader.getNextMsPtr();
+  }
+  std::cout << "Second precursor search - " << added_mass_num
+            << " masses of the second pass's post mass matching added to "
+            << added_spec_num << " spectra." << std::endl;
 }
 
 void mergePrsms(const std::string& first_prsm_file_name,
@@ -216,12 +241,9 @@ void mergePrsms(const std::string& first_prsm_file_name,
   int kept = 0;
   int replaced = 0;
   int dropped = 0;
-  int offset = SpPara::getMaxSpecNumPerFile();
   for (const PrsmStrPtr& p : second) {
-    p->setSpectrumId(p->getSpectrumId() + offset);
-    p->setPrecursorId(1);
     p->setFileName(sp_short_name);
-    PrsmStrPtrVec& units = by_spec[p->getSpectrumId() - offset];
+    PrsmStrPtrVec& units = by_spec[p->getSpectrumId()];
     bool same = false;
     for (size_t i = 0; i < units.size(); i++) {
       const PrsmStrPtr& q = units[i];

@@ -41,7 +41,8 @@ void PrsmMatchTableWriter::writeHeader(std::ofstream& file) {
   // write title
   std::string delim = "\t";
   file << "Data file name" << delim << "Prsm ID" << delim << "Spectrum ID"
-       << delim << "Fragmentation" << delim << "Scan(s)" << delim
+       << delim << "Precursor ID" << delim << "Fragmentation" << delim
+       << "Scan(s)" << delim
        << "Retention time" << delim << "# Masses" << delim << "Charge" << delim
        << "Precursor mass" << delim << "Adjusted precursor mass" << delim
        << "N-terminal label mass" << delim << "Proteoform ID" << delim
@@ -162,10 +163,16 @@ void PrsmMatchTableWriter::writePrsmStandardFormat(
   std::stringstream line_str;
   line_str << std::setprecision(10);
   LOG_DEBUG("start output prsm ");
+  // the PrSM's precursor: the scan's first, or with --second-precursor the
+  // one of its precursor id in the scan's list
+  int prec_charge = deconv_ms_ptr_vec[0]
+                        ->getMsHeaderPtr()
+                        ->getPrecPtrById(prsm_ptr->getPrecursorId())
+                        ->getCharge();
   line_str << prsm_ptr->getFileName() << delim << prsm_ptr->getPrsmId() << delim
-           << spec_ids << delim << spec_activations << delim << spec_scans
-           << delim << retention_time << delim << mass_num << delim
-           << deconv_ms_ptr_vec[0]->getMsHeaderPtr()->getFirstPrecCharge()
+           << spec_ids << delim << prsm_ptr->getPrecursorId() << delim
+           << spec_activations << delim << spec_scans << delim
+           << retention_time << delim << mass_num << delim << prec_charge
            << delim << prsm_ptr->getOriPrecMass() << delim
            << prsm_ptr->getAdjustedPrecMass() << delim
            << prsm_ptr->getNTermLabelMass() << delim
@@ -254,9 +261,10 @@ void PrsmMatchTableWriter::writePrsmStandardFormat(
         continue;
       }
 
+      // the fields from the spectrum id to the proteoform intensity empty
       line_str << prsm_ptr->getFileName() << delim << prsm_ptr->getPrsmId()
                << delim << delim << delim << delim << delim << delim << delim
-               << delim << delim << delim << delim << delim;
+               << delim << delim << delim << delim << delim << delim;
 
       // feature
       line_str << delim << delim << delim << delim << delim;
