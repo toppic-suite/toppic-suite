@@ -30,11 +30,14 @@ void mergeMsalignFiles(const std::vector<std::string>& spec_file_lst,
 // Merges <name>_ms1.msalign and <name><ms2_suffix> of every fraction into
 // <output>_ms1.msalign and <output>_ms2.msalign. ms2_suffix is "_ms2.msalign"
 // for TopFD's spectra and "_post_ms2.msalign" for the spectra written by
-// TopPIC's post mass matching.
+// TopPIC's post mass matching. ms1_base_names, when given, name the MS1
+// files instead (<ms1 name>_ms1.msalign): TopFD's base names, when the MS/MS
+// files are toppic's copies (<name>_calib_post_ms2 of --mass-calib).
 void mergeFractions(const std::vector<std::string>& spec_file_names,
                     const std::string& output_file_name,
                     const std::string& para_str,
-                    const std::string& ms2_suffix = "_ms2.msalign");
+                    const std::string& ms2_suffix = "_ms2.msalign",
+                    const std::vector<std::string>& ms1_base_names = {});
 
 }  // namespace msalign_frac_merge
 

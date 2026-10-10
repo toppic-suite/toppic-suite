@@ -56,6 +56,15 @@ void stepAndReset(sqlite3* sql_db, sqlite3_stmt* stmt) {
   sqlite3_reset(stmt);
 }
 
+bool hasTable(sqlite3* sql_db, const std::string& name) {
+  sqlite3_stmt* stmt = prepareSql(
+      sql_db, "SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = ?;");
+  sqlite3_bind_text(stmt, 1, name.c_str(), -1, SQLITE_TRANSIENT);
+  bool found = sqlite3_step(stmt) == SQLITE_ROW;
+  sqlite3_finalize(stmt);
+  return found;
+}
+
 }  // namespace sql_util
 
 }  // namespace toppic

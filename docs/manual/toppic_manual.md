@@ -38,7 +38,7 @@ TopPIC also reads, from the same directory:
 | File | Needed when | Purpose |
 |---|---|---|
 | `sample_ms2.feature` | Always, unless `--no-topfd-feature` is given | The proteoform feature of each MS/MS spectrum, used to cluster the identifications of one proteoform across spectra and to report abundances. |
-| `sample.sqlite` | Always, unless `--disable-post-match` is given | The centroided MS/MS peaks, used by post mass matching (section 2, step 11). TopFD writes it unless run with `-N`. A missing database is an error, reported before the search starts. |
+| `sample.sqlite` | Always, unless `--disable-post-match` is given | The centroided MS/MS peaks, used by post mass matching (section 2, step 11). TopFD writes it unless run with `-N`. A missing database is an error, reported before the search starts. With `--average-mass` TopPIC searches a copy of it, `sample_mono.sqlite` (section 2). |
 
 **Database indexes.** TopPIC does not require `topindex`. It prepares the
 database itself in a `<database>_idx/` directory next to the FASTA file, and
@@ -61,10 +61,13 @@ monoisotopic masses with the theoretical isotopic distributions TopFD used
 `sample_mono_ms2.msalign` (the input file is left unchanged, a comment line
 records the conversion), `sample_ms2.feature` is copied to
 `sample_mono_ms2.feature`, and the steps below, the result file names and
-the merge of a `-c` run all use the converted file. Post mass matching
-reads the database of the original file, `sample.sqlite`, and its results
-are named after `sample_post_ms2` as usual; with `--disable-post-match`
-the result files are named after `sample_mono_ms2`.
+the merge of a `-c` run all use the converted file. TopFD's database
+`sample.sqlite` is copied to `sample_mono.sqlite` (TopFD keeps the
+monoisotopic masses in its database, so the copy has the same values; an
+earlier copy is replaced): post mass matching reads the copy and adds its
+envelopes to it, the identifications are written into it (step 17), and
+TopFD's database is not changed. The result files are named after
+`sample_mono_post_ms2`, or `sample_mono_ms2` with `--disable-post-match`.
 
 1. **Zero unexpected shift filtering and search.** Protein candidates are
    selected with index-based filters and aligned to each spectrum without any
@@ -164,7 +167,8 @@ the result files are named after `sample_mono_ms2`.
 For an input `sample_ms2.msalign` searched with the default settings, the
 result files are named after `sample_post_ms2`; with `--disable-post-match`
 they are named after `sample_ms2`, and the combined results of a `-c` run
-after `<name>_ms2`:
+after `<name>_ms2`. With `--average-mass` the names start with
+`sample_mono` instead of `sample` (section 2):
 
 | File | Contents |
 |---|---|
@@ -173,7 +177,7 @@ after `<name>_ms2`:
 | `sample_post_ms2_toppic_proteoform.tsv`, `..._proteoform_single.tsv` | One PrSM per identified proteoform (the best one), passing the proteoform-level cutoff. |
 | `sample_post_ms2_toppic_protein.tsv`, `..._protein_single.tsv` | One PrSM per identified protein (the best one), passing the protein-level cutoff. |
 | `sample_post_ms2_toppic_prsm.xml`, `..._proteoform.xml`, `..._protein.xml` | The same three sets of PrSMs in XML, read by TopDiff and the visualization tools. Every PrSM records the TopPIC Suite version that wrote it, and TopDiff reads only the files of its own version. Every proteoform element has its classification, `<classification>` (the `Proteoform classification` column). |
-| `sample.sqlite` | Updated with the tables `prsm`, `proteoform`, `protein`, `prsm_mass_shift`, `prsm_protein_match` and `fasta_seq`, for visualization. The first three hold the PrSMs of the tables below, with the columns `precursor_id` and `proforma` for `Precursor ID` and `ProForma`. |
+| `sample.sqlite` (`sample_mono.sqlite` with `--average-mass`) | Updated with the tables `prsm`, `proteoform`, `protein`, `prsm_mass_shift`, `prsm_protein_match` and `fasta_seq`, for visualization. The first three hold the PrSMs of the tables below, with the columns `precursor_id` and `proforma` for `Precursor ID` and `ProForma`. |
 | `sample_post_ms2.toppic_record_prsm` | The best PrSM of every spectrum after the FDR computation and before the cutoffs, decoy identifications included. Always kept. |
 
 The `_single` tables have one line per PrSM. The tables without `_single`
@@ -239,7 +243,7 @@ Spectra and tolerances:
 | `-r`, `--num-combined-spectra <int>` | 1 | Number of consecutive MS/MS spectra of one precursor searched together, for alternating fragmentation (2 for pairs, 3 for triplets). |
 | `-A`, `--approximate-spectra` | off | Use approximate spectra in protein filtering, for higher sensitivity. Only affects the variable PTM filtering step (`-b`). |
 | `-x`, `--no-topfd-feature` | off | Run without the TopFD feature file; proteoforms are then clustered by protein, precursor mass and sequence overlap (two PrSMs share a proteoform only if their proteoform sequences overlap by at least 70% of the shorter one, so equal masses at different positions of a protein stay apart), the `Feature ...` columns are `-` and the proteoform intensity is `-1`. |
-| `-g`, `--average-mass` | off | The spectrum files report average masses (`topfd --average-mass`): each is converted to `<name>_mono_ms2.msalign` with monoisotopic masses before the search (section 2). In `toppic_gui`, the checkbox "Spectrum files with average masses" on the Advanced Parameters tab turns this on. |
+| `-g`, `--average-mass` | off | The spectrum files report average masses (`topfd --average-mass`): each is converted to `<name>_mono_ms2.msalign` with monoisotopic masses, and TopFD's database is copied to `<name>_mono.sqlite`, before the search (section 2). In `toppic_gui`, the checkbox "Spectrum files with average masses" on the Advanced Parameters tab turns this on. |
 
 Post mass matching:
 

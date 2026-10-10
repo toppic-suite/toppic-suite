@@ -498,31 +498,41 @@ std::string stripSuffix(const std::string& name, const std::string& suffix) {
   return name;
 }
 
+// The base name of a spectrum file's database: the file's own base,
+// <base> for <base>_ms2.msalign, also for its residual spectra
+// <base>_resid_ms2.msalign of the second precursor search
+// (--second-precursor). toppic's other copies of a spectrum file have
+// databases of their own: <base>_mono_ms2.msalign of -g (--average-mass)
+// <base>_mono.sqlite, <base>_calib_ms2.msalign of --mass-calib
+// <base>_calib.sqlite, <base>_mono_calib_ms2.msalign <base>_mono_calib.sqlite.
+// *resid tells whether the file is a residual one.
+std::string dbBaseName(const std::string& sp_file_name, bool* resid) {
+  std::string base = stripSuffix(file_util::basename(sp_file_name), "_ms2");
+  *resid = str_util::endsWith(base, "_resid");
+  return stripSuffix(base, "_resid");
+}
+
 }  // namespace
 
+std::string topfdBaseName(const std::string& sp_file_name) {
+  std::string base = stripSuffix(file_util::basename(sp_file_name), "_ms2");
+  return stripSuffix(stripSuffix(stripSuffix(base, "_resid"), "_calib"),
+                     "_mono");
+}
+
 std::string sqlFileName(const std::string& sp_file_name) {
-  std::string sql_base =
-      stripSuffix(file_util::basename(sp_file_name), "_ms2");
-  // <base>_resid_ms2.msalign, the residual spectra of the second precursor
-  // search (--second-precursor), <base>_calib_ms2.msalign, the corrected
-  // spectra of --mass-calib, and <base>_mono_ms2.msalign, the
-  // monoisotopic-mass copy TopPIC writes for an average-mass file
-  // (--average-mass), share the database of <base>_ms2.msalign
-  sql_base = stripSuffix(sql_base, "_resid");
-  sql_base = stripSuffix(sql_base, "_calib");
-  sql_base = stripSuffix(sql_base, "_mono");
-  return sql_base + ".sqlite";
+  bool resid = false;
+  return dbBaseName(sp_file_name, &resid) + ".sqlite";
 }
 
 std::string postBaseName(const std::string& sp_file_name) {
   // the database's base name, with the _resid suffix of the second
   // precursor search kept: <base>_post_ms2 for <base>_ms2.msalign,
-  // <base>_calib_ms2.msalign and <base>_mono_ms2.msalign,
-  // <base>_resid_post_ms2 for <base>_resid_ms2.msalign
-  std::string base = stripSuffix(file_util::basename(sp_file_name), "_ms2");
-  bool resid = str_util::endsWith(base, "_resid");
-  base = stripSuffix(stripSuffix(stripSuffix(base, "_resid"), "_calib"),
-                     "_mono");
+  // <base>_mono_post_ms2 for <base>_mono_ms2.msalign, <base>_calib_post_ms2
+  // for <base>_calib_ms2.msalign, <base>_resid_post_ms2 for
+  // <base>_resid_ms2.msalign
+  bool resid = false;
+  std::string base = dbBaseName(sp_file_name, &resid);
   if (resid) {
     base += "_resid";
   }
@@ -531,8 +541,7 @@ std::string postBaseName(const std::string& sp_file_name) {
 
 std::string process(const PrsmParaPtr& prsm_para_ptr,
                     const std::string& input_file_ext,
-                    const std::string& output_file_ext, int min_peak_num,
-                    const MassCalibModel* calib_model_ptr) {
+                    const std::string& output_file_ext, int min_peak_num) {
   std::string sp_file_name = prsm_para_ptr->getSpectrumFileName();
   std::string sql_file_name = sqlFileName(sp_file_name);
   std::string post_base_name = postBaseName(sp_file_name);
@@ -576,14 +585,6 @@ std::string process(const PrsmParaPtr& prsm_para_ptr,
           continue;
         }
         RawPeakVec peaks = reader.getPeaks(sql_spec_id);
-        if (calib_model_ptr != nullptr) {
-          // --mass-calib: the MS/MS model at the spectrum's retention time
-          // (MsHeader keeps seconds); the correction keeps the m/z order
-          double rt_min = header_ptr->getRetentionTime() / 60;
-          for (RawPeak& peak : peaks) {
-            peak.mz = calib_model_ptr->correctMz(2, peak.mz, rt_min);
-          }
-        }
         PostMatchVec matches =
             matchPrsm(prsm_ptr, peaks, sp_para_ptr, min_peak_num);
         if (matches.empty()) {
@@ -604,11 +605,8 @@ std::string process(const PrsmParaPtr& prsm_para_ptr,
     sqlite3_close(db);
   }
   std::cout << "Post mass matching: " << match_num << " masses added to "
-            << prsm_num << " of " << prsm_ptrs.size() << " PrSMs"
-            << (calib_model_ptr != nullptr
-                    ? " (MS/MS peaks corrected with the mass calibration model)."
-                    : ".")
-            << std::endl;
+            << prsm_num << " of " << prsm_ptrs.size() << " PrSMs from "
+            << sql_file_name << "." << std::endl;
 
   // PrSMs with the recounted matched masses and fragments, under the name of
   // the new spectrum file

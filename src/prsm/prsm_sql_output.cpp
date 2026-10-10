@@ -25,6 +25,7 @@
 #include "common/util/logger.hpp"
 #include "common/util/str_util.hpp"
 #include "para/prsm_para.hpp"
+#include "prsm/prsm_post_mass_match.hpp"
 #include "prsm/prsm_sql_writer.hpp"
 #include "seq/fasta_sql_writer.hpp"
 
@@ -37,14 +38,16 @@ void write(const PrsmParaPtr& prsm_para_ptr, const std::string& base_name,
            const std::string& prsm_file_ext,
            const std::string& form_file_ext,
            const std::string& prot_file_ext) {
-  std::string sql_base = base_name;
-  // the spectra written by the post mass matching keep TopFD's database name
-  if (str_util::endsWith(sql_base, "_post_ms2")) {
-    sql_base = sql_base.substr(0, sql_base.size() - 9);
-  } else if (str_util::endsWith(sql_base, "_ms2")) {
-    sql_base = sql_base.substr(0, sql_base.size() - 4);
+  // the database of the spectra: the post-matched ones (<x>_post_ms2) have
+  // the database of <x>_ms2.msalign (prsm_post_mass_match::sqlFileName):
+  // TopFD's, toppic's copy of it for -g, or the corrected copy for
+  // --mass-calib
+  std::string sp_base = base_name;
+  if (str_util::endsWith(sp_base, "_post_ms2")) {
+    sp_base = sp_base.substr(0, sp_base.size() - 9) + "_ms2";
   }
-  std::string sql_file_name = sql_base + ".sqlite";
+  std::string sql_file_name =
+      prsm_post_mass_match::sqlFileName(sp_base + ".msalign");
   if (!std::filesystem::exists(sql_file_name)) {
     std::cout << "SQLite database " << sql_file_name
               << " not found: identifications are not written to a database."

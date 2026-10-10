@@ -1258,8 +1258,9 @@ instead of the input. Facts to keep straight:
 - **The PrSM-only output steps take the spectrum base name, not the
   spectrum file.** `prsm_decoy_filter`, `prsm_cutoff_selector`,
   `prsm_form_filter`, `prsm_prot_filter` and `prsm_sql_output::write` only
-  ever name `<base>.<ext>` files (the SQL writer strips `_ms2`/`_post_ms2`
-  from it for the `.sqlite` name), so their first name argument is
+  ever name `<base>.<ext>` files (the SQL writer names its database with
+  `prsm_post_mass_match::sqlFileName` of `<base>_ms2.msalign`, `_post_ms2`
+  read as `_ms2`), so their first name argument is
   `base_name`, the spectrum file name without its extension
   (`file_util::basename(sp_file)`); `TopPIC_report` and `TopMG_post`
   compute it once. Do not pass the spectrum file name to them. The steps
@@ -1268,9 +1269,12 @@ instead of the input. Facts to keep straight:
   msalign named in `PrsmPara`, so the report still needs `<base>.msalign`
   on disk for the tables (the PrSM XML stores no peaks).
 - **Result file names carry `_post_ms2`** whenever post matching ran
-  (`postBaseName`: the database's base name, so also for the `_calib` and
-  `_mono` copies of `--mass-calib` and `-g`, with the `_resid` suffix of
-  `--second-precursor`'s residual spectra kept: `<base>_resid_post_ms2`); the
+  (`postBaseName`: the database's base name, which is the spectrum file's
+  own base: `<base>_mono_post_ms2` for the `_mono` copy of `-g`,
+  `<base>_calib_post_ms2` for the corrected spectra of `--mass-calib`,
+  `<base>_mono_calib_post_ms2` for both; with the `_resid` suffix of
+  `--second-precursor`'s residual spectra kept: `<base>_resid_post_ms2`);
+  the
   cleanup in `toppic_process` (`cleanToppicDir`) takes that name to find the
   intermediate files. With `-D` the names are the plain `<base>_ms2` ones.
 - **Combined runs (`-c`) merge the spectra and record files, re-cluster,
@@ -1280,9 +1284,10 @@ instead of the input. Facts to keep straight:
   `msalign_frac_merge::mergeFractions`, and each fraction's
   `toppic_record_prsm` (`<frac>_post_ms2.toppic_record_prsm`, or
   `<frac>_ms2.…` with `-D`) into `<name>_ms2.toppic_raw_prsm`; `<frac>` is
-  the mzML base without the `_calib` suffix of `--mass-calib` and the
-  `_mono` suffix of a `-g` run (the same rule as
-  `prsm_post_mass_match::sqlFileName`). The spectra are merged from the
+  the spectrum file's base, with the `_mono` suffix of a `-g` run and the
+  `_calib` suffix of `--mass-calib` (`prsm_post_mass_match::postBaseName`),
+  and the MS1 spectra are TopFD's `<frac>_ms1.msalign` without them
+  (`topfdBaseName`). The spectra are merged from the
   post-matched files because the report attaches them to the PrSMs, whose
   matches were counted on those spectra. `TopPIC_multi_postprocess` then
   clusters the merged PrSMs into proteoforms and proteins across the
@@ -1537,8 +1542,32 @@ before any search, with `avg_mass_util::convertToMonoMass` to
 table by fixed-point iteration; the feature file is copied to the new
 name) and replaces the spectrum file list with the converted names, so the
 per-file runs, the cleanup and the `-c` merge all see monoisotopic files.
-`prsm_post_mass_match::sqlFileName` strips the `_mono` suffix so the post
-mass matching finds `<base>.sqlite` and still writes `<base>_post_ms2.*`.
+Each converted file gets its own database, `<base>_mono.sqlite`, a copy
+of TopFD's `<base>.sqlite` (`sql/sql_db_copy`, SQLite's backup API,
+toppic's tables of an earlier run dropped) written right after the
+conversion, replacing an earlier one (with `-C` an existing one is kept);
+its masses are TopFD's, which are monoisotopic already (on toppic_test
+experiment 154's `topfd -D -A` subset the converted msalign masses equal
+`ms2_env.mono_mass` within 1e-6 Da, the six decimals). The post mass
+matching reads it and appends its envelopes to it, the PrSM tables are
+written into it, and TopFD's database is not written by a `-g` run
+(toppic_test experiment 154, amendment 1, the user's decision: main up to
+then wrote into TopFD's database with `-g` and wrote no PrSM tables with
+`-g -D`, which looked for `<base>_mono.sqlite`). `sqlFileName` gives it
+for `<base>_mono_ms2.msalign`, and the results are
+`<base>_mono_post_ms2_*` (`<base>_mono_ms2_*` with `-D`; main wrote
+`<base>_post_ms2_*`). Without TopFD's database (TopFD `-N`, possible with
+`-D`) a note is printed and there is no copy. Results (toppic_test
+experiment 154, amendment 1; 9ac2ada0 against main 506f18b4, setting d with
+`--disable-rescore` on spectra 1500-1999 of `topfd -D -A`'s 480_F3_02
+output, whose database is 2.5 GB with the 3D tables): the copy takes 1.7 s;
+`-g`, `-g -D`, `-c AB -g` and `-C` write main's files under the new names
+(476 / 345 / 151 PrSMs / proteoforms / proteins; combined 918 / 594 / 225),
+and `<base>_mono.sqlite` equals the TopFD database main wrote into, table
+for table (TopFD's rows, the 3,207 post-matched envelopes, the PrSM
+tables); TopFD's database keeps its md5; `-g --mass-calib` writes the three
+databases, its corrected one equal to the branch's earlier
+`<base>_calib.sqlite` and to a Python recomputation.
 Do not convert masses inside `MsAlignReader` instead: the converted file
 is what every later step (and the user) sees. GUI: `toppicwindow.ui` has
 `averageMassCheckBox` (Advanced Parameters tab, above the localization
@@ -3534,9 +3563,10 @@ with `-r` other than 1. Facts to keep straight:
   copy of the arguments (`rescore` "false": the merged set is rescored
   instead), so its files are `<base>_resid_ms2.toppic_*` and, post-matched,
   `<base>_resid_post_ms2.*`: `prsm_post_mass_match::sqlFileName` strips
-  `_resid` (and then `_calib` and `_mono`) to find `<base>.sqlite`, and
-  `postBaseName`
-  keeps `_resid` in the post-matched name.
+  `_resid` to find the database of the spectra the residual ones are made
+  from (`<base>.sqlite`, `<base>_mono.sqlite` of `-g`, `<base>_calib.sqlite`
+  of `--mass-calib`), and `postBaseName` keeps `_resid` in the
+  post-matched name.
 - **The units.** A PrSM is the unit (spectrum id, precursor id), the
   precursor id the position of its precursor in the scan's list (0 the
   first pass's, 1 the second pass's); the spectrum ids are the scan's own
@@ -3669,8 +3699,8 @@ the method inside a search. Facts to keep straight:
   `RETENTION_TIME`; six decimals; every other line copied. Experiment 152
   found it equal to recalibrating the raw peaks and rerunning TopFD at
   `-e 5` (shortcut against raw peaks: Bruker 851 / 850 PrSMs, 480 3,308 /
-  3,310, the same targets at E <= 1e-5). The SQLite peaks that TopPIC's post mass matching reads are
-  not corrected.
+  3,310, the same targets at E <= 1e-5). TopFD's SQLite database is not
+  changed; toppic `--mass-calib` writes a corrected copy of it (below).
 - **The model file** (`MassCalibModel::write`/`read`) has calib.py's keys
   (`mz0`, `rt0_min`, `ms1` / `ms2` with `c0`, `c_mz`, `c_rt_per_hour`, the
   calibrant numbers, the robust SDs); it is written by hand with `%.17g`
@@ -3728,24 +3758,97 @@ the method inside a search. Facts to keep straight:
       a copy of the feature file; the file list then names the corrected
       file (with `-C` the earlier run's, when it exists). Both stay after the
       run, as `-g`'s `_mono` files do.
-    - **The post mass matching** (`TopPIC_postprocess`, from the per-file
-      argument `massCalibModelFile`) passes the model to
-      `prsm_post_mass_match::process`, which corrects every raw peak's m/z
-      with the MS/MS level at the spectrum's retention time (`MsHeader`
-      keeps seconds, the msalign file minutes); the database's peaks are not
-      changed, and the envelopes it adds to `ms2_env` are at the corrected
-      m/z. `--second-precursor`'s residual pass inherits the model through
-      its copy of the arguments.
-    - **Names**: `sqlFileName` and `postBaseName` strip `_calib` (after
-      `_resid`, before `_mono`), so with post matching the result files are
-      `<base>_post_ms2_*` as without the option (a run without it in the
-      same directory is replaced), with `-D` `<base>_calib_ms2_*`; `-c`
-      strips `_calib` from the fractions' record names. The parameter block
-      prints "Mass calibration: two-pass (zero-shift calibration search)"
-      only with the option.
+    - **The corrected database** (`ms/calib/sqlite_mass_calib::process`,
+      toppic_test experiment 154; until then the post mass matching
+      corrected the peaks it read in memory and TopFD's database stayed
+      uncorrected, while the envelopes it appended were at the corrected
+      m/z): `<base>_calib.sqlite`, written after the corrected spectra from
+      the database of the spectrum file it corrects (TopFD's `<base>.sqlite`,
+      or its copy `<base>_mono.sqlite` after `-g`, which gives
+      `<base>_mono_calib.sqlite`: three databases), which is only read (the
+      md5 stays) and which
+      the user chose not to correct in place, so that nothing has to be
+      undone for a later run without the option. The copy goes through
+      SQLite's backup API (`sql/sql_db_copy`, shared with `-g`'s copy;
+      TopFD writes its database in WAL mode, and pages
+      may still be in the `-wal` file), toppic's own tables of an earlier
+      run are dropped (no VACUUM: it may renumber the rows of the tables
+      without an INTEGER PRIMARY KEY), and every m/z and deconvoluted mass
+      is corrected with the model at its own spectrum's retention time
+      (the spectrum table's `retention_time` in seconds / 60; SQL functions
+      over `MassCalibModel::correctMz` / `correctMass`): the MS1 model for
+      `ms1_peak.mz`, `ms1_env.mono_mass` / `ref_mass`, `ms1_env_peak.mz` and
+      the 3D tables of `topfd -D` (`PEAKS<k>.MZ` at `RETENTIONTIME` / 60,000,
+      each `CONFIG` row's `MZMIN` / `MZMAX` the range of its corrected layer;
+      the k-th row is layer k), the MS/MS model for `ms2_peak.mz`,
+      `ms2_env.mono_mass` / `ref_mass` and `ms2_env_peak.mz`. Not changed
+      (the user's decision): the isolation windows (`ms2_spectrum.target_mz`,
+      `begin_mz`, `end_mz`, the instrument's settings), nor intensities,
+      retention times, ids and scores. A table `mass_calib` holds the model
+      (`MassCalibModel::toJson`, the text of the model file), the source
+      database, the version and the time. The file is written as
+      `<base>_calib.sqlite.tmp` with no journal and renamed when complete,
+      and every run writes it again from TopFD's database. The envelopes the
+      post mass matching of runs without the option appended to TopFD's
+      database cannot be told apart from TopFD's own (`ms2_spectrum` has no
+      envelope count) and are copied and corrected with them. Without
+      TopFD's database (TopFD `-N`, possible with `-D`) a note is printed
+      and there is no corrected database.
+    - **The search uses it.** The post mass matching
+      (`prsm_post_mass_match::process`) reads the corrected database's peaks
+      as they are and appends its envelopes there, and `prsm_sql_output`
+      writes the PrSM tables there.
+    - **Names**: a spectrum file's database is its own base
+      (`sqlFileName`, only `_ms2` and `_resid` removed): the corrected
+      spectra `<base>_calib_ms2.msalign` (and their residual spectra
+      `..._calib_resid_ms2.msalign` of `--second-precursor`) have
+      `<base>_calib.sqlite`, after `-g` `<base>_mono_calib_ms2.msalign` has
+      `<base>_mono_calib.sqlite`, and `postBaseName` gives
+      `<base>_calib_post_ms2` (`<base>_calib_resid_post_ms2`,
+      `<base>_mono_calib_post_ms2`), so the result files of a run with the
+      option are `<base>_calib_post_ms2_*` (with `-D` `<base>_calib_ms2_*`)
+      beside a run without it (`<base>_post_ms2_*`, `<base>.sqlite`) in the
+      same directory; `-c` takes the fractions' record names from
+      `postBaseName`. `prsm_sql_output` names its database with
+      `sqlFileName` too (`_post_ms2` read as `_ms2`), so a `-g -D` run
+      (base `<base>_mono_ms2`) writes its tables into `<base>_mono.sqlite`
+      (main looked for that file, which nothing wrote, and wrote no
+      tables). A combined run merges the fractions' MS1 spectra
+      from TopFD's `<frac>_ms1.msalign` (`prsm_post_mass_match::
+      topfdBaseName`, the spectrum file's base without `_ms2`, `_resid`,
+      `_calib` and `_mono`; `msalign_frac_merge::mergeFractions`'
+      `ms1_base_names`): the merge took them from the post-matched spectra's
+      base, which keeps `_calib` now, and with `-D` main already looked for
+      `<frac>_calib_ms1.msalign` (`-c -D --mass-calib` stopped there) and
+      `<frac>_mono_ms1.msalign` (`-g`). The parameter block prints "Mass
+      calibration: two-pass (zero-shift calibration search)" only with the
+      option.
     - **Research switches** in `TOPPIC_MASS_CALIB_PARA` ("name=value,..."):
-      `max_evalue` (1e-5), `tol_ppm` (20), `min_tole` (10), `post_match`
-      (1; 0: the post mass matching reads the peaks uncorrected).
+      `max_evalue` (1e-5), `tol_ppm` (20), `min_tole` (10). (`post_match`,
+      the in-memory correction's switch, went with it in experiment 154.)
+    - **Results of the corrected database** (toppic_test experiment 154,
+      report 0154; branch `mass_calib_sqlite` 3affd343 and 52a8b87a against
+      main 506f18b4, setting d with `--mass-calib -e 5 --disable-rescore`):
+      every corrected value equals a Python recomputation from TopFD's
+      database and the run's model bit for bit (480_F3_02 27.7 M values in
+      26.2 M rows, Bruker 18.3 M, a `topfd -D -A` database with its 10 layer
+      tables 57.3 M), every
+      other value and TopFD's schema unchanged, TopFD's database's md5
+      unchanged by the run; the corrected `ms2_env` masses are the corrected
+      msalign masses within 1.2e-6 Da (six decimals, the msalign file's
+      rounded retention time). 480_F3_02 3,488 / 2,096 / 452 and Bruker 852 /
+      116 / 79 PrSMs / proteoforms / proteins, as main; the same tables, XML
+      files and SQLite PrSM tables (main's in TopFD's database), the same
+      22,342 / 11,533 post-matched masses, of which 34 / 142 differ from
+      main's by 1e-6 Da (main corrected the peaks with the msalign file's
+      rounded retention time). A rerun writes the same files and database
+      tables; a run without the option in the same folder writes main's
+      files beside them, and a later `--mass-calib` run copies the
+      envelopes that run appended to TopFD's database (23,585 / 21,978) into
+      its corrected database without changing its files. Writing the
+      corrected database: 3-5 s (480: 875 MB, 26 M rows; Bruker MS/MS only),
+      26 s with topfd `-D`'s layer tables (2.5 GB); run time and peak memory
+      as main's. Without the option main's files (500-spectrum subset).
     - Without the option the run writes main 2863fa08's files (a
       500-spectrum subset of 480_F3_02, setting d: every file but the
       tables' time lines, every SQLite table).
@@ -3782,8 +3885,11 @@ above it, never the reverse:
 - `src/common` — foundation: `base`, `util`, `xml`, `thread`, `emass`
   (isotope distributions; see its section).
 - `src/sql` — thin SQLite helper (`sql_util`: `execSql`, `prepareSql`,
-  `stepAndReset`, all abort on error — use them rather than re-implementing
-  the prepare/step boilerplate) plus `ms_sql_writer`, the
+  `stepAndReset`, `hasTable`, all abort on error — use them rather than
+  re-implementing the prepare/step boilerplate), `sql_db_copy` (toppic's
+  copies of TopFD's database for `-g` and `--mass-calib`: backup API,
+  toppic's tables dropped, a temporary name renamed when complete) plus
+  `ms_sql_writer`, the
   MS1-peak tables for 3D visualization: `MsSqlWriter` writes a peak list as `PEAKS0`
   (all peaks) plus down-sampled `PEAKS1..n` layer tables, one `CONFIG` row
   per layer, and a colour bucket per peak, on a caller-owned connection like
@@ -3793,7 +3899,8 @@ above it, never the reverse:
 - `src/seq` — sequence/proteoform layer.
 - `src/ms` — mass-spectrum layer: `spec` (peaks/spectra/msalign), `msmap`,
   `factory`, `env` (envelope detection), `feature`, `mzml`, `calib` (the
-  two-pass m/z recalibration of topcalib, see its section).
+  two-pass m/z recalibration of topcalib and toppic `--mass-calib`, with
+  the corrected database of `sqlite_mass_calib`, see its section).
   `MsAlignReader` has a four-argument constructor taking an EnvCNN score
   cutoff (`SpPara::getEnvCnnCutoff()`, whose own default is 0.2, but both
   toppic and topmg set the key from their `-F`, which defaults to 0.4 in
