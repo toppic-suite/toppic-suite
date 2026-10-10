@@ -3517,17 +3517,26 @@ tables therefore differ from those of main before the change;
   `rescore_fdr_fallback` e10d3fd0, not merged). `prsm_rescore::process`
   takes an `EValueFloor` (`getRescoreEValueFloor` in `toppic_process`, for
   the three callers): the PrSMs with E >= `ExpectedValue::getMaxDouble()`
-  (1e300) are left out of the training and get a rescore 1 below the
-  lowest rescore of the search's other PrSMs, so the FDRs rank them last,
-  as the E-value does; a search without a model keeps the -log10 E-value.
-  The console prints "<n> PrSMs with the maximum E-value (<d> decoys) get
-  the rescore <v> and are left out of the training", and the parameter
+  (1e300) are left out of the training and get the lowest double,
+  `std::numeric_limits<double>::lowest()` (-DBL_MAX; the user's choice,
+  amendment 1, fc2e8b46; f3d913c6 gave 1 below the lowest rescore of the
+  search's other PrSMs, the same order), so the FDRs rank them last, as the
+  E-value does; a search without a model keeps the -log10 E-value. Every
+  use of a rescore is a comparison or a negation (`rescoreKey`), so the
+  value is safe; `Prsm::appendXml` writes a rescore of magnitude 1e100 or
+  more with `max_digits10` digits (`-1.7976931348623157e+308`, read back
+  exactly by `std::stod`), not with `str_util::toString`, whose fixed
+  notation writes 309 digits. The console prints "<n> PrSMs with the
+  maximum E-value (<d> decoys) get the rescore -DBL_MAX (the lowest double)
+  and are left out of the training", and the parameter
   block's FDR line "(linear SVM, 3-fold cross-validation; the maximum
   E-value last)". Hidden `--disable-rescore-evalue-floor` (argument
   `rescoreEvalueFloor`) turns it off (the files of `rescore_fdr_fallback`,
   checked on the Bruker run and the 500-spectrum subset); research
   switches in `TOPPIC_RESCORE_PARA`: `floor_train=1` (the model trained on
   every PrSM as before, only their scores replaced) and `floor_value=<v>`.
+  With -DBL_MAX every output equals f3d913c6's but the `<rescore>` values of
+  those PrSMs (toppic_test experiment 155, amendment 1).
   Not 0: the rescore's scale puts the training folds' 1% threshold at 0 and
   the median decoy at -1, so a 0 sits at the acceptance threshold and,
   with the tie rule of the FDR (tied decoys first), stops every list there
