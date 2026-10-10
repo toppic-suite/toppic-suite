@@ -3796,8 +3796,9 @@ the method inside a search. Facts to keep straight:
       report 0154; branch `mass_calib_sqlite` 3affd343 and 52a8b87a against
       main 506f18b4, setting d with `--mass-calib -e 5 --disable-rescore`):
       every corrected value equals a Python recomputation from TopFD's
-      database and the run's model bit for bit (480_F3_02 25.5 M values,
-      Bruker 17.9 M, a `topfd -D -A` database with its 10 layer tables), every
+      database and the run's model bit for bit (480_F3_02 27.7 M values in
+      26.2 M rows, Bruker 18.3 M, a `topfd -D -A` database with its 10 layer
+      tables 57.3 M), every
       other value and TopFD's schema unchanged, TopFD's database's md5
       unchanged by the run; the corrected `ms2_env` masses are the corrected
       msalign masses within 1.2e-6 Da (six decimals, the msalign file's
@@ -3811,7 +3812,7 @@ the method inside a search. Facts to keep straight:
       files beside them, and a later `--mass-calib` run copies the
       envelopes that run appended to TopFD's database (23,585 / 21,978) into
       its corrected database without changing its files. Writing the
-      corrected database: 3-5 s (480: 875 MB, 25 M rows; Bruker MS/MS only),
+      corrected database: 3-5 s (480: 875 MB, 26 M rows; Bruker MS/MS only),
       26 s with topfd `-D`'s layer tables (2.5 GB); run time and peak memory
       as main's. Without the option main's files (500-spectrum subset).
     - Without the option the run writes main 2863fa08's files (a
