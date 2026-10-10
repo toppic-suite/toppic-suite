@@ -3427,25 +3427,26 @@ XML). Facts to keep straight:
   binary-search shift predecessors in the alignments (the quadratic loop
   was 1% of the search), per-class table heights in the E-value.
 
-## Rescoring of the PrSMs (`stat/rescore`, default with `-d`)
+## Rescoring of the PrSMs (`stat/rescore`, `--rescore`)
 
 Branch `prsm_rescore` (toppic_test experiment 151, report 0151 and its
 amendment 1; from main 3b8041dd, merged into main on 2026-10-09 as the
-hidden `--rescore`, off by default). **On by default in a target-decoy
-search (`-d`) since 2026-10-09**: argument key `rescore`, "true"; the hidden
-`--disable-rescore` sets "false" (`--rescore` is gone), and
-`validateArguments` sets it to "false" without `-d` and with
-`--fdr-groups` (both were errors with `--rescore`), so a run without `-d`
-is unchanged; the parameter block prints "FDR computation: rescored PrSMs
-(linear SVM, 3-fold cross-validation; the maximum E-value last), the E-value
-at a level where it gives more" only when it runs (the two additions only
-while their rules, below, are on; this line and
-`--fdr-groups`' "FDR computation: separate PrSM groups" are printed with or
-without a variable PTM file; before, only with `-b`). It gives the best
-PrSM of every spectrum a score of a semi-supervised linear model, and the
-FDRs rank by it instead of the E-value. A `-d` run's FDRs, cutoffs and
-tables therefore differ from those of main before the change;
-`--disable-rescore` reproduces them. Facts to keep straight:
+hidden `--rescore`, off by default). **Off by default**: toppic's hidden
+`--rescore` (argument key `rescore`, "false") turns it on, and
+`validateArguments` refuses it without a target-decoy search (`-d`) and
+together with `--fdr-groups`. From 2026-10-09 (2863fa08) to 2026-10-10 it
+was on by default with `-d`, with the hidden `--disable-rescore` to turn it
+off; at the user's request it is opt-in again (`rescore_opt_in`, toppic_test
+experiment 155, amendment 3), and `--disable-rescore` is gone (a run of it
+in the toppic_test reports is a run without `--rescore` now). The parameter
+block prints "FDR computation: rescored PrSMs (linear SVM, 3-fold
+cross-validation; the maximum E-value last), the E-value at a level where
+it gives more" only when it runs (the two additions only while their rules,
+below, are on; this line and `--fdr-groups`' "FDR computation: separate
+PrSM groups" are printed with or without a variable PTM file). It gives
+the best PrSM of every spectrum a score of a semi-supervised linear model,
+and the FDRs rank by it instead of the E-value. The toppic manual does not
+describe it (a hidden option). Facts to keep straight:
 
 - **Where it runs.** `TopPIC_postprocess` keeps its order (clustering,
   cluster protein correction, recount, post mass matching, PTM
@@ -3511,7 +3512,7 @@ tables therefore differ from those of main before the change;
   `prsm_fdr::process` with `use_rescore` computes the three FDRs by the
   E-value (on copies of the PrSMs, sorted from the input order as the
   E-value computation sorts them, so the E-value round equals a
-  `--disable-rescore` computation) and by the rescore (on the PrSMs, as
+  computation without `--rescore`) and by the rescore (on the PrSMs, as
   before), counts the targets within each level's cutoff (`FdrCutoffs`:
   the `-t` / `-T` / `-y` value when the type is FDR, else 1%;
   `getFdrCutoffs` in `toppic_process`) and keeps a level's rescored FDRs
@@ -3531,7 +3532,7 @@ tables therefore differ from those of main before the change;
   rescore, proteoforms and proteins by the E-value; main 1,276 / 64 / 59,
   `--disable-rescore` 806 / 83 / 72); the 500-spectrum subset of 480 with
   `--mass-calib` (6 decoys) 474 / 345 / 152 by the E-value at every level
-  (main 26 / 22 / 12). With `--disable-rescore` the files are main's.
+  (main 26 / 22 / 12). Without the rescoring the files are main's.
 - **The rescore's PrSM-level FDR is not valid on the Bruker run**
   (toppic_test experiment 153, entrapment search: human SwissProt plus 0.5
   x shuffled `ENTRAP_` proteins): at 1% FDR the rescore accepts 1,357
@@ -3679,7 +3680,7 @@ with `-r` other than 1. Facts to keep straight:
   clusters (`prsm_feature_cluster`, or `prsm_simple_cluster` with `-x`;
   `toppic_second_cluster`, `toppic_second_prot`), without a cluster
   protein correction, recount or post mass matching (each pass did its
-  own), rescored (default with `-d`, not with `--disable-rescore`;
+  own), rescored (with `--rescore`;
   `toppic_second_rescore`) and given one FDR over all units
   (`toppic_second_fdr`; `--fdr-groups` applies), which becomes the file's
   `toppic_record_prsm`. `TopPIC_report` then runs as usual.
@@ -3734,7 +3735,7 @@ with `-r` other than 1. Facts to keep straight:
   2,004 / 440 (825 PrSMs of the second pass), the prototype's combination
   of two runs (toppic_test report 0151, `resid_prec.py` + `combine.py`)
   giving 4,107 / 2,394 / 528 with 4,098 accepted units in common; with
-  `--rescore` (now the default with `-d`; the first pass rescored too, so the residual spectra follow
+  `--rescore` (the first pass rescored too, so the residual spectra follow
   the rescored acceptance) 4,507 / 2,559 / 565 (prototype 4,517 / 2,565 /
   554). 25.5 min against 12.5 (the second pass is a full search of 2,440
   spectra), 7-8.6 GB. Without the option the 62 output files equal main's
@@ -4153,7 +4154,7 @@ above it, never the reverse:
   carry the thread number from the toppic `-u` option.
 - `src/stat` — E-value/p-value estimation (`count`/`local`/`mcmc`/`tdgf`),
   the PTM localization (`local`, and its alternative `local_align`, see
-  its section) and the rescoring of the PrSMs before the FDR (`rescore`, default with `-d`,
+  its section) and the rescoring of the PrSMs before the FDR (`rescore`, `--rescore`,
   see its section);
   `tdgf/cluster_prot_corrector` (see the post mass matching section) is
   here rather than in `prsm` because it recomputes E-values.

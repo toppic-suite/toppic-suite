@@ -128,10 +128,11 @@ std::map<std::string, std::string> ToppicArgument::initArguments() {
   arguments["keepTempFiles"] = "false";
   arguments["keepDecoyResults"] = "false";
   arguments["useFdrGroups"] = "false";
-  // the FDR ranks the PrSMs by a semi-supervised rescoring
-  // (stat/rescore/prsm_rescore) instead of the E-value; on by default in a
-  // target-decoy search (-d), off with the hidden --disable-rescore
-  arguments["rescore"] = "true";
+  // hidden --rescore: the FDR ranks the PrSMs by a semi-supervised
+  // rescoring (stat/rescore/prsm_rescore) instead of the E-value; off by
+  // default, refused without a target-decoy search (-d) and with
+  // --fdr-groups
+  arguments["rescore"] = "false";
   // with the rescoring, the FDRs of each level by the E-value when they give
   // more identifications than the rescore's (prsm_fdr); off with the hidden
   // --disable-rescore-fallback
@@ -729,7 +730,7 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
         "post-min-peak-num,I", po::value<std::string>(&post_min_peak_num), "")(
         "average-mass,g", "")("disable-zero-shift-prec-error", "")(
         "enable-one-shift-prec-error", "")("enable-var-ptm-prec-error", "")(
-        "fdr-groups", "")("disable-rescore", "")(
+        "fdr-groups", "")("rescore", "")(
         "disable-rescore-fallback", "")("disable-rescore-evalue-floor", "")(
         "second-precursor", "")(
         "mass-calib", "")(
@@ -952,8 +953,8 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
     if (vm.count("fdr-groups")) {
       arguments_["useFdrGroups"] = "true";
     }
-    if (vm.count("disable-rescore")) {
-      arguments_["rescore"] = "false";
+    if (vm.count("rescore")) {
+      arguments_["rescore"] = "true";
     }
     if (vm.count("disable-rescore-fallback")) {
       arguments_["rescoreFallback"] = "false";
@@ -1244,11 +1245,17 @@ bool ToppicArgument::validateArguments() {
     return false;
   }
 
-  // the rescoring trains on the decoys and replaces the E-value in the FDR:
-  // off without a target-decoy search (-d) and with --fdr-groups, whose
-  // separate FDRs rank by the E-value
-  if (search_type != "TARGET+DECOY" || arguments_["useFdrGroups"] == "true") {
-    arguments_["rescore"] = "false";
+  if (arguments_["rescore"] == "true") {
+    // the rescoring trains on the decoys and replaces the E-value in the
+    // FDR; the separate FDRs of --fdr-groups rank by the E-value
+    if (search_type != "TARGET+DECOY") {
+      LOG_ERROR("--rescore needs a target-decoy search (-d)!");
+      return false;
+    }
+    if (arguments_["useFdrGroups"] == "true") {
+      LOG_ERROR("--rescore cannot be combined with --fdr-groups!");
+      return false;
+    }
   }
 
   if (arguments_["secondPrecursor"] == "true") {

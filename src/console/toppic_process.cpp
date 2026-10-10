@@ -1385,11 +1385,11 @@ int TopPIC_postprocess(std::map<std::string, std::string>& arguments,
 
     bool use_rescore = arguments["rescore"] == "true";
     if (arguments["searchType"] == "TARGET+DECOY" && use_rescore) {
-      // the rescoring (default with -d; off with the hidden
-      // --disable-rescore): the best PrSM of every spectrum, targets and
-      // decoys, after the recount, the post mass matching and the PTM
-      // characterization, gets a score of a linear SVM trained with
-      // cross-validation, which the FDR ranks by instead of the E-value
+      // the rescoring (hidden --rescore, with -d; off by default): the
+      // best PrSM of every spectrum, targets and decoys, after the
+      // recount, the post mass matching and the PTM characterization, gets
+      // a score of a linear SVM trained with cross-validation, which the
+      // FDR ranks by instead of the E-value
       std::cout << "Rescoring - started." << std::endl;
       prsm_rescore::process(prsm_para_ptr, cur_suffix, "toppic_rescore", "",
                             getRescoreEValueFloor(arguments));
@@ -1702,7 +1702,7 @@ std::string TopPIC_identifyAll(std::map<std::string, std::string>& arguments) {
 // which runs on the merged set); then the two passes' record PrSMs are
 // merged into one set of (spectrum id, precursor id) units, clustered again
 // (no cluster protein correction, recount or post mass matching: each pass
-// did its own), rescored (unless --disable-rescore; the second units with
+// did its own), rescored (with --rescore; the second units with
 // their residual spectra), given one FDR and written as the file's
 // toppic_record_prsm (the first pass's is kept as toppic_first_record_prsm),
 // which TopPIC_report reads; the masses the second pass's post mass
