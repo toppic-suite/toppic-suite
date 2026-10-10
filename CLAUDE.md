@@ -3440,9 +3440,11 @@ off; at the user's request it is opt-in again (`rescore_opt_in`, toppic_test
 experiment 155, amendment 3), and `--disable-rescore` is gone (a run of it
 in the toppic_test reports is a run without `--rescore` now). Since
 2026-10-10 (`rescore_visible`, experiment 155, amendment 5) `--rescore` is
-a visible option: `toppic -h` lists it after the cutoffs, and the toppic
-manual describes it (section 2, steps 13 Rescoring and 14 FDR computation;
-the `--rescore` row of section 4; an example in section 6). The parameter
+a visible option: `toppic -h` lists it after the cutoffs (short form `-q`
+since amendment 6, `rescore_short_option`; `toppic_gui` still emits
+`--rescore`), and the toppic manual describes it (section 2, steps 13
+Rescoring and 14 FDR computation; the `-q`, `--rescore` row of section 4;
+an example in section 6). The parameter
 block prints "FDR computation: rescored PrSMs (linear SVM, 3-fold
 cross-validation; the maximum E-value last), the E-value at a level where
 it gives more" only when it runs (the two additions only while their rules,
