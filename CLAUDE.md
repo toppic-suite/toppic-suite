@@ -3437,7 +3437,9 @@ search (`-d`) since 2026-10-09**: argument key `rescore`, "true"; the hidden
 `validateArguments` sets it to "false" without `-d` and with
 `--fdr-groups` (both were errors with `--rescore`), so a run without `-d`
 is unchanged; the parameter block prints "FDR computation: rescored PrSMs
-(linear SVM, 3-fold cross-validation)" only when it runs (this line and
+(linear SVM, 3-fold cross-validation; the maximum E-value last), the E-value
+at a level where it gives more" only when it runs (the two additions only
+while their rules, below, are on; this line and
 `--fdr-groups`' "FDR computation: separate PrSM groups" are printed with or
 without a variable PTM file; before, only with `-b`). It gives the best
 PrSM of every spectrum a score of a semi-supervised linear model, and the
@@ -3504,7 +3506,8 @@ tables therefore differ from those of main before the change;
   on its own spectrum. Rescoring the PrSMs before the correction keeps the
   decoys valid (+2.4% PrSMs instead of +6.3% in the Python prototype).
 - **Two rounds of FDRs** (branch `rescore_fdr_fallback`, toppic_test
-  experiment 153, report 0153; from main 2e97163f, not merged).
+  experiment 153, report 0153; from main 2e97163f; merged into main on
+  2026-10-10 with `rescore_evalue_floor` as c122997d, on main e5c15398).
   `prsm_fdr::process` with `use_rescore` computes the three FDRs by the
   E-value (on copies of the PrSMs, sorted from the input order as the
   E-value computation sorts them, so the E-value round equals a
@@ -3544,7 +3547,9 @@ tables therefore differ from those of main before the change;
   FDP was 0.84% (report 0151).
 - **The lowest rescore for the PrSMs with the maximum E-value** (branch
   `rescore_evalue_floor`, toppic_test experiment 155, report 0155; from
-  `rescore_fdr_fallback` e10d3fd0, not merged). `prsm_rescore::process`
+  `rescore_fdr_fallback` e10d3fd0; merged into main on 2026-10-10 as
+  c122997d, on main e5c15398: the merge check of experiment 155,
+  amendment 2). `prsm_rescore::process`
   takes an `EValueFloor` (`getRescoreEValueFloor` in `toppic_process`, for
   the three callers): the PrSMs with E >= `ExpectedValue::getMaxDouble()`
   (1e300) are left out of the training and get the lowest double,
