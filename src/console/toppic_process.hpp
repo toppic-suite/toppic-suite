@@ -63,6 +63,14 @@ int TopPIC_multi_postprocess(std::map<std::string, std::string>& arguments);
 // toppic_record_prsm file
 int TopPIC_report(std::map<std::string, std::string>& arguments);
 
+// the two-pass m/z recalibration of one spectrum file (hidden --mass-calib):
+// a zero-shift calibration search, the MS1 and MS/MS error models fitted on
+// its confident PrSMs (<base>_mass_calib.json, *model_file_name) and the
+// corrected spectra <base>_calib_ms2.msalign, whose name it returns (the
+// file's own name, uncorrected, with too few calibrants; "" on an error)
+std::string TopPIC_mass_calib(std::map<std::string, std::string>& arguments,
+                              std::string* model_file_name);
+
 int TopPICProgress_multi_file(std::map<std::string, std::string>& arguments,
                               const std::vector<std::string>& spec_file_lst);
 

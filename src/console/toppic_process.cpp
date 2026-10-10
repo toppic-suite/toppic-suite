@@ -23,7 +23,9 @@
 #include <iostream>
 #include <limits>
 #include <map>
+#include <memory>
 #include <set>
+#include <sstream>
 #include <string>
 #include <thread>
 #include <vector>
@@ -50,6 +52,9 @@
 #include "filter/varptm/var_ptm_filter_processor.hpp"
 #include "filter/varptm/zero_var_ptm_filter_processor.hpp"
 #include "filter/zeroptm/zero_ptm_filter_processor.hpp"
+#include "ms/calib/mass_calib_fit.hpp"
+#include "ms/calib/mass_calib_model.hpp"
+#include "ms/calib/msalign_mass_calib.hpp"
 #include "ms/env/avg_mass_util.hpp"
 #include "ms/env/env_base.hpp"
 #include "ms/spec/msalign_frac_merge.hpp"
@@ -63,6 +68,7 @@
 #include "prsm/prsm_fdr_groups.hpp"
 #include "prsm/prsm_feature_cluster.hpp"
 #include "prsm/prsm_form_filter.hpp"
+#include "prsm/prsm_mass_calib.hpp"
 #include "prsm/prsm_match_num_recount.hpp"
 #include "prsm/prsm_match_table_writer.hpp"
 #include "prsm/prsm_post_mass_match.hpp"
@@ -269,6 +275,56 @@ bool TopPIC_init(std::map<std::string, std::string>& arguments) {
     }
   }
   return true;
+}
+
+// The research switches of --mass-calib, from the environment variable
+// TOPPIC_MASS_CALIB_PARA ("name=value,..."): max_evalue (1e-5, the largest
+// E-value of a calibrant PrSM), tol_ppm (20, the tolerance of the fragment
+// calibrants), min_tole (10, the smallest precursor and fragment tolerance in
+// ppm of the calibration search) and post_match (1; 0: the post mass
+// matching reads TopFD's peaks uncorrected).
+struct MassCalibPara {
+  double max_evalue = 1e-5;
+  double tol_ppm = 20.0;
+  double min_tole = 10.0;
+  bool post_match = true;
+};
+
+MassCalibPara getMassCalibPara() {
+  MassCalibPara para;
+  const char* env = std::getenv("TOPPIC_MASS_CALIB_PARA");
+  if (env == nullptr) {
+    return para;
+  }
+  for (const std::string& item : str_util::split(env, ",")) {
+    size_t eq = item.find('=');
+    if (eq == std::string::npos) {
+      continue;
+    }
+    std::string name = item.substr(0, eq);
+    double value = std::stod(item.substr(eq + 1));
+    if (name == "max_evalue") {
+      para.max_evalue = value;
+    } else if (name == "tol_ppm") {
+      para.tol_ppm = value;
+    } else if (name == "min_tole") {
+      para.min_tole = value;
+    } else if (name == "post_match") {
+      para.post_match = value != 0;
+    } else {
+      LOG_ERROR("Unknown TOPPIC_MASS_CALIB_PARA switch " << name << "!");
+      exit(EXIT_FAILURE);
+    }
+  }
+  return para;
+}
+
+// a tolerance as the arguments write it ("10", "7.5"): the index file names
+// carry the fragment tolerance's string
+std::string toleranceStr(double value) {
+  std::ostringstream out;
+  out << value;
+  return out.str();
 }
 
 // By default the generating function of the variable PTM PrSMs takes the
@@ -1244,8 +1300,16 @@ int TopPIC_postprocess(std::map<std::string, std::string>& arguments,
       // the EnvCNN model scores the added masses
       onnx_env_cnn::initModel(resource_dir,
                               std::stoi(arguments["threadNumber"]));
-      sp_file_name = prsm_post_mass_match::process(prsm_para_ptr, cur_suffix,
-                                                   cur_suffix, min_peak_num);
+      // --mass-calib: TopFD's peaks corrected as the spectra were
+      std::unique_ptr<MassCalibModel> calib_model_ptr;
+      if (arguments["massCalibModelFile"] != "" &&
+          getMassCalibPara().post_match) {
+        calib_model_ptr = std::make_unique<MassCalibModel>(
+            MassCalibModel::read(arguments["massCalibModelFile"]));
+      }
+      sp_file_name = prsm_post_mass_match::process(
+          prsm_para_ptr, cur_suffix, cur_suffix, min_peak_num,
+          calib_model_ptr.get());
       // The steps below read the spectra with the added masses and the PrSMs
       // with the recounted matches, and name their files after the new
       // spectrum file.
@@ -1737,6 +1801,102 @@ int TopPIC_second_precursor(std::map<std::string, std::string>& arguments,
   return 0;
 }
 
+// The two-pass m/z recalibration of one spectrum file (hidden --mass-calib;
+// ms/calib, prsm/prsm_mass_calib; toppic_test experiment 152, amendment 3).
+// A zero-shift calibration search of arguments["spectrumFileName"] on its own
+// copy of the arguments: no unexpected shift, no variable PTM, no tag filter
+// or TopMG stage, and precursor and fragment tolerances of at least 10 ppm
+// (min_tole), so that an instrument's offset of a few ppm does not cost the
+// calibrants their fragments and the index of the default tolerance serves.
+// Its target PrSMs with E-value <= 1e-5, no unexpected shift and no variable
+// PTM are the calibrants: the MS1 model is fitted on their precursor errors,
+// the MS/MS model on their fragment errors (mass_calib_fit::fitModel), and
+// written to <base>_mass_calib.json; the corrected spectra are written to
+// <base>_calib_ms2.msalign, with a copy of the feature file, and the search
+// reads them. The calibration search's files are deleted (kept with -k).
+// Returns the corrected spectrum file name and sets *model_file_name; with
+// fewer than 3 precursor or 4 fragment calibrants the file is searched
+// uncorrected: its own name and an empty model name. "" on an error.
+std::string TopPIC_mass_calib(std::map<std::string, std::string>& arguments,
+                              std::string* model_file_name) {
+  std::string sp_file_name = arguments["spectrumFileName"];
+  *model_file_name = "";
+  try {
+    MassCalibPara para = getMassCalibPara();
+    std::cout << "Mass calibration of " << sp_file_name << " - started."
+              << std::endl;
+    std::map<std::string, std::string> calib_arguments = arguments;
+    calib_arguments["shiftNumber"] = "0";
+    calib_arguments["variablePtmFileName"] = "";
+    calib_arguments["tagFilterStages"] = "";
+    calib_arguments["topmgMode"] = "disabled";
+    calib_arguments["deamidSelector"] = "false";
+    calib_arguments["massCalib"] = "false";
+    if (std::stod(arguments["fragErrorTolerance"]) < para.min_tole) {
+      calib_arguments["fragErrorTolerance"] = toleranceStr(para.min_tole);
+    }
+    if (arguments["precDaltonError"] == "" &&
+        std::stod(arguments["precErrorTolerance"]) < para.min_tole) {
+      calib_arguments["precErrorTolerance"] = toleranceStr(para.min_tole);
+    }
+    std::cout << "Mass calibration - zero unexpected shift search (fragment "
+                 "tolerance "
+              << calib_arguments["fragErrorTolerance"] << " ppm) - started."
+              << std::endl;
+    std::string raw_prsm_ext = TopPIC_identify(calib_arguments);
+    if (raw_prsm_ext.empty()) {
+      return "";
+    }
+    std::cout << "Mass calibration - zero unexpected shift search - finished."
+              << std::endl;
+    PrsmParaPtr prsm_para_ptr = std::make_shared<PrsmPara>(calib_arguments);
+    MassCalibrantSet set = prsm_mass_calib::readCalibrants(
+        prsm_para_ptr, raw_prsm_ext, para.max_evalue, para.tol_ppm);
+    std::cout << "Mass calibration - calibrants: " << set.used_prsm_num
+              << " of " << set.prsm_num
+              << " PrSMs (targets with E-value <= " << para.max_evalue
+              << ", no unexpected shift and no variable PTM), "
+              << set.prec.size() << " precursors and " << set.frag.size()
+              << " fragments." << std::endl;
+    cleanToppicDir(arguments["oriDatabaseFileName"], sp_file_name,
+                   arguments["keepTempFiles"] == "true", "", false);
+    if (set.prec.size() < 3 || set.frag.size() < 4) {
+      std::cout << "WARNING: too few calibrants for the mass calibration; "
+                << sp_file_name << " is searched without it." << std::endl;
+      return sp_file_name;
+    }
+    MassCalibModel model = mass_calib_fit::fitModel(set);
+    std::ostringstream info;
+    info << std::setprecision(3) << "Mass calibration - model: MS1 "
+         << model.ms1.c0 << " ppm, " << model.ms1.c_rt_per_hour
+         << " ppm/h; MS/MS " << model.ms2.c0 << " ppm, " << model.ms2.c_mz
+         << " ppm per 1000 m/z, " << model.ms2.c_rt_per_hour
+         << " ppm/h; robust SD of the residuals: precursors "
+         << model.prec_robust_sd << " ppm, fragments " << model.frag_robust_sd
+         << " ppm.";
+    std::cout << info.str() << std::endl;
+    *model_file_name = prsm_mass_calib::modelFileName(sp_file_name);
+    model.write(*model_file_name);
+    std::string calib_sp_file_name =
+        prsm_mass_calib::calibSpFileName(sp_file_name);
+    int sp_num =
+        msalign_mass_calib::process(model, sp_file_name, calib_sp_file_name);
+    if (arguments["useFeatureFile"] == "true") {
+      file_util::copyFile(file_util::basename(sp_file_name) + ".feature",
+                          file_util::basename(calib_sp_file_name) + ".feature",
+                          true);
+    }
+    std::cout << "Mass calibration - finished: " << sp_num
+              << " spectra corrected in " << calib_sp_file_name
+              << ", the model in " << *model_file_name << "." << std::endl;
+    return calib_sp_file_name;
+  } catch (const char* e) {
+    std::cout << "[Exception]" << std::endl;
+    std::cout << e << std::endl;
+    return "";
+  }
+}
+
 int TopPICProgress(std::map<std::string, std::string>& arguments) {
   std::string ori_sp_file_name = arguments["spectrumFileName"];
   std::string raw_prsm_ext = TopPIC_identifyAll(arguments);
@@ -1813,12 +1973,37 @@ int TopPICProgress_multi_file(std::map<std::string, std::string>& arguments,
               << std::endl;
   }
 
+  // --mass-calib: every file is recalibrated before the searches, and every
+  // step below, including the merge of a combined run, works on the
+  // corrected <name>_calib_ms2.msalign files (with -C, on the earlier run's)
+  std::vector<std::string> calib_model_lst(spec_file_lst.size(), "");
+  if (arguments["massCalib"] == "true") {
+    for (size_t k = 0; k < spec_file_lst.size(); k++) {
+      if (combine_result_only) {
+        std::string calib_name =
+            prsm_mass_calib::calibSpFileName(spec_file_lst[k]);
+        if (std::filesystem::exists(calib_name)) {
+          spec_file_lst[k] = calib_name;
+        }
+        continue;
+      }
+      arguments["spectrumFileName"] = spec_file_lst[k];
+      std::string calib_name = TopPIC_mass_calib(arguments,
+                                                 &calib_model_lst[k]);
+      if (calib_name.empty()) {
+        return 1;
+      }
+      spec_file_lst[k] = calib_name;
+    }
+  }
+
   if (!combine_result_only) {
     for (size_t k = 0; k < spec_file_lst.size(); k++) {
       std::strftime(buf, 50, "%a %b %d %H:%M:%S %Y", std::localtime(&start));
       std::string start_time = buf;
       arguments["startTime"] = start_time;
       arguments["spectrumFileName"] = spec_file_lst[k];
+      arguments["massCalibModelFile"] = calib_model_lst[k];
       if (toppic::TopPICProgress(arguments) != 0) {
         return 1;
       }
@@ -1853,8 +2038,8 @@ int TopPICProgress_multi_file(std::map<std::string, std::string>& arguments,
     // The record file of each fraction and the spectra it was matched
     // against are named after the post-matched spectrum file,
     // <frac>_post_ms2 (<frac>_ms2 with -D), <frac> being the mzML base
-    // without the _mono suffix of a -g run (see
-    // prsm_post_mass_match::sqlFileName).
+    // without the _calib suffix of --mass-calib and the _mono suffix of a
+    // -g run (see prsm_post_mass_match::sqlFileName).
     bool post_matched = arguments["postMassMatch"] == "true";
     std::string ms2_suffix =
         post_matched ? "_post_ms2.msalign" : "_ms2.msalign";
@@ -1862,6 +2047,9 @@ int TopPICProgress_multi_file(std::map<std::string, std::string>& arguments,
     std::vector<std::string> prsm_file_lst(raw_file_list.size());
     for (size_t i = 0; i < raw_file_list.size(); i++) {
       std::string record_base = raw_file_list[i];
+      if (post_matched && str_util::endsWith(record_base, "_calib")) {
+        record_base = record_base.substr(0, record_base.size() - 6);
+      }
       if (post_matched && str_util::endsWith(record_base, "_mono")) {
         record_base = record_base.substr(0, record_base.size() - 5);
       }
