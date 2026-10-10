@@ -3512,6 +3512,47 @@ tables therefore differ from those of main before the change;
   fix the proteoform and protein levels but cannot see this at the PrSM
   level, where the rescore gives more targets. On 480_F3_02 the rescored
   FDP was 0.84% (report 0151).
+- **The lowest rescore for the PrSMs with the maximum E-value** (branch
+  `rescore_evalue_floor`, toppic_test experiment 155, report 0155; from
+  `rescore_fdr_fallback` e10d3fd0, not merged). `prsm_rescore::process`
+  takes an `EValueFloor` (`getRescoreEValueFloor` in `toppic_process`, for
+  the three callers): the PrSMs with E >= `ExpectedValue::getMaxDouble()`
+  (1e300) are left out of the training and get a rescore 1 below the
+  lowest rescore of the search's other PrSMs, so the FDRs rank them last,
+  as the E-value does; a search without a model keeps the -log10 E-value.
+  The console prints "<n> PrSMs with the maximum E-value (<d> decoys) get
+  the rescore <v> and are left out of the training", and the parameter
+  block's FDR line "(linear SVM, 3-fold cross-validation; the maximum
+  E-value last)". Hidden `--disable-rescore-evalue-floor` (argument
+  `rescoreEvalueFloor`) turns it off (the files of `rescore_fdr_fallback`,
+  checked on the Bruker run and the 500-spectrum subset); research
+  switches in `TOPPIC_RESCORE_PARA`: `floor_train=1` (the model trained on
+  every PrSM as before, only their scores replaced) and `floor_value=<v>`.
+  Not 0: the rescore's scale puts the training folds' 1% threshold at 0 and
+  the median decoy at -1, so a 0 sits at the acceptance threshold and,
+  with the tie rule of the FDR (tied decoys first), stops every list there
+  (the Bruker run's 2% and 5% lists equal its 1% list). Results at 1% FDR,
+  entrapment FDP (human + 0.5 x shuffled `ENTRAP_`) in brackets: 480_F3_02
+  setting d 3,481 / 2,046 / 443 (main's rescore 3,573 / 2,041 / 447,
+  E-value 3,374 / 2,004 / 440); on the entrapment database 3,475 PrSMs
+  (0.9%), 2,032 proteoforms (0.9%), 442 proteins (0), E-value 3,353 (1.0%) /
+  1,981 (1.1%) / 439 (2.7%), main's rescore 3,556 (0.8%) / 2,020 (0.4%) / 442
+  (0): valid, gain +3.6% PrSMs, all gained PrSMs with E > 1 (the E = 1e300
+  ones gone). The Bruker run: 905 PrSMs (rescore) / 82 / 71 (E-value); on
+  the entrapment database the floored rescore wins at every level, 918
+  PrSMs (3.9%, against 13.0% without the floor and the E-value's 1.2%), 92
+  proteoforms with 4 entrapment ones, 80 proteins with 4: still not valid.
+  Its accepted entrapment PrSMs have E 0.4-346 and sit on intense features
+  (the model's largest weight is the feature intensity once the E = 1e300
+  records are out of the training): among the records with E < 1e300, junk
+  on features above 1e7 is entrapment and decoy 10 : 10, elsewhere about
+  1 : 4 (the expected 1 : 3). Trained on every PrSM (`floor_train=1`) 903
+  PrSMs (5.3%), 87 proteoforms with 1; with 0 (`floor_value=0`) 895 (4.4%).
+  Few decoys: st_1 (63 decoys) main's rescore keeps 16 PrSMs against the
+  E-value's 177, the floored rescore 64, the two rounds the E-value's 177 /
+  56 / 35; the 500-spectrum subset of 480 the E-value at every level
+  (with `--mass-calib` 481 / 343 / 151, the PrSMs by the rescore). No time
+  cost.
 - **Results on 480_F3_02** (setting d of toppic_test report 0062, TopFD
   main 915bb387 output of experiment 151; toppic_test experiment 151,
   amendment 1): 3,573 PrSMs / 2,041 proteoforms / 447 proteins at 1% FDR

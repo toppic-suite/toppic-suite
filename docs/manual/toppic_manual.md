@@ -142,8 +142,13 @@ the result files are named after `sample_mono_ms2`.
     N-terminal form, the proteoform's length and mass, the precursor, the
     TopFD feature, the fragment mass errors, the cleavage sites covered and
     the retention time against a value predicted from the sequence. The
-    E-values are not changed. When a part has fewer than 10 targets at 1%
-    FDR to train on, every PrSM keeps its E-value as the score.
+    E-values are not changed. PrSMs with the maximum E-value (1e300, given
+    to PrSMs without a valid E-value, mostly PrSMs that step 9 moved to
+    their cluster's proteoform and that then matched too few fragments) are
+    left out of the training and get a score below every other PrSM's, so
+    that the FDRs rank them last, as the E-value does. When a part has
+    fewer than 10 targets at 1% FDR to train on, every PrSM keeps its
+    E-value as the score.
 14. **FDR computation** (only with `--decoy`). Spectrum-, proteoform- and
     protein-level false discovery rates are estimated from the decoy hits
     twice: with the PrSMs ranked by the score of step 13 and ranked by the
