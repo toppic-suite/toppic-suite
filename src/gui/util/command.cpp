@@ -199,7 +199,8 @@ std::map<std::string, std::string> toppic_para{
     {"localPtmFileName", "-B "},
     {"localThreshold", "-H "},
     {"postMassMatch", "-D "},
-    {"averageMass", "-g "}};
+    {"averageMass", "-g "},
+    {"rescore", "--rescore "}};
 
 std::string geneToppicCommand(std::map<std::string, std::string> arguments_,
                               std::vector<std::string> spec_file_lst_) {
@@ -249,6 +250,11 @@ std::string geneToppicCommand(std::map<std::string, std::string> arguments_,
         }
       } else if (it->first == "averageMass") {
         // -g (--average-mass): the spectrum files hold average masses
+        if (it->second == "true") {
+          command = command + toppic_para[it->first];
+        }
+      } else if (it->first == "rescore") {
+        // the hidden --rescore: off by default, needs -d
         if (it->second == "true") {
           command = command + toppic_para[it->first];
         }

@@ -1332,6 +1332,28 @@ level:</string>
        </item>
       </layout>
      </widget>
+     <widget class="QWidget" name="horizontalLayoutWidget_rescore">
+      <property name="geometry">
+       <rect>
+        <x>500</x>
+        <y>248</y>
+        <width>361</width>
+        <height>30</height>
+       </rect>
+      </property>
+      <layout class="QHBoxLayout" name="horizontalLayout_rescore">
+       <item>
+        <widget class="QCheckBox" name="rescoreCheckBox">
+         <property name="toolTip">
+          <string>Rescore the best PrSM of every spectrum with a linear SVM trained on the target and decoy PrSMs (3-fold cross-validation, toppic --rescore). The FDRs then rank the PrSMs by the rescore, or by the E-value at a level where the E-value gives more identifications. Needs the decoy database.</string>
+         </property>
+         <property name="text">
+          <string>Rescore PrSMs (needs the decoy database)</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
      <widget class="QWidget" name="horizontalLayoutWidget_28">
       <property name="geometry">
        <rect>

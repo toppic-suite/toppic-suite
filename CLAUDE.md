@@ -3446,7 +3446,16 @@ below, are on; this line and `--fdr-groups`' "FDR computation: separate
 PrSM groups" are printed with or without a variable PTM file). It gives
 the best PrSM of every spectrum a score of a semi-supervised linear model,
 and the FDRs rank by it instead of the E-value. The toppic manual does not
-describe it (a hidden option). Facts to keep straight:
+describe it (a hidden option). GUI wiring: `toppicwindow.ui` has
+`rescoreCheckBox`, "Rescore PrSMs (needs the decoy database)", on the
+Advanced Parameters tab under "Keep intermediate files" (500, 248),
+unchecked by default from the argument map and read back into
+`arguments_["rescore"]`; it cannot be checked while "Decoy database" is
+unchecked, "Decoy database" cannot be unchecked while it is checked, and
+`checkError` refuses the pair before toppic is started;
+`gui/util/command.cpp` emits `--rescore` only when it is checked (the
+hidden `--disable-rescore-fallback` and `--disable-rescore-evalue-floor`
+have no GUI control). Facts to keep straight:
 
 - **Where it runs.** `TopPIC_postprocess` keeps its order (clustering,
   cluster protein correction, recount, post mass matching, PTM

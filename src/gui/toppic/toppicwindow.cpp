@@ -180,6 +180,8 @@ void ToppicWindow::on_defaultButton_clicked() {
   // post mass matching is on by default (arguments_["postMassMatch"])
   ui->postMassMatchCheckBox->setChecked(arguments_["postMassMatch"] == "true");
   ui->averageMassCheckBox->setChecked(arguments_["averageMass"] == "true");
+  // the rescoring (toppic --rescore) is off by default
+  ui->rescoreCheckBox->setChecked(arguments_["rescore"] == "true");
 }
 
 void ToppicWindow::updatedir(QString s) {
@@ -411,6 +413,11 @@ std::map<std::string, std::string> ToppicWindow::getArguments() {
   } else {
     arguments_["averageMass"] = "false";
   }
+  if (ui->rescoreCheckBox->isChecked()) {
+    arguments_["rescore"] = "true";
+  } else {
+    arguments_["rescore"] = "false";
+  }
   arguments_["localThreshold"] = ui->miscoreThresholdEdit->text().toStdString();
   // the EnvCNN score cutoff and the minimum isotopic peak number of post mass
   // matching are not shown by the GUI, so the command line leaves them out and
@@ -535,6 +542,7 @@ void ToppicWindow::lockDialog() {
   ui->keepTempCheckBox->setEnabled(false);
   ui->postMassMatchCheckBox->setEnabled(false);
   ui->averageMassCheckBox->setEnabled(false);
+  ui->rescoreCheckBox->setEnabled(false);
 }
 
 void ToppicWindow::unlockDialog() {
@@ -588,6 +596,7 @@ void ToppicWindow::unlockDialog() {
   ui->keepTempCheckBox->setEnabled(true);
   ui->postMassMatchCheckBox->setEnabled(true);
   ui->averageMassCheckBox->setEnabled(true);
+  ui->rescoreCheckBox->setEnabled(true);
 }
 
 bool ToppicWindow::checkError() {
@@ -718,6 +727,14 @@ bool ToppicWindow::checkError() {
       }
     }
   }
+  // the rescoring trains on the decoys: toppic refuses --rescore without -d
+  if (ui->rescoreCheckBox->isChecked() && !ui->decoyCheckBox->isChecked()) {
+    QMessageBox::warning(this, tr("Warning"),
+                         tr("To rescore the PrSMs, the checkbox \"decoy "
+                            "database\" should be checked!"),
+                         QMessageBox::Yes);
+    return true;
+  }
   return false;
 }
 
@@ -769,7 +786,8 @@ void ToppicWindow::showArguments() {
        "\nthreadNumber:" + arguments_["threadNumber"] + "\nuseFeatureFile:" +
        arguments_["useFeatureFile"] + "\npostMassMatch:" +
        arguments_["postMassMatch"] + "\naverageMass:" +
-       arguments_["averageMass"] + "\nskipList:" + arguments_["skipList"])
+       arguments_["averageMass"] + "\nrescore:" + arguments_["rescore"] +
+       "\nskipList:" + arguments_["skipList"])
           .c_str(),
       QMessageBox::Yes);
 }
@@ -921,6 +939,24 @@ void ToppicWindow::on_decoyCheckBox_clicked(bool checked) {
                             "\"decoy database\" cannot be unchecked."),
                          QMessageBox::Yes);
     ui->decoyCheckBox->setChecked(true);
+  } else if (!checked && ui->rescoreCheckBox->isChecked()) {
+    QMessageBox::warning(this, tr("Warning"),
+                         tr("Because \"Rescore PrSMs\" is selected, the "
+                            "checkbox \"decoy database\" cannot be "
+                            "unchecked."),
+                         QMessageBox::Yes);
+    ui->decoyCheckBox->setChecked(true);
+  }
+}
+
+// the rescoring trains on the decoys (toppic refuses --rescore without -d)
+void ToppicWindow::on_rescoreCheckBox_clicked(bool checked) {
+  if (checked && !ui->decoyCheckBox->isChecked()) {
+    QMessageBox::warning(this, tr("Warning"),
+                         tr("To rescore the PrSMs, the checkbox \"decoy "
+                            "database\" should be checked!"),
+                         QMessageBox::Yes);
+    ui->rescoreCheckBox->setChecked(false);
   }
 }
 
