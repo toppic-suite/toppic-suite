@@ -1558,7 +1558,8 @@ for `<base>_mono_ms2.msalign`, and the results are
 `<base>_mono_post_ms2_*` (`<base>_mono_ms2_*` with `-D`; main wrote
 `<base>_post_ms2_*`). Without TopFD's database (TopFD `-N`, possible with
 `-D`) a note is printed and there is no copy. Results (toppic_test
-experiment 154, amendment 1; 9ac2ada0 against main 506f18b4, setting d with
+experiment 154, amendment 1; 9ac2ada0 against main 506f18b4, merged into
+main on 2026-10-10 as fdef25ed; setting d with
 `--disable-rescore` on spectra 1500-1999 of `topfd -D -A`'s 480_F3_02
 output, whose database is 2.5 GB with the 3D tables): the copy takes 1.7 s;
 `-g`, `-g -D`, `-c AB -g` and `-C` write main's files under the new names
@@ -3828,7 +3829,8 @@ the method inside a search. Facts to keep straight:
       the in-memory correction's switch, went with it in experiment 154.)
     - **Results of the corrected database** (toppic_test experiment 154,
       report 0154; branch `mass_calib_sqlite` 3affd343 and 52a8b87a against
-      main 506f18b4, setting d with `--mass-calib -e 5 --disable-rescore`):
+      main 506f18b4, merged into main on 2026-10-10 as fdef25ed with
+      amendment 1; setting d with `--mass-calib -e 5 --disable-rescore`):
       every corrected value equals a Python recomputation from TopFD's
       database and the run's model bit for bit (480_F3_02 27.7 M values in
       26.2 M rows, Bruker 18.3 M, a `topfd -D -A` database with its 10 layer
