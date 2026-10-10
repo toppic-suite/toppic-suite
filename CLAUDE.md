@@ -3431,22 +3431,25 @@ XML). Facts to keep straight:
 
 Branch `prsm_rescore` (toppic_test experiment 151, report 0151 and its
 amendment 1; from main 3b8041dd, merged into main on 2026-10-09 as the
-hidden `--rescore`, off by default). **Off by default**: toppic's hidden
+hidden `--rescore`, off by default). **Off by default**: toppic's
 `--rescore` (argument key `rescore`, "false") turns it on, and
 `validateArguments` refuses it without a target-decoy search (`-d`) and
 together with `--fdr-groups`. From 2026-10-09 (2863fa08) to 2026-10-10 it
 was on by default with `-d`, with the hidden `--disable-rescore` to turn it
 off; at the user's request it is opt-in again (`rescore_opt_in`, toppic_test
 experiment 155, amendment 3), and `--disable-rescore` is gone (a run of it
-in the toppic_test reports is a run without `--rescore` now). The parameter
+in the toppic_test reports is a run without `--rescore` now). Since
+2026-10-10 (`rescore_visible`, experiment 155, amendment 5) `--rescore` is
+a visible option: `toppic -h` lists it after the cutoffs, and the toppic
+manual describes it (section 2, steps 13 Rescoring and 14 FDR computation;
+the `--rescore` row of section 4; an example in section 6). The parameter
 block prints "FDR computation: rescored PrSMs (linear SVM, 3-fold
 cross-validation; the maximum E-value last), the E-value at a level where
 it gives more" only when it runs (the two additions only while their rules,
 below, are on; this line and `--fdr-groups`' "FDR computation: separate
 PrSM groups" are printed with or without a variable PTM file). It gives
 the best PrSM of every spectrum a score of a semi-supervised linear model,
-and the FDRs rank by it instead of the E-value. The toppic manual does not
-describe it (a hidden option). GUI wiring: `toppicwindow.ui` has
+and the FDRs rank by it instead of the E-value. GUI wiring: `toppicwindow.ui` has
 `rescoreCheckBox`, "Rescore PrSMs (needs the decoy database)", on the
 Advanced Parameters tab under "Keep intermediate files" (500, 248),
 unchecked by default from the argument map and read back into

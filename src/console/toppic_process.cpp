@@ -1385,7 +1385,7 @@ int TopPIC_postprocess(std::map<std::string, std::string>& arguments,
 
     bool use_rescore = arguments["rescore"] == "true";
     if (arguments["searchType"] == "TARGET+DECOY" && use_rescore) {
-      // the rescoring (hidden --rescore, with -d; off by default): the
+      // the rescoring (--rescore, with -d; off by default): the
       // best PrSM of every spectrum, targets and decoys, after the
       // recount, the post mass matching and the PTM characterization, gets
       // a score of a linear SVM trained with cross-validation, which the

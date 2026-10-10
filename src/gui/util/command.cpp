@@ -254,7 +254,7 @@ std::string geneToppicCommand(std::map<std::string, std::string> arguments_,
           command = command + toppic_para[it->first];
         }
       } else if (it->first == "rescore") {
-        // the hidden --rescore: off by default, needs -d
+        // --rescore: off by default, needs -d
         if (it->second == "true") {
           command = command + toppic_para[it->first];
         }

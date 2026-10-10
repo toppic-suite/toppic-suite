@@ -65,7 +65,7 @@ the merge of a `-c` run all use the converted file. TopFD's database
 `sample.sqlite` is copied to `sample_mono.sqlite` (TopFD keeps the
 monoisotopic masses in its database, so the copy has the same values; an
 earlier copy is replaced): post mass matching reads the copy and adds its
-envelopes to it, the identifications are written into it (step 16), and
+envelopes to it, the identifications are written into it (step 17), and
 TopFD's database is not changed. The result files are named after
 `sample_mono_post_ms2`, or `sample_mono_ms2` with `--disable-post-match`.
 
@@ -125,25 +125,52 @@ TopFD's database is not changed. The result files are named after
     spectrum, scored by EnvCNN. The spectra with the added masses are
     written to `sample_post_ms2.msalign`, **the steps below and the result
     files use that name**, and the added envelopes are also stored in the
-    database. The E-values and the clusters are not changed, so the
-    FDRs, the cutoffs and the identifications are those of a run with
-    `--disable-post-match`; only the matched masses and fragments grow.
+    database. The E-values and the clusters are not changed, so without
+    `--rescore` the FDRs, the cutoffs and the identifications are those of
+    a run with `--disable-post-match` and only the matched masses and
+    fragments grow; with `--rescore` the rescoring (step 13) uses the
+    matched masses and fragments, so the FDRs can differ slightly.
 12. **PTM characterization** (only with `--local-ptm-file-name`). Each
     unexpected mass shift is compared with the listed common modifications,
     and the modification and its site are reported when the MIScore reaches
     `--miscore-threshold`.
-13. **FDR computation** (only with `--decoy`). Spectrum-, proteoform- and
-    protein-level false discovery rates are estimated from the decoy hits.
-14. **Record file and decoy removal.** The PrSMs with their FDRs are
+13. **Rescoring** (only with `--rescore`, which needs `--decoy`). The best
+    PrSM of every spectrum, target or decoy, gets a score from a linear
+    support vector machine trained to separate the targets at 1% FDR from
+    the decoys (the method of Percolator, Kall et al., Nat. Methods 2007),
+    with 3-fold cross-validation: the spectra are split into three parts,
+    and the PrSMs of each part are scored by a model trained on the other
+    two. The features describe the PrSM and its spectrum: the E-value, the
+    matched masses and fragments, the unexpected shifts and variable PTMs,
+    the N-terminal form, the proteoform's length and mass, the precursor,
+    the TopFD feature, the fragment mass errors, the cleavage sites covered
+    and the retention time against a value predicted from the sequence.
+    The E-values are not changed. PrSMs with the maximum E-value (1e300,
+    given to PrSMs without a valid E-value, mostly PrSMs that step 9 moved
+    to their cluster's proteoform and that then matched too few fragments)
+    are left out of the training and get a score below every other PrSM's,
+    so that the FDRs rank them last, as the E-value does. When a part has
+    fewer than 10 targets at 1% FDR to train on, every PrSM keeps its
+    E-value as the score.
+14. **FDR computation** (only with `--decoy`). Spectrum-, proteoform- and
+    protein-level false discovery rates are estimated from the decoy hits,
+    with the PrSMs ranked by the E-value. With `--rescore` they are
+    estimated twice: with the PrSMs ranked by the score of step 13 and
+    ranked by the E-value. At each level the score's FDRs are used unless
+    the E-value's give more identifications within that level's FDR cutoff
+    (1% when the level's cutoff type is `EVALUE`); the console prints both
+    counts and the choice. The `FDR` cutoffs then apply to the chosen
+    FDRs; the `EVALUE` cutoffs still compare E-values.
+15. **Record file and decoy removal.** The PrSMs with their FDRs are
     kept as `sample_post_ms2.toppic_record_prsm`, decoy identifications
     included. Unless `--keep-decoy-ids` is given, the decoy identifications
     are then removed from the PrSMs.
-15. **Filtering and output at three levels.** The PrSMs passing the
+16. **Filtering and output at three levels.** The PrSMs passing the
     spectrum-level cutoff are written to the PrSM tables; the best PrSM per
     proteoform passing the proteoform-level cutoff to the proteoform tables;
     the best PrSM per protein passing the protein-level cutoff to the
     protein tables.
-16. **Writing identifications to the SQLite database**, for visualization.
+17. **Writing identifications to the SQLite database**, for visualization.
 
 ## 3. Output files
 
@@ -200,7 +227,7 @@ Database and modifications:
 | `-n`, `--n-terminal-form <list>` | NONE,NME,NME_ACETYLATION,M_ACETYLATION | Allowed protein N-terminal forms, comma-separated: no modification, methionine excision, acetylation after methionine excision, acetylation of the initial methionine. |
 | `-N`, `--n-terminal-label <number>` | 0 | Mass (Da) of a label on the N-terminus of every proteoform, for example 229.162932 for TMT. The label is added to the N-terminal fragment ions and removed from the precursor mass; the reported proteoforms and adjusted precursor masses are label-free, and the `N-terminal label mass` column gives the label (section 3). Every N-terminus is labeled, acetylated ones included. In `toppic_gui`: "N-terminal label mass (Da)" on the Advanced Parameters tab. |
 | `-R`, `--proteoform-type <list>` | COMPLETE,PREFIX,SUFFIX,INTERNAL | Allowed proteoform types, comma-separated: the complete protein, its N-terminal part, its C-terminal part, or an internal part. |
-| `-d`, `--decoy` | off | Search a shuffled decoy database as well, to estimate false discovery rates. Required for the `FDR` cutoff types. |
+| `-d`, `--decoy` | off | Search a shuffled decoy database as well, to estimate false discovery rates. Required for the `FDR` cutoff types and for `--rescore`. |
 
 Mass shifts and variable modifications:
 
@@ -242,7 +269,8 @@ Cutoffs and output:
 | `-t`, `--spectrum-cutoff-type <EVALUE\|FDR>`, `-v`, `--spectrum-cutoff-value <number>` | EVALUE, 0.01 | Cutoff for PrSMs. |
 | `-T`, `--proteoform-cutoff-type <EVALUE\|FDR>`, `-V`, `--proteoform-cutoff-value <number>` | EVALUE, 0.01 | Cutoff for proteoforms. |
 | `-y`, `--protein-cutoff-type <EVALUE\|FDR>`, `-Y`, `--protein-cutoff-value <number>` | EVALUE, 0.01 | Cutoff for proteins; with `FDR` a protein is represented by its best proteoform. |
-| `-c`, `--combined-file-name <name>` | none | Combine several fractions: after the files are searched, their spectra and best PrSMs per spectrum are merged under `<name>_ms2`, and the clustering (by protein, precursor mass and sequence overlap), FDR computation, decoy removal, cutoffs and tables are repeated on the merged data; the files' results are then written with the proteoform ids of the combined results. A relative `<name>` is placed in the directory of the first spectrum file and must differ from the input file names. See the note below. |
+| `--rescore` | off | Rank the PrSMs by a rescore instead of the E-value in the FDR computation (section 2, steps 13 and 14): the best PrSM of every spectrum gets a score from a linear support vector machine trained on the target and decoy PrSMs with 3-fold cross-validation, and at each level the E-value is used instead when it gives more identifications within the FDR cutoff. Requires `-d`; the `FDR` cutoffs and the q-value columns then follow the chosen FDRs, and the `EVALUE` cutoffs still compare E-values. In `toppic_gui`: the checkbox "Rescore PrSMs (needs the decoy database)" on the Advanced Parameters tab. |
+| `-c`, `--combined-file-name <name>` | none | Combine several fractions: after the files are searched, their spectra and best PrSMs per spectrum are merged under `<name>_ms2`, and the clustering (by protein, precursor mass and sequence overlap), rescoring (with `--rescore`), FDR computation, decoy removal, cutoffs and tables are repeated on the merged data; the files' results are then written with the proteoform ids of the combined results. A relative `<name>` is placed in the directory of the first spectrum file and must differ from the input file names. See the note below. |
 | `-u`, `--thread-number <int>` | 1 | Number of threads; must not exceed the number of hardware threads. Each protein filtering step may use fewer: it fits its thread number to the memory available when it starts (about 1.25 GiB per thread for zero-shift filtering, 1 GiB for variable-PTM and one-shift filtering, 0.5 GiB for multiple-shift filtering). The run starts with a warning listing the filtering steps that will use fewer threads and how many, and a step prints its number again if the memory available when it starts gives a different one. All other steps use the full number. |
 | `-k`, `--keep-temp-files` | off | Keep the intermediate files. |
 | `-K`, `--keep-decoy-ids` | off | Keep decoy identifications in the result tables. |
@@ -258,7 +286,7 @@ fraction's FDR computation
 `<fraction>_ms2.toppic_record_prsm`; decoy identifications included). The
 merged PrSMs are clustered again into proteoforms and proteins across the
 fractions, by protein and precursor mass as with `-x` (the feature files
-are not merged), and given one set of FDRs (steps 8 and 13), and the decoy
+are not merged), rescored with `--rescore` and given one set of FDRs (steps 8, 13 and 14), and the decoy
 removal, the cutoffs and the output steps are repeated on them; the
 recount, post mass matching and PTM characterization of the fractions are
 kept. The combined results are always named `<name>_ms2_toppic_*`, the
@@ -334,6 +362,9 @@ toppic proteins.fasta sample_ms2.msalign
 
 # Target-decoy search with 1% FDR at all three levels, 8 threads
 toppic -d -t FDR -v 0.01 -T FDR -V 0.01 -y FDR -Y 0.01 -u 8 proteins.fasta sample_ms2.msalign
+
+# The same with the FDRs ranked by the rescore (the E-value at a level where it gives more)
+toppic -d --rescore -t FDR -T FDR -y FDR -u 8 proteins.fasta sample_ms2.msalign
 
 # Carbamidomethylated cysteines, phosphorylation as a variable PTM, no unexpected shift
 toppic -f C57 -b phospho.txt -s 0 proteins.fasta sample_ms2.msalign

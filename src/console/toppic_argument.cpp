@@ -128,10 +128,9 @@ std::map<std::string, std::string> ToppicArgument::initArguments() {
   arguments["keepTempFiles"] = "false";
   arguments["keepDecoyResults"] = "false";
   arguments["useFdrGroups"] = "false";
-  // hidden --rescore: the FDR ranks the PrSMs by a semi-supervised
-  // rescoring (stat/rescore/prsm_rescore) instead of the E-value; off by
-  // default, refused without a target-decoy search (-d) and with
-  // --fdr-groups
+  // --rescore: the FDR ranks the PrSMs by a semi-supervised rescoring
+  // (stat/rescore/prsm_rescore) instead of the E-value; off by default,
+  // refused without a target-decoy search (-d) and with --fdr-groups
   arguments["rescore"] = "false";
   // with the rescoring, the FDRs of each level by the E-value when they give
   // more identifications than the rescore's (prsm_fdr); off with the hidden
@@ -640,6 +639,13 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
             po::value<std::string>(&cutoff_protein_value),
             "<a positive number>. Protein-level cutoff value for filtering "
             "identified proteoform-spectrum-matches. Default value: 0.01.")(
+            "rescore",
+            "Rank the PrSMs by a rescore instead of the E-value in the FDR "
+            "computation: the best PrSM of every spectrum gets a score from a "
+            "linear support vector machine trained on the target and decoy "
+            "PrSMs with 3-fold cross-validation. At each level, the E-value "
+            "is used instead when it gives more identifications within the "
+            "FDR cutoff. Requires -d. Default value: false.")(
             "approximate-spectra,A",
             "Use approximate spectra to increase the sensitivity in protein "
             "filtering. Default value: false.")(
