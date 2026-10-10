@@ -138,12 +138,11 @@ std::map<std::string, std::string> ToppicArgument::initArguments() {
   arguments["secondPrecursor"] = "false";
   // hidden --mass-calib: the two-pass m/z recalibration (ms/calib,
   // prsm/prsm_mass_calib): a zero-shift calibration search, the MS1 and MS/MS
-  // error models fitted on its confident PrSMs, the search on the corrected
-  // spectra (<base>_calib_ms2.msalign) and the post mass matching on the
-  // corrected peaks. massCalibModelFile is set per file by
-  // TopPICProgress_multi_file (the model the post mass matching applies).
+  // error models fitted on its confident PrSMs, and the search on the
+  // corrected spectra (<base>_calib_ms2.msalign) with the corrected copy of
+  // TopFD's database (<base>_calib.sqlite) for the post mass matching and
+  // the PrSM tables.
   arguments["massCalib"] = "false";
-  arguments["massCalibModelFile"] = "";
   arguments["combineResultOnly"] = "false";
   arguments["outputRawPrsmTable"] = "false";
   arguments["outputPrsmCoverage"] = "false";

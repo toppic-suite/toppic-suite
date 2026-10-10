@@ -18,7 +18,6 @@
 
 #include <string>
 
-#include "ms/calib/mass_calib_model.hpp"
 #include "para/prsm_para.hpp"
 
 namespace toppic {
@@ -52,31 +51,32 @@ namespace prsm_post_mass_match {
 // instead of the input one. The SQLite database must exist (see
 // sqlFileName); if it is missing the run stops with an error. The EnvCNN
 // model must have been loaded with onnx_env_cnn::initModel.
-// calib_model_ptr: with toppic's --mass-calib, the m/z of every peak read
-// from the database is corrected in memory with the model's MS/MS level at
-// the spectrum's retention time (MassCalibModel::correctMz), as the
-// searched spectra were; the database's peaks are not changed. nullptr: the
-// peaks as TopFD stored them.
+// With toppic's --mass-calib the spectrum file is the corrected one, and
+// its database is the corrected copy of TopFD's (sqlFileName), whose peaks
+// are read as they are.
 std::string process(const PrsmParaPtr& prsm_para_ptr,
                     const std::string& input_file_ext,
-                    const std::string& output_file_ext, int min_peak_num,
-                    const MassCalibModel* calib_model_ptr = nullptr);
+                    const std::string& output_file_ext, int min_peak_num);
 
 // The TopFD SQLite database that goes with an msalign spectrum file:
 // <path>/<base>.sqlite, where <base> is the file name without its extension
 // and without a trailing "_ms2" (TopFD writes <base>_ms2.msalign and
 // <base>.sqlite), nor the suffixes of toppic's own copies before it:
-// "_resid" (the residual spectra of --second-precursor), "_calib" (the
-// corrected spectra of --mass-calib) and "_mono" (the monoisotopic-mass copy
-// of an average-mass file that TopPIC searches with --average-mass), in that
-// order: they all share the database of <base>_ms2.msalign. The argument
-// parser checks it exists before the search.
+// "_resid" (the residual spectra of --second-precursor) and "_mono" (the
+// monoisotopic-mass copy of an average-mass file that TopPIC searches with
+// --average-mass), which share the database of <base>_ms2.msalign. The
+// corrected spectra of --mass-calib (<base>_calib_ms2.msalign, after -g
+// <base>_mono_calib_ms2.msalign, and their residual spectra) have the
+// corrected database <path>/<base>_calib.sqlite, which TopPIC_mass_calib
+// writes (ms/calib/sqlite_mass_calib). The argument parser checks that
+// TopFD's database exists before the search.
 std::string sqlFileName(const std::string& sp_file_name);
 
-// the base name of the post-matched files of a spectrum file:
-// <base>_post_ms2 (the database's base name, so also for the _calib and
-// _mono copies; <base>_resid_post_ms2 for the residual spectra of
-// --second-precursor)
+// the base name of the post-matched files of a spectrum file: the
+// database's base name with "_post_ms2", <base>_post_ms2 (also for the _mono
+// copy), <base>_calib_post_ms2 for the corrected spectra of --mass-calib;
+// the residual spectra of --second-precursor keep "_resid":
+// <base>_resid_post_ms2, <base>_calib_resid_post_ms2
 std::string postBaseName(const std::string& sp_file_name);
 
 }  // namespace prsm_post_mass_match

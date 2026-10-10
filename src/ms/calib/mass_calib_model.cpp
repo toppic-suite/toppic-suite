@@ -19,6 +19,7 @@
 #include <cstdlib>
 #include <exception>
 #include <fstream>
+#include <sstream>
 #include <string>
 
 #include <boost/property_tree/json_parser.hpp>
@@ -76,12 +77,8 @@ double MassCalibModel::correctMass(int ms_level, double mass, int charge,
   return mass - e * (mass + charge * proton);
 }
 
-void MassCalibModel::write(const std::string& file_name) const {
-  std::ofstream out(file_name);
-  if (!out) {
-    LOG_ERROR("Cannot write the calibration model " << file_name << "!");
-    std::exit(EXIT_FAILURE);
-  }
+std::string MassCalibModel::toJson() const {
+  std::ostringstream out;
   out << "{\n"
       << " \"mz0\": " << fmt(mz0) << ",\n"
       << " \"rt0_min\": " << fmt(rt0_min) << ",\n"
@@ -95,6 +92,16 @@ void MassCalibModel::write(const std::string& file_name) const {
       << " \"note\": \"e (ppm) = c0 + c_mz (m/z - mz0)/1000 + c_rt_per_hour "
          "(rt_min - rt0_min)/60; corrected m/z = m/z (1 - e 1e-6)\"\n"
       << "}\n";
+  return out.str();
+}
+
+void MassCalibModel::write(const std::string& file_name) const {
+  std::ofstream out(file_name);
+  if (!out) {
+    LOG_ERROR("Cannot write the calibration model " << file_name << "!");
+    std::exit(EXIT_FAILURE);
+  }
+  out << toJson();
 }
 
 MassCalibModel MassCalibModel::read(const std::string& file_name) {

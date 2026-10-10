@@ -50,6 +50,9 @@ class MassCalibModel {
   double correctMass(int ms_level, double mass, int charge,
                      double rt_min) const;
 
+  // the model as JSON, the text write() writes
+  std::string toJson() const;
+
   // writes the model as JSON
   void write(const std::string& file_name) const;
 
