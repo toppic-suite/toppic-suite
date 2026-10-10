@@ -86,6 +86,10 @@ class TopfdPara {
   const std::string& getMs2DeconvMethod() const { return ms2_deconv_method_; }
   bool isMs1GreedyDeconv() const { return ms1_deconv_method_ == "greedy"; }
   bool isMs2GreedyDeconv() const { return ms2_deconv_method_ == "greedy"; }
+  // the greedy searches' limit of the peaks a new envelope may share with
+  // each envelope already reported (-1: no limit)
+  int getMs1MaxSharedPeakNum() const { return ms1_max_shared_peak_num_; }
+  int getMs2MaxSharedPeakNum() const { return ms2_max_shared_peak_num_; }
   bool isUseFlashDeconv() const { return ms2_deconv_method_ == "flashdeconv"; }
   bool isMs2PrecPairRefine() const { return ms2_prec_pair_refine_; }
 
@@ -135,6 +139,8 @@ class TopfdPara {
   void setMaxPeakSharingRatio(double ratio) {
     max_peak_sharing_ratio_ = ratio;
   }
+  void setMs1MaxSharedPeakNum(int num) { ms1_max_shared_peak_num_ = num; }
+  void setMs2MaxSharedPeakNum(int num) { ms2_max_shared_peak_num_ = num; }
   void setMaxMass(double mass) { max_mass_ = mass; }
   void setMzError(double error) { mz_error_ = error; }
   void setMsOneSnRatio(double ratio) { ms_one_sn_ratio_ = ratio; }
@@ -309,6 +315,12 @@ class TopfdPara {
   // DeconvSingleSp; TopDIA's default) or "flashdeconv" (FlashDeconvMs2Process
   // instead of DeconvMs2Process)
   std::string ms2_deconv_method_ = "greedy";
+  // hidden options --ms1-max-shared-peak-num and --ms2-max-shared-peak-num:
+  // the greedy MS1 and MS/MS searches do not report an envelope that shares
+  // more than this number of peaks with an envelope already reported in the
+  // spectrum (-1: no limit, the searches before toppic_test experiment 157)
+  int ms1_max_shared_peak_num_ = 1;
+  int ms2_max_shared_peak_num_ = 1;
   // the precursor masses of an MS/MS spectrum corrected by whole isotopes
   // with the complementary pairs of its fragment masses and the MS1 spectrum
   // (prec_pair_refine::correctIsotopes; toppic_test experiment 116): on by

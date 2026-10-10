@@ -33,6 +33,15 @@
 
 namespace toppic {
 
+namespace {
+
+// the limit of the shared peaks of the greedy searches, -1 being no limit
+std::string sharedPeakNumStr(int num) {
+  return num < 0 ? "No limit" : std::to_string(num);
+}
+
+}  // namespace
+
 // A banner line with the title centered and padded with '#' to a fixed width,
 // e.g. "############### Parameters ###############".
 std::string TopfdPara::banner(const std::string& prefix,
@@ -261,6 +270,8 @@ std::string TopfdPara::getTopfdParaStr(const std::string& prefix,
     // parameter block of earlier versions
     if (isMs1GreedyDeconv()) {
       kv("MS1 deconvolution:") << "Greedy" << std::endl;
+      kv("MS1 maximum shared peak number:")
+          << sharedPeakNumStr(ms1_max_shared_peak_num_) << std::endl;
     } else if (run_filter_by_mz_) {
       kv("Precursor envelope ranking window:")
           << ms1_rank_peak_distance_ << " Dalton" << std::endl;
@@ -302,6 +313,8 @@ std::string TopfdPara::getTopfdParaStr(const std::string& prefix,
   // files of --deconv-ms2 msdeconv keep the block of earlier versions.
   if (isMs2GreedyDeconv()) {
     kv("MS/MS deconvolution:") << "Greedy" << std::endl;
+    kv("MS/MS maximum shared peak number:")
+        << sharedPeakNumStr(ms2_max_shared_peak_num_) << std::endl;
   } else if (isUseFlashDeconv()) {
     kv("MS/MS deconvolution:") << "FLASHDeconv" << std::endl;
   } else {

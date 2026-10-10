@@ -297,6 +297,10 @@ struct Fit {
 
 using FitVec = std::vector<Fit>;
 
+// the envelope of a fit as it is reported (defined below)
+MatchEnvPtr getMatchEnv(const PeakPtrVec& peak_list, const Fit& fit,
+                        const EnvParaPtr& env_para_ptr, double min_inte);
+
 // One spectrum's search.
 class GreedySearch {
  public:
@@ -328,6 +332,14 @@ class GreedySearch {
   std::vector<std::vector<double>> found_masses_;
   // the alternative masses one isotope away (alt_ratio)
   FitVec alts_;
+  PeakPtrVec peak_list_;
+  // the limit of the shared peaks (TopfdPara::getMs2MaxSharedPeakNum; -1:
+  // no limit)
+  int max_shared_peak_num_;
+  // per peak of the spectrum, the reported envelopes that match it (indexes
+  // into reported_envs_); the mass and charge of each reported envelope
+  std::vector<std::vector<int>> peak_envs_;
+  std::vector<std::pair<double, int>> reported_envs_;
 
   const Distr& getDistr(double mono_mass);
 
@@ -362,6 +374,8 @@ class GreedySearch {
                   double sign);
 
   void refit(std::vector<FitVec>& result);
+
+  FitVec removeSharedEnvs(FitVec series);
 };
 
 GreedySearch::GreedySearch(const PeakPtrVec& peak_list,
@@ -372,7 +386,9 @@ GreedySearch::GreedySearch(const PeakPtrVec& peak_list,
       env_para_ptr_(env_para_ptr),
       debug_os_(debug_os),
       max_charge_(max_charge),
-      max_mass_(max_mass) {
+      max_mass_(max_mass),
+      peak_list_(peak_list),
+      max_shared_peak_num_(topfd_para_ptr->getMs2MaxSharedPeakNum()) {
   mzs_.reserve(peak_list.size());
   intes_.reserve(peak_list.size());
   for (const PeakPtr& peak : peak_list) {
@@ -381,6 +397,9 @@ GreedySearch::GreedySearch(const PeakPtrVec& peak_list,
   }
   residuals_ = intes_;
   found_masses_.resize(max_charge_ + 1);
+  if (max_shared_peak_num_ >= 0) {
+    peak_envs_.resize(peak_list.size());
+  }
   // the noise level and the thresholds of DeconvData::initMinInte with the
   // MS/MS signal-to-noise ratio
   double noise_inte = baseline_util::getBaseLine(intes_);
@@ -948,6 +967,10 @@ std::vector<FitVec> GreedySearch::run() {
         best_series[0].cos < para_.single_min_cos) {
       continue;
     }
+    best_series = removeSharedEnvs(std::move(best_series));
+    if (best_series.empty()) {
+      continue;
+    }
     // the alternative mass one isotope away (alt_ratio)
     if (para_.alt_ratio > 0 && best_series[0].mono_mass < para_.alt_max_mass) {
       const Fit& chosen = best_series[0];
@@ -982,6 +1005,68 @@ std::vector<FitVec> GreedySearch::run() {
   }
   refit(result);
   return result;
+}
+
+// The test of the shared peaks (TopfdPara::getMs2MaxSharedPeakNum, hidden
+// option --ms2-max-shared-peak-num; toppic_test experiment 157): the
+// envelopes of a mass, in the order of its charge series (the seed charge
+// first), are built as they would be reported (getMatchEnv) and compared
+// with every envelope reported before in the spectrum, those of the earlier
+// masses and those of the mass kept before. The peaks two envelopes share
+// are the spectrum peaks both match, as the DP counts them
+// (CoTable::cntSharedPeakNum). An envelope that shares more than
+// max_shared_peak_num_ peaks with one of them is not reported (nor
+// subtracted); the others are kept and their peaks recorded. Not tested:
+// the alternative masses (alt_ratio) and the masses the refit pass moves.
+FitVec GreedySearch::removeSharedEnvs(FitVec series) {
+  if (max_shared_peak_num_ < 0) {
+    return series;
+  }
+  FitVec kept;
+  for (Fit& fit : series) {
+    std::vector<int> peak_idxes;
+    MatchEnvPtr env = getMatchEnv(peak_list_, fit, env_para_ptr_, min_inte_);
+    if (env != nullptr) {
+      ExpEnvPtr exp_env = env->getExpEnvPtr();
+      for (int i = 0; i < exp_env->getPeakNum(); i++) {
+        if (exp_env->isExist(i)) {
+          peak_idxes.push_back(exp_env->getPeakIdx(i));
+        }
+      }
+    }
+    // the number of peaks shared with each envelope reported before
+    std::unordered_map<int, int> shared_nums;
+    int max_num = 0;
+    int max_env = -1;
+    for (int idx : peak_idxes) {
+      for (int e : peak_envs_[idx]) {
+        int num = ++shared_nums[e];
+        if (num > max_num) {
+          max_num = num;
+          max_env = e;
+        }
+      }
+    }
+    if (max_num > max_shared_peak_num_) {
+      if (debug_os_ != nullptr) {
+        *debug_os_ << "shared mass " << fit.mono_mass << " charge "
+                   << fit.charge << " shares " << max_num
+                   << " peaks with mass " << reported_envs_[max_env].first
+                   << " charge " << reported_envs_[max_env].second
+                   << ": not reported\n";
+      }
+      continue;
+    }
+    int env_id = static_cast<int>(reported_envs_.size());
+    for (int idx : peak_idxes) {
+      if (peak_envs_[idx].empty() || peak_envs_[idx].back() != env_id) {
+        peak_envs_[idx].push_back(env_id);
+      }
+    }
+    reported_envs_.emplace_back(fit.mono_mass, fit.charge);
+    kept.push_back(std::move(fit));
+  }
+  return kept;
 }
 
 // adds (sign 1) or removes (sign -1) the theoretical intensities of a fit's
