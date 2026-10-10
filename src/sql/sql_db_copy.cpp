@@ -89,6 +89,11 @@ sqlite3* openCopy(const std::string& src_name, const std::string& dest_name) {
 
 void closeCopy(sqlite3* db, const std::string& dest_name) {
   std::string tmp_name = tmpName(dest_name);
+  // WAL mode, as TopFD writes its database: a reader of the copy (a viewer)
+  // then does not block toppic's later writes to it (toppic_test experiment
+  // 156: in rollback mode the post mass matching stopped with "database is
+  // locked")
+  sql_util::execSql(db, "PRAGMA journal_mode = WAL;");
   if (sqlite3_close(db) != SQLITE_OK) {
     LOG_ERROR("Cannot close the database " << tmp_name << ".");
     std::exit(EXIT_FAILURE);

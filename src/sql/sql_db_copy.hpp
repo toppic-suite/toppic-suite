@@ -41,9 +41,10 @@ namespace sql_db_copy {
 // read or written.
 sqlite3* openCopy(const std::string& src_name, const std::string& dest_name);
 
-// Closes a copy opened by openCopy and renames it to dest_name, replacing an
-// earlier file, so that an interrupted run leaves no partial file under that
-// name.
+// Closes a copy opened by openCopy in WAL mode (TopFD's journal mode, so that
+// a reader of the copy does not block a later writer) and renames it to
+// dest_name, replacing an earlier file, so that an interrupted run leaves no
+// partial file under that name.
 void closeCopy(sqlite3* db, const std::string& dest_name);
 
 // openCopy and closeCopy with no change in between.
