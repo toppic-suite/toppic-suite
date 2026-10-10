@@ -2047,7 +2047,11 @@ int TopPICProgress_multi_file(std::map<std::string, std::string>& arguments,
         post_matched ? "_post_ms2.msalign" : "_ms2.msalign";
     std::vector<std::string> record_base_list(raw_file_list.size());
     std::vector<std::string> prsm_file_lst(raw_file_list.size());
+    // the MS1 spectra are TopFD's, <frac>_ms1.msalign without toppic's
+    // suffixes
+    std::vector<std::string> ms1_base_list(raw_file_list.size());
     for (size_t i = 0; i < raw_file_list.size(); i++) {
+      ms1_base_list[i] = prsm_post_mass_match::topfdBaseName(spec_file_lst[i]);
       std::string record_base = raw_file_list[i];
       if (post_matched) {
         std::string post_base =
@@ -2065,7 +2069,7 @@ int TopPICProgress_multi_file(std::map<std::string, std::string>& arguments,
     std::cout << "Merging msalign files started." << std::endl;
     std::string para_str = "";
     msalign_frac_merge::mergeFractions(record_base_list, merged_file_name,
-                                       para_str, ms2_suffix);
+                                       para_str, ms2_suffix, ms1_base_list);
     std::cout << "Merging msalign files finished." << std::endl;
 
     std::cout << "Merging identification files started." << std::endl;

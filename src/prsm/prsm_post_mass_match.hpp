@@ -72,6 +72,11 @@ std::string process(const PrsmParaPtr& prsm_para_ptr,
 // TopFD's database exists before the search.
 std::string sqlFileName(const std::string& sp_file_name);
 
+// TopFD's base name of a spectrum file, <path>/<base> for <base>_ms2.msalign
+// and toppic's copies of it (the suffixes "_resid", "_calib" and "_mono"
+// removed): the base of TopFD's database and MS1 spectra
+std::string topfdBaseName(const std::string& sp_file_name);
+
 // the base name of the post-matched files of a spectrum file: the
 // database's base name with "_post_ms2", <base>_post_ms2 (also for the _mono
 // copy), <base>_calib_post_ms2 for the corrected spectra of --mass-calib;

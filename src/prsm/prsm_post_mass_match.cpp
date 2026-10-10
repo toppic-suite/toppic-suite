@@ -509,13 +509,18 @@ std::string stripSuffix(const std::string& name, const std::string& suffix) {
 std::string dbBaseName(const std::string& sp_file_name, bool* resid) {
   std::string base = stripSuffix(file_util::basename(sp_file_name), "_ms2");
   *resid = str_util::endsWith(base, "_resid");
-  base = stripSuffix(base, "_resid");
-  bool calib = str_util::endsWith(base, "_calib");
-  base = stripSuffix(stripSuffix(base, "_calib"), "_mono");
+  bool calib = str_util::endsWith(stripSuffix(base, "_resid"), "_calib");
+  base = topfdBaseName(sp_file_name);
   return calib ? base + "_calib" : base;
 }
 
 }  // namespace
+
+std::string topfdBaseName(const std::string& sp_file_name) {
+  std::string base = stripSuffix(file_util::basename(sp_file_name), "_ms2");
+  return stripSuffix(stripSuffix(stripSuffix(base, "_resid"), "_calib"),
+                     "_mono");
+}
 
 std::string sqlFileName(const std::string& sp_file_name) {
   bool resid = false;
