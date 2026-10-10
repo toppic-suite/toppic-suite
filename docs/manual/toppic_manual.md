@@ -38,7 +38,7 @@ TopPIC also reads, from the same directory:
 | File | Needed when | Purpose |
 |---|---|---|
 | `sample_ms2.feature` | Always, unless `--no-topfd-feature` is given | The proteoform feature of each MS/MS spectrum, used to cluster the identifications of one proteoform across spectra and to report abundances. |
-| `sample.sqlite` | Always, unless `--disable-post-match` is given | The centroided MS/MS peaks, used by post mass matching (section 2, step 11). TopFD writes it unless run with `-N`. A missing database is an error, reported before the search starts. With `--average-mass` TopPIC searches a copy of it, `sample_mono.sqlite` (section 2). |
+| `sample.sqlite` | Always, unless `--disable-post-match` is given | The centroided MS/MS peaks, used by post mass matching (section 2, step 11). TopFD writes it unless run with `-N`. A missing database is an error, reported before the search starts. TopPIC only reads it: it searches its own copy, `sample_toppic.sqlite` (section 2). |
 
 **Database indexes.** TopPIC does not require `topindex`. It prepares the
 database itself in a `<database>_idx/` directory next to the FASTA file, and
@@ -54,6 +54,19 @@ Intermediate files carry the spectrum file name plus a `.toppic_*`
 extension and are deleted at the end unless `--keep-temp-files` is given,
 except the `toppic_record_prsm` file (section 3), which is always kept.
 
+**TopPIC's database.** Before a spectrum file `sample_ms2.msalign` is
+searched, TopPIC writes its own SQLite database, `sample_toppic.sqlite`: a
+copy of TopFD's `sample.sqlite` with all its tables (spectra, peaks,
+deconvoluted masses and their envelopes, and the other tables TopFD
+wrote). An earlier `sample_toppic.sqlite` is deleted first, so every run
+starts from TopFD's data. Post mass matching reads the peaks of the copy
+and adds its envelopes to it (step 11), and the identifications are
+written into it (step 17); TopFD's database is only read. The name is the
+same with every option (`--average-mass`, `--disable-post-match`, `-c`),
+so a TopFD and a TopPIC run leave two databases per spectrum file. Without
+TopFD's database (TopFD `-N`, possible with `--disable-post-match`) no
+copy is written and the identifications are not written to a database.
+
 With `--average-mass`, every spectrum file is first converted: the average
 precursor and fragment masses of `sample_ms2.msalign` are converted back to
 monoisotopic masses with the theoretical isotopic distributions TopFD used
@@ -61,12 +74,9 @@ monoisotopic masses with the theoretical isotopic distributions TopFD used
 `sample_mono_ms2.msalign` (the input file is left unchanged, a comment line
 records the conversion), `sample_ms2.feature` is copied to
 `sample_mono_ms2.feature`, and the steps below, the result file names and
-the merge of a `-c` run all use the converted file. TopFD's database
-`sample.sqlite` is copied to `sample_mono.sqlite` (TopFD keeps the
-monoisotopic masses in its database, so the copy has the same values; an
-earlier copy is replaced): post mass matching reads the copy and adds its
-envelopes to it, the identifications are written into it (step 17), and
-TopFD's database is not changed. The result files are named after
+the merge of a `-c` run all use the converted file. TopFD keeps the
+monoisotopic masses in its database, so `sample_toppic.sqlite` is the
+same copy as without the option. The result files are named after
 `sample_mono_post_ms2`, or `sample_mono_ms2` with `--disable-post-match`.
 
 1. **Zero unexpected shift filtering and search.** Protein candidates are
@@ -117,15 +127,15 @@ TopFD's database is not changed. The result files are named after
     the best PrSM of every spectrum, target or decoy, after the clustering,
     the cluster protein correction and the recount, the theoretical
     fragment masses that no deconvoluted mass matched are searched in the
-    centroided MS/MS peaks of the spectrum, stored in the TopFD SQLite
-    database, using the isotopic-envelope test of MSPathFinderT: an envelope
+    centroided MS/MS peaks of the spectrum, stored in TopPIC's copy of the
+    TopFD SQLite database (`sample_toppic.sqlite`), using the isotopic-envelope test of MSPathFinderT: an envelope
     is accepted when its most abundant peak and at least
     `--post-min-peak-num` of its peaks are present and its intensities fit
     the theoretical ones. Each accepted fragment adds one mass to the
     spectrum, scored by EnvCNN. The spectra with the added masses are
     written to `sample_post_ms2.msalign`, **the steps below and the result
-    files use that name**, and the added envelopes are also stored in the
-    database. The E-values and the clusters are not changed, so without
+    files use that name**, and the added envelopes are also stored in
+    `sample_toppic.sqlite`. The E-values and the clusters are not changed, so without
     `--decoy` the cutoffs and the identifications are those of a run with
     `--disable-post-match` and only the matched masses and fragments grow;
     with `--decoy` the rescoring (step 13) uses the matched masses and
@@ -160,7 +170,8 @@ TopFD's database is not changed. The result files are named after
     proteoform passing the proteoform-level cutoff to the proteoform tables;
     the best PrSM per protein passing the protein-level cutoff to the
     protein tables.
-17. **Writing identifications to the SQLite database**, for visualization.
+17. **Writing identifications to the SQLite database**
+    `sample_toppic.sqlite`, for visualization.
 
 ## 3. Output files
 
@@ -177,7 +188,7 @@ after `<name>_ms2`. With `--average-mass` the names start with
 | `sample_post_ms2_toppic_proteoform.tsv`, `..._proteoform_single.tsv` | One PrSM per identified proteoform (the best one), passing the proteoform-level cutoff. |
 | `sample_post_ms2_toppic_protein.tsv`, `..._protein_single.tsv` | One PrSM per identified protein (the best one), passing the protein-level cutoff. |
 | `sample_post_ms2_toppic_prsm.xml`, `..._proteoform.xml`, `..._protein.xml` | The same three sets of PrSMs in XML, read by TopDiff and the visualization tools. Every PrSM records the TopPIC Suite version that wrote it, and TopDiff reads only the files of its own version. Every proteoform element has its classification, `<classification>` (the `Proteoform classification` column). |
-| `sample.sqlite` (`sample_mono.sqlite` with `--average-mass`) | Updated with the tables `prsm`, `proteoform`, `protein`, `prsm_mass_shift`, `prsm_protein_match` and `fasta_seq`, for visualization. The first three hold the PrSMs of the tables below, with the columns `precursor_id` and `proforma` for `Precursor ID` and `ProForma`. |
+| `sample_toppic.sqlite` (the same name with every option) | TopPIC's database (section 2): a copy of TopFD's `sample.sqlite` with the envelopes added by post mass matching and the tables `prsm`, `proteoform`, `protein`, `prsm_mass_shift`, `prsm_protein_match` and `fasta_seq`, for visualization. The first three hold the PrSMs of the tables below, with the columns `precursor_id` and `proforma` for `Precursor ID` and `ProForma`. It is written again by every run on the spectrum file; TopFD's `sample.sqlite` is not changed. |
 | `sample_post_ms2.toppic_record_prsm` | The best PrSM of every spectrum after the FDR computation and before the cutoffs, decoy identifications included. Always kept. |
 
 The `_single` tables have one line per PrSM. The tables without `_single`
@@ -243,13 +254,13 @@ Spectra and tolerances:
 | `-r`, `--num-combined-spectra <int>` | 1 | Number of consecutive MS/MS spectra of one precursor searched together, for alternating fragmentation (2 for pairs, 3 for triplets). |
 | `-A`, `--approximate-spectra` | off | Use approximate spectra in protein filtering, for higher sensitivity. Only affects the variable PTM filtering step (`-b`). |
 | `-x`, `--no-topfd-feature` | off | Run without the TopFD feature file; proteoforms are then clustered by protein, precursor mass and sequence overlap (two PrSMs share a proteoform only if their proteoform sequences overlap by at least 70% of the shorter one, so equal masses at different positions of a protein stay apart), the `Feature ...` columns are `-` and the proteoform intensity is `-1`. |
-| `-g`, `--average-mass` | off | The spectrum files report average masses (`topfd --average-mass`): each is converted to `<name>_mono_ms2.msalign` with monoisotopic masses, and TopFD's database is copied to `<name>_mono.sqlite`, before the search (section 2). In `toppic_gui`, the checkbox "Spectrum files with average masses" on the Advanced Parameters tab turns this on. |
+| `-g`, `--average-mass` | off | The spectrum files report average masses (`topfd --average-mass`): each is converted to `<name>_mono_ms2.msalign` with monoisotopic masses before the search (section 2). In `toppic_gui`, the checkbox "Spectrum files with average masses" on the Advanced Parameters tab turns this on. |
 
 Post mass matching:
 
 | Option | Default | Meaning |
 |---|---|---|
-| `-D`, `--disable-post-match` | off | Do not run post mass matching; result files keep the `_ms2` name and the SQLite database is not needed. |
+| `-D`, `--disable-post-match` | off | Do not run post mass matching; result files keep the `_ms2` name and TopFD's SQLite database is not needed (without it no `<name>_toppic.sqlite` is written). |
 | `-I`, `--post-min-peak-num <int>` | 1 | Minimum number of observed isotopic peaks of a fragment accepted by post mass matching (at least 1). |
 
 Cutoffs and output:
@@ -266,7 +277,8 @@ Cutoffs and output:
 
 **Combining fractions.** With `-c`, each fraction is searched,
 post-matched, clustered and given its FDRs on its own first (post mass
-matching needs the fraction's own TopFD SQLite database). The merge then
+matching needs the fraction's own TopFD SQLite database, and each
+fraction gets its own `<fraction>_toppic.sqlite`). The merge then
 takes, for every fraction, the post-matched spectra
 (`<fraction>_post_ms2.msalign`, or `<fraction>_ms2.msalign` with
 `--disable-post-match`) and the best PrSM of every spectrum after the
