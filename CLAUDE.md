@@ -3637,7 +3637,10 @@ with `-r` other than 1. Facts to keep straight:
 ## Two-pass m/z recalibration (`ms/calib`, `topcalib`, `toppic --mass-calib`)
 
 Branch `mass_calib` (toppic_test experiment 152, report 0152 and its
-amendments 2 and 3; from main 2863fa08, not merged). `topcalib` is the C++
+amendments 2 and 3; from main 2863fa08, merged into main on 2026-10-09 as
+140d9479: on the 500-spectrum subset of 480_F3_02 in setting d the merged
+main writes main 6949cad7's files without the option and the branch's model,
+spectra and PrSM files with `--mass-calib`). `topcalib` is the C++
 form of the experiment's `calib.py` and `recal_msalign.py`
 (`tests/202610/scripts/two_pass_recal/` of toppic_test; the manual is
 `docs/manual/topcalib_manual.md`), and toppic's hidden `--mass-calib` runs
