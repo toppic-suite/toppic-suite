@@ -319,6 +319,22 @@ MassCalibPara getMassCalibPara() {
   return para;
 }
 
+// The cutoffs at which a rescored FDR computation's two rounds (E-value and
+// rescore) count the targets that pass: each level's cutoff value when its
+// cutoff type is FDR, else 1% (the level is then cut by the E-value and its
+// FDR only reported).
+prsm_fdr::FdrCutoffs getFdrCutoffs(
+    std::map<std::string, std::string>& arguments) {
+  auto value = [&](const std::string& type, const std::string& val) {
+    return arguments[type] == "FDR" ? std::stod(arguments[val]) : 0.01;
+  };
+  prsm_fdr::FdrCutoffs cutoffs;
+  cutoffs.prsm = value("cutoffSpectralType", "cutoffSpectralValue");
+  cutoffs.proteoform = value("cutoffProteoformType", "cutoffProteoformValue");
+  cutoffs.protein = value("cutoffProteinType", "cutoffProteinValue");
+  return cutoffs;
+}
+
 // a tolerance as the arguments write it ("10", "7.5"): the index file names
 // carry the fragment tolerance's string
 std::string toleranceStr(double value) {
@@ -1364,7 +1380,8 @@ int TopPIC_postprocess(std::map<std::string, std::string>& arguments,
                                  "toppic_cluster_fdr");
       } else {
         prsm_fdr::process(sp_file_name, cur_suffix, "toppic_cluster_fdr",
-                          use_rescore);
+                          use_rescore, getFdrCutoffs(arguments),
+                          arguments["rescoreFallback"] != "false");
       }
       std::cout << "FDR computation - finished." << std::endl;
       cur_suffix = "toppic_cluster_fdr";
@@ -1443,7 +1460,8 @@ int TopPIC_multi_postprocess(std::map<std::string, std::string>& arguments) {
                                  "toppic_cluster_fdr");
       } else {
         prsm_fdr::process(sp_file_name, cur_suffix, "toppic_cluster_fdr",
-                          use_rescore);
+                          use_rescore, getFdrCutoffs(arguments),
+                          arguments["rescoreFallback"] != "false");
       }
       std::cout << "FDR computation - finished." << std::endl;
       cur_suffix = "toppic_cluster_fdr";
@@ -1756,7 +1774,8 @@ int TopPIC_second_precursor(std::map<std::string, std::string>& arguments,
                                  "toppic_second_fdr");
       } else {
         prsm_fdr::process(post_sp_name, cur_suffix, "toppic_second_fdr",
-                          use_rescore);
+                          use_rescore, getFdrCutoffs(arguments),
+                          arguments["rescoreFallback"] != "false");
       }
       std::cout << "FDR computation - finished." << std::endl;
       cur_suffix = "toppic_second_fdr";

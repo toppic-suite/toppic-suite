@@ -67,14 +67,32 @@ void computeProteinFdr(PrsmStrPtrVec2D& target_proteins,
                        PrsmStrPtrVec2D& decoy_proteins,
                        FdrKey key = eValueKey);
 
+// The FDR cutoffs at which the two rounds of a rescored FDR computation
+// count the targets that pass (spectrum, proteoform and protein level).
+struct FdrCutoffs {
+  double prsm = 0.01;
+  double proteoform = 0.01;
+  double protein = 0.01;
+};
+
 // Writes every PrSM (targets and decoys) with its spectrum-, proteoform- and
 // protein-level FDRs to <base>.<output_file_ext>; the decoys are removed
 // later (prsm_decoy_filter) when they are not wanted. use_rescore: the
-// PrSMs are ranked by the rescoring step's score (--rescore,
+// PrSMs are ranked by the rescoring step's score (default with -d,
 // prsm/prsm_rescore) instead of the E-value; every PrSM must have one.
+// rescore_fallback (with use_rescore; off with the hidden
+// --disable-rescore-fallback): two rounds, the FDRs by the E-value and by
+// the rescore, and at each level (PrSM, proteoform, protein) the rescored
+// FDRs unless the E-value's give more targets within the level's cutoff
+// (toppic_test experiment 153: the rescoring raised the Bruker run's PrSMs
+// but lowered its proteoforms and proteins, and collapsed on a data set
+// with few decoys); a tie keeps the rescore. Each search (toppic, topmg)
+// chooses on its own.
 void process(const std::string& spec_file_name,
              const std::string& input_file_ext,
-             const std::string& output_file_ext, bool use_rescore = false);
+             const std::string& output_file_ext, bool use_rescore = false,
+             const FdrCutoffs& cutoffs = FdrCutoffs(),
+             bool rescore_fallback = true);
 
 }  // namespace prsm_fdr
 
