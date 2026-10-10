@@ -139,9 +139,9 @@ std::map<std::string, std::string> ToppicArgument::initArguments() {
   // hidden --mass-calib: the two-pass m/z recalibration (ms/calib,
   // prsm/prsm_mass_calib): a zero-shift calibration search, the MS1 and MS/MS
   // error models fitted on its confident PrSMs, and the search on the
-  // corrected spectra (<base>_calib_ms2.msalign) with the corrected copy of
-  // TopFD's database (<base>_calib.sqlite) for the post mass matching and
-  // the PrSM tables.
+  // corrected spectra (<base>_calib_ms2.msalign) with toppic's database
+  // <base>_toppic.sqlite, the corrected copy of TopFD's, for the post mass
+  // matching and the PrSM tables.
   arguments["massCalib"] = "false";
   arguments["combineResultOnly"] = "false";
   arguments["outputRawPrsmTable"] = "false";

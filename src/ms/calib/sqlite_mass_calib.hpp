@@ -26,7 +26,8 @@ namespace sqlite_mass_calib {
 
 // Writes calib_db_name, TopFD's database ori_db_name with every m/z value and
 // deconvoluted mass corrected with a calibration model (toppic --mass-calib,
-// toppic_test experiment 154), for the search of the corrected spectra:
+// toppic_test experiment 154; calib_db_name is toppic's <base>_toppic.sqlite
+// since experiment 156), for the search of the corrected spectra:
 // - the MS1 model: ms1_peak.mz and ms1_env_peak.mz (m/z' = m/z (1 - e 1e-6)),
 //   ms1_env.mono_mass and ms1_env.ref_mass (mass - e 1e-6 (mass + z proton),
 //   e at the mass's m/z), and the 3D tables of topfd -D (PEAKS<k>.MZ, each

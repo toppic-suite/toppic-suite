@@ -106,6 +106,14 @@ void copy(const std::string& src_name, const std::string& dest_name) {
   closeCopy(openCopy(src_name, dest_name), dest_name);
 }
 
+bool removeDb(const std::string& name) {
+  bool found = std::filesystem::exists(name);
+  for (const char* suffix : {"", "-journal", "-wal", "-shm"}) {
+    removeFile(name + suffix);
+  }
+  return found;
+}
+
 }  // namespace sql_db_copy
 
 }  // namespace toppic
