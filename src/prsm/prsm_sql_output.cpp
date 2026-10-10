@@ -39,8 +39,9 @@ void write(const PrsmParaPtr& prsm_para_ptr, const std::string& base_name,
            const std::string& form_file_ext,
            const std::string& prot_file_ext) {
   // the database of the spectra: the post-matched ones (<x>_post_ms2) have
-  // the database of <x>_ms2.msalign, TopFD's or, with --mass-calib, its
-  // corrected copy (prsm_post_mass_match::sqlFileName)
+  // the database of <x>_ms2.msalign (prsm_post_mass_match::sqlFileName):
+  // TopFD's, toppic's copy of it for -g, or the corrected copy for
+  // --mass-calib
   std::string sp_base = base_name;
   if (str_util::endsWith(sp_base, "_post_ms2")) {
     sp_base = sp_base.substr(0, sp_base.size() - 9) + "_ms2";

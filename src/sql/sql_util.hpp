@@ -34,6 +34,9 @@ sqlite3_stmt* prepareSql(sqlite3* sql_db, const std::string& sql);
 // handle can be reused; every parameter must be rebound before the next step.
 void stepAndReset(sqlite3* sql_db, sqlite3_stmt* stmt);
 
+// Whether the database has a table of that name.
+bool hasTable(sqlite3* sql_db, const std::string& name);
+
 }  // namespace sql_util
 
 }  // namespace toppic

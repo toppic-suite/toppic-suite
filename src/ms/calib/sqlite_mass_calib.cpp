@@ -17,11 +17,9 @@
 
 #include <chrono>
 #include <cstdlib>
-#include <filesystem>
 #include <iomanip>
 #include <iostream>
 #include <string>
-#include <system_error>
 #include <unordered_map>
 #include <utility>
 #include <vector>
@@ -31,6 +29,7 @@
 #include "common/util/logger.hpp"
 #include "common/util/time_util.hpp"
 #include "common/util/version.hpp"
+#include "sql/sql_db_copy.hpp"
 #include "sql/sql_util.hpp"
 
 namespace toppic {
@@ -38,11 +37,6 @@ namespace toppic {
 namespace sqlite_mass_calib {
 
 namespace {
-
-// toppic's own tables, which every run writes again (prsm_sql_output)
-const std::vector<std::string> kToppicTables = {
-    "prsm",          "proteoform",         "protein",
-    "prsm_mass_shift", "prsm_protein_match", "fasta_seq"};
 
 // The user data of the SQL functions below: the model, the spectrum level and
 // the retention time (minutes) of every spectrum id of that level.
@@ -105,15 +99,6 @@ void calibMzRtMs(sqlite3_context* ctx, int, sqlite3_value** argv) {
                                  rt_min));
 }
 
-bool hasTable(sqlite3* db, const std::string& name) {
-  sqlite3_stmt* stmt = sql_util::prepareSql(
-      db, "SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = ?;");
-  sqlite3_bind_text(stmt, 1, name.c_str(), -1, SQLITE_TRANSIENT);
-  bool found = sqlite3_step(stmt) == SQLITE_ROW;
-  sqlite3_finalize(stmt);
-  return found;
-}
-
 std::unordered_map<int, double> readRtMins(sqlite3* db,
                                            const std::string& table) {
   std::unordered_map<int, double> rt_mins;
@@ -152,59 +137,14 @@ int update(sqlite3* db, const std::string& sql) {
   return sqlite3_changes(db);
 }
 
-void removeFile(const std::string& name) {
-  std::error_code ec;
-  std::filesystem::remove(name, ec);
-}
-
 }  // namespace
 
 void process(const MassCalibModel& model, const std::string& ori_db_name,
              const std::string& calib_db_name) {
   auto start = std::chrono::steady_clock::now();
-  std::string tmp_name = calib_db_name + ".tmp";
-  for (const char* suffix : {"", "-journal", "-wal", "-shm"}) {
-    removeFile(tmp_name + suffix);
-  }
-  // the copy goes through SQLite's backup API, not a file copy: TopFD
-  // writes its database in WAL mode, and pages still in the -wal file are
-  // part of it
-  sqlite3* ori_db = nullptr;
-  if (sqlite3_open_v2(ori_db_name.c_str(), &ori_db, SQLITE_OPEN_READONLY,
-                      nullptr) != SQLITE_OK) {
-    LOG_ERROR("Cannot open the database " << ori_db_name << ": "
-                                          << sqlite3_errmsg(ori_db));
-    std::exit(EXIT_FAILURE);
-  }
-  sqlite3* db = nullptr;
-  if (sqlite3_open(tmp_name.c_str(), &db) != SQLITE_OK) {
-    LOG_ERROR("Cannot open the database " << tmp_name << ": "
-                                          << sqlite3_errmsg(db));
-    std::exit(EXIT_FAILURE);
-  }
-  sqlite3_backup* backup = sqlite3_backup_init(db, "main", ori_db, "main");
-  if (backup != nullptr) {
-    sqlite3_backup_step(backup, -1);
-    sqlite3_backup_finish(backup);
-  }
-  if (backup == nullptr || sqlite3_errcode(db) != SQLITE_OK) {
-    LOG_ERROR("Cannot copy " << ori_db_name << " to " << tmp_name << ": "
-                             << sqlite3_errmsg(db));
-    std::exit(EXIT_FAILURE);
-  }
-  sqlite3_close(ori_db);
-  // the file is a new copy under a temporary name: no journal is needed
-  sql_util::execSql(db, "PRAGMA journal_mode = OFF;");
-  sql_util::execSql(db, "PRAGMA synchronous = OFF;");
-
-  // toppic's tables of an earlier run on TopFD's database; their pages stay
-  // free in the file (no VACUUM: it may renumber the rows of the tables
-  // without an INTEGER PRIMARY KEY, every TopFD table but the spectra)
-  for (const std::string& table : kToppicTables) {
-    if (hasTable(db, table)) {
-      sql_util::execSql(db, "DROP TABLE " + table + ";");
-    }
-  }
+  // a copy of TopFD's database without toppic's tables of an earlier run,
+  // under a temporary name until it is complete
+  sqlite3* db = sql_db_copy::openCopy(ori_db_name, calib_db_name);
 
   LevelContext ms1_ctx;
   ms1_ctx.model = &model;
@@ -236,8 +176,8 @@ void process(const MassCalibModel& model, const std::string& ori_db_name,
   }
   // the 3D tables of topfd -D: layer k is PEAKS<k>, its range the CONFIG row
   // inserted k-th (ms_sql_writer)
-  bool has_config = hasTable(db, "CONFIG");
-  for (int layer = 0; hasTable(db, "PEAKS" + std::to_string(layer));
+  bool has_config = sql_util::hasTable(db, "CONFIG");
+  for (int layer = 0; sql_util::hasTable(db, "PEAKS" + std::to_string(layer));
        layer++) {
     std::string table = "PEAKS" + std::to_string(layer);
     counts.emplace_back(
@@ -270,17 +210,7 @@ void process(const MassCalibModel& model, const std::string& ori_db_name,
   sql_util::stepAndReset(db, stmt);
   sqlite3_finalize(stmt);
   sql_util::execSql(db, "COMMIT;");
-  if (sqlite3_close(db) != SQLITE_OK) {
-    LOG_ERROR("Cannot close the database " << tmp_name << ".");
-    std::exit(EXIT_FAILURE);
-  }
-  std::error_code ec;
-  std::filesystem::rename(tmp_name, calib_db_name, ec);
-  if (ec) {
-    LOG_ERROR("Cannot rename " << tmp_name << " to " << calib_db_name << ": "
-                               << ec.message());
-    std::exit(EXIT_FAILURE);
-  }
+  sql_db_copy::closeCopy(db, calib_db_name);
 
   double seconds = std::chrono::duration<double>(
                        std::chrono::steady_clock::now() - start)

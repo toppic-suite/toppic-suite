@@ -1,0 +1,111 @@
+// Copyright (c) 2014 - 2026, The Trustees of Indiana University, Tulane
+// University.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+#include "sql/sql_db_copy.hpp"
+
+#include <cstdlib>
+#include <filesystem>
+#include <string>
+#include <system_error>
+#include <vector>
+
+#include "common/util/logger.hpp"
+#include "sql/sql_util.hpp"
+
+namespace toppic {
+
+namespace sql_db_copy {
+
+namespace {
+
+// toppic's own tables, which every run writes again (prsm_sql_output)
+const std::vector<std::string> kToppicTables = {
+    "prsm",            "proteoform",         "protein",
+    "prsm_mass_shift", "prsm_protein_match", "fasta_seq"};
+
+std::string tmpName(const std::string& dest_name) {
+  return dest_name + ".tmp";
+}
+
+void removeFile(const std::string& name) {
+  std::error_code ec;
+  std::filesystem::remove(name, ec);
+}
+
+}  // namespace
+
+sqlite3* openCopy(const std::string& src_name, const std::string& dest_name) {
+  std::string tmp_name = tmpName(dest_name);
+  for (const char* suffix : {"", "-journal", "-wal", "-shm"}) {
+    removeFile(tmp_name + suffix);
+  }
+  sqlite3* src_db = nullptr;
+  if (sqlite3_open_v2(src_name.c_str(), &src_db, SQLITE_OPEN_READONLY,
+                      nullptr) != SQLITE_OK) {
+    LOG_ERROR("Cannot open the database " << src_name << ": "
+                                          << sqlite3_errmsg(src_db));
+    std::exit(EXIT_FAILURE);
+  }
+  sqlite3* db = nullptr;
+  if (sqlite3_open(tmp_name.c_str(), &db) != SQLITE_OK) {
+    LOG_ERROR("Cannot open the database " << tmp_name << ": "
+                                          << sqlite3_errmsg(db));
+    std::exit(EXIT_FAILURE);
+  }
+  sqlite3_backup* backup = sqlite3_backup_init(db, "main", src_db, "main");
+  if (backup != nullptr) {
+    sqlite3_backup_step(backup, -1);
+    sqlite3_backup_finish(backup);
+  }
+  if (backup == nullptr || sqlite3_errcode(db) != SQLITE_OK) {
+    LOG_ERROR("Cannot copy " << src_name << " to " << tmp_name << ": "
+                             << sqlite3_errmsg(db));
+    std::exit(EXIT_FAILURE);
+  }
+  sqlite3_close(src_db);
+  // the file is a new copy under a temporary name: no journal is needed
+  sql_util::execSql(db, "PRAGMA journal_mode = OFF;");
+  sql_util::execSql(db, "PRAGMA synchronous = OFF;");
+  // their pages stay free in the file
+  for (const std::string& table : kToppicTables) {
+    if (sql_util::hasTable(db, table)) {
+      sql_util::execSql(db, "DROP TABLE " + table + ";");
+    }
+  }
+  return db;
+}
+
+void closeCopy(sqlite3* db, const std::string& dest_name) {
+  std::string tmp_name = tmpName(dest_name);
+  if (sqlite3_close(db) != SQLITE_OK) {
+    LOG_ERROR("Cannot close the database " << tmp_name << ".");
+    std::exit(EXIT_FAILURE);
+  }
+  std::error_code ec;
+  std::filesystem::rename(tmp_name, dest_name, ec);
+  if (ec) {
+    LOG_ERROR("Cannot rename " << tmp_name << " to " << dest_name << ": "
+                               << ec.message());
+    std::exit(EXIT_FAILURE);
+  }
+}
+
+void copy(const std::string& src_name, const std::string& dest_name) {
+  closeCopy(openCopy(src_name, dest_name), dest_name);
+}
+
+}  // namespace sql_db_copy
+
+}  // namespace toppic

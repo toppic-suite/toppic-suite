@@ -498,20 +498,18 @@ std::string stripSuffix(const std::string& name, const std::string& suffix) {
   return name;
 }
 
-// The base name of a spectrum file's database. <base>_resid_ms2.msalign,
-// the residual spectra of the second precursor search (--second-precursor),
-// and <base>_mono_ms2.msalign, the monoisotopic-mass copy TopPIC writes for
-// an average-mass file (--average-mass), share the database of
-// <base>_ms2.msalign, <base>; the corrected spectra of --mass-calib,
-// <base>_calib_ms2.msalign (<base>_mono_calib_ms2.msalign after -g, and the
-// residual spectra made from them), have the corrected database
-// <base>_calib. *resid tells whether the file is a residual one.
+// The base name of a spectrum file's database: the file's own base,
+// <base> for <base>_ms2.msalign, also for its residual spectra
+// <base>_resid_ms2.msalign of the second precursor search
+// (--second-precursor). toppic's other copies of a spectrum file have
+// databases of their own: <base>_mono_ms2.msalign of -g (--average-mass)
+// <base>_mono.sqlite, <base>_calib_ms2.msalign of --mass-calib
+// <base>_calib.sqlite, <base>_mono_calib_ms2.msalign <base>_mono_calib.sqlite.
+// *resid tells whether the file is a residual one.
 std::string dbBaseName(const std::string& sp_file_name, bool* resid) {
   std::string base = stripSuffix(file_util::basename(sp_file_name), "_ms2");
   *resid = str_util::endsWith(base, "_resid");
-  bool calib = str_util::endsWith(stripSuffix(base, "_resid"), "_calib");
-  base = topfdBaseName(sp_file_name);
-  return calib ? base + "_calib" : base;
+  return stripSuffix(base, "_resid");
 }
 
 }  // namespace
@@ -529,9 +527,9 @@ std::string sqlFileName(const std::string& sp_file_name) {
 
 std::string postBaseName(const std::string& sp_file_name) {
   // the database's base name, with the _resid suffix of the second
-  // precursor search kept: <base>_post_ms2 for <base>_ms2.msalign and
-  // <base>_mono_ms2.msalign, <base>_calib_post_ms2 for the corrected
-  // spectra of --mass-calib, <base>_resid_post_ms2 for
+  // precursor search kept: <base>_post_ms2 for <base>_ms2.msalign,
+  // <base>_mono_post_ms2 for <base>_mono_ms2.msalign, <base>_calib_post_ms2
+  // for <base>_calib_ms2.msalign, <base>_resid_post_ms2 for
   // <base>_resid_ms2.msalign
   bool resid = false;
   std::string base = dbBaseName(sp_file_name, &resid);
