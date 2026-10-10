@@ -324,7 +324,7 @@ MassCalibPara getMassCalibPara() {
 // research switches from the environment variable TOPPIC_RESCORE_PARA
 // ("name=value,..."): floor_train (0; 1: the model is trained on every PrSM
 // and only their scores are replaced) and floor_value (their rescore; by
-// default 1 below the lowest rescore of the other PrSMs).
+// default the lowest double, -DBL_MAX).
 prsm_rescore::EValueFloor getRescoreEValueFloor(
     std::map<std::string, std::string>& arguments) {
   prsm_rescore::EValueFloor floor;

@@ -55,9 +55,9 @@ struct EValueFloor {
   // false: they are left out of the training; true: the model is trained
   // on every PrSM, as without the floor, and only their scores are replaced
   bool train = false;
-  // their rescore; NaN: 1 below the lowest rescore of the search's other
-  // PrSMs
-  double value = std::numeric_limits<double>::quiet_NaN();
+  // their rescore: the most negative double, below every score the model
+  // gives
+  double value = std::numeric_limits<double>::lowest();
 };
 
 // Rescores the PrSMs of <base>.<input_file_ext> (targets and decoys, one per

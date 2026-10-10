@@ -24,6 +24,7 @@
 #include <map>
 #include <set>
 #include <sstream>
+#include <string>
 #include <utility>
 
 #include "common/base/prot_mod_base.hpp"
@@ -346,15 +347,6 @@ void process(const PrsmParaPtr& prsm_para_ptr,
       size_t n_floored = std::count(floored.begin(), floored.end(), true);
       if (n_floored > 0) {
         double value = floor.value;
-        if (std::isnan(value)) {
-          double low = std::numeric_limits<double>::infinity();
-          for (size_t k = 0; k < n; k++) {
-            if (!floored[k]) {
-              low = std::min(low, scores[k]);
-            }
-          }
-          value = std::isinf(low) ? 0.0 : low - 1.0;
-        }
         size_t n_floored_decoy = 0;
         for (size_t k = 0; k < n; k++) {
           if (floored[k]) {
@@ -364,8 +356,10 @@ void process(const PrsmParaPtr& prsm_para_ptr,
         }
         std::cout << "Rescoring - " << tool.first << ": " << n_floored
                   << " PrSMs with the maximum E-value (" << n_floored_decoy
-                  << " decoys) get the rescore " << std::fixed
-                  << std::setprecision(2) << value << std::defaultfloat
+                  << " decoys) get the rescore "
+                  << (value == std::numeric_limits<double>::lowest()
+                          ? std::string("-DBL_MAX (the lowest double)")
+                          : std::to_string(value))
                   << (floor.train ? "" : " and are left out of the training")
                   << "." << std::endl;
       }

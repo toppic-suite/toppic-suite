@@ -17,6 +17,9 @@
 
 #include <algorithm>
 #include <cmath>
+#include <iomanip>
+#include <limits>
+#include <sstream>
 
 #include "common/util/logger.hpp"
 #include "common/util/str_util.hpp"
@@ -152,7 +155,17 @@ XmlDOMElement Prsm::toXmlElement(XmlDOMDocument* xml_doc,
   str = str_util::toString(protein_fdr_);
   xml_doc->addElement(element, "protein_fdr", str.c_str());
   if (!std::isnan(rescore_)) {
-    str = str_util::toString(rescore_);
+    // a huge value (the lowest double of prsm_rescore::EValueFloor) in the
+    // shortest form that reads back exactly; toString's fixed notation would
+    // write all its 309 digits
+    if (std::abs(rescore_) >= 1e100) {
+      std::ostringstream os;
+      os << std::setprecision(std::numeric_limits<double>::max_digits10)
+         << rescore_;
+      str = os.str();
+    } else {
+      str = str_util::toString(rescore_);
+    }
     xml_doc->addElement(element, "rescore", str.c_str());
   }
   str = str_util::toString(frac_feature_inte_);
