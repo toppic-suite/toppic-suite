@@ -61,12 +61,16 @@ PeakPtrVec readPeakFile(const std::string& file_name) {
   input.open(file_name.c_str(), std::ios::in);
   std::string line;
   int skip_num = 0;
+  int mgf_spec_num = 0;
   while (std::getline(input, line)) {
     str_util::trim(line);
     if (line.length() == 0) {
       continue;
     }
     if (!isPeakLine(line)) {
+      if (line == "BEGIN IONS") {
+        mgf_spec_num++;
+      }
       skip_num++;
       continue;
     }
@@ -86,6 +90,14 @@ PeakPtrVec readPeakFile(const std::string& file_name) {
   if (skip_num > 0) {
     std::cout << "Skipped " << skip_num
               << " lines that do not start with a number." << std::endl;
+  }
+  // -T deconvolutes one spectrum, so the peaks of all spectra of an MGF
+  // file are read as one
+  if (mgf_spec_num > 1) {
+    LOG_WARN(file_name << " has " << mgf_spec_num
+                       << " MGF spectra (BEGIN IONS lines); their peaks are "
+                          "read as one spectrum. Split the file into one "
+                          "file per spectrum.");
   }
   // Deconvolution assumes peaks in increasing m/z order; the input file need
   // not be sorted. A stable sort keeps the file order of equal m/z values.
