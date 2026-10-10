@@ -318,6 +318,55 @@ MassCalibPara getMassCalibPara() {
   return para;
 }
 
+// The rescoring's treatment of the PrSMs with the maximum E-value
+// (prsm_rescore::EValueFloor): on unless --disable-rescore-evalue-floor;
+// research switches from the environment variable TOPPIC_RESCORE_PARA
+// ("name=value,..."): floor_train (0; 1: the model is trained on every PrSM
+// and only their scores are replaced) and floor_value (their rescore; by
+// default the lowest double, -DBL_MAX).
+prsm_rescore::EValueFloor getRescoreEValueFloor(
+    std::map<std::string, std::string>& arguments) {
+  prsm_rescore::EValueFloor floor;
+  floor.enabled = arguments["rescoreEvalueFloor"] != "false";
+  const char* env = std::getenv("TOPPIC_RESCORE_PARA");
+  if (env == nullptr) {
+    return floor;
+  }
+  for (const std::string& item : str_util::split(env, ",")) {
+    size_t eq = item.find('=');
+    if (eq == std::string::npos) {
+      continue;
+    }
+    std::string name = item.substr(0, eq);
+    double value = std::stod(item.substr(eq + 1));
+    if (name == "floor_train") {
+      floor.train = value != 0;
+    } else if (name == "floor_value") {
+      floor.value = value;
+    } else {
+      LOG_ERROR("Unknown TOPPIC_RESCORE_PARA switch " << name << "!");
+      exit(EXIT_FAILURE);
+    }
+  }
+  return floor;
+}
+
+// The cutoffs at which a rescored FDR computation's two rounds (E-value and
+// rescore) count the targets that pass: each level's cutoff value when its
+// cutoff type is FDR, else 1% (the level is then cut by the E-value and its
+// FDR only reported).
+prsm_fdr::FdrCutoffs getFdrCutoffs(
+    std::map<std::string, std::string>& arguments) {
+  auto value = [&](const std::string& type, const std::string& val) {
+    return arguments[type] == "FDR" ? std::stod(arguments[val]) : 0.01;
+  };
+  prsm_fdr::FdrCutoffs cutoffs;
+  cutoffs.prsm = value("cutoffSpectralType", "cutoffSpectralValue");
+  cutoffs.proteoform = value("cutoffProteoformType", "cutoffProteoformValue");
+  cutoffs.protein = value("cutoffProteinType", "cutoffProteinValue");
+  return cutoffs;
+}
+
 // a tolerance as the arguments write it ("10", "7.5"): the index file names
 // carry the fragment tolerance's string
 std::string toleranceStr(double value) {
@@ -1342,7 +1391,8 @@ int TopPIC_postprocess(std::map<std::string, std::string>& arguments,
       // characterization, gets a score of a linear SVM trained with
       // cross-validation, which the FDR ranks by instead of the E-value
       std::cout << "Rescoring - started." << std::endl;
-      prsm_rescore::process(prsm_para_ptr, cur_suffix, "toppic_rescore");
+      prsm_rescore::process(prsm_para_ptr, cur_suffix, "toppic_rescore", "",
+                            getRescoreEValueFloor(arguments));
       std::cout << "Rescoring - finished." << std::endl;
       cur_suffix = "toppic_rescore";
     }
@@ -1358,7 +1408,8 @@ int TopPIC_postprocess(std::map<std::string, std::string>& arguments,
                                  "toppic_cluster_fdr");
       } else {
         prsm_fdr::process(sp_file_name, cur_suffix, "toppic_cluster_fdr",
-                          use_rescore);
+                          use_rescore, getFdrCutoffs(arguments),
+                          arguments["rescoreFallback"] != "false");
       }
       std::cout << "FDR computation - finished." << std::endl;
       cur_suffix = "toppic_cluster_fdr";
@@ -1424,7 +1475,8 @@ int TopPIC_multi_postprocess(std::map<std::string, std::string>& arguments) {
     bool use_rescore = arguments["rescore"] == "true";
     if (arguments["searchType"] == "TARGET+DECOY" && use_rescore) {
       std::cout << "Rescoring - started." << std::endl;
-      prsm_rescore::process(prsm_para_ptr, cur_suffix, "toppic_rescore");
+      prsm_rescore::process(prsm_para_ptr, cur_suffix, "toppic_rescore", "",
+                            getRescoreEValueFloor(arguments));
       std::cout << "Rescoring - finished." << std::endl;
       cur_suffix = "toppic_rescore";
     }
@@ -1437,7 +1489,8 @@ int TopPIC_multi_postprocess(std::map<std::string, std::string>& arguments) {
                                  "toppic_cluster_fdr");
       } else {
         prsm_fdr::process(sp_file_name, cur_suffix, "toppic_cluster_fdr",
-                          use_rescore);
+                          use_rescore, getFdrCutoffs(arguments),
+                          arguments["rescoreFallback"] != "false");
       }
       std::cout << "FDR computation - finished." << std::endl;
       cur_suffix = "toppic_cluster_fdr";
@@ -1739,7 +1792,8 @@ int TopPIC_second_precursor(std::map<std::string, std::string>& arguments,
       // the second units with their residual spectra, the masses their
       // search used
       prsm_rescore::process(prsm_para_ptr, cur_suffix,
-                            "toppic_second_rescore", resid_post_sp_name);
+                            "toppic_second_rescore", resid_post_sp_name,
+                            getRescoreEValueFloor(arguments));
       std::cout << "Rescoring - finished." << std::endl;
       cur_suffix = "toppic_second_rescore";
     }
@@ -1750,7 +1804,8 @@ int TopPIC_second_precursor(std::map<std::string, std::string>& arguments,
                                  "toppic_second_fdr");
       } else {
         prsm_fdr::process(post_sp_name, cur_suffix, "toppic_second_fdr",
-                          use_rescore);
+                          use_rescore, getFdrCutoffs(arguments),
+                          arguments["rescoreFallback"] != "false");
       }
       std::cout << "FDR computation - finished." << std::endl;
       cur_suffix = "toppic_second_fdr";

@@ -20,13 +20,16 @@
 #include <cstddef>
 #include <iomanip>
 #include <iostream>
+#include <limits>
 #include <map>
 #include <set>
 #include <sstream>
+#include <string>
 #include <utility>
 
 #include "common/base/prot_mod_base.hpp"
 #include "common/util/file_util.hpp"
+#include "prsm/expected_value.hpp"
 #include "prsm/peak_ion_pair_util.hpp"
 #include "prsm/prsm_reader_util.hpp"
 #include "prsm/prsm_xml_writer.hpp"
@@ -277,7 +280,8 @@ std::vector<double> compFeatures(const PrsmPtr& prsm_ptr,
 void process(const PrsmParaPtr& prsm_para_ptr,
              const std::string& input_file_ext,
              const std::string& output_file_ext,
-             const std::string& second_sp_file_name) {
+             const std::string& second_sp_file_name,
+             const EValueFloor& floor) {
   SpParaPtr sp_para_ptr = prsm_para_ptr->getSpParaPtr();
   // every PrSM with the full spectra (as the recount and the tables read
   // them), and the masses the search used for the fragment features
@@ -298,13 +302,28 @@ void process(const PrsmParaPtr& prsm_para_ptr,
   }
   rescore_model::Para para;
   for (const auto& tool : by_tool) {
+    size_t n = tool.second.size();
+    std::vector<bool> decoy(n);
+    // the PrSMs with the maximum E-value (EValueFloor) and the rows the
+    // model is trained on and scores
+    std::vector<bool> floored(n, false);
+    std::vector<size_t> model_rows;
+    for (size_t k = 0; k < n; k++) {
+      const PrsmPtr& p = prsm_ptrs[tool.second[k]];
+      decoy[k] = isDecoy(p);
+      floored[k] = floor.enabled &&
+                   p->getEValue() >= ExpectedValue::getMaxDouble();
+      if (!floored[k] || floor.train) {
+        model_rows.push_back(k);
+      }
+    }
     rescore_model::Data data;
-    for (size_t i : tool.second) {
-      const PrsmPtr& p = prsm_ptrs[i];
+    for (size_t k : model_rows) {
+      const PrsmPtr& p = prsm_ptrs[tool.second[k]];
       auto it = filtered_map.find(prsmKey(p));
       PrsmPtr fp = it == filtered_map.end() ? nullptr : it->second;
       data.features.push_back(compFeatures(p, fp, sp_para_ptr->getMinMass()));
-      data.decoy.push_back(isDecoy(p));
+      data.decoy.push_back(decoy[k]);
       data.spec_ids.push_back(p->getSpectrumId());
       data.comp.push_back(compComposition(p));
       data.rt.push_back(p->getRetentionTime());
@@ -312,16 +331,40 @@ void process(const PrsmParaPtr& prsm_para_ptr,
     data.init_col = 0;
     bool ok = false;
     std::vector<double> weights;
-    std::vector<double> scores =
+    std::vector<double> model_scores =
         rescore_model::rescore(data, para, &ok, &weights);
+    std::vector<double> scores(n);
     if (!ok) {
       // the -log10 E-value: the FDR then gives the E-value's result
-      for (size_t k = 0; k < tool.second.size(); k++) {
+      for (size_t k = 0; k < n; k++) {
         double e = prsm_ptrs[tool.second[k]]->getEValue();
         scores[k] = -log10Floor(e, 1e-300);
       }
+    } else {
+      for (size_t j = 0; j < model_rows.size(); j++) {
+        scores[model_rows[j]] = model_scores[j];
+      }
+      size_t n_floored = std::count(floored.begin(), floored.end(), true);
+      if (n_floored > 0) {
+        double value = floor.value;
+        size_t n_floored_decoy = 0;
+        for (size_t k = 0; k < n; k++) {
+          if (floored[k]) {
+            scores[k] = value;
+            n_floored_decoy += decoy[k] ? 1 : 0;
+          }
+        }
+        std::cout << "Rescoring - " << tool.first << ": " << n_floored
+                  << " PrSMs with the maximum E-value (" << n_floored_decoy
+                  << " decoys) get the rescore "
+                  << (value == std::numeric_limits<double>::lowest()
+                          ? std::string("-DBL_MAX (the lowest double)")
+                          : std::to_string(value))
+                  << (floor.train ? "" : " and are left out of the training")
+                  << "." << std::endl;
+      }
     }
-    for (size_t k = 0; k < tool.second.size(); k++) {
+    for (size_t k = 0; k < n; k++) {
       prsm_ptrs[tool.second[k]]->setRescore(scores[k]);
     }
     // the console summary: targets at 1% FDR by E-value and by the score
@@ -331,10 +374,10 @@ void process(const PrsmParaPtr& prsm_para_ptr,
     }
     double thr;
     std::vector<bool> e_pass =
-        rescore_model::passFdr(lg_e, data.decoy, para.train_fdr, &thr);
+        rescore_model::passFdr(lg_e, decoy, para.train_fdr, &thr);
     std::vector<bool> r_pass =
-        rescore_model::passFdr(scores, data.decoy, para.train_fdr, &thr);
-    size_t n_decoy = std::count(data.decoy.begin(), data.decoy.end(), true);
+        rescore_model::passFdr(scores, decoy, para.train_fdr, &thr);
+    size_t n_decoy = std::count(decoy.begin(), decoy.end(), true);
     std::cout << "Rescoring - " << tool.first << ": " << tool.second.size()
               << " PrSMs (" << n_decoy << " decoys); target PrSMs at "
               << para.train_fdr * 100 << "% FDR: "

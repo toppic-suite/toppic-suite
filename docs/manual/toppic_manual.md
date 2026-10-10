@@ -145,12 +145,21 @@ TopFD's database is not changed. The result files are named after
     N-terminal form, the proteoform's length and mass, the precursor, the
     TopFD feature, the fragment mass errors, the cleavage sites covered and
     the retention time against a value predicted from the sequence. The
-    E-values are not changed. When a part has fewer than 10 targets at 1%
-    FDR to train on, every PrSM keeps its E-value as the score.
+    E-values are not changed. PrSMs with the maximum E-value (1e300, given
+    to PrSMs without a valid E-value, mostly PrSMs that step 9 moved to
+    their cluster's proteoform and that then matched too few fragments) are
+    left out of the training and get a score below every other PrSM's, so
+    that the FDRs rank them last, as the E-value does. When a part has
+    fewer than 10 targets at 1% FDR to train on, every PrSM keeps its
+    E-value as the score.
 14. **FDR computation** (only with `--decoy`). Spectrum-, proteoform- and
-    protein-level false discovery rates are estimated from the decoy hits,
-    with the PrSMs ranked by the score of step 13, so the `FDR` cutoffs
-    apply to it; the `EVALUE` cutoffs still compare E-values.
+    protein-level false discovery rates are estimated from the decoy hits
+    twice: with the PrSMs ranked by the score of step 13 and ranked by the
+    E-value. At each level the score's FDRs are used unless the E-value's
+    give more identifications within that level's FDR cutoff (1% when the
+    level's cutoff type is `EVALUE`); the console prints both counts and
+    the choice. The `FDR` cutoffs then apply to the chosen FDRs; the
+    `EVALUE` cutoffs still compare E-values.
 15. **Record file and decoy removal.** The PrSMs with their FDRs are
     kept as `sample_post_ms2.toppic_record_prsm`, decoy identifications
     included. Unless `--keep-decoy-ids` is given, the decoy identifications

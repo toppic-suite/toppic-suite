@@ -132,6 +132,14 @@ std::map<std::string, std::string> ToppicArgument::initArguments() {
   // (stat/rescore/prsm_rescore) instead of the E-value; on by default in a
   // target-decoy search (-d), off with the hidden --disable-rescore
   arguments["rescore"] = "true";
+  // with the rescoring, the FDRs of each level by the E-value when they give
+  // more identifications than the rescore's (prsm_fdr); off with the hidden
+  // --disable-rescore-fallback
+  arguments["rescoreFallback"] = "true";
+  // with the rescoring, the PrSMs with the maximum E-value get the lowest
+  // rescore and are left out of the training (prsm_rescore::EValueFloor);
+  // off with the hidden --disable-rescore-evalue-floor
+  arguments["rescoreEvalueFloor"] = "true";
   // hidden --second-precursor: the spectra with two or more precursors are
   // searched again with the second one, without the first pass's matched
   // masses, and the two passes are reported together (prsm_second_prec)
@@ -254,8 +262,15 @@ void ToppicArgument::outputArguments(
   if (arguments.count("rescore") > 0 && arguments.at("rescore") == "true" &&
       arguments.at("searchType") == "TARGET+DECOY" &&
       arguments.at("useFdrGroups") != "true") {
+    bool fallback = arguments.count("rescoreFallback") == 0 ||
+                    arguments.at("rescoreFallback") != "false";
+    bool floor = arguments.count("rescoreEvalueFloor") == 0 ||
+                 arguments.at("rescoreEvalueFloor") != "false";
     output << std::setw(gap) << std::left << "FDR computation:" << sep
-           << "rescored PrSMs (linear SVM, 3-fold cross-validation)"
+           << "rescored PrSMs (linear SVM, 3-fold cross-validation"
+           << (floor ? "; the maximum E-value last" : "") << ")"
+           << (fallback ? ", the E-value at a level where it gives more"
+                        : "")
            << std::endl;
   }
   // printed only when set, so that the default parameter block is unchanged
@@ -714,7 +729,9 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
         "post-min-peak-num,I", po::value<std::string>(&post_min_peak_num), "")(
         "average-mass,g", "")("disable-zero-shift-prec-error", "")(
         "enable-one-shift-prec-error", "")("enable-var-ptm-prec-error", "")(
-        "fdr-groups", "")("disable-rescore", "")("second-precursor", "")(
+        "fdr-groups", "")("disable-rescore", "")(
+        "disable-rescore-fallback", "")("disable-rescore-evalue-floor", "")(
+        "second-precursor", "")(
         "mass-calib", "")(
         "local-align", "")(
         "local-original", "")(
@@ -937,6 +954,12 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
     }
     if (vm.count("disable-rescore")) {
       arguments_["rescore"] = "false";
+    }
+    if (vm.count("disable-rescore-fallback")) {
+      arguments_["rescoreFallback"] = "false";
+    }
+    if (vm.count("disable-rescore-evalue-floor")) {
+      arguments_["rescoreEvalueFloor"] = "false";
     }
     if (vm.count("second-precursor")) {
       arguments_["secondPrecursor"] = "true";
