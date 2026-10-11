@@ -648,8 +648,10 @@ straight:
   the envelopes, which only seeded extra MS1 features).
 - **Shared peaks** (toppic_test experiments 157 and 158, reports 0157 and
   0158; branch `greedy_shared_peaks`, merged into main on 2026-10-10 as
-  2df670d5, then branch `shared_peaks_same_charge`). Before a mass's
-  envelopes are added to the result, `GreedySearch::removeSharedEnvs`
+  2df670d5, then branch `shared_peaks_same_charge`, merged into main on
+  2026-10-11 as 8269c2c2, so the same-charge rule with the default -1 is
+  main's from then on). Before a mass's envelopes are added to the
+  result, `GreedySearch::removeSharedEnvs`
   builds each one as it will be reported (`getMatchEnv`: the peaks within
   TopFD's m/z error with an intensity of at least the noise) and drops it
   when it shares more than k spectrum peaks (the count of
@@ -668,10 +670,11 @@ straight:
   no k raised the identifications on 480_F3_02; 2df670d5 had the default
   1); the parameter block prints "MS1 maximum shared peak number (same
   charge)" under "MS1 deconvolution: Greedy" only when the limit is set,
-  so that a default run writes the block of earlier versions. Not tested: the precursor-window envelopes of
-  `addPrecWinEnvs` (an envelope of a window without one may share any
-  number of peaks with the search's envelopes) and the PTCR search
-  (`deconvSeries` passes -1). On 480_F3_02 ecf67378's MS1 envelopes form
+  so that a default run writes the block of earlier versions. Not
+  tested: the precursor-window envelopes of `addPrecWinEnvs` (an envelope
+  of a window without one may share any number of peaks with the search's
+  envelopes) and the PTCR search (`deconvSeries` passes -1). On 480_F3_02
+  ecf67378's MS1 envelopes form
   124,239 pairs that share peaks (7,030 of one charge). Any charge (2df670d5,
   k = 0 / 1 / 2 at both levels): the MS1 masses fall from 845,164 to
   742,233 / 821,822 / 837,855, the MS/MS precursors from 9,228 to 8,893 /
