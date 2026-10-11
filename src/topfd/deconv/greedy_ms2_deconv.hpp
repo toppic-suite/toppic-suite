@@ -41,10 +41,14 @@ namespace toppic {
 //      charge z/2 or z/3;
 //   3. choose the monoisotopic mass among +-2 isotope offsets by the cosine
 //      with the isotope intensities summed over the series' charges;
-//   4. subtract the theoretical envelopes of the mass at all its charges: a
+//   4. drop the envelopes of the mass that share more than k peaks (the
+//      spectrum peaks both match) with an envelope already reported in the
+//      spectrum (--ms2-max-shared-peak-num, default 1; -1: no limit);
+//      a mass with no envelope left is not reported;
+//   5. subtract the theoretical envelopes of the mass at all its charges: a
 //      peak much more intense than its theoretical intensity keeps the
 //      difference, any other matched peak is used up;
-//   5. repeat from 1 until no peak above the reference intensity is left.
+//   6. repeat from 1 until no peak above the reference intensity is left.
 // The parameters and their sources are in GreedyMs2Para (cpp).
 namespace greedy_ms2_deconv {
 

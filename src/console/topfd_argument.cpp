@@ -86,6 +86,8 @@ bool Argument::parse(int argc, char* argv[]) {
   std::string ms2_rank_peak_distance = "";
   std::string mass_group_boundary = "";
   std::string max_peak_sharing_ratio = "";
+  std::string ms1_max_shared_peak_num = "";
+  std::string ms2_max_shared_peak_num = "";
   // deconvolution methods
   std::string deconv_ms1 = "";
   std::string deconv_ms2 = "";
@@ -204,6 +206,16 @@ bool Argument::parse(int argc, char* argv[]) {
         "programming when the ratio between their number of shared peaks and "
         "the smaller of their numbers of matched peaks is larger than this "
         "value (default 1.0, no limit).")(
+        "ms1-max-shared-peak-num",
+        po::value<std::string>(&ms1_max_shared_peak_num),
+        "<a non-negative integer, or -1>. The greedy MS1 deconvolution does "
+        "not report an envelope that shares more than this number of peaks "
+        "with an envelope already reported in the spectrum; -1 sets no "
+        "limit. The default value is 1.")(
+        "ms2-max-shared-peak-num",
+        po::value<std::string>(&ms2_max_shared_peak_num),
+        "<a non-negative integer, or -1>. The same limit for the greedy "
+        "MS/MS deconvolution. The default value is 1.")(
         "max-miss-peak-num", po::value<std::string>(&max_miss_peak_num),
         "<a non-negative integer>. Maximum number of missing peaks allowed in "
         "a matched envelope. The default value is 1.")(
@@ -433,6 +445,28 @@ bool Argument::parse(int argc, char* argv[]) {
         return false;
       }
       topfd_para_ptr_->setMaxPeakSharingRatio(ratio);
+    }
+
+    if (vm.count("ms1-max-shared-peak-num")) {
+      int num = 0;
+      if (!toInt(ms1_max_shared_peak_num, num) || num < -1) {
+        LOG_ERROR("MS1 max shared peak number "
+                  << ms1_max_shared_peak_num
+                  << " should be a non-negative integer or -1.");
+        return false;
+      }
+      topfd_para_ptr_->setMs1MaxSharedPeakNum(num);
+    }
+
+    if (vm.count("ms2-max-shared-peak-num")) {
+      int num = 0;
+      if (!toInt(ms2_max_shared_peak_num, num) || num < -1) {
+        LOG_ERROR("MS/MS max shared peak number "
+                  << ms2_max_shared_peak_num
+                  << " should be a non-negative integer or -1.");
+        return false;
+      }
+      topfd_para_ptr_->setMs2MaxSharedPeakNum(num);
     }
 
     if (vm.count("max-miss-peak-num")) {
