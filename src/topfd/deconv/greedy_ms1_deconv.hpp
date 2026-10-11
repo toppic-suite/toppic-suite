@@ -44,10 +44,11 @@ namespace toppic {
 //   3. choose the monoisotopic mass among +-2 isotope offsets by the cosine
 //      with the isotope intensities summed over the series' charges
 //      (FLASHDeconv);
-//   4. drop the envelopes of the mass that share more than k peaks (the
-//      spectrum peaks both match) with an envelope of the same charge
-//      already reported in the spectrum (--ms1-max-shared-peak-num, default 1; -1: no limit);
-//      a mass with no envelope left is not reported;
+//   4. with the hidden --ms1-max-shared-peak-num k (default -1, no
+//      limit: the step is skipped), drop the envelopes of the mass that
+//      share more than k peaks (the spectrum peaks both match) with an
+//      envelope of the same charge already reported in the spectrum; a mass
+//      with no envelope left is not reported;
 //   5. subtract the theoretical envelopes of the mass at all its charges: a
 //      peak much more intense than its theoretical intensity keeps the
 //      difference, any other matched peak is used up, and the tail isotopes

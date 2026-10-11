@@ -663,10 +663,12 @@ straight:
   4-6, a second mass on the tail of a large envelope). A dropped envelope
   is neither reported nor subtracted, as one that fails `single_min_cos`;
   a mass with none left is dropped. k is the hidden
-  `--ms1-max-shared-peak-num` (`TopfdPara::getMs1MaxSharedPeakNum`,
-  default 1; -1 is no limit, ecf67378's behaviour); the parameter block
-  prints "MS1 maximum shared peak number (same charge)" under "MS1
-  deconvolution: Greedy". Not tested: the precursor-window envelopes of
+  `--ms1-max-shared-peak-num` (`TopfdPara::getMs1MaxSharedPeakNum`;
+  default -1, no limit: the test is off and the search is ecf67378's, since
+  no k raised the identifications on 480_F3_02; 2df670d5 had the default
+  1); the parameter block prints "MS1 maximum shared peak number (same
+  charge)" under "MS1 deconvolution: Greedy" only when the limit is set,
+  so that a default run writes the block of earlier versions. Not tested: the precursor-window envelopes of
   `addPrecWinEnvs` (an envelope of a window without one may share any
   number of peaks with the search's envelopes) and the PTCR search
   (`deconvSeries` passes -1). On 480_F3_02 ecf67378's MS1 envelopes form
@@ -787,7 +789,7 @@ rows) is written as `DeconvSingleSp`'s. Facts to keep straight:
       difference is 2.9 ppm, more than half of the 5 ppm window.
 - **Shared peaks**: the MS1 search's test (previous section, the
   same-charge rule) with the hidden `--ms2-max-shared-peak-num` (default
-  1, -1 no limit; also MS3 spectra and `-T`); not for the alternative
+  -1, no limit, as for MS1; also MS3 spectra and `-T`); not for the alternative
   masses of `alt_ratio` and the refits of `refit_rounds` (both off). On
   480_F3_02 ecf67378's MS/MS envelopes form 126,804 pairs that share peaks
   (99,798 one peak); 20,448 are of one charge: 1-3 isotopes apart (13,454,
@@ -802,7 +804,7 @@ rows) is written as `DeconvSingleSp`'s. Facts to keep straight:
   masses (4.4%), same charge 11,940 (1.7%; median EnvCNN 0.36); the PrSMs
   unchanged against no limit match 0.7% (any charge) and 0.2% (same
   charge) fewer fragments, and the same-charge PrSMs match 0.5% more
-  fragments than the any-charge ones. The default 1 is the DP's
+  fragments than the any-charge ones. k = 1 is the DP's
   coexistence rule (`CoTable::checkCoexist`, any charge); any charge at
   k = 0 costs identifications, every other setting is within 7 PrSMs of no
   limit.
