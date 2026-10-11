@@ -1221,7 +1221,8 @@ instead of the input. Facts to keep straight:
   any more), and `-I` / `--post-min-peak-num` (default 1) is the minimum
   number of observed isotopic peaks per accepted fragment.
 - **toppic's database, `<base>_toppic.sqlite`** (branch `toppic_sqlite`,
-  toppic_test experiment 156, the user's design): one database per
+  toppic_test experiment 156, the user's design; merged into main on
+  2026-10-11 as 8b1f61ac): one database per
   spectrum file given to toppic, whatever the options, so that a TopFD and
   a TopPIC run leave two databases per file and toppic never writes into
   TopFD's. `TopPICProgress_multi_file` names it for each input file
@@ -1249,7 +1250,16 @@ instead of the input. Facts to keep straight:
   `-N`, possible with `-D`) nothing is written and the PrSM tables are not
   written to a database. The envelopes that toppic versions before this
   change appended to TopFD's database cannot be told apart from TopFD's and
-  are copied with them; TopFD again gives a clean database. Main up to
+  are copied with them; TopFD again gives a clean database. TopFD writes
+  its database in WAL mode, so the read-only connection of the copy leaves
+  an empty `<base>.sqlite-wal` and a `<base>.sqlite-shm` next to it (a
+  read-only connection cannot remove them; main up to b34fec7e opened it
+  read-write, which removed them on close); TopFD's file keeps its md5.
+  Checked on the merge against main b34fec7e on 300 spectra of 480_F3_02
+  (toppic_test experiment 141's dev subset, the full TopFD database), -d
+  -t FDR -T FDR -y FDR: main's result files, `<base>_toppic.sqlite` equal
+  in all 15 tables to the database main wrote into, the same again in a
+  second run. Main up to
   e5c15398 wrote into TopFD's database without `-g` and `--mass-calib`
   (every run appended its envelopes again) and into `<base>_mono.sqlite`,
   `<base>_calib.sqlite` or `<base>_mono_calib.sqlite` with them. topmg is
