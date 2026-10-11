@@ -210,12 +210,12 @@ bool Argument::parse(int argc, char* argv[]) {
         po::value<std::string>(&ms1_max_shared_peak_num),
         "<a non-negative integer, or -1>. The greedy MS1 deconvolution does "
         "not report an envelope that shares more than this number of peaks "
-        "with an envelope already reported in the spectrum; -1 sets no "
-        "limit. The default value is 1.")(
+        "with an envelope of the same charge already reported in the "
+        "spectrum; -1 sets no limit. The default value is -1.")(
         "ms2-max-shared-peak-num",
         po::value<std::string>(&ms2_max_shared_peak_num),
         "<a non-negative integer, or -1>. The same limit for the greedy "
-        "MS/MS deconvolution. The default value is 1.")(
+        "MS/MS deconvolution. The default value is -1.")(
         "max-miss-peak-num", po::value<std::string>(&max_miss_peak_num),
         "<a non-negative integer>. Maximum number of missing peaks allowed in "
         "a matched envelope. The default value is 1.")(

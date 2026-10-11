@@ -87,7 +87,7 @@ class TopfdPara {
   bool isMs1GreedyDeconv() const { return ms1_deconv_method_ == "greedy"; }
   bool isMs2GreedyDeconv() const { return ms2_deconv_method_ == "greedy"; }
   // the greedy searches' limit of the peaks a new envelope may share with
-  // each envelope already reported (-1: no limit)
+  // each envelope of its charge already reported (-1: no limit)
   int getMs1MaxSharedPeakNum() const { return ms1_max_shared_peak_num_; }
   int getMs2MaxSharedPeakNum() const { return ms2_max_shared_peak_num_; }
   bool isUseFlashDeconv() const { return ms2_deconv_method_ == "flashdeconv"; }
@@ -317,10 +317,13 @@ class TopfdPara {
   std::string ms2_deconv_method_ = "greedy";
   // hidden options --ms1-max-shared-peak-num and --ms2-max-shared-peak-num:
   // the greedy MS1 and MS/MS searches do not report an envelope that shares
-  // more than this number of peaks with an envelope already reported in the
-  // spectrum (-1: no limit, the searches before toppic_test experiment 157)
-  int ms1_max_shared_peak_num_ = 1;
-  int ms2_max_shared_peak_num_ = 1;
+  // more than this number of peaks with an envelope of the same charge
+  // already reported in the spectrum (toppic_test experiment 157;
+  // experiment 158 limited the test to the same charge). The default -1 is
+  // no limit (the test is off, the searches before experiment 157): no k
+  // raised the identifications on 480_F3_02 (reports 0157 and 0158).
+  int ms1_max_shared_peak_num_ = -1;
+  int ms2_max_shared_peak_num_ = -1;
   // the precursor masses of an MS/MS spectrum corrected by whole isotopes
   // with the complementary pairs of its fragment masses and the MS1 spectrum
   // (prec_pair_refine::correctIsotopes; toppic_test experiment 116): on by

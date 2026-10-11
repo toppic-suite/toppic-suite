@@ -646,32 +646,43 @@ straight:
   charge only needs an isotope cosine of 0.8 (`single_min_cos`); envelopes
   with an EnvCNN score below 0.2 are not written (`min_envcnn`; a third of
   the envelopes, which only seeded extra MS1 features).
-- **Shared peaks** (branch `greedy_shared_peaks`, toppic_test experiment
-  157, report 0157; merged into main on 2026-10-10 as 2df670d5, so k = 1
-  is main's default from then on). Before a mass's envelopes are added to
-  the result, `GreedySearch::removeSharedEnvs` builds each one as it will
-  be reported (`getMatchEnv`: the peaks within TopFD's m/z error with an
-  intensity of at least the noise) and drops it when it shares more than
-  k spectrum peaks (the count of `CoTable::cntSharedPeakNum`) with any one
-  envelope already in the spectrum's result, those of the same mass kept
-  before it included (charge-series order, the seed charge first). A
-  dropped envelope is neither reported nor subtracted, as one that fails
-  `single_min_cos`; a mass with none left is dropped. k is the hidden
-  `--ms1-max-shared-peak-num` (`TopfdPara::getMs1MaxSharedPeakNum`,
-  default 1; -1 is no limit, ecf67378's behaviour); the parameter block
-  prints "MS1 maximum shared peak number" under "MS1 deconvolution:
-  Greedy". Not
-  tested: the precursor-window envelopes of `addPrecWinEnvs` (an envelope
-  of a window without one may share any number of peaks with the search's
-  envelopes) and the PTCR search (`deconvSeries` passes -1). On 480_F3_02
-  ecf67378's MS1 envelopes form 124,239 pairs that share peaks (94,937 one
-  peak, 3,898 four or more); with k = 0 / 1 / 2 at both levels the MS1
-  masses fall from 845,164 to 742,233 / 821,822 / 837,855, the MS/MS
-  precursors from 9,228 to 8,893 / 9,087 / 9,181, and toppic (setting d)
-  finds 3,340 / 3,379 / 3,372 PrSMs, 1,969 / 2,004 / 1,995 proteoforms and
-  433 / 445 / 440 proteins against ecf67378's 3,374 / 2,004 / 440 (a
-  second ecf67378 run wrote the same msalign and feature files and
-  identifications).
+- **Shared peaks** (toppic_test experiments 157 and 158, reports 0157 and
+  0158; branch `greedy_shared_peaks`, merged into main on 2026-10-10 as
+  2df670d5, then branch `shared_peaks_same_charge`). Before a mass's
+  envelopes are added to the result, `GreedySearch::removeSharedEnvs`
+  builds each one as it will be reported (`getMatchEnv`: the peaks within
+  TopFD's m/z error with an intensity of at least the noise) and drops it
+  when it shares more than k spectrum peaks (the count of
+  `CoTable::cntSharedPeakNum`) with any one envelope of the same charge
+  already in the spectrum's result (charge-series order, the seed charge
+  first). Envelopes of other charges do not count (the same-charge rule of
+  `shared_peaks_same_charge`; 2df670d5 counted every charge). Envelopes of
+  one charge share peaks only when their isotope grids line up: on
+  480_F3_02 without a limit the MS1 pairs of one charge are almost all 4
+  or more isotope spacings apart (7,028 of 7,030; mostly 4-7 Da at charges
+  4-6, a second mass on the tail of a large envelope). A dropped envelope
+  is neither reported nor subtracted, as one that fails `single_min_cos`;
+  a mass with none left is dropped. k is the hidden
+  `--ms1-max-shared-peak-num` (`TopfdPara::getMs1MaxSharedPeakNum`;
+  default -1, no limit: the test is off and the search is ecf67378's, since
+  no k raised the identifications on 480_F3_02; 2df670d5 had the default
+  1); the parameter block prints "MS1 maximum shared peak number (same
+  charge)" under "MS1 deconvolution: Greedy" only when the limit is set,
+  so that a default run writes the block of earlier versions. Not tested: the precursor-window envelopes of
+  `addPrecWinEnvs` (an envelope of a window without one may share any
+  number of peaks with the search's envelopes) and the PTCR search
+  (`deconvSeries` passes -1). On 480_F3_02 ecf67378's MS1 envelopes form
+  124,239 pairs that share peaks (7,030 of one charge). Any charge (2df670d5,
+  k = 0 / 1 / 2 at both levels): the MS1 masses fall from 845,164 to
+  742,233 / 821,822 / 837,855, the MS/MS precursors from 9,228 to 8,893 /
+  9,087 / 9,181, and toppic (setting d) finds 3,340 / 3,379 / 3,372 PrSMs,
+  1,969 / 2,004 / 1,995 proteoforms and 433 / 445 / 440 proteins against
+  ecf67378's 3,374 / 2,004 / 440. Same charge (k = 1 / 2 / 3 at both
+  levels): MS1 masses 843,382 / 844,278 / 844,602, precursors 9,160 /
+  9,164 / 9,231, toppic 3,381 / 3,375 / 3,373 PrSMs, 2,011 / 2,006 /
+  2,004 proteoforms, 442 / 444 / 441 proteins (any charge at k = 3:
+  3,370 / 1,997 / 439). TopFD is repeatable on 480_F3_02 (a second run
+  writes the same msalign and feature files).
 - **Precursor windows without an envelope** (postprocessing step,
   `addPrecWinEnvs`, switch `prec_win_post`, on by default; toppic_test
   experiment 113): `deconvMsOneGreedy` passes the precursor windows of the
@@ -776,23 +787,27 @@ rows) is written as `DeconvSingleSp`'s. Facts to keep straight:
       5 kDa; 1.00235 before toppic_test experiment 111) fits the apex
       (toppic_test experiments 107 and 108); at m/z 200 and charge 1 the
       difference is 2.9 ppm, more than half of the 5 ppm window.
-- **Shared peaks**: the MS1 search's test (previous section; branch
-  `greedy_shared_peaks`, merged into main as 2df670d5) with the hidden
-  `--ms2-max-shared-peak-num` (default 1, -1 no limit; also MS3 spectra
-  and `-T`); not for the alternative masses of `alt_ratio` and the refits
-  of `refit_rounds` (both off). On 480_F3_02 ecf67378's MS/MS envelopes form
-  126,804 pairs that share peaks (99,798 one peak); of the pairs sharing
-  one peak 10% are harmonics (charges 2:1 or 3:1) and 3.5% the same
-  charge one to three isotopes apart, the rest other masses. With the MS1 search
-  unlimited, k = 0 / 1 / 2 removes 95,834 / 29,389 / 8,905 of the 701,494
-  masses (median EnvCNN 0.18 / 0.14 / 0.15, about 27% of them >= 0.5)
-  and adds 25,671 / 15,505 / 6,410 (median 0.05 / 0.03 / 0.02: seeds the
-  removed envelopes no longer subtract); toppic (setting d) finds 3,351 /
-  3,377 / 3,375 PrSMs, 1,981 / 2,005 / 1,999 proteoforms and 433 / 440 /
-  440 proteins against ecf67378's 3,374 / 2,004 / 440, the unchanged PrSMs
-  matching fewer fragments (k = 1: 590 of 3,348 lose, 31 gain; -0.7%).
-  The default 1 is the DP's coexistence rule (`CoTable::checkCoexist`);
-  0 costs identifications, 1 and 2 are within a few PrSMs of no limit.
+- **Shared peaks**: the MS1 search's test (previous section, the
+  same-charge rule) with the hidden `--ms2-max-shared-peak-num` (default
+  -1, no limit, as for MS1; also MS3 spectra and `-T`); not for the alternative
+  masses of `alt_ratio` and the refits of `refit_rounds` (both off). On
+  480_F3_02 ecf67378's MS/MS envelopes form 126,804 pairs that share peaks
+  (99,798 one peak); 20,448 are of one charge: 1-3 isotopes apart (13,454,
+  within 0.02 Da or looser), 4 or more apart (6,362, mostly 4-5 Da) and
+  632 near-identical masses. Of the pairs sharing one peak 10% are
+  harmonics (charges 2:1 or 3:1). Any charge (2df670d5, MS1 unlimited):
+  k = 0 / 1 / 2 removes 95,834 / 29,389 / 8,905 of the 701,494 masses
+  (median EnvCNN 0.18 / 0.14 / 0.15) and adds 25,671 / 15,505 / 6,410
+  (median 0.05 / 0.03 / 0.02: seeds the removed envelopes no longer
+  subtract); toppic finds 3,351 / 3,377 / 3,375 PrSMs and 1,981 / 2,005 /
+  1,999 proteoforms. Both levels at k = 1: any charge removes 31,025 MS/MS
+  masses (4.4%), same charge 11,940 (1.7%; median EnvCNN 0.36); the PrSMs
+  unchanged against no limit match 0.7% (any charge) and 0.2% (same
+  charge) fewer fragments, and the same-charge PrSMs match 0.5% more
+  fragments than the any-charge ones. k = 1 is the DP's
+  coexistence rule (`CoTable::checkCoexist`, any charge); any charge at
+  k = 0 costs identifications, every other setting is within 7 PrSMs of no
+  limit.
 - **Research switches**: `TOPFD_GREEDY_MS2_PARA` ("name=value,...")
   overrides the defaults in `GreedyMs2Para`; `TOPFD_GREEDY_MS2_DEBUG_SCAN=
   <scan>` writes one scan's decisions to `greedy_ms2_scan<scan>.txt`.
