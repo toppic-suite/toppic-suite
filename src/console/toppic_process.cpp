@@ -375,6 +375,28 @@ std::string toleranceStr(double value) {
   return out.str();
 }
 
+// Writes toppic's database of a spectrum file, toppic_db_name
+// (<base>_toppic.sqlite), as a copy of TopFD's topfd_db_name (sql_db_copy),
+// or prints a note when TopFD's database does not exist (TopFD -N, possible
+// with -D): the run then writes no database.
+void writeToppicDb(const std::string& topfd_db_name,
+                   const std::string& toppic_db_name) {
+  if (!std::filesystem::exists(topfd_db_name)) {
+    std::cout << "The TopFD database " << topfd_db_name
+              << " was not found: no " << toppic_db_name << " is written."
+              << std::endl;
+    return;
+  }
+  auto copy_start = std::chrono::steady_clock::now();
+  sql_db_copy::copy(topfd_db_name, toppic_db_name);
+  double seconds = std::chrono::duration<double>(
+                       std::chrono::steady_clock::now() - copy_start)
+                       .count();
+  std::cout << "Copied the database " << topfd_db_name << " to "
+            << toppic_db_name << " (" << std::fixed << std::setprecision(1)
+            << seconds << " s)." << std::defaultfloat << std::endl;
+}
+
 // By default the generating function of the variable PTM PrSMs takes the
 // residues and their forms with the variable PTMs of the file (toppic_test
 // experiment 129), unless the hidden --disable-var-ptm-evalue-mod-residues
@@ -1348,11 +1370,11 @@ int TopPIC_postprocess(std::map<std::string, std::string>& arguments,
       // the EnvCNN model scores the added masses
       onnx_env_cnn::initModel(resource_dir,
                               std::stoi(arguments["threadNumber"]));
-      // the spectrum file's database (prsm_post_mass_match::sqlFileName):
-      // TopFD's, toppic's copy of it for -g, the corrected copy for
-      // --mass-calib
+      // toppic's database of the file, <base>_toppic.sqlite (a copy of
+      // TopFD's, corrected with --mass-calib; TopPICProgress_multi_file)
       sp_file_name = prsm_post_mass_match::process(
-          prsm_para_ptr, cur_suffix, cur_suffix, min_peak_num);
+          prsm_para_ptr, cur_suffix, cur_suffix, min_peak_num,
+          arguments["toppicDbFileName"]);
       // The steps below read the spectra with the added masses and the PrSMs
       // with the recounted matches, and name their files after the new
       // spectrum file.
@@ -1624,8 +1646,11 @@ int TopPIC_report(std::map<std::string, std::string>& arguments) {
     prot_out = nullptr;
     std::cout << "Outputting protein table - finished." << std::endl;
 
-    prsm_sql_output::write(prsm_para_ptr, base_name, ori_db_file_name,
-                           "toppic_prsm_cutoff", "toppic_form_cutoff_form",
+    // toppic's database of the file, <base>_toppic.sqlite; none for the
+    // combined result of -c
+    prsm_sql_output::write(prsm_para_ptr, arguments["toppicDbFileName"],
+                           base_name, ori_db_file_name, "toppic_prsm_cutoff",
+                           "toppic_form_cutoff_form",
                            "toppic_prot_cutoff_prot");
 
   } catch (const char* e) {
@@ -1861,15 +1886,16 @@ int TopPIC_second_precursor(std::map<std::string, std::string>& arguments,
 // PTM are the calibrants: the MS1 model is fitted on their precursor errors,
 // the MS/MS model on their fragment errors (mass_calib_fit::fitModel), and
 // written to <base>_mass_calib.json; the corrected spectra are written to
-// <base>_calib_ms2.msalign, with a copy of the feature file, and the
-// spectrum file's database (TopFD's <base>.sqlite, or its copy
-// <base>_mono.sqlite after -g), with every m/z and deconvoluted mass
-// corrected, to <base>_calib.sqlite (<base>_mono_calib.sqlite;
-// sqlite_mass_calib; toppic_test experiment 154), which the search of the
-// corrected spectra uses (the post mass matching, the PrSM tables). The calibration search's files are deleted (kept with -k).
-// Returns the corrected spectrum file name; with fewer than 3 precursor or 4
-// fragment calibrants the file is searched uncorrected: its own name. "" on
-// an error.
+// <base>_calib_ms2.msalign, with a copy of the feature file, and TopFD's
+// database arguments["topfdDbFileName"], with every m/z and deconvoluted
+// mass corrected, to toppic's database arguments["toppicDbFileName"]
+// (<base>_toppic.sqlite; sqlite_mass_calib; toppic_test experiments 154 and
+// 156), which the search of the corrected spectra uses (the post mass
+// matching, the PrSM tables). The calibration search's files are deleted
+// (kept with -k). Returns the corrected spectrum file name; with fewer than
+// 3 precursor or 4 fragment calibrants the file is searched uncorrected: its
+// own name, and toppic's database is a plain copy of TopFD's. "" on an
+// error.
 std::string TopPIC_mass_calib(std::map<std::string, std::string>& arguments) {
   std::string sp_file_name = arguments["spectrumFileName"];
   try {
@@ -1911,9 +1937,12 @@ std::string TopPIC_mass_calib(std::map<std::string, std::string>& arguments) {
               << " fragments." << std::endl;
     cleanToppicDir(arguments["oriDatabaseFileName"], sp_file_name,
                    arguments["keepTempFiles"] == "true", "", false);
+    std::string topfd_db_name = arguments["topfdDbFileName"];
+    std::string toppic_db_name = arguments["toppicDbFileName"];
     if (set.prec.size() < 3 || set.frag.size() < 4) {
       std::cout << "WARNING: too few calibrants for the mass calibration; "
                 << sp_file_name << " is searched without it." << std::endl;
+      writeToppicDb(topfd_db_name, toppic_db_name);
       return sp_file_name;
     }
     MassCalibModel model = mass_calib_fit::fitModel(set);
@@ -1937,16 +1966,14 @@ std::string TopPIC_mass_calib(std::map<std::string, std::string>& arguments) {
                           file_util::basename(calib_sp_file_name) + ".feature",
                           true);
     }
-    // the spectrum file's database (TopFD's, or its copy of -g), read only,
-    // and its corrected copy for the search of the corrected spectra
-    std::string ori_db_name = prsm_post_mass_match::sqlFileName(sp_file_name);
-    std::string calib_db_name =
-        prsm_post_mass_match::sqlFileName(calib_sp_file_name);
-    if (std::filesystem::exists(ori_db_name)) {
-      sqlite_mass_calib::process(model, ori_db_name, calib_db_name);
+    // TopFD's database, read only, and toppic's corrected copy of it for the
+    // search of the corrected spectra (TopFD's masses are monoisotopic, also
+    // after -g)
+    if (std::filesystem::exists(topfd_db_name)) {
+      sqlite_mass_calib::process(model, topfd_db_name, toppic_db_name);
     } else {
-      std::cout << "Mass calibration - the database " << ori_db_name
-                << " was not found: no corrected database is written."
+      std::cout << "Mass calibration - the database " << topfd_db_name
+                << " was not found: no " << toppic_db_name << " is written."
                 << std::endl;
     }
     std::cout << "Mass calibration - finished: " << sp_num
@@ -2022,12 +2049,7 @@ int TopPICProgress_multi_file(std::map<std::string, std::string>& arguments,
 
   // Average-mass spectrum files (topfd --average-mass): every step below,
   // including the merge of a combined run, works on the converted
-  // <name>_mono_ms2.msalign files with monoisotopic masses, and on their
-  // databases <name>_mono.sqlite: copies of TopFD's <name>.sqlite, whose
-  // masses are monoisotopic already (topfd writes average masses into the
-  // msalign file only), so that the post mass matching and the PrSM tables
-  // of the run never write into TopFD's file (toppic_test experiment 154,
-  // amendment 1). With -C the earlier run's copy is kept.
+  // <name>_mono_ms2.msalign files with monoisotopic masses.
   if (arguments["averageMass"] == "true") {
     std::cout << "Converting average masses to monoisotopic masses - started."
               << std::endl;
@@ -2036,37 +2058,44 @@ int TopPICProgress_multi_file(std::map<std::string, std::string>& arguments,
       spec_file_lst[k] = avg_mass_util::convertToMonoMass(spec_file_lst[k]);
       std::cout << "Converted " << ori_spec_file_lst[k] << " to "
                 << spec_file_lst[k] << "." << std::endl;
-      std::string ori_db_name =
-          prsm_post_mass_match::sqlFileName(ori_spec_file_lst[k]);
-      std::string mono_db_name =
-          prsm_post_mass_match::sqlFileName(spec_file_lst[k]);
-      if (combine_result_only && std::filesystem::exists(mono_db_name)) {
-        continue;
-      }
-      if (!std::filesystem::exists(ori_db_name)) {
-        std::cout << "The TopFD database " << ori_db_name
-                  << " was not found: no " << mono_db_name << " is written."
-                  << std::endl;
-        continue;
-      }
-      auto copy_start = std::chrono::steady_clock::now();
-      sql_db_copy::copy(ori_db_name, mono_db_name);
-      double seconds = std::chrono::duration<double>(
-                           std::chrono::steady_clock::now() - copy_start)
-                           .count();
-      std::cout << "Copied the database " << ori_db_name << " to "
-                << mono_db_name << " (" << std::fixed << std::setprecision(1)
-                << seconds << " s)." << std::defaultfloat << std::endl;
     }
     std::cout << "Converting average masses to monoisotopic masses - finished."
               << std::endl;
   }
 
+  // toppic's database of each spectrum file (toppic_test experiment 156):
+  // <name>_toppic.sqlite for <name>_ms2.msalign and TopFD's <name>.sqlite,
+  // whatever the options. Before the file is searched an earlier one is
+  // deleted and a copy of TopFD's database written (with --mass-calib its
+  // corrected copy, by TopPIC_mass_calib); the post mass matching appends its
+  // envelopes to it and the report writes toppic's tables into it, so that
+  // TopFD's database is only read. Every step gets the names from
+  // arguments["topfdDbFileName"] and arguments["toppicDbFileName"]. With -C
+  // (no search) the earlier run's database is kept: it holds that run's
+  // post-matched envelopes.
+  std::vector<std::string> topfd_db_lst(spec_file_lst.size());
+  std::vector<std::string> toppic_db_lst(spec_file_lst.size());
+  for (size_t k = 0; k < spec_file_lst.size(); k++) {
+    topfd_db_lst[k] = prsm_post_mass_match::sqlFileName(ori_spec_file_lst[k]);
+    toppic_db_lst[k] =
+        prsm_post_mass_match::toppicSqlFileName(ori_spec_file_lst[k]);
+    if (combine_result_only) {
+      continue;
+    }
+    if (sql_db_copy::removeDb(toppic_db_lst[k])) {
+      std::cout << "Deleted the earlier database " << toppic_db_lst[k] << "."
+                << std::endl;
+    }
+    if (arguments["massCalib"] != "true") {
+      writeToppicDb(topfd_db_lst[k], toppic_db_lst[k]);
+    }
+  }
+
   // --mass-calib: every file is recalibrated before the searches, and every
   // step below, including the merge of a combined run, works on the
-  // corrected <name>_calib_ms2.msalign files and their corrected databases
-  // <name>_calib.sqlite (after -g <name>_mono_calib_ms2.msalign and
-  // <name>_mono_calib.sqlite; with -C, on the earlier run's)
+  // corrected <name>_calib_ms2.msalign files (after -g
+  // <name>_mono_calib_ms2.msalign; with -C, on the earlier run's) and the
+  // corrected <name>_toppic.sqlite
   if (arguments["massCalib"] == "true") {
     for (size_t k = 0; k < spec_file_lst.size(); k++) {
       if (combine_result_only) {
@@ -2078,6 +2107,8 @@ int TopPICProgress_multi_file(std::map<std::string, std::string>& arguments,
         continue;
       }
       arguments["spectrumFileName"] = spec_file_lst[k];
+      arguments["topfdDbFileName"] = topfd_db_lst[k];
+      arguments["toppicDbFileName"] = toppic_db_lst[k];
       std::string calib_name = TopPIC_mass_calib(arguments);
       if (calib_name.empty()) {
         return 1;
@@ -2092,6 +2123,7 @@ int TopPICProgress_multi_file(std::map<std::string, std::string>& arguments,
       std::string start_time = buf;
       arguments["startTime"] = start_time;
       arguments["spectrumFileName"] = spec_file_lst[k];
+      arguments["toppicDbFileName"] = toppic_db_lst[k];
       if (toppic::TopPICProgress(arguments) != 0) {
         return 1;
       }
@@ -2169,6 +2201,8 @@ int TopPICProgress_multi_file(std::map<std::string, std::string>& arguments,
     std::string sp_file_name = merged_file_name + "_ms2.msalign";
     arguments["spectrumFileName"] = sp_file_name;
     arguments["startTime"] = combined_start_time;
+    // the combined result has no database
+    arguments["toppicDbFileName"] = "";
 
     TopPIC_multi_postprocess(arguments);
     TopPIC_report(arguments);
@@ -2196,6 +2230,7 @@ int TopPICProgress_multi_file(std::map<std::string, std::string>& arguments,
       std::cout << "Reporting " << file_sp_name << " - started." << std::endl;
       arguments["spectrumFileName"] = file_sp_name;
       arguments["startTime"] = combined_start_time;
+      arguments["toppicDbFileName"] = toppic_db_lst[k];
       msalign_util::geneSpIndex(file_sp_name);
       TopPIC_report(arguments);
       cleanToppicDir(ori_db_file_name, spec_file_lst[k], keep_temp_files,

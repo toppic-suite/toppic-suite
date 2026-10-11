@@ -43,43 +43,46 @@ namespace prsm_post_mass_match {
 //                              msalign file is left untouched),
 //   <base>_post_ms2.<output_file_ext>  the PrSMs with the recounted matched
 //                              masses and fragments,
-//   <base>.sqlite               the added masses as new rows of the ms2_env
-//                              and ms2_env_peak tables (the spectrum file's
-//                              database, sqlFileName),
+//   sql_file_name               the added masses as new rows of the ms2_env
+//                              and ms2_env_peak tables,
 //   <base>_post_ms2.feature    a copy of the TopFD feature file, so the
 //                              downstream steps find it under the new name.
 // Returns the name of the new spectrum file, which the downstream steps read
-// instead of the input one. The SQLite database must exist (see
-// sqlFileName); if it is missing the run stops with an error. The EnvCNN
-// model must have been loaded with onnx_env_cnn::initModel.
-// The database is the spectrum file's (sqlFileName): TopFD's, toppic's
-// copy of it for -g, or the corrected copy for --mass-calib, whose peaks are
-// read as they are.
+// instead of the input one. sql_file_name is toppic's database of the
+// spectrum file, <base>_toppic.sqlite (toppicSqlFileName of the file given
+// to toppic, a copy of TopFD's database, corrected with --mass-calib),
+// whose peaks are read as they are; if it is missing the run stops with an
+// error. The EnvCNN model must have been loaded with
+// onnx_env_cnn::initModel.
 std::string process(const PrsmParaPtr& prsm_para_ptr,
                     const std::string& input_file_ext,
-                    const std::string& output_file_ext, int min_peak_num);
+                    const std::string& output_file_ext, int min_peak_num,
+                    const std::string& sql_file_name);
 
-// The SQLite database that goes with an msalign spectrum file:
-// <path>/<base>.sqlite, where <base> is the file name without its extension
-// and a trailing "_ms2" (TopFD writes <base>_ms2.msalign and <base>.sqlite),
-// and without "_resid" before it (the residual spectra of --second-precursor
-// share the database of the spectra they are made from). toppic's copies of
-// a spectrum file have their own copies of TopFD's database, so that a run
-// on them never writes into TopFD's file: <base>_mono_ms2.msalign of -g
-// (--average-mass) <base>_mono.sqlite, the corrected spectra of
-// --mass-calib <base>_calib_ms2.msalign <base>_calib.sqlite and, after -g,
-// <base>_mono_calib_ms2.msalign <base>_mono_calib.sqlite (written by
-// TopPICProgress_multi_file and TopPIC_mass_calib). The argument parser
-// checks that TopFD's database exists before the search.
+// TopFD's SQLite database of a spectrum file: <path>/<base>.sqlite, where
+// <base> is the file name without its extension and a trailing "_ms2"
+// (TopFD writes <base>_ms2.msalign and <base>.sqlite), and without "_resid"
+// before it. toppic only reads it (the argument check, the copy into
+// toppicSqlFileName); topmg writes its PrSM tables into it.
 std::string sqlFileName(const std::string& sp_file_name);
+
+// toppic's SQLite database of a spectrum file given to toppic,
+// <path>/<base>_toppic.sqlite for <base>_ms2.msalign and TopFD's
+// <base>.sqlite (toppic_test experiment 156): written again before each
+// search of the file, a copy of TopFD's database (every table) or, with
+// --mass-calib, its corrected copy; the post mass matching appends its
+// envelopes to it and the report writes toppic's tables into it. -g,
+// --mass-calib and --second-precursor use the database of the given file
+// (TopPICProgress_multi_file passes it to every step).
+std::string toppicSqlFileName(const std::string& sp_file_name);
 
 // TopFD's base name of a spectrum file, <path>/<base> for <base>_ms2.msalign
 // and toppic's copies of it (the suffixes "_resid", "_calib" and "_mono"
-// removed): the base of TopFD's database and MS1 spectra
+// removed): the base of TopFD's MS1 spectra
 std::string topfdBaseName(const std::string& sp_file_name);
 
-// the base name of the post-matched files of a spectrum file: the
-// database's base name with "_post_ms2", <base>_post_ms2,
+// the base name of the post-matched files of a spectrum file: the spectrum
+// file's base name with "_post_ms2", <base>_post_ms2,
 // <base>_mono_post_ms2 for the copy of -g, <base>_calib_post_ms2 and
 // <base>_mono_calib_post_ms2 for the corrected spectra of --mass-calib; the
 // residual spectra of --second-precursor keep "_resid":

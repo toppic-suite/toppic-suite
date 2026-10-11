@@ -498,14 +498,10 @@ std::string stripSuffix(const std::string& name, const std::string& suffix) {
   return name;
 }
 
-// The base name of a spectrum file's database: the file's own base,
-// <base> for <base>_ms2.msalign, also for its residual spectra
+// The base name of a spectrum file: the file's own base, <base> for
+// <base>_ms2.msalign, also for its residual spectra
 // <base>_resid_ms2.msalign of the second precursor search
-// (--second-precursor). toppic's other copies of a spectrum file have
-// databases of their own: <base>_mono_ms2.msalign of -g (--average-mass)
-// <base>_mono.sqlite, <base>_calib_ms2.msalign of --mass-calib
-// <base>_calib.sqlite, <base>_mono_calib_ms2.msalign <base>_mono_calib.sqlite.
-// *resid tells whether the file is a residual one.
+// (--second-precursor). *resid tells whether the file is a residual one.
 std::string dbBaseName(const std::string& sp_file_name, bool* resid) {
   std::string base = stripSuffix(file_util::basename(sp_file_name), "_ms2");
   *resid = str_util::endsWith(base, "_resid");
@@ -525,8 +521,13 @@ std::string sqlFileName(const std::string& sp_file_name) {
   return dbBaseName(sp_file_name, &resid) + ".sqlite";
 }
 
+std::string toppicSqlFileName(const std::string& sp_file_name) {
+  bool resid = false;
+  return dbBaseName(sp_file_name, &resid) + "_toppic.sqlite";
+}
+
 std::string postBaseName(const std::string& sp_file_name) {
-  // the database's base name, with the _resid suffix of the second
+  // the spectrum file's base name, with the _resid suffix of the second
   // precursor search kept: <base>_post_ms2 for <base>_ms2.msalign,
   // <base>_mono_post_ms2 for <base>_mono_ms2.msalign, <base>_calib_post_ms2
   // for <base>_calib_ms2.msalign, <base>_resid_post_ms2 for
@@ -541,9 +542,9 @@ std::string postBaseName(const std::string& sp_file_name) {
 
 std::string process(const PrsmParaPtr& prsm_para_ptr,
                     const std::string& input_file_ext,
-                    const std::string& output_file_ext, int min_peak_num) {
+                    const std::string& output_file_ext, int min_peak_num,
+                    const std::string& sql_file_name) {
   std::string sp_file_name = prsm_para_ptr->getSpectrumFileName();
-  std::string sql_file_name = sqlFileName(sp_file_name);
   std::string post_base_name = postBaseName(sp_file_name);
   std::string post_sp_file_name = post_base_name + ".msalign";
   SpParaPtr sp_para_ptr = prsm_para_ptr->getSpParaPtr();
@@ -558,12 +559,12 @@ std::string process(const PrsmParaPtr& prsm_para_ptr,
   int match_num = 0;
   int prsm_num = 0;
   if (!std::filesystem::exists(sql_file_name)) {
-    LOG_ERROR("The TopFD SQLite database "
+    LOG_ERROR("The SQLite database "
               << sql_file_name << " for " << sp_file_name
               << " is missing! Post mass matching needs the centroided MS/MS "
-                 "peaks stored in it: run TopFD without disabling its SQLite "
-                 "database output (without -N) to deconvolute the spectra, or "
-                 "run TopPIC with --disable-post-match.");
+                 "peaks of TopFD's database: run TopFD without disabling its "
+                 "SQLite database output (without -N) to deconvolute the "
+                 "spectra, or run TopPIC with --disable-post-match.");
     exit(EXIT_FAILURE);
   } else {
     sqlite3* db = nullptr;

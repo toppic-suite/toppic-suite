@@ -23,6 +23,7 @@
 #include "common/base/base_data.hpp"
 #include "common/base/mod_util.hpp"
 #include "common/util/file_util.hpp"
+#include "common/util/str_util.hpp"
 #include "common/util/mem_check.hpp"
 #include "common/util/version.hpp"
 #include "console/topmg_argument.hpp"
@@ -44,6 +45,7 @@
 #include "prsm/prsm_form_filter.hpp"
 #include "prsm/prsm_match_num_recount.hpp"
 #include "prsm/prsm_match_table_writer.hpp"
+#include "prsm/prsm_post_mass_match.hpp"
 #include "prsm/prsm_prot_cluster.hpp"
 #include "prsm/prsm_prot_filter.hpp"
 #include "prsm/prsm_simple_cluster.hpp"
@@ -446,9 +448,17 @@ int TopMG_post(std::map<std::string, std::string>& arguments) {
     prot_out = nullptr;
     std::cout << "Outputting protein table - finished." << std::endl;
 
-    prsm_sql_output::write(prsm_para_ptr, base_name, ori_db_file_name,
-                           "topmg_prsm_cutoff", "topmg_form_cutoff_form",
-                           "topmg_prot_cutoff_prot");
+    // topmg's identifications go into TopFD's database of the spectrum file
+    // (that of <x>_ms2.msalign for toppic's post-matched <x>_post_ms2.msalign)
+    std::string sql_sp_base = base_name;
+    if (str_util::endsWith(sql_sp_base, "_post_ms2")) {
+      sql_sp_base = sql_sp_base.substr(0, sql_sp_base.size() - 9) + "_ms2";
+    }
+    prsm_sql_output::write(
+        prsm_para_ptr,
+        prsm_post_mass_match::sqlFileName(sql_sp_base + ".msalign"),
+        base_name, ori_db_file_name, "topmg_prsm_cutoff",
+        "topmg_form_cutoff_form", "topmg_prot_cutoff_prot");
 
   } catch (const char* e) {
     LOG_ERROR("[Exception]" << e);

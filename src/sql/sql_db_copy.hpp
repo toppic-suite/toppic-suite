@@ -24,10 +24,9 @@ namespace toppic {
 
 namespace sql_db_copy {
 
-// The copies of TopFD's database that toppic writes for its own spectrum
-// files and searches in place of TopFD's (toppic_test experiment 154):
-// <base>_mono.sqlite for the monoisotopic-mass copy of -g, and the
-// corrected <base>_calib.sqlite (<base>_mono_calib.sqlite) of --mass-calib.
+// toppic's copy of TopFD's database, <base>_toppic.sqlite, which toppic
+// searches in place of TopFD's (toppic_test experiments 154 and 156): a
+// plain copy, or the corrected copy of --mass-calib (sqlite_mass_calib).
 // TopFD's database is only read.
 
 // Opens a copy of src_name, written under the temporary name
@@ -42,13 +41,18 @@ namespace sql_db_copy {
 // read or written.
 sqlite3* openCopy(const std::string& src_name, const std::string& dest_name);
 
-// Closes a copy opened by openCopy and renames it to dest_name, replacing an
-// earlier file, so that an interrupted run leaves no partial file under that
-// name.
+// Closes a copy opened by openCopy in WAL mode (TopFD's journal mode, so that
+// a reader of the copy does not block a later writer) and renames it to
+// dest_name, replacing an earlier file, so that an interrupted run leaves no
+// partial file under that name.
 void closeCopy(sqlite3* db, const std::string& dest_name);
 
 // openCopy and closeCopy with no change in between.
 void copy(const std::string& src_name, const std::string& dest_name);
+
+// Deletes the database name with its -journal, -wal and -shm files, if they
+// exist. Returns whether name existed.
+bool removeDb(const std::string& name);
 
 }  // namespace sql_db_copy
 
