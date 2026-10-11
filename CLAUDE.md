@@ -647,7 +647,8 @@ straight:
   with an EnvCNN score below 0.2 are not written (`min_envcnn`; a third of
   the envelopes, which only seeded extra MS1 features).
 - **Shared peaks** (branch `greedy_shared_peaks`, toppic_test experiment
-  157, report 0157; not merged). Before a mass's envelopes are added to
+  157, report 0157; merged into main on 2026-10-10 as 2df670d5, so k = 1
+  is main's default from then on). Before a mass's envelopes are added to
   the result, `GreedySearch::removeSharedEnvs` builds each one as it will
   be reported (`getMatchEnv`: the peaks within TopFD's m/z error with an
   intensity of at least the noise) and drops it when it shares more than
@@ -657,18 +658,20 @@ straight:
   dropped envelope is neither reported nor subtracted, as one that fails
   `single_min_cos`; a mass with none left is dropped. k is the hidden
   `--ms1-max-shared-peak-num` (`TopfdPara::getMs1MaxSharedPeakNum`,
-  default 1; -1 is no limit, main's behaviour); the parameter block prints
-  "MS1 maximum shared peak number" under "MS1 deconvolution: Greedy". Not
+  default 1; -1 is no limit, ecf67378's behaviour); the parameter block
+  prints "MS1 maximum shared peak number" under "MS1 deconvolution:
+  Greedy". Not
   tested: the precursor-window envelopes of `addPrecWinEnvs` (an envelope
   of a window without one may share any number of peaks with the search's
   envelopes) and the PTCR search (`deconvSeries` passes -1). On 480_F3_02
-  main's MS1 envelopes form 124,239 pairs that share peaks (94,937 one
+  ecf67378's MS1 envelopes form 124,239 pairs that share peaks (94,937 one
   peak, 3,898 four or more); with k = 0 / 1 / 2 at both levels the MS1
   masses fall from 845,164 to 742,233 / 821,822 / 837,855, the MS/MS
   precursors from 9,228 to 8,893 / 9,087 / 9,181, and toppic (setting d)
   finds 3,340 / 3,379 / 3,372 PrSMs, 1,969 / 2,004 / 1,995 proteoforms and
-  433 / 445 / 440 proteins against main's 3,374 / 2,004 / 440 (a second
-  main run wrote the same msalign and feature files and identifications).
+  433 / 445 / 440 proteins against ecf67378's 3,374 / 2,004 / 440 (a
+  second ecf67378 run wrote the same msalign and feature files and
+  identifications).
 - **Precursor windows without an envelope** (postprocessing step,
   `addPrecWinEnvs`, switch `prec_win_post`, on by default; toppic_test
   experiment 113): `deconvMsOneGreedy` passes the precursor windows of the
@@ -774,10 +777,10 @@ rows) is written as `DeconvSingleSp`'s. Facts to keep straight:
       (toppic_test experiments 107 and 108); at m/z 200 and charge 1 the
       difference is 2.9 ppm, more than half of the 5 ppm window.
 - **Shared peaks**: the MS1 search's test (previous section; branch
-  `greedy_shared_peaks`, not merged) with the hidden
+  `greedy_shared_peaks`, merged into main as 2df670d5) with the hidden
   `--ms2-max-shared-peak-num` (default 1, -1 no limit; also MS3 spectra
   and `-T`); not for the alternative masses of `alt_ratio` and the refits
-  of `refit_rounds` (both off). On 480_F3_02 main's MS/MS envelopes form
+  of `refit_rounds` (both off). On 480_F3_02 ecf67378's MS/MS envelopes form
   126,804 pairs that share peaks (99,798 one peak); of the pairs sharing
   one peak 10% are harmonics (charges 2:1 or 3:1) and 3.5% the same
   charge one to three isotopes apart, the rest other masses. With the MS1 search
@@ -786,7 +789,7 @@ rows) is written as `DeconvSingleSp`'s. Facts to keep straight:
   and adds 25,671 / 15,505 / 6,410 (median 0.05 / 0.03 / 0.02: seeds the
   removed envelopes no longer subtract); toppic (setting d) finds 3,351 /
   3,377 / 3,375 PrSMs, 1,981 / 2,005 / 1,999 proteoforms and 433 / 440 /
-  440 proteins against main's 3,374 / 2,004 / 440, the unchanged PrSMs
+  440 proteins against ecf67378's 3,374 / 2,004 / 440, the unchanged PrSMs
   matching fewer fragments (k = 1: 590 of 3,348 lose, 31 gain; -0.7%).
   The default 1 is the DP's coexistence rule (`CoTable::checkCoexist`);
   0 costs identifications, 1 and 2 are within a few PrSMs of no limit.
