@@ -333,8 +333,8 @@ class GreedySearch {
   // the alternative masses one isotope away (alt_ratio)
   FitVec alts_;
   PeakPtrVec peak_list_;
-  // the limit of the shared peaks (TopfdPara::getMs2MaxSharedPeakNum; -1:
-  // no limit)
+  // the limit of the peaks shared with an envelope of the same charge
+  // (TopfdPara::getMs2MaxSharedPeakNum; -1: no limit)
   int max_shared_peak_num_;
   // per peak of the spectrum, the reported envelopes that match it (indexes
   // into reported_envs_); the mass and charge of each reported envelope
@@ -1008,16 +1008,19 @@ std::vector<FitVec> GreedySearch::run() {
 }
 
 // The test of the shared peaks (TopfdPara::getMs2MaxSharedPeakNum, hidden
-// option --ms2-max-shared-peak-num; toppic_test experiment 157): the
-// envelopes of a mass, in the order of its charge series (the seed charge
-// first), are built as they would be reported (getMatchEnv) and compared
-// with every envelope reported before in the spectrum, those of the earlier
-// masses and those of the mass kept before. The peaks two envelopes share
-// are the spectrum peaks both match, as the DP counts them
+// option --ms2-max-shared-peak-num; toppic_test experiments 157 and 158):
+// the envelopes of a mass, in the order of its charge series (the seed
+// charge first), are built as they would be reported (getMatchEnv) and
+// compared with every envelope of the same charge reported before in the
+// spectrum (the envelopes of a mass have different charges, so these are
+// envelopes of earlier masses). The peaks two envelopes share are the
+// spectrum peaks both match, as the DP counts them
 // (CoTable::cntSharedPeakNum). An envelope that shares more than
 // max_shared_peak_num_ peaks with one of them is not reported (nor
-// subtracted); the others are kept and their peaks recorded. Not tested:
-// the alternative masses (alt_ratio) and the masses the refit pass moves.
+// subtracted); the others are kept and their peaks recorded. Peaks shared
+// with envelopes of other charges (harmonics, overlapping species) do not
+// count (experiment 157 counted every charge). Not tested: the alternative
+// masses (alt_ratio) and the masses the refit pass moves.
 FitVec GreedySearch::removeSharedEnvs(FitVec series) {
   if (max_shared_peak_num_ < 0) {
     return series;
@@ -1034,12 +1037,16 @@ FitVec GreedySearch::removeSharedEnvs(FitVec series) {
         }
       }
     }
-    // the number of peaks shared with each envelope reported before
+    // the number of peaks shared with each envelope of the same charge
+    // reported before (the envelopes of other charges do not count)
     std::unordered_map<int, int> shared_nums;
     int max_num = 0;
     int max_env = -1;
     for (int idx : peak_idxes) {
       for (int e : peak_envs_[idx]) {
+        if (reported_envs_[e].second != fit.charge) {
+          continue;
+        }
         int num = ++shared_nums[e];
         if (num > max_num) {
           max_num = num;

@@ -270,7 +270,7 @@ std::string TopfdPara::getTopfdParaStr(const std::string& prefix,
     // parameter block of earlier versions
     if (isMs1GreedyDeconv()) {
       kv("MS1 deconvolution:") << "Greedy" << std::endl;
-      kv("MS1 maximum shared peak number:")
+      kv("MS1 maximum shared peak number (same charge):")
           << sharedPeakNumStr(ms1_max_shared_peak_num_) << std::endl;
     } else if (run_filter_by_mz_) {
       kv("Precursor envelope ranking window:")
@@ -313,7 +313,7 @@ std::string TopfdPara::getTopfdParaStr(const std::string& prefix,
   // files of --deconv-ms2 msdeconv keep the block of earlier versions.
   if (isMs2GreedyDeconv()) {
     kv("MS/MS deconvolution:") << "Greedy" << std::endl;
-    kv("MS/MS maximum shared peak number:")
+    kv("MS/MS maximum shared peak number (same charge):")
         << sharedPeakNumStr(ms2_max_shared_peak_num_) << std::endl;
   } else if (isUseFlashDeconv()) {
     kv("MS/MS deconvolution:") << "FLASHDeconv" << std::endl;
