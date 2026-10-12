@@ -386,8 +386,8 @@ void DeconvSingleSp::postprocess(MatchEnvPtrVec& dp_envs, int ms_level) {
     result_envs_ = match_env_filter::filterByEnvCnnScore(
         result_envs_, topfd_para_ptr_->getMs2EnvCnnScoreCutoff());
   }
-  // filtering by estimated number of amino acids
-  if (topfd_para_ptr_->isAANumBasedFilter()) {
+  // filtering by estimated number of amino acids (-j): MS/MS envelopes only
+  if (ms_level == 2 && topfd_para_ptr_->isAANumBasedFilter()) {
     result_envs_ = match_env_filter::filterByAANum(
         result_envs_, data_ptr_->getMaxMass(),
         topfd_para_ptr_->isSortUseMsDeconv(), env_para_ptr_);

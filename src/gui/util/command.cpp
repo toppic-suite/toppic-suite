@@ -48,6 +48,7 @@ std::string geneTopfdCommand(const TopfdParaPtr& para_ptr,
   oss << "-w " << para_ptr->getPrecWindowWidth() << " ";
   oss << "-t " << para_ptr->getMs1EcscoreCutoff() << " ";
   oss << "-b " << para_ptr->getMs1MinScanNum() << " ";
+  oss << "-l " << para_ptr->getSplitIntensityRatio() << " ";
   command = command + oss.str();
   command = command + "--env-rank " + para_ptr->getDeconvScore() + " ";
   if (para_ptr->isMissingLevelOne()) {

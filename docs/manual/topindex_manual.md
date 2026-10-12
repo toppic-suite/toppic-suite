@@ -69,8 +69,10 @@ without `-f` the fixed-modification part is left out; a fixed-modification
 file appears by its file name without directory or extension
 (`-f mods/C57.txt` gives `C57`). The indexes themselves depend on the fixed
 modifications, the N-terminal forms and the decoy database, but on neither
-error tolerance: the fragment tolerance `-e` is in the names only, and the
-precursor tolerance `-E` affects neither the files nor their names.
+error tolerance: the fragment tolerance `-e` is in the names only, as the
+whole number of ppm that TopIndex, TopPIC and TopMG use (`-e 7.5` and `-e 07`
+give `7`), and the precursor tolerance `-E` affects neither the files nor
+their names.
 
 ## 3. Using the indexes
 

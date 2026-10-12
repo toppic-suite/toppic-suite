@@ -630,6 +630,15 @@ bool ToppicWindow::checkError() {
     return true;
   }
 
+  // toppic refuses an empty proteoform type list (-R)
+  if (!ui->CompleteCheckBox->isChecked() && !ui->PrefixCheckBox->isChecked() &&
+      !ui->SuffixCheckBox->isChecked() && !ui->InternalCheckBox->isChecked()) {
+    QMessageBox::warning(this, tr("Warning"),
+                         tr("Please select at least one proteoform type!"),
+                         QMessageBox::Yes);
+    return true;
+  }
+
   if (ui->fixedModFileEdit->text().isEmpty() &&
       ui->fixedModComboBox->currentIndex() == 3) {
     QMessageBox::warning(this, tr("Warning"),

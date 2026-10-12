@@ -15,6 +15,7 @@
 
 #include "console/topdiff_argument.hpp"
 
+#include <exception>
 #include <filesystem>
 #include <iomanip>
 
@@ -172,6 +173,18 @@ bool TopDiffArgument::validateArguments() {
     LOG_ERROR(
         "Only 1 spectrum file added. Please add at least 2 spectrum files to "
         "make a comparison.");
+    return false;
+  }
+
+  std::string error_tole = arguments_["errorTolerance"];
+  try {
+    if (std::stod(error_tole) <= 0) {
+      LOG_ERROR("Error tolerance " << error_tole
+                                   << " error! The value should be positive.");
+      return false;
+    }
+  } catch (const std::exception& ex) {
+    LOG_ERROR("Error tolerance " << error_tole << " should be a number.");
     return false;
   }
 

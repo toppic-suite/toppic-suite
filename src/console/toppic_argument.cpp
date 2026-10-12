@@ -605,10 +605,11 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
             "prec-error-tolerance,E", po::value<std::string>(&prec_error_tole),
             "<a positive integer>. Error tolerance for precursor masses in "
             "PPM. Default value: 10.")(
-            "filter-by-envcnn,F", po::value<std::string>(&env_cnn_cutoff),
+            "filter-by-score,F", po::value<std::string>(&env_cnn_cutoff),
             "<a number between 0 and 1>. Remove the deconvoluted masses whose "
-            "EnvCNN score is below the cutoff before spectral filtering, "
-            "database search and E-value computation. Default value: 0.4.")(
+            "confidence score (e.g., EnvCNN score) is below the cutoff before "
+            "spectral filtering, database search and E-value computation. "
+            "Default value: 0.4.")(
             "proteoform-error-tolerance,p",
             po::value<std::string>(&form_error_tole),
             "<a positive number>. Error tolerance for identifying PrSM "
@@ -717,7 +718,7 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
         "frag-error-tolerance,e", po::value<std::string>(&frag_error_tole), "")(
         "prec-error-tolerance,E", po::value<std::string>(&prec_error_tole), "")(
         "prec-dalton-error", po::value<std::string>(&prec_dalton_error), "")(
-        "filter-by-envcnn,F", po::value<std::string>(&env_cnn_cutoff), "")(
+        "filter-by-score,F", po::value<std::string>(&env_cnn_cutoff), "")(
         "proteoform-ppm-error,P", "")("proteoform-error-tolerance,p",
                                       po::value<std::string>(&form_error_tole),
                                       "")(
@@ -896,7 +897,7 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
       arguments_["precDaltonError"] = prec_dalton_error;
     }
 
-    if (vm.count("filter-by-envcnn")) {
+    if (vm.count("filter-by-score")) {
       arguments_["envCnnCutoff"] = env_cnn_cutoff;
     }
 
@@ -1304,6 +1305,56 @@ bool ToppicArgument::validateArguments() {
           "NME or NME_ACETYLATION.");
       return false;
     }
+  }
+
+  // -R: PrsmPara skips a name it does not know, so a misspelt type would
+  // silently leave the type out of the search
+  std::string allow_type = arguments_["allowProtType"];
+  std::vector<std::string> type_strs = str_util::split(allow_type, ",");
+  std::set<std::string> type_set;
+  for (size_t i = 0; i < type_strs.size(); i++) {
+    if (type_strs[i] != "COMPLETE" && type_strs[i] != "PREFIX" &&
+        type_strs[i] != "SUFFIX" && type_strs[i] != "INTERNAL") {
+      LOG_ERROR("Proteoform type "
+                << allow_type
+                << " error! The value should be a comma-separated list of "
+                   "COMPLETE, PREFIX, SUFFIX and INTERNAL.");
+      return false;
+    }
+    if (!type_set.insert(type_strs[i]).second) {
+      LOG_ERROR("Proteoform type " << allow_type << " error! "
+                                   << type_strs[i] << " is listed twice.");
+      return false;
+    }
+  }
+
+  std::string local_threshold = arguments_["localThreshold"];
+  try {
+    double th = std::stod(local_threshold);
+    if (th < 0 || th > 1) {
+      LOG_ERROR("MIScore threshold "
+                << local_threshold
+                << " error! The value should be between 0 and 1.");
+      return false;
+    }
+  } catch (const std::exception& ex) {
+    LOG_ERROR("MIScore threshold " << local_threshold
+                                   << " should be a number.");
+    return false;
+  }
+
+  std::string group_num = arguments_["groupSpectrumNumber"];
+  try {
+    if (std::stoi(group_num) <= 0) {
+      LOG_ERROR("Number of combined spectra "
+                << group_num << " error! The value should be a positive "
+                   "integer.");
+      return false;
+    }
+  } catch (const std::exception& ex) {
+    LOG_ERROR("Number of combined spectra "
+              << group_num << " should be a positive integer.");
+    return false;
   }
 
   std::string variable_ptm_num = arguments_["variablePtmNum"];

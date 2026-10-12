@@ -108,8 +108,8 @@ deleted at the end unless `--keep-temp-files` is given;
    PrSMs with fewer than four matched fragments get the maximum E-value.
 7. **Top PrSM selection.** The best PrSM of each spectrum is kept.
 8. **Recounting matched masses and fragments** against the complete spectra
-   (the search uses only masses with an EnvCNN score of at least
-   `--filter-by-envcnn`).
+   (the search uses only masses with a confidence score, such as the EnvCNN
+   score, of at least `--filter-by-score`).
 9. **Proteoform and protein clustering.** PrSMs sharing a TopFD feature form
    one proteoform; proteoforms of the same protein whose precursor masses
    agree within `--proteoform-error-tolerance` are merged; proteoforms are
@@ -181,7 +181,7 @@ Spectra and tolerances:
 | `-a`, `--activation <CID\|ETD\|ETCID\|ETHCD\|HCD\|MPD\|UVPD\|FILE>` | FILE | Fragmentation method; `FILE` takes it from each spectrum. ETCID (ETciD) and ETHCD (EThcD) are searched with the ion types of ETD (c, z-dot). |
 | `-e`, `--frag-error-tolerance <int>` | 10 | Error tolerance of fragment masses (ppm). |
 | `-E`, `--prec-error-tolerance <int>` | 10 | Error tolerance of precursor masses (ppm). |
-| `-F`, `--filter-by-envcnn <0..1>` | 0.4 | Masses with an EnvCNN score below this are ignored during filtering, search and E-value computation. |
+| `-F`, `--filter-by-score <0..1>` | 0.4 | Masses whose confidence score (the fourth column of the msalign file: the EnvCNN score in TopFD's files, the pseudo score in TopDIA's) is below this are ignored during filtering, search and E-value computation. |
 | `-p`, `--proteoform-error-tolerance <number>` | 1.2 | Precursor mass tolerance (Da) for grouping PrSMs into proteoforms. |
 | `-x`, `--no-topfd-feature` | off | Run without the TopFD feature file. |
 

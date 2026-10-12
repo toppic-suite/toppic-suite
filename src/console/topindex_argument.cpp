@@ -265,7 +265,7 @@ bool TopIndexArgument::validateArguments() {
 
   if (!std::filesystem::exists(arguments_["oriDatabaseFileName"])) {
     LOG_ERROR("Database file "
-              << arguments_["databaseFileName"] << " does not exist!\n"
+              << arguments_["oriDatabaseFileName"] << " does not exist!\n"
               << " Please check if file directory or name contains special "
                  "characters such as spaces or quotation marks.");
     return false;

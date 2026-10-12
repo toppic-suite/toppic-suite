@@ -124,9 +124,10 @@ same copy as without the option. The result files are named after
    protein; their E-values are recomputed for the new proteoform on the
    masses the search used.
 10. **Recounting matched masses and fragments.** The search and the
-    cluster protein correction use only the masses whose EnvCNN score is at
-    least `--filter-by-envcnn`; the matched masses and fragments of every
-    PrSM are recounted against the complete spectra.
+    cluster protein correction use only the masses whose confidence score
+    (such as the EnvCNN score) is at least `--filter-by-score`; the matched
+    masses and fragments of every PrSM are recounted against the complete
+    spectra.
 11. **Post mass matching** (default; off with `--disable-post-match`). For
     the best PrSM of every spectrum, target or decoy, after the clustering,
     the cluster protein correction and the recount, the theoretical
@@ -256,7 +257,7 @@ Database and modifications:
 | `-f`, `--fixed-mod <C57\|C58\|file>` | none | Fixed modifications: `C57` carbamidomethylation of cysteine, `C58` carboxymethylation of cysteine, or a modification file (section 5). |
 | `-n`, `--n-terminal-form <list>` | NONE,NME,NME_ACETYLATION,M_ACETYLATION | Allowed protein N-terminal forms, comma-separated: no modification, methionine excision, acetylation after methionine excision, acetylation of the initial methionine. |
 | `-N`, `--n-terminal-label <number>` | 0 | Mass (Da) of a label on the N-terminus of every proteoform, for example 229.162932 for TMT. The label is added to the N-terminal fragment ions and removed from the precursor mass; the reported proteoforms and adjusted precursor masses are label-free, and the `N-terminal label mass` column gives the label (section 3). Every N-terminus is labeled, acetylated ones included. In `toppic_gui`: "N-terminal label mass (Da)" on the Advanced Parameters tab. |
-| `-R`, `--proteoform-type <list>` | COMPLETE,PREFIX,SUFFIX,INTERNAL | Allowed proteoform types, comma-separated: the complete protein, its N-terminal part, its C-terminal part, or an internal part. |
+| `-R`, `--proteoform-type <list>` | COMPLETE,PREFIX,SUFFIX,INTERNAL | Allowed proteoform types, comma-separated: the complete protein, its N-terminal part, its C-terminal part, or an internal part. An empty list, an unknown name or a name given twice stops TopPIC with an error. |
 | `-d`, `--decoy` | off | Search a shuffled decoy database as well, to estimate false discovery rates. Required for the `FDR` cutoff types and for `--rescore`. |
 
 Mass shifts and variable modifications:
@@ -278,7 +279,7 @@ Spectra and tolerances:
 | `-a`, `--activation <CID\|ETD\|ETCID\|ETHCD\|HCD\|MPD\|UVPD\|FILE>` | FILE | Fragmentation method; `FILE` takes it from each spectrum. ETCID (ETciD) and ETHCD (EThcD) are searched with the ion types of ETD (c, z-dot). |
 | `-e`, `--frag-error-tolerance <int>` | 10 | Error tolerance of fragment masses (ppm). |
 | `-E`, `--prec-error-tolerance <int>` | 10 | Error tolerance of precursor masses (ppm). |
-| `-F`, `--filter-by-envcnn <0..1>` | 0.4 | Masses with an EnvCNN score below this are ignored during filtering, search and E-value computation. |
+| `-F`, `--filter-by-score <0..1>` | 0.4 | Masses whose confidence score (the fourth column of the msalign file: the EnvCNN score in TopFD's files, the pseudo score in TopDIA's) is below this are ignored during filtering, search and E-value computation. |
 | `-p`, `--proteoform-error-tolerance <number>` | 1.2 | Precursor mass tolerance (Da) for grouping PrSMs into proteoform clusters. |
 | `-r`, `--num-combined-spectra <int>` | 1 | Number of consecutive MS/MS spectra of one precursor searched together, for alternating fragmentation (2 for pairs, 3 for triplets). |
 | `-X`, `--approximate-spectra` | off | Use approximate spectra in protein filtering, for higher sensitivity. Only affects the variable PTM filtering step (`-b`). |

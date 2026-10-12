@@ -538,7 +538,9 @@ command emits `-y` and `-Y`). Facts to keep straight:
   MS-Deconv score", topdia_gui "Use MS-Deconv score", `msDeconvCheckBox`),
   and `gui/util/command.cpp` always emits `--env-rank <score>`. The ranking
   only decides which envelopes `--frag-num-filtering` (`-j` in topfd and
-  topdia) keeps; the EnvCNN cutoffs and the msalign
+  topdia; MS/MS envelopes only: `DeconvSingleSp`, which also deconvolutes
+  the MS1 spectra with `--deconv-ms1 msdeconv`, applied it to MS1 envelopes
+  too until 2026-10-12) keeps; the EnvCNN cutoffs and the msalign
   score column use the EnvCNN score with either value.
 - **The EnvCNN cutoffs** (2026-10-12): `-f`/`--envcnn-cutoff-ms1`
   (`TopfdPara::ms1_env_cnn_score_cutoff_`, default 0.2) and
@@ -1807,7 +1809,9 @@ precursor, through `getActivationName` (branch `ethcd_activation`, issue
 `-e`/`--frag-error-tolerance` (argument keys `precErrorTolerance` and
 `fragErrorTolerance`, both default 10 ppm) in toppic, topindex and topmg and
 their GUIs. The index file name (`filter/mng/index_file_name`) carries only
-the fragment value: the indexes depend on neither tolerance, and the manuals
+the fragment value, as the integer the searches use (`std::stoi`: `7.5` and
+`07` give `7`; until 2026-10-12 the string as given, so `-e 07` missed the
+index of `-e 7`): the indexes depend on neither tolerance, and the manuals
 say an index is reused when `-f`, `-n`, `-e` and `-d` match. topmg's hidden
 `--proteoform-ppm-error` moved from `-E` to `-Q` to free the letter. The
 rule for choosing between the two tolerances: the
@@ -4180,7 +4184,9 @@ above it, never the reverse:
   the corrected database of `sqlite_mass_calib`, see its section).
   `MsAlignReader` has a four-argument constructor taking an EnvCNN score
   cutoff (`SpPara::getEnvCnnCutoff()`, whose own default is 0.2, but both
-  toppic and topmg set the key from their `-F`, which defaults to 0.4 in
+  toppic and topmg set the key from their `-F` (`--filter-by-score`; the
+  fourth msalign column is TopFD's EnvCNN score or TopDIA's pseudo score;
+  `--filter-by-envcnn` until 2026-10-12), which defaults to 0.4 in
   each): masses whose fourth
   msalign column is below it are skipped, keeping the file's peak ids. The
   filter, search and E-value/p-value stages (`filter/*`, `search/*`,

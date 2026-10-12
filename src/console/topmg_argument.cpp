@@ -338,10 +338,11 @@ bool TopmgArgument::parse(int argc, char* argv[]) {
         "prec-error-tolerance,E", po::value<std::string>(&prec_error_tole),
         "<a positive integer>. Error tolerance for precursor masses in PPM. "
         "Default value: 10.")(
-        "filter-by-envcnn,F", po::value<std::string>(&env_cnn_cutoff),
+        "filter-by-score,F", po::value<std::string>(&env_cnn_cutoff),
         "<a number between 0 and 1>. Remove the deconvoluted masses whose "
-        "EnvCNN score is below the cutoff before spectral filtering, "
-        "database search and E-value computation. Default value: 0.4.")(
+        "confidence score (e.g., EnvCNN score) is below the cutoff before "
+        "spectral filtering, database search and E-value computation. "
+        "Default value: 0.4.")(
         "proteoform-error-tolerance,p",
         po::value<std::string>(&form_error_tole),
         "<a positive number>. Error tolerance for identifying PrSM clusters "
@@ -412,7 +413,7 @@ bool TopmgArgument::parse(int argc, char* argv[]) {
         "decoy,d", "")("frag-error-tolerance,e",
                        po::value<std::string>(&frag_error_tole), "")(
         "prec-error-tolerance,E", po::value<std::string>(&prec_error_tole), "")(
-        "filter-by-envcnn,F", po::value<std::string>(&env_cnn_cutoff), "")(
+        "filter-by-score,F", po::value<std::string>(&env_cnn_cutoff), "")(
         "proteoform-ppm-error,Q", "")("proteoform-error-tolerance,p",
                                       po::value<std::string>(&form_error_tole),
                                       "")(
@@ -533,7 +534,7 @@ bool TopmgArgument::parse(int argc, char* argv[]) {
       arguments_["precErrorTolerance"] = prec_error_tole;
     }
 
-    if (vm.count("filter-by-envcnn")) {
+    if (vm.count("filter-by-score")) {
       arguments_["envCnnCutoff"] = env_cnn_cutoff;
     }
 
@@ -656,7 +657,7 @@ bool TopmgArgument::validateArguments() {
 
   if (!std::filesystem::exists(arguments_["oriDatabaseFileName"])) {
     LOG_ERROR("Database file "
-              << arguments_["databaseFileName"] << " does not exist!\n"
+              << arguments_["oriDatabaseFileName"] << " does not exist!\n"
               << "Please check if file directory or name contains special "
                  "characters such as spaces or quotation marks.");
     return false;
@@ -845,7 +846,7 @@ bool TopmgArgument::validateArguments() {
                 << max_shift_mass << " error! The value should be positive.");
       return false;
     }
-  } catch (int e) {
+  } catch (const std::exception& ex) {
     LOG_ERROR("Maximum shift mass " << max_shift_mass
                                     << " should be a number.");
     return false;
@@ -860,7 +861,7 @@ bool TopmgArgument::validateArguments() {
                 << " error! The value should be positive.");
       return false;
     }
-  } catch (int e) {
+  } catch (const std::exception& ex) {
     LOG_ERROR("Spectrum-level cutoff value " << cutoff_spectral_value
                                              << " should be a number.");
     return false;
@@ -951,23 +952,32 @@ bool TopmgArgument::validateArguments() {
                 << " error! The value should be positive.");
       return false;
     }
-  } catch (int e) {
+  } catch (const std::exception& ex) {
     LOG_ERROR("PrSM clustering error tolerance: " << form_error_tole_value
                                                   << " should be a number.");
     return false;
   }
 
-  std::string var_ptm_num = arguments_["varPtmNumber"];
-  try {
-    double ptm_n = std::stod(var_ptm_num);
-    if (ptm_n <= 0.0) {
-      LOG_ERROR("Maximum PTM sites "
-                << var_ptm_num << " error! The value should be positive.");
+  // -P, -j and -G are read with std::stoi by TopMG_identify
+  for (const auto& [key, name] :
+       {std::pair<const char*, const char*>{"varPtmNumber",
+                                            "Maximum variable PTM number"},
+        std::pair<const char*, const char*>{"proteoGraphGap",
+                                            "Proteoform graph gap"},
+        std::pair<const char*, const char*>{"varPtmNumInGap",
+                                            "Maximum variable PTM number in "
+                                            "a gap"}}) {
+    std::string value = arguments_[key];
+    try {
+      if (std::stoi(value) <= 0) {
+        LOG_ERROR(name << " " << value
+                       << " error! The value should be a positive integer.");
+        return false;
+      }
+    } catch (const std::exception& ex) {
+      LOG_ERROR(name << " " << value << " should be a positive integer.");
       return false;
     }
-  } catch (int e) {
-    LOG_ERROR("Maximum ptm sites " << var_ptm_num << " should be a number.");
-    return false;
   }
   return true;
 }
