@@ -138,11 +138,6 @@ bool Argument::parse(int argc, char* argv[]) {
         "fragment ions; msdeconv, the MS-Deconv dynamic programming of "
         "earlier versions; or flashdeconv, the FLASHDeconv algorithm "
         "(experimental). The default value is greedy.")(
-        "env-rank,n", po::value<std::string>(&env_rank),
-        "<envcnn|msdeconv>. Set the score used to rank isotopic envelopes: "
-        "envcnn, the EnvCNN score, or msdeconv, the MS-Deconv score. The "
-        "EnvCNN cutoffs (-f and -g) use the EnvCNN score with either "
-        "value. The default value is envcnn.")(
         "envcnn-cutoff-ms1,f",
         po::value<std::string>(&ms1_env_cnn_score_cutoff),
         "<a number in [0,1]>. Set the EnvCNN score cutoff for isotopic "
@@ -156,9 +151,16 @@ bool Argument::parse(int argc, char* argv[]) {
         "envelopes in MS/MS spectra: envelopes with a lower EnvCNN score are "
         "not reported. Used with the greedy and msdeconv MS/MS deconvolution "
         "methods, not with flashdeconv. The default value is 0.")(
-        "frag-num-filtering,F",
+        "env-rank,n", po::value<std::string>(&env_rank),
+        "<envcnn|msdeconv>. Set the score used to rank isotopic envelopes: "
+        "envcnn, the EnvCNN score, or msdeconv, the MS-Deconv score. The "
+        "ranking decides which envelopes -v keeps; the EnvCNN cutoffs (-f "
+        "and -g) use the EnvCNN score with either value. The default value "
+        "is envcnn.")(
+        "frag-num-filtering,v",
         "Filter fragment ion envelopes in MS/MS scans based on the estimated "
-        "number of fragment ions.")(
+        "number of fragment ions: the envelopes ranked highest by the score "
+        "of -n are kept.")(
         "ecscore-cutoff,t", po::value<std::string>(&ecscore_cutoff),
         "<a number in [0,1]>. Set the ECScore cutoff value for proteoform "
         "features. The default value is 0.1.")(

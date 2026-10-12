@@ -482,7 +482,7 @@ rows. `assignIntensity` (called before `mzRefine` and again after sorting)
 only splits an experimental peak among envelopes that share it; it never
 changes theoretical intensities. The greedy MS1 and MS/MS searches (TopFD's
 defaults) do not run this refinement. When touching any of this, validate
-with `topfd -T -F --deconv-ms2 msdeconv` on the myoglobin peak list (without
+with `topfd -T -v --deconv-ms2 msdeconv` on the myoglobin peak list (without
 the option `-T` runs the greedy search): compare the deconvoluted masses
 against the sequence's b/y ions (46 exact / 14 off-by-one-isotope is the
 reference), and count envelopes whose theoretical apex exceeds the observed
@@ -537,7 +537,7 @@ command emits `-y` and `-Y`). Facts to keep straight:
   MS-Deconv score", topdia_gui "Use MS-Deconv score", `msDeconvCheckBox`),
   and `gui/util/command.cpp` always emits `--env-rank <score>` (topfd) or
   `--deconv-score <score>` (topdia). The ranking only decides which
-  envelopes `-F` (topdia `-d`) keeps; the EnvCNN cutoffs and the msalign
+  envelopes `-v` (topdia `-d`) keeps; the EnvCNN cutoffs and the msalign
   score column use the EnvCNN score with either value.
 - **The EnvCNN cutoffs** (2026-10-12): topfd's `-f`/`--envcnn-cutoff-ms1`
   (`TopfdPara::ms1_env_cnn_score_cutoff_`, default 0.2) and
@@ -555,9 +555,10 @@ command emits `-y` and `-Y`). Facts to keep straight:
   block prints "MS1 envelope EnvCNN score cutoff" in the MS1 section.
   TopDIA has no options for them and takes the same defaults, so its
   default MS1 output (MS-Deconv) lost the envelopes below 0.2 too. The
-  letters of topfd's `--frag-num-filtering` (`-g` -> `-F`) and
-  `--disable-additional-feature-search` (`-f` -> `-d`) moved for them;
-  topfd_gui's command emits the new letters.
+  letters of topfd's `--frag-num-filtering` (`-g` -> `-v`; `-F` for a few
+  hours) and `--disable-additional-feature-search` (`-f` -> `-d`) moved
+  for them; topfd_gui's command emits the new letters. `topfd -h` lists
+  `-f`, `-g`, `-n`, `-v` in that order after `-q`.
 - **GUI wiring**: `topfddialog.ui` and `topdiadialog.ui` have
   `ms1DeconvComboBox` and `ms2DeconvComboBox`, whose item texts are the
   option values (as `activationComboBox`'s are), set from the dialog's
@@ -787,7 +788,7 @@ deconvMsTwo` and `topfd -T` call it; the parameter block then prints
 "MS/MS deconvolution: Greedy" instead of the DP's ranking window and
 harmonic check lines). `DeconvSingleSp`, TopFD's default up to main
 89df2a8c, runs with `--deconv-ms2 msdeconv`, TopDIA's default (see
-"Deconvolution methods" above). `-g`, `-F` and `-n` apply to both methods
+"Deconvolution methods" above). `-g`, `-v` and `-n` apply to both methods
 (`greedy_ms2_deconv::deconv` ends with the same filters). It started as a
 copy of the greedy MS1 search (previous section) and keeps its structure;
 the output (msalign lines, EnvCNN scores, the `-F`-relevant score, SQLite

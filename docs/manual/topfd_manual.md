@@ -259,10 +259,10 @@ MS/MS deconvolution:
 | `-a`, `--activation <CID\|ETD\|ETCID\|ETHCD\|HCD\|MPD\|UVPD\|FILE>` | FILE | Fragmentation method. `FILE` takes it from the activation terms of each spectrum in the input file, whatever their order: ETD with beam-type or supplemental beam-type CID (or the EThcD term) is ETHCD, ETD with CID or supplemental CID (or the ETciD term) is ETCID, otherwise ETD, HCD, CID or MPD. ETCID (ETciD) and ETHCD (EThcD) have the ion types of ETD (c, z-dot). Give a method explicitly when the file does not record it or records it wrongly. |
 | `-s`, `--ms-two-sn-ratio <number>` | 1 | Signal-to-noise ratio for MS/MS spectra. Only peaks with intensity at least `ratio × noise level` can be the reference peak of an isotopic envelope; the other peaks of an envelope must be above the noise level. Values below 1, down to 0, lower both thresholds to `ratio × noise level`; the noise level itself still bounds how far isotopic envelopes extend. |
 | `-w`, `--precursor-window <number>` | 3.0 | Default precursor isolation window width (m/z). Ignored when the file contains isolation window information. |
-| `-n`, `--env-rank <envcnn\|msdeconv>` | envcnn | The score that ranks isotopic envelopes: `envcnn`, the EnvCNN neural-network score, or `msdeconv`, the MS-Deconv score. The ranking decides which envelopes `-F` keeps; the EnvCNN cutoffs `-f` and `-g` compare the EnvCNN score with either value, and the score column of the msalign files is the EnvCNN score. In `topfd_gui`: "Sort using MS-Deconv score" (`msdeconv` when checked). |
-| `-g`, `--envcnn-cutoff-ms2 <0..1>` | 0 | MS/MS envelopes whose EnvCNN score is below the cutoff are not reported. Used with `-q greedy` and `msdeconv`, not with `flashdeconv`; also for MS3 spectra and `-T`. |
-| `-F`, `--frag-num-filtering` | off | Limit the number of fragment envelopes in an MS/MS spectrum based on the estimated number of fragment ions. |
 | `-q`, `--deconv-ms2 <greedy\|msdeconv\|flashdeconv>` | greedy | MS/MS deconvolution method (section 1.2): `greedy`, the greedy search adapted to fragment ions; `msdeconv`, the MS-Deconv dynamic programming, the default method of earlier versions; or `flashdeconv`, the FLASHDeconv algorithm (experimental; the output files are the same; not with `-T`). In `topfd_gui`: "MS/MS deconvolution" (it replaces the former option `--ms2-flashdeconv`). |
+| `-g`, `--envcnn-cutoff-ms2 <0..1>` | 0 | MS/MS envelopes whose EnvCNN score is below the cutoff are not reported. Used with `-q greedy` and `msdeconv`, not with `flashdeconv`; also for MS3 spectra and `-T`. |
+| `-n`, `--env-rank <envcnn\|msdeconv>` | envcnn | The score that ranks isotopic envelopes: `envcnn`, the EnvCNN neural-network score, or `msdeconv`, the MS-Deconv score. The ranking decides which envelopes `-v` keeps; the EnvCNN cutoffs `-f` and `-g` compare the EnvCNN score with either value, and the score column of the msalign files is the EnvCNN score. In `topfd_gui`: "Sort using MS-Deconv score" (`msdeconv` when checked). |
+| `-v`, `--frag-num-filtering` | off | Limit the number of fragment envelopes in an MS/MS spectrum based on the estimated number of fragment ions: the envelopes ranked highest by the score of `-n` are kept. |
 
 ### 1.5 Examples
 
@@ -336,7 +336,7 @@ topfd -T [options] peaks.txt
 Only the parameters of MS/MS deconvolution apply. The useful ones are
 `-c`/`--max-charge`, `-m`/`--max-mass`, `-e`/`--mz-error`,
 `-s`/`--ms-two-sn-ratio`, `-n`/`--env-rank`, `-g`/`--envcnn-cutoff-ms2`,
-`-F`/`--frag-num-filtering` and `-q`/`--deconv-ms2` (`greedy` or `msdeconv`;
+`-v`/`--frag-num-filtering` and `-q`/`--deconv-ms2` (`greedy` or `msdeconv`;
 `flashdeconv` is refused with `-T`). The MS1 and feature detection options
 (`-r`, `-p`, `-f`, `-t`, `-b`, `-l`, `-i`, `-d`), `-o` and `-w` have
 no effect; `-u` only sets the number of threads ONNX Runtime uses for EnvCNN
