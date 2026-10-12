@@ -47,7 +47,10 @@ and runs five steps:
 
 1. **MS1 deconvolution.** Every MS1 scan is deconvoluted, by default with
    the MS-Deconv dynamic programming (`--deconv-ms1 msdeconv`); `--deconv-ms1
-   greedy` selects TopFD's default greedy search.
+   greedy` selects TopFD's default greedy search. With either method, MS1
+   envelopes whose EnvCNN score is below 0.2 are not reported (TopFD's
+   `--envcnn-cutoff-ms1` default; TopDIA has no option for it), except
+   the envelopes of the precursor isolation windows.
 2. **MS1 feature detection.** The MS1 envelopes are linked across scans into
    proteoform features, scored with ECScore and filtered by
    `--ms1-ecscore-cutoff` and `--ms1-min-scan-number`.

@@ -377,8 +377,12 @@ void DeconvSingleSp::postprocess(MatchEnvPtrVec& dp_envs, int ms_level) {
 
   // Obtain EnvCNN Scores for envelopes
   onnx_env_cnn::computeEnvScores(peak_list, result_envs_);
-  // filtering by EnvCNN score
-  if (ms_level == 2) {
+  // filtering by EnvCNN score (MS1: the whole-spectrum envelopes of
+  // deconv_ms1_process::deconvMsOne, not its precursor-window envelopes)
+  if (ms_level == 1) {
+    result_envs_ = match_env_filter::filterByEnvCnnScore(
+        result_envs_, topfd_para_ptr_->getMs1EnvCnnScoreCutoff());
+  } else if (ms_level == 2) {
     result_envs_ = match_env_filter::filterByEnvCnnScore(
         result_envs_, topfd_para_ptr_->getMs2EnvCnnScoreCutoff());
   }

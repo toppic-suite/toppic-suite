@@ -482,7 +482,7 @@ rows. `assignIntensity` (called before `mzRefine` and again after sorting)
 only splits an experimental peak among envelopes that share it; it never
 changes theoretical intensities. The greedy MS1 and MS/MS searches (TopFD's
 defaults) do not run this refinement. When touching any of this, validate
-with `topfd -T -g --deconv-ms2 msdeconv` on the myoglobin peak list (without
+with `topfd -T -F --deconv-ms2 msdeconv` on the myoglobin peak list (without
 the option `-T` runs the greedy search): compare the deconvoluted masses
 against the sequence's b/y ions (46 exact / 14 off-by-one-isotope is the
 reference), and count envelopes whose theoretical apex exceeds the observed
@@ -525,16 +525,39 @@ command emits `-y` and `-Y`). Facts to keep straight:
   hidden `--ms1-greedy-deconv` / `--ms2-greedy-deconv`, and the short-lived
   `--deconv-ms1-msdeconv` / `--deconv-ms2-msdeconv` of commit b3d71867.
   The letter `-F` is free in topfd.
-- **The envelope ranking score** (2026-10-12): `-n`/`--deconv-score
-  <envcnn|msdeconv>` (default `envcnn`) replaces the flag `-n`/`--msdeconv`
-  (unrecognised now) in topfd and topdia. `TopfdPara` stores the name
+- **The envelope ranking score** (2026-10-12): topfd's `-n`/`--env-rank
+  <envcnn|msdeconv>` and topdia's `-n`/`--deconv-score <envcnn|msdeconv>`
+  (default `envcnn`; topfd's was `--deconv-score` for a few hours) replace
+  the flag `-n`/`--msdeconv` (unrecognised now). `TopfdPara` stores the name
   (`deconv_score_`; `getDeconvScores()` lists the values, `setDeconvScore`
   returns false for any other, which both parsers report), and
   `isSortUseMsDeconv()` is `deconv_score_ == "msdeconv"`, so the
   deconvolutions and the parameter block's "Fragment envelope ranking" line
   are unchanged. The GUIs keep their checkboxes (topfd_gui "Sort using
   MS-Deconv score", topdia_gui "Use MS-Deconv score", `msDeconvCheckBox`),
-  and `gui/util/command.cpp` always emits `--deconv-score <score>`.
+  and `gui/util/command.cpp` always emits `--env-rank <score>` (topfd) or
+  `--deconv-score <score>` (topdia). The ranking only decides which
+  envelopes `-F` (topdia `-d`) keeps; the EnvCNN cutoffs and the msalign
+  score column use the EnvCNN score with either value.
+- **The EnvCNN cutoffs** (2026-10-12): topfd's `-f`/`--envcnn-cutoff-ms1`
+  (`TopfdPara::ms1_env_cnn_score_cutoff_`, default 0.2) and
+  `-g`/`--envcnn-cutoff-ms2` (`ms2_env_cnn_score_cutoff_`, default 0; was
+  `-v`/`--env-cnn-cutoff`), with the greedy and MS-Deconv deconvolutions
+  only. MS1: the greedy search drops its envelopes below the larger of the
+  cutoff and `GreedyPara::min_envcnn` (now 0; its default 0.2 became the
+  option's), `DeconvSingleSp::postprocess` those of `deconvMsOne`'s
+  whole-spectrum search (`ms_level` 1; `--deconv-ms1 msdeconv` had no
+  EnvCNN filter before, so its default output lost the envelopes below
+  0.2); the precursor-window envelopes (`addPrecWinEnvs`, `deconvMsOne`'s
+  precursor-window step) are not filtered. MS/MS as before
+  (`DeconvSingleSp`, `greedy_ms2_deconv`; MS3 and `-T` too; not
+  FLASHDeconv; PTCR keeps `TOPFD_PTCR_PARA`'s `min_envcnn`). The parameter
+  block prints "MS1 envelope EnvCNN score cutoff" in the MS1 section.
+  TopDIA has no options for them and takes the same defaults, so its
+  default MS1 output (MS-Deconv) lost the envelopes below 0.2 too. The
+  letters of topfd's `--frag-num-filtering` (`-g` -> `-F`) and
+  `--disable-additional-feature-search` (`-f` -> `-d`) moved for them;
+  topfd_gui's command emits the new letters.
 - **GUI wiring**: `topfddialog.ui` and `topdiadialog.ui` have
   `ms1DeconvComboBox` and `ms2DeconvComboBox`, whose item texts are the
   option values (as `activationComboBox`'s are), set from the dialog's
@@ -654,8 +677,9 @@ straight:
   isotopes off the grid of every 2nd/3rd isotope are much weaker than those
   on it is rejected as a harmonic (`harm_ratio` 0.4); a mass found at one
   charge only needs an isotope cosine of 0.8 (`single_min_cos`); envelopes
-  with an EnvCNN score below 0.2 are not written (`min_envcnn`; a third of
-  the envelopes, which only seeded extra MS1 features).
+  with an EnvCNN score below 0.2 are not written (`-f`/`--envcnn-cutoff-ms1`,
+  until 2026-10-12 the switch `min_envcnn`; a third of the envelopes, which
+  only seeded extra MS1 features).
 - **Shared peaks** (toppic_test experiments 157 and 158, reports 0157 and
   0158; branch `greedy_shared_peaks`, merged into main on 2026-10-10 as
   2df670d5, then branch `shared_peaks_same_charge`, merged into main on
@@ -730,7 +754,7 @@ straight:
   directory.
 - **Cost**: the search itself is cheap (about 70 ms per 480_F3_02 MS1
   spectrum); almost all of the extra MS1 time against main is EnvCNN on
-  the envelopes before the `min_envcnn` filter (about twice main's
+  the envelopes before the EnvCNN filter (`-f`; about twice main's
   number).
 - **Results** (toppic_test experiment 104, report 0104): on 480_F3_02
   with main's TopPIC in the benchmark setting, 3,181-3,182 PrSMs, 1,887
@@ -742,7 +766,9 @@ straight:
   The search gives fewer MS/MS spectra a precursor on some data: 612 of
   1,381 against MS-Deconv's 855 on st_1.mzML (MS/MS-matched features 894
   against 1,158), 4,289 against 4,303 on 480_F3_02.
-- **`--deconv-ms1 msdeconv` writes the earlier default's output**: on st_1
+- **`--deconv-ms1 msdeconv` writes the earlier default's output** (with
+  `-f 0` since 2026-10-12, when the MS1 EnvCNN cutoff 0.2 began to apply to
+  it): on st_1
   all 1,418 MS1 scans' masses and charges, both feature files and the
   parameter block equal main 89df2a8c's (the last main with the DP as the
   default), the MS/MS spectra up to the EnvCNN jitter of two runs of one
@@ -761,7 +787,7 @@ deconvMsTwo` and `topfd -T` call it; the parameter block then prints
 "MS/MS deconvolution: Greedy" instead of the DP's ranking window and
 harmonic check lines). `DeconvSingleSp`, TopFD's default up to main
 89df2a8c, runs with `--deconv-ms2 msdeconv`, TopDIA's default (see
-"Deconvolution methods" above). `-v`, `-g` and `-n` apply to both methods
+"Deconvolution methods" above). `-g`, `-F` and `-n` apply to both methods
 (`greedy_ms2_deconv::deconv` ends with the same filters). It started as a
 copy of the greedy MS1 search (previous section) and keeps its structure;
 the output (msalign lines, EnvCNN scores, the `-F`-relevant score, SQLite

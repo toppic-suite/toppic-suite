@@ -270,6 +270,8 @@ std::string TopfdPara::getTopfdParaStr(const std::string& prefix,
            << banner(prefix, "MS1 spectral deconvolution parameters")
            << std::endl;
     kv("MS1 signal/noise ratio:") << ms_one_sn_ratio_ << std::endl;
+    kv("MS1 envelope EnvCNN score cutoff:")
+        << ms1_env_cnn_score_cutoff_ << std::endl;
     // printed only for the greedy search (TopFD's default), so that the
     // output files of --deconv-ms1 msdeconv (TopDIA's default) keep the
     // parameter block of earlier versions

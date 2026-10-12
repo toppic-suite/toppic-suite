@@ -68,12 +68,13 @@ class TopfdPara {
   double getMsTwoSnRatio() const { return ms_two_sn_ratio_; }
   double getSplitIntensityRatio() const { return split_intensity_ratio_; }
   double getPrecWindowWidth() const { return prec_window_; }
-  // the score that ranks the envelopes (--deconv-score of topfd and
-  // topdia): "envcnn" or "msdeconv"
+  // the score that ranks the envelopes (topfd's --env-rank, topdia's
+  // --deconv-score): "envcnn" or "msdeconv"
   static const std::vector<std::string>& getDeconvScores();
   const std::string& getDeconvScore() const { return deconv_score_; }
   bool isSortUseMsDeconv() const { return deconv_score_ == "msdeconv"; }
   bool isAANumBasedFilter() const { return aa_num_based_filter_; }
+  double getMs1EnvCnnScoreCutoff() const { return ms1_env_cnn_score_cutoff_; }
   double getMs2EnvCnnScoreCutoff() const { return ms2_env_cnn_score_cutoff_; }
   const std::string& getActivation() const { return activation_; }
   bool isGeneSql() const { return gene_sql_; }
@@ -154,6 +155,9 @@ class TopfdPara {
   // false, and the score unchanged, for a name not in getDeconvScores()
   bool setDeconvScore(const std::string& score);
   void setAANumBasedFilter(bool filter) { aa_num_based_filter_ = filter; }
+  void setMs1EnvCnnScoreCutoff(double cutoff) {
+    ms1_env_cnn_score_cutoff_ = cutoff;
+  }
   void setMs2EnvCnnScoreCutoff(double cutoff) {
     ms2_env_cnn_score_cutoff_ = cutoff;
   }
@@ -270,9 +274,18 @@ class TopfdPara {
   std::string activation_ = "FILE";
   // keep unused peaks in dynamic programming
   bool keep_unused_peaks_ = false;
-  // the score that ranks the envelopes (option --deconv-score): "envcnn"
-  // (the EnvCNN score, the default) or "msdeconv" (the MS-Deconv score)
+  // the score that ranks the envelopes (topfd's --env-rank, topdia's
+  // --deconv-score): "envcnn" (the EnvCNN score, the default) or "msdeconv"
+  // (the MS-Deconv score)
   std::string deconv_score_ = "envcnn";
+  // the EnvCNN score cutoffs of the MS1 and MS/MS envelopes (topfd's
+  // --envcnn-cutoff-ms1 and --envcnn-cutoff-ms2) of the greedy and MS-Deconv
+  // deconvolutions; not the envelopes added for precursor windows, not
+  // FLASHDeconv. MS1 0.2: the greedy MS1 search's own minimum until then
+  // (its envelopes below 0.2 are a third of them, seed the features that the
+  // feature detection would otherwise spend 50% more time on, and gave no
+  // identification; toppic_test experiment 104, run g6)
+  double ms1_env_cnn_score_cutoff_ = 0.2;
   double ms2_env_cnn_score_cutoff_ = 0.0;
   bool aa_num_based_filter_ = false;
   bool output_csv_feature_file_ = false;

@@ -120,11 +120,10 @@ struct GreedyPara {
   // peaks of a charge state missing from a mass's series must not become a
   // near-duplicate mass
   double merge_window = 0;
-  // envelopes with an EnvCNN score below min_envcnn are not reported (0 =
-  // all reported): they are a third of the envelopes, seed the features
-  // that the feature detection would otherwise spend 50% more time on, and
-  // gave no identification (experiment 104, run g6)
-  double min_envcnn = 0.2;
+  // envelopes with an EnvCNN score below the larger of min_envcnn and
+  // --envcnn-cutoff-ms1 (TopfdPara, default 0.2; it was this switch's
+  // default, experiment 104, run g6) are not reported
+  double min_envcnn = 0;
   // research aid for timing: 0 skips the EnvCNN scores
   int envcnn = 1;
   // main's precursor-window step first (1) or not (0)
@@ -1260,10 +1259,12 @@ MatchEnvPtrVec deconv(const PeakPtrVec& peak_list,
   if (getPara().envcnn != 0) {
     onnx_env_cnn::computeEnvScores(peak_list, envs);
   }
-  if (getPara().min_envcnn > 0) {
+  double min_envcnn = std::max(getPara().min_envcnn,
+                               topfd_para_ptr->getMs1EnvCnnScoreCutoff());
+  if (min_envcnn > 0) {
     MatchEnvPtrVec kept;
     for (const MatchEnvPtr& env : envs) {
-      if (env->getEnvcnnScore() >= getPara().min_envcnn) {
+      if (env->getEnvcnnScore() >= min_envcnn) {
         kept.push_back(env);
       }
     }

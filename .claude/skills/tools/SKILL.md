@@ -89,7 +89,7 @@ takes the same two options (`-p`, `-q`) with `msdeconv` as the default.
   matched peak, `PEAK_IDX` is the index after sorting by m/z) and
   `peaks.sqlite`. Useful for inspecting one spectrum's deconvolution; the
   reference test is the horse myoglobin list
-  `~/code/mms/data/myoglobin_peaks.txt` with `topfd -T -g`.
+  `~/code/mms/data/myoglobin_peaks.txt` with `topfd -T -F`.
 
 ## topdia
 

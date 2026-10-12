@@ -47,16 +47,16 @@ std::string geneTopfdCommand(const TopfdParaPtr& para_ptr,
   oss << "-t " << para_ptr->getMs1EcscoreCutoff() << " ";
   oss << "-b " << para_ptr->getMs1MinScanNum() << " ";
   command = command + oss.str();
-  command = command + "--deconv-score " + para_ptr->getDeconvScore() + " ";
+  command = command + "--env-rank " + para_ptr->getDeconvScore() + " ";
   if (para_ptr->isMissingLevelOne()) {
     command = command + "-o ";
   }
   command = command + "-u " + std::to_string(para_ptr->getThreadNum()) + " ";
   if (para_ptr->isAANumBasedFilter()) {
-    command = command + "-g ";
+    command = command + "-F ";
   }
   if (para_ptr->isSearchPrecWindow()) {
-    command = command + "-f ";
+    command = command + "-d ";
   }
   if (para_ptr->isUseSingleScanNoiseLevel()) {
     command = command + "-i ";
