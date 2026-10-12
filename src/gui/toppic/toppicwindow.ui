@@ -155,6 +155,9 @@ li.checked::marker { content: &quot;\2612&quot;; }
         <height>221</height>
        </rect>
       </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The deconvoluted MS/MS spectrum files (&amp;lt;name&amp;gt;_ms2.msalign, written by TopFD) to search, one after another with the same parameters. toppic also reads &amp;lt;name&amp;gt;_ms2.feature (unless Missing MS1 feature file is checked) and, for post mass matching, TopFD's SQLite database &amp;lt;name&amp;gt;.sqlite from the same folder. (toppic argument spectrum-file-names)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
      </widget>
      <widget class="QWidget" name="horizontalLayoutWidget">
       <property name="geometry">
@@ -174,6 +177,9 @@ li.checked::marker { content: &quot;\2612&quot;; }
            <height>0</height>
           </size>
          </property>
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The protein database, a FASTA file (.fasta or .fa) chosen with the Select button; required. Its path must not contain spaces and must be at most 200 characters long. (toppic argument database-file-name)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
          <property name="text">
           <string>Database file: </string>
          </property>
@@ -190,6 +196,9 @@ li.checked::marker { content: &quot;\2612&quot;; }
            <height>16777215</height>
           </size>
          </property>
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The protein database, a FASTA file (.fasta or .fa) chosen with the Select button; required. Its path must not contain spaces and must be at most 200 characters long. (toppic argument database-file-name)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
          <property name="readOnly">
           <bool>true</bool>
          </property>
@@ -202,6 +211,9 @@ li.checked::marker { content: &quot;\2612&quot;; }
            <width>85</width>
            <height>16777215</height>
           </size>
+         </property>
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The protein database, a FASTA file (.fasta or .fa) chosen with the Select button; required. Its path must not contain spaces and must be at most 200 characters long. (toppic argument database-file-name)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
          <property name="text">
           <string>Select</string>
@@ -228,6 +240,9 @@ li.checked::marker { content: &quot;\2612&quot;; }
            <height>0</height>
           </size>
          </property>
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The deconvoluted MS/MS spectrum files (&amp;lt;name&amp;gt;_ms2.msalign, written by TopFD) to search, one after another with the same parameters. toppic also reads &amp;lt;name&amp;gt;_ms2.feature (unless Missing MS1 feature file is checked) and, for post mass matching, TopFD's SQLite database &amp;lt;name&amp;gt;.sqlite from the same folder. (toppic argument spectrum-file-names)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
          <property name="text">
           <string>Spectrum files: </string>
          </property>
@@ -235,6 +250,9 @@ li.checked::marker { content: &quot;\2612&quot;; }
        </item>
        <item>
         <widget class="QPushButton" name="addButton">
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Add spectrum files (*ms2.msalign, written by TopFD) to the list; several files can be selected at once. A file already listed or with a path longer than 200 characters is not added, and paths must not contain spaces. (toppic argument spectrum-file-names)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
          <property name="text">
           <string>Add</string>
          </property>
@@ -242,6 +260,9 @@ li.checked::marker { content: &quot;\2612&quot;; }
        </item>
        <item>
         <widget class="QPushButton" name="delButton">
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Remove the selected spectrum file from the list. (toppic argument spectrum-file-names)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
          <property name="text">
           <string>Remove</string>
          </property>
@@ -264,6 +285,9 @@ li.checked::marker { content: &quot;\2612&quot;; }
        </property>
        <item>
         <widget class="QLabel" name="label_7">
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Optional name for combining the results of the listed spectrum files, enabled when two or more files are listed: each file is searched on its own, then their spectra and PrSMs are merged, clustered and given FDRs again, and reported as &amp;lt;name&amp;gt;_ms2_toppic_*. A relative name is placed in the folder of the first spectrum file; empty (default): no combined results. (toppic -c, --combined-file-name)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
          <property name="text">
           <string>Combined output file:</string>
          </property>
@@ -285,6 +309,9 @@ li.checked::marker { content: &quot;\2612&quot;; }
            <width>4000000</width>
            <height>25</height>
           </size>
+         </property>
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Optional name for combining the results of the listed spectrum files, enabled when two or more files are listed: each file is searched on its own, then their spectra and PrSMs are merged, clustered and given FDRs again, and reported as &amp;lt;name&amp;gt;_ms2_toppic_*. A relative name is placed in the folder of the first spectrum file; empty (default): no combined results. (toppic -c, --combined-file-name)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
          <property name="text">
           <string/>
@@ -319,6 +346,9 @@ li.checked::marker { content: &quot;\2612&quot;; }
            <height>0</height>
           </size>
          </property>
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Fixed modifications: NONE (default), Carbamidomethylation on cysteine (C57), Carboxymethylation on cysteine (C58), or A fixed modification file, a text file chosen with the File button. (toppic -f, --fixed-mod)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
          <property name="text">
           <string>Fixed modifications:</string>
          </property>
@@ -331,6 +361,9 @@ li.checked::marker { content: &quot;\2612&quot;; }
            <width>270</width>
            <height>0</height>
           </size>
+         </property>
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Fixed modifications: NONE (default), Carbamidomethylation on cysteine (C57), Carboxymethylation on cysteine (C58), or A fixed modification file, a text file chosen with the File button. (toppic -f, --fixed-mod)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
          <item>
           <property name="text">
@@ -359,6 +392,9 @@ li.checked::marker { content: &quot;\2612&quot;; }
          <property name="enabled">
           <bool>false</bool>
          </property>
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The text file of fixed modifications (format in the TopPIC manual), chosen with the File button; enabled when the fixed modifications are set to A fixed modification file. (toppic -f, --fixed-mod)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
          <property name="readOnly">
           <bool>true</bool>
          </property>
@@ -374,6 +410,9 @@ li.checked::marker { content: &quot;\2612&quot;; }
            <width>85</width>
            <height>16777215</height>
           </size>
+         </property>
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The text file of fixed modifications (format in the TopPIC manual), chosen with the File button; enabled when the fixed modifications are set to A fixed modification file. (toppic -f, --fixed-mod)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
          <property name="text">
           <string>File</string>
@@ -399,6 +438,9 @@ li.checked::marker { content: &quot;\2612&quot;; }
            <width>16777215</width>
            <height>16777215</height>
           </size>
+         </property>
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Also search a shuffled decoy protein database to estimate false discovery rates; off by default. Needed for the FDR cutoff types and for Rescore PrSMs, and cannot be cleared while one of them is selected. (toppic -d, --decoy)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
          <property name="text">
           <string>Decoy database</string>
@@ -431,6 +473,9 @@ li.checked::marker { content: &quot;\2612&quot;; }
            <height>16777215</height>
           </size>
          </property>
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Error tolerance of precursor masses in ppm, a positive integer; default 10. (toppic -E, --prec-error-tolerance)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
          <property name="text">
           <string>Precursor tolerance (PPM):</string>
          </property>
@@ -438,6 +483,9 @@ li.checked::marker { content: &quot;\2612&quot;; }
        </item>
        <item>
         <widget class="QLineEdit" name="precErrorToleranceEdit">
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Error tolerance of precursor masses in ppm, a positive integer; default 10. (toppic -E, --prec-error-tolerance)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
          <property name="text">
           <string>10</string>
          </property>
@@ -469,6 +517,9 @@ li.checked::marker { content: &quot;\2612&quot;; }
            <height>16777215</height>
           </size>
          </property>
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Error tolerance of fragment masses in ppm, a positive integer; default 10. (toppic -e, --frag-error-tolerance)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
          <property name="text">
           <string>Fragment tolerance (PPM):</string>
          </property>
@@ -476,6 +527,9 @@ li.checked::marker { content: &quot;\2612&quot;; }
        </item>
        <item>
         <widget class="QLineEdit" name="errorToleranceEdit">
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Error tolerance of fragment masses in ppm, a positive integer; default 10. (toppic -e, --frag-error-tolerance)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
          <property name="text">
           <string>10</string>
          </property>
@@ -495,6 +549,9 @@ li.checked::marker { content: &quot;\2612&quot;; }
       <layout class="QHBoxLayout" name="horizontalLayout_13">
        <item>
         <widget class="QLabel" name="label_14">
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Error tolerance in Dalton for clustering PrSMs into proteoforms: proteoforms of the same protein whose adjusted precursor masses agree within it are merged. A positive number; default 1.2. (toppic -p, --proteoform-error-tolerance)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
          <property name="text">
           <string>PrSM cluster error tolerance (Da):</string>
          </property>
@@ -502,6 +559,9 @@ li.checked::marker { content: &quot;\2612&quot;; }
        </item>
        <item>
         <widget class="QLineEdit" name="formErrorToleranceEdit">
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Error tolerance in Dalton for clustering PrSMs into proteoforms: proteoforms of the same protein whose adjusted precursor masses agree within it are merged. A positive number; default 1.2. (toppic -p, --proteoform-error-tolerance)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
          <property name="text">
           <string>1.2</string>
          </property>
@@ -533,6 +593,9 @@ li.checked::marker { content: &quot;\2612&quot;; }
            <height>16777215</height>
           </size>
          </property>
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Number of threads, a positive integer at most the number of hardware threads; default 1. The protein filtering steps may use fewer threads to fit the available memory. (toppic -u, --thread-number)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
          <property name="text">
           <string>Thread number:</string>
          </property>
@@ -540,6 +603,9 @@ li.checked::marker { content: &quot;\2612&quot;; }
        </item>
        <item>
         <widget class="QLineEdit" name="threadNumberEdit">
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Number of threads, a positive integer at most the number of hardware threads; default 1. The protein filtering steps may use fewer threads to fit the available memory. (toppic -u, --thread-number)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
          <property name="text">
           <string>1</string>
          </property>
@@ -574,6 +640,9 @@ li.checked::marker { content: &quot;\2612&quot;; }
            <height>16777215</height>
           </size>
          </property>
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Maximum number of variable PTMs in a proteoform, a non-negative integer; default 3. Used only with a variable PTM file. (toppic -S, --variable-ptm-num)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
          <property name="text">
           <string>Max variable PTM number: </string>
          </property>
@@ -581,6 +650,9 @@ li.checked::marker { content: &quot;\2612&quot;; }
        </item>
        <item>
         <widget class="QLineEdit" name="varPtmNumEdit">
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Maximum number of variable PTMs in a proteoform, a non-negative integer; default 3. Used only with a variable PTM file. (toppic -S, --variable-ptm-num)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
          <property name="text">
           <string>3</string>
          </property>
@@ -606,6 +678,9 @@ li.checked::marker { content: &quot;\2612&quot;; }
            <height>0</height>
           </size>
          </property>
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;A text file of variable PTMs to search (format in the TopPIC manual), chosen with the File button; cancel the file dialog to clear it. Empty (default): no variable PTM search. (toppic -b, --variable-ptm-file-name)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
          <property name="text">
           <string>Variable PTM file:</string>
          </property>
@@ -616,6 +691,9 @@ li.checked::marker { content: &quot;\2612&quot;; }
          <property name="enabled">
           <bool>true</bool>
          </property>
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;A text file of variable PTMs to search (format in the TopPIC manual), chosen with the File button; cancel the file dialog to clear it. Empty (default): no variable PTM search. (toppic -b, --variable-ptm-file-name)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
          <property name="readOnly">
           <bool>true</bool>
          </property>
@@ -625,6 +703,9 @@ li.checked::marker { content: &quot;\2612&quot;; }
         <widget class="QPushButton" name="varPtmFileButton">
          <property name="enabled">
           <bool>true</bool>
+         </property>
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;A text file of variable PTMs to search (format in the TopPIC manual), chosen with the File button; cancel the file dialog to clear it. Empty (default): no variable PTM search. (toppic -b, --variable-ptm-file-name)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
          <property name="text">
           <string>File</string>
@@ -652,7 +733,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
           </size>
          </property>
          <property name="toolTip">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;After the search, match the theoretical fragment masses of each PrSM that no deconvoluted mass matched against the centroided MS/MS peaks in the TopFD SQLite database (run TopFD with the SQLite database output enabled), and add the matched masses to the spectra.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;On by default: after the search, the theoretical fragment masses of the best PrSM of each spectrum that no deconvoluted mass matched are searched in the centroided MS/MS peaks, and the matched masses are added to the spectra (written to &amp;lt;name&amp;gt;_post_ms2.msalign). For a spectrum file &amp;lt;name&amp;gt;_ms2.msalign, toppic reads the peaks from TopFD's SQLite database &amp;lt;name&amp;gt;.sqlite (run TopFD without -N, --no-sql) through its own copy &amp;lt;name&amp;gt;_toppic.sqlite. Clear it to skip this step; TopFD's database is then not needed. (when cleared: toppic -D, --disable-post-match)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
          <property name="text">
           <string>Post mass matching (needs the TopFD SQLite database)</string>
@@ -679,6 +760,9 @@ li.checked::marker { content: &quot;\2612&quot;; }
            <height>0</height>
           </size>
          </property>
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Use approximate spectra to increase the sensitivity of the variable PTM filtering; it only has an effect with a variable PTM file. Off by default. (toppic -X, --approximate-spectra)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
          <property name="text">
           <string>Use approximate spectra in protein filtering</string>
          </property>
@@ -703,6 +787,9 @@ li.checked::marker { content: &quot;\2612&quot;; }
            <width>230</width>
            <height>0</height>
           </size>
+         </property>
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Check it when the spectrum files have no TopFD feature file &amp;lt;name&amp;gt;_ms2.feature, or to search without it: proteoforms are then clustered by protein, precursor mass and sequence overlap instead of by TopFD feature, and the feature columns of the results show -. Off by default: the feature file is read and PrSMs whose spectrum has no feature are discarded. (toppic -x, --no-topfd-feature)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
          <property name="text">
           <string>Missing MS1 feature file</string>
@@ -732,6 +819,9 @@ li.checked::marker { content: &quot;\2612&quot;; }
          <height>41</height>
         </rect>
        </property>
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Spectrum-level cutoff for the reported PrSMs: the cutoff type (EVALUE or FDR; FDR needs the decoy database) and the cutoff value, the maximum E-value or FDR of a reported PrSM. Defaults: EVALUE and 0.01. (toppic -t, --spectrum-cutoff-type and -v, --spectrum-cutoff-value)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
        <property name="text">
         <string>Spectrum
 level:</string>
@@ -745,6 +835,9 @@ level:</string>
          <width>91</width>
          <height>41</height>
         </rect>
+       </property>
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Proteoform-level cutoff for the reported proteoforms (the best PrSM of each proteoform): the cutoff type (EVALUE or FDR; FDR needs the decoy database) and the cutoff value, the maximum E-value or FDR. Defaults: EVALUE and 0.01. (toppic -T, --proteoform-cutoff-type and -V, --proteoform-cutoff-value)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="text">
         <string>Proteoform
@@ -763,6 +856,9 @@ level:</string>
        <layout class="QVBoxLayout" name="verticalLayout">
         <item>
          <widget class="QComboBox" name="cutoffSpectralTypeComboBox">
+          <property name="toolTip">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Spectrum-level cutoff type: EVALUE (default) filters the PrSMs by their E-value, FDR by their spectrum-level FDR. FDR needs the decoy database. (toppic -t, --spectrum-cutoff-type)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
           <property name="editable">
            <bool>false</bool>
           </property>
@@ -780,6 +876,9 @@ level:</string>
         </item>
         <item>
          <widget class="QLineEdit" name="cutoffSpectralValueEdit">
+          <property name="toolTip">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Spectrum-level cutoff value: a PrSM is reported when its E-value (or FDR, with the FDR type) is at most this value. A non-negative number with at most two decimals; default 0.01. (toppic -v, --spectrum-cutoff-value)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
           <property name="text">
            <string>0.01</string>
           </property>
@@ -802,6 +901,9 @@ level:</string>
        <layout class="QVBoxLayout" name="verticalLayout_2">
         <item>
          <widget class="QComboBox" name="cutoffProteoformTypeComboBox">
+          <property name="toolTip">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Proteoform-level cutoff type: EVALUE (default) filters the proteoforms by the E-value of their best PrSM, FDR by the proteoform-level FDR. FDR needs the decoy database. (toppic -T, --proteoform-cutoff-type)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
           <property name="editable">
            <bool>false</bool>
           </property>
@@ -819,6 +921,9 @@ level:</string>
         </item>
         <item>
          <widget class="QLineEdit" name="cutoffProteoformValueEdit">
+          <property name="toolTip">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Proteoform-level cutoff value: a proteoform is reported when the E-value of its best PrSM (or its FDR, with the FDR type) is at most this value. A non-negative number with at most two decimals; default 0.01. (toppic -V, --proteoform-cutoff-value)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
           <property name="text">
            <string>0.01</string>
           </property>
@@ -838,6 +943,9 @@ level:</string>
          <height>41</height>
         </rect>
        </property>
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Protein-level cutoff for the reported proteins (the best PrSM of each protein): the cutoff type (EVALUE or FDR; FDR needs the decoy database) and the cutoff value, the maximum E-value or FDR. Defaults: EVALUE and 0.01. (toppic -y, --protein-cutoff-type and -Y, --protein-cutoff-value)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
        <property name="text">
         <string>Protein
 level:</string>
@@ -855,6 +963,9 @@ level:</string>
        <layout class="QVBoxLayout" name="verticalLayout_3">
         <item>
          <widget class="QComboBox" name="cutoffProteinTypeComboBox">
+          <property name="toolTip">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Protein-level cutoff type: EVALUE (default) filters the proteins by the E-value of their best PrSM, FDR by the protein-level FDR, with each protein represented by its best proteoform. FDR needs the decoy database. (toppic -y, --protein-cutoff-type)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
           <property name="editable">
            <bool>false</bool>
           </property>
@@ -872,6 +983,9 @@ level:</string>
         </item>
         <item>
          <widget class="QLineEdit" name="cutoffProteinValueEdit">
+          <property name="toolTip">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Protein-level cutoff value: a protein is reported when the E-value of its best PrSM (or its FDR, with the FDR type) is at most this value. A non-negative number with at most two decimals; default 0.01. (toppic -Y, --protein-cutoff-value)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
           <property name="text">
            <string>0.01</string>
           </property>
@@ -903,6 +1017,9 @@ level:</string>
        </property>
        <item>
         <widget class="QLabel" name="label_3">
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Fragmentation method of the MS/MS spectra: FILE (default) takes the method of each spectrum from the spectrum file; CID, ETD, ETCID (ETciD), ETHCD (EThcD), HCD, MPD or UVPD sets it for all spectra. ETCID and ETHCD are searched with the ion types of ETD (c and z-dot). (toppic -a, --activation)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
          <property name="text">
           <string>Fragmentation:</string>
          </property>
@@ -915,6 +1032,9 @@ level:</string>
            <width>110</width>
            <height>16777215</height>
           </size>
+         </property>
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Fragmentation method of the MS/MS spectra: FILE (default) takes the method of each spectrum from the spectrum file; CID, ETD, ETCID (ETciD), ETHCD (EThcD), HCD, MPD or UVPD sets it for all spectra. ETCID and ETHCD are searched with the ion types of ETD (c and z-dot). (toppic -a, --activation)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
          <item>
           <property name="text">
@@ -972,6 +1092,9 @@ level:</string>
       <layout class="QHBoxLayout" name="horizontalLayout_15">
        <item>
         <widget class="QLabel" name="label_16">
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Number of consecutive MS/MS spectra of one precursor searched together, a positive integer: 2 (or 3) combines the spectrum pairs (or triplets) of an alternating fragmentation mode. Default 1. (toppic -r, --num-combined-spectra)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
          <property name="text">
           <string>Number of combined spectra:</string>
          </property>
@@ -984,6 +1107,9 @@ level:</string>
            <width>110</width>
            <height>16777215</height>
           </size>
+         </property>
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Number of consecutive MS/MS spectra of one precursor searched together, a positive integer: 2 (or 3) combines the spectrum pairs (or triplets) of an alternating fragmentation mode. Default 1. (toppic -r, --num-combined-spectra)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
          <property name="text">
           <string>1</string>
@@ -1007,6 +1133,9 @@ level:</string>
       <layout class="QHBoxLayout" name="horizontalLayout_10">
        <item>
         <widget class="QLabel" name="label_8">
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Maximum mass (Da) of an unexpected mass shift, a positive number with at most two decimals; default 500. Disabled when the maximum number of mass shifts is 0. (toppic -M, --max-shift)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
          <property name="text">
           <string>Maximum mass shift (Da):</string>
          </property>
@@ -1019,6 +1148,9 @@ level:</string>
            <width>110</width>
            <height>16777215</height>
           </size>
+         </property>
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Maximum mass (Da) of an unexpected mass shift, a positive number with at most two decimals; default 500. Disabled when the maximum number of mass shifts is 0. (toppic -M, --max-shift)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
          <property name="text">
           <string>500</string>
@@ -1042,6 +1174,9 @@ level:</string>
       <layout class="QHBoxLayout" name="horizontalLayout_9">
        <item>
         <widget class="QLabel" name="label_12">
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Maximum number of unexpected mass shifts in a proteoform: 0, 1 (default) or 2. With 0, the mass shift range, the PTM file for localization and the MIScore threshold are disabled. (toppic -s, --num-shift)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
          <property name="text">
           <string>Maximum number of mass shifts:</string>
          </property>
@@ -1054,6 +1189,9 @@ level:</string>
            <width>110</width>
            <height>16777215</height>
           </size>
+         </property>
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Maximum number of unexpected mass shifts in a proteoform: 0, 1 (default) or 2. With 0, the mass shift range, the PTM file for localization and the MIScore threshold are disabled. (toppic -s, --num-shift)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
          <property name="editable">
           <bool>false</bool>
@@ -1107,6 +1245,9 @@ level:</string>
           <property name="enabled">
            <bool>true</bool>
           </property>
+          <property name="toolTip">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Allow proteoforms whose protein N-terminus is not modified (NONE). Checked by default, like the other N-terminal forms; at least one form must be checked. (toppic -n, --n-terminal-form)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
           <property name="text">
            <string>NONE</string>
           </property>
@@ -1120,6 +1261,9 @@ level:</string>
         </item>
         <item row="1" column="0">
          <widget class="QCheckBox" name="NMECheckBox">
+          <property name="toolTip">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Allow N-terminal methionine excision (NME): the initiator methionine is removed. Checked by default, like the other N-terminal forms; at least one form must be checked. (toppic -n, --n-terminal-form)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
           <property name="text">
            <string>NME</string>
           </property>
@@ -1130,6 +1274,9 @@ level:</string>
         </item>
         <item row="0" column="1">
          <widget class="QCheckBox" name="NMEACCheckBox">
+          <property name="toolTip">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Allow N-terminal acetylation after the initiator methionine is removed (NME_ACETYLATION). Checked by default, like the other N-terminal forms; at least one form must be checked. (toppic -n, --n-terminal-form)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
           <property name="text">
            <string>NME_ACETYLATION</string>
           </property>
@@ -1140,6 +1287,9 @@ level:</string>
         </item>
         <item row="1" column="1">
          <widget class="QCheckBox" name="MACCheckBox">
+          <property name="toolTip">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Allow acetylation of the N-terminal initiator methionine (M_ACETYLATION). Checked by default, like the other N-terminal forms; at least one form must be checked. (toppic -n, --n-terminal-form)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
           <property name="text">
            <string>M_ACETYLATION</string>
           </property>
@@ -1181,6 +1331,9 @@ level:</string>
             <height>0</height>
            </size>
           </property>
+          <property name="toolTip">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;A text file of common modifications used to characterize the unexpected mass shifts: a shift explained by exactly one modification or pair of them is replaced by it and located by MIScore. Chosen with the File button (cancel the dialog to clear it); empty (default): no characterization. Disabled when the maximum number of mass shifts is 0. (toppic -B, --local-ptm-file-name)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
           <property name="text">
            <string>PTM file for localization:</string>
           </property>
@@ -1191,6 +1344,9 @@ level:</string>
           <property name="enabled">
            <bool>true</bool>
           </property>
+          <property name="toolTip">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;A text file of common modifications used to characterize the unexpected mass shifts: a shift explained by exactly one modification or pair of them is replaced by it and located by MIScore. Chosen with the File button (cancel the dialog to clear it); empty (default): no characterization. Disabled when the maximum number of mass shifts is 0. (toppic -B, --local-ptm-file-name)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
           <property name="readOnly">
            <bool>true</bool>
           </property>
@@ -1200,6 +1356,9 @@ level:</string>
          <widget class="QPushButton" name="modFileButton">
           <property name="enabled">
            <bool>true</bool>
+          </property>
+          <property name="toolTip">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;A text file of common modifications used to characterize the unexpected mass shifts: a shift explained by exactly one modification or pair of them is replaced by it and located by MIScore. Chosen with the File button (cancel the dialog to clear it); empty (default): no characterization. Disabled when the maximum number of mass shifts is 0. (toppic -B, --local-ptm-file-name)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
           </property>
           <property name="text">
            <string>File</string>
@@ -1226,6 +1385,9 @@ level:</string>
             <height>0</height>
            </size>
           </property>
+          <property name="toolTip">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;MIScore threshold of the modification characterization (with a PTM file for localization): a characterized modification is reported on the range of its sites whose MIScore is above the threshold, or, when no site reaches it, on the range of its sites with a positive MIScore. A number from 0 to 1 with at most two decimals; default 0.15. (toppic -H, --miscore-threshold)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
           <property name="text">
            <string>MIScore threshold:</string>
           </property>
@@ -1233,6 +1395,9 @@ level:</string>
         </item>
         <item>
          <widget class="QLineEdit" name="miscoreThresholdEdit">
+          <property name="toolTip">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;MIScore threshold of the modification characterization (with a PTM file for localization): a characterized modification is reported on the range of its sites whose MIScore is above the threshold, or, when no site reaches it, on the range of its sites with a positive MIScore. A number from 0 to 1 with at most two decimals; default 0.15. (toppic -H, --miscore-threshold)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
           <property name="text">
            <string>0.45</string>
           </property>
@@ -1256,6 +1421,9 @@ level:</string>
       <layout class="QHBoxLayout" name="horizontalLayout_12">
        <item>
         <widget class="QLabel" name="label_10">
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Minimum mass (Da) of an unexpected mass shift, a number with at most two decimals, usually negative; default -500. Disabled when the maximum number of mass shifts is 0. (toppic -m, --min-shift)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
          <property name="text">
           <string>Minimum mass shift (Da):</string>
          </property>
@@ -1268,6 +1436,9 @@ level:</string>
            <width>110</width>
            <height>16777215</height>
           </size>
+         </property>
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Minimum mass (Da) of an unexpected mass shift, a number with at most two decimals, usually negative; default -500. Disabled when the maximum number of mass shifts is 0. (toppic -m, --min-shift)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
          <property name="text">
           <string>-500</string>
@@ -1297,6 +1468,9 @@ level:</string>
            <height>0</height>
           </size>
          </property>
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Keep the decoy identifications in the result tables (with the decoy database); off by default. (toppic -K, --keep-decoy-ids)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
          <property name="text">
           <string>Keep decoy identifications</string>
          </property>
@@ -1323,7 +1497,7 @@ level:</string>
           </size>
          </property>
          <property name="toolTip">
-          <string>The spectrum files report average masses of precursor and fragment ions (TopFD run with --average-mass). Before the search, each file is converted to &lt;name&gt;_mono_ms2.msalign with monoisotopic masses, which is then searched.</string>
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Check it when the spectrum files report average masses of precursor and fragment ions (TopFD run with --average-mass). Before the search, each &amp;lt;name&amp;gt;_ms2.msalign is converted to &amp;lt;name&amp;gt;_mono_ms2.msalign with monoisotopic masses, which is then searched. Off by default. (toppic -A, --average-mass)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
          <property name="text">
           <string>Spectrum files with average masses (TopFD --average-mass)</string>
@@ -1345,7 +1519,7 @@ level:</string>
        <item>
         <widget class="QCheckBox" name="rescoreCheckBox">
          <property name="toolTip">
-          <string>Rescore the best PrSM of every spectrum with a linear SVM trained on the target and decoy PrSMs (3-fold cross-validation, toppic --rescore). The FDRs then rank the PrSMs by the rescore, or by the E-value at a level where the E-value gives more identifications. Needs the decoy database.</string>
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Rank the PrSMs by a rescore instead of the E-value in the FDR computation: the best PrSM of every spectrum gets a score from a linear support vector machine trained on the target and decoy PrSMs with 3-fold cross-validation, and at each level the E-value is used instead when it gives more identifications within the FDR cutoff. The rescoring may underestimate the FDRs. Needs the decoy database; off by default. (toppic -q, --rescore)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
          <property name="text">
           <string>Rescore PrSMs (needs the decoy database)</string>
@@ -1366,6 +1540,9 @@ level:</string>
       <layout class="QHBoxLayout" name="horizontalLayout_29">
        <item>
         <widget class="QCheckBox" name="keepTempCheckBox">
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Keep the intermediate files (*.toppic_* files) instead of deleting them at the end of the run; off by default. (toppic -k, --keep-temp-files)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
          <property name="text">
           <string>Keep intermediate files</string>
          </property>
@@ -1408,6 +1585,9 @@ level:</string>
           <property name="enabled">
            <bool>true</bool>
           </property>
+          <property name="toolTip">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Allow proteoforms that cover the complete sequence of a protein (COMPLETE; N-terminal methionine excision is allowed). Checked by default, like the other types; at least one proteoform type must be checked. (toppic -R, --proteoform-type)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
           <property name="text">
            <string>Complete</string>
           </property>
@@ -1421,6 +1601,9 @@ level:</string>
         </item>
         <item row="1" column="0">
          <widget class="QCheckBox" name="SuffixCheckBox">
+          <property name="toolTip">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Allow proteoforms that cover a C-terminal part of a protein (SUFFIX). Checked by default, like the other types; at least one proteoform type must be checked. (toppic -R, --proteoform-type)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
           <property name="text">
            <string>C-terminal</string>
           </property>
@@ -1431,6 +1614,9 @@ level:</string>
         </item>
         <item row="0" column="1">
          <widget class="QCheckBox" name="PrefixCheckBox">
+          <property name="toolTip">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Allow proteoforms that cover an N-terminal part of a protein (PREFIX). Checked by default, like the other types; at least one proteoform type must be checked. (toppic -R, --proteoform-type)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
           <property name="text">
            <string>N-terminal</string>
           </property>
@@ -1441,6 +1627,9 @@ level:</string>
         </item>
         <item row="1" column="1">
          <widget class="QCheckBox" name="InternalCheckBox">
+          <property name="toolTip">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Allow proteoforms that cover an internal part of a protein (INTERNAL). Checked by default, like the other types; at least one proteoform type must be checked. (toppic -R, --proteoform-type)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
           <property name="text">
            <string>Internal</string>
           </property>
@@ -1465,7 +1654,7 @@ level:</string>
        <item>
         <widget class="QLabel" name="label_nTermLabel">
          <property name="toolTip">
-          <string>Mass of a label on the N-terminus of every proteoform, for example 229.162932 for TMT; 0 for none</string>
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Mass (Da) of a label on the N-terminus of every proteoform, for example 229.162932 for TMT; 0 (default) for no label. The label is added to the N-terminal fragment ions and removed from the precursor mass, and the reported proteoforms are label-free. A non-negative number with at most six decimals. (toppic -N, --n-terminal-label)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
          <property name="text">
           <string>N-terminal label mass (Da):</string>
@@ -1481,7 +1670,7 @@ level:</string>
           </size>
          </property>
          <property name="toolTip">
-          <string>Mass of a label on the N-terminus of every proteoform, for example 229.162932 for TMT; 0 for none</string>
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Mass (Da) of a label on the N-terminus of every proteoform, for example 229.162932 for TMT; 0 (default) for no label. The label is added to the N-terminal fragment ions and removed from the precursor mass, and the reported proteoforms are label-free. A non-negative number with at most six decimals. (toppic -N, --n-terminal-label)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
          <property name="text">
           <string>0</string>

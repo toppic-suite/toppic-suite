@@ -145,6 +145,9 @@ p, li { white-space: pre-wrap; }
          <height>16777215</height>
         </size>
        </property>
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The protein database in FASTA format (.fasta or .fa) to index, selected with the Select button. TopIndex writes the index files into the directory &amp;lt;database&amp;gt;_idx next to it, where TopPIC and TopMG look for them; the path must have at most 200 characters and no spaces. (topindex database-file-name)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
        <property name="readOnly">
         <bool>true</bool>
        </property>
@@ -157,6 +160,9 @@ p, li { white-space: pre-wrap; }
          <width>85</width>
          <height>16777215</height>
         </size>
+       </property>
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select the protein database file in FASTA format (.fasta or .fa) to index; the index files are written into the directory &amp;lt;database&amp;gt;_idx next to it. (topindex database-file-name)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="text">
         <string>Select</string>
@@ -177,6 +183,9 @@ p, li { white-space: pre-wrap; }
     <layout class="QHBoxLayout" name="horizontalLayout_5">
      <item>
       <widget class="QComboBox" name="fixedModComboBox">
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Fixed modifications: NONE (the default), carbamidomethylation on cysteine (C57), carboxymethylation on cysteine (C58), or a fixed modification file selected with the File button. The index depends on them: use the same setting as the TopPIC or TopMG searches that will use the index. (topindex -f, --fixed-mod)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
        <item>
         <property name="text">
          <string>NONE</string>
@@ -204,6 +213,9 @@ p, li { white-space: pre-wrap; }
        <property name="enabled">
         <bool>false</bool>
        </property>
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Fixed modification file, a text file in the format given in the TopPIC manual, selected with the File button; enabled when 'A fixed modification file' is chosen. Give the TopPIC or TopMG searches that will use the index the same file. (topindex -f, --fixed-mod)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
        <property name="readOnly">
         <bool>true</bool>
        </property>
@@ -219,6 +231,9 @@ p, li { white-space: pre-wrap; }
          <width>85</width>
          <height>16777215</height>
         </size>
+       </property>
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Fixed modification file, a text file in the format given in the TopPIC manual, selected with the File button; enabled when 'A fixed modification file' is chosen. Give the TopPIC or TopMG searches that will use the index the same file. (topindex -f, --fixed-mod)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="text">
         <string>File</string>
@@ -251,6 +266,9 @@ p, li { white-space: pre-wrap; }
            <height>16777215</height>
           </size>
          </property>
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Error tolerance for precursor masses in ppm, a positive integer; default 10. Neither the index files nor their names depend on it, so it need not match the searches. (topindex -E, --prec-error-tolerance)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
          <property name="text">
           <string>Precursor tolerance (PPM):</string>
          </property>
@@ -269,6 +287,9 @@ p, li { white-space: pre-wrap; }
            <width>110</width>
            <height>16777215</height>
           </size>
+         </property>
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Error tolerance for precursor masses in ppm, a positive integer; default 10. Neither the index files nor their names depend on it, so it need not match the searches. (topindex -E, --prec-error-tolerance)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
          <property name="text">
           <string>10</string>
@@ -304,6 +325,9 @@ p, li { white-space: pre-wrap; }
            <height>16777215</height>
           </size>
          </property>
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Error tolerance for fragment masses in ppm, a positive integer; default 10. The index files do not depend on it, but their names include it: give the -e value of the TopPIC or TopMG searches that will use the index. (topindex -e, --frag-error-tolerance)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
        <property name="text">
         <string>Fragment tolerance (PPM):</string>
        </property>
@@ -322,6 +346,9 @@ p, li { white-space: pre-wrap; }
          <width>110</width>
          <height>16777215</height>
         </size>
+       </property>
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Error tolerance for fragment masses in ppm, a positive integer; default 10. The index files do not depend on it, but their names include it: give the -e value of the TopPIC or TopMG searches that will use the index. (topindex -e, --frag-error-tolerance)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="text">
         <string>15</string>
@@ -345,6 +372,9 @@ p, li { white-space: pre-wrap; }
     <layout class="QHBoxLayout" name="horizontalLayout_22">
      <item alignment="Qt::AlignLeft">
       <widget class="QLabel" name="label_23">
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Number of threads; the database blocks are indexed in parallel, each thread needing about 0.5 GiB of memory. A positive integer, at most the number of hardware threads; default 1. It does not affect the index files. (topindex -u, --thread-number)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
        <property name="text">
         <string>Thread number:</string>
        </property>
@@ -363,6 +393,9 @@ p, li { white-space: pre-wrap; }
          <width>80</width>
          <height>16777215</height>
         </size>
+       </property>
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Number of threads; the database blocks are indexed in parallel, each thread needing about 0.5 GiB of memory. A positive integer, at most the number of hardware threads; default 1. It does not affect the index files. (topindex -u, --thread-number)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="text">
         <string>1</string>
@@ -386,6 +419,9 @@ p, li { white-space: pre-wrap; }
     <layout class="QHBoxLayout" name="horizontalLayout_21">
      <item>
       <widget class="QCheckBox" name="decoyCheckBox">
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Index a database of the target proteins and shuffled decoy proteins, for TopPIC and TopMG searches with the decoy database (-d); leave it unchecked for searches without decoys. Off by default. (topindex -d, --decoy)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
        <property name="text">
         <string>Decoy database</string>
        </property>
@@ -401,6 +437,9 @@ p, li { white-space: pre-wrap; }
       <width>260</width>
       <height>91</height>
      </rect>
+    </property>
+    <property name="toolTip">
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Allowed N-terminal forms of the proteins; at least one must be selected, all four by default. The index depends on them: select the same forms as the TopPIC or TopMG searches that will use the index; a command-line search must list them in -n in the order NONE, NME, NME_ACETYLATION, M_ACETYLATION. (topindex -n, --n-terminal-form)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
     </property>
     <property name="title">
      <string>N-terminal forms</string>
@@ -420,6 +459,9 @@ p, li { white-space: pre-wrap; }
         <property name="enabled">
          <bool>true</bool>
         </property>
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;N-terminal form NONE: the protein N-terminus without modifications. Checked by default; the TopPIC or TopMG searches that will use the index must allow the same N-terminal forms. (topindex -n, --n-terminal-form)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
         <property name="text">
          <string>NONE</string>
         </property>
@@ -433,6 +475,9 @@ p, li { white-space: pre-wrap; }
       </item>
       <item row="1" column="0">
        <widget class="QCheckBox" name="NMECheckBox">
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;N-terminal form NME: N-terminal methionine excision. Checked by default; the TopPIC or TopMG searches that will use the index must allow the same N-terminal forms. (topindex -n, --n-terminal-form)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
         <property name="text">
          <string>NME</string>
         </property>
@@ -443,6 +488,9 @@ p, li { white-space: pre-wrap; }
       </item>
       <item row="0" column="1">
        <widget class="QCheckBox" name="NMEACCheckBox">
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;N-terminal form NME_ACETYLATION: N-terminal acetylation after the initiator methionine is removed. Checked by default; the TopPIC or TopMG searches that will use the index must allow the same N-terminal forms. (topindex -n, --n-terminal-form)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
         <property name="text">
          <string>NME_ACETYLATION</string>
         </property>
@@ -453,6 +501,9 @@ p, li { white-space: pre-wrap; }
       </item>
       <item row="1" column="1">
        <widget class="QCheckBox" name="MACCheckBox">
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;N-terminal form M_ACETYLATION: acetylation of the N-terminal methionine. Checked by default; the TopPIC or TopMG searches that will use the index must allow the same N-terminal forms. (topindex -n, --n-terminal-form)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
         <property name="text">
          <string>M_ACETYLATION</string>
         </property>
@@ -476,6 +527,9 @@ p, li { white-space: pre-wrap; }
     <layout class="QHBoxLayout" name="horizontalLayout_4">
      <item>
       <widget class="QLabel" name="label_3">
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The protein database in FASTA format (.fasta or .fa) to index, selected with the Select button. TopIndex writes the index files into the directory &amp;lt;database&amp;gt;_idx next to it, where TopPIC and TopMG look for them; the path must have at most 200 characters and no spaces. (topindex database-file-name)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
        <property name="text">
         <string>Database file: </string>
        </property>
@@ -495,6 +549,9 @@ p, li { white-space: pre-wrap; }
     <layout class="QHBoxLayout" name="horizontalLayout_8">
      <item>
       <widget class="QLabel" name="label_7">
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Fixed modifications: NONE (the default), carbamidomethylation on cysteine (C57), carboxymethylation on cysteine (C58), or a fixed modification file selected with the File button. The index depends on them: use the same setting as the TopPIC or TopMG searches that will use the index. (topindex -f, --fixed-mod)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
        <property name="text">
         <string>Fixed modifications:</string>
        </property>

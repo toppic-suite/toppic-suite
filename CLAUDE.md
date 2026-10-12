@@ -4377,6 +4377,14 @@ NOT in `COMMON_SRCS`; each is its own `add_executable` that links
   the matching CLI tool via QProcess, reading its default values from that
   tool's console argument parser. `src/gui/topmerge` is migrated but has no
   target (no `topmerge` CLI tool drives the `merge` backend yet).
+  Every parameter control of the six forms has a tooltip (2026-10-12):
+  rich text, `<html><head/><body><p>...</p></body></html>` (Qt wraps rich
+  text; a plain-text tooltip is one long line), with `<`, `>` and `&` of
+  the message HTML-escaped (`&lt;name&gt;`), the same text on a row's
+  label and input, ending with the option it sets, e.g. `(topfd -c,
+  --max-charge)`. Give a new control one, and change it with its option's
+  help. The forms' `checkError()` (empty fields, path lengths, missing
+  files) is not called by any `on_startButton_clicked` except topmerge's.
 
 The `<tool>_argument.cpp` parsers are compiled into both the CLI tool and its
 GUI (each target compiles its own object — no shared lib for them). When

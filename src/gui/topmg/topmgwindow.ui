@@ -152,6 +152,9 @@ p, li { white-space: pre-wrap; }
         <height>151</height>
        </rect>
       </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The deconvoluted spectrum files (_ms2.msalign, written by TopFD or TopDIA) to search, one after another with the same parameters; at least one is needed. Add selects files and Remove removes the selected one. Each file's TopFD feature file (_ms2.feature) must be in the same folder unless Missing MS1 feature file is checked. (topmg argument spectrum-file-names)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
      </widget>
      <widget class="QWidget" name="horizontalLayoutWidget">
       <property name="geometry">
@@ -171,6 +174,9 @@ p, li { white-space: pre-wrap; }
            <height>0</height>
           </size>
          </property>
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The protein database file in FASTA format (.fasta or .fa) to search; required, no default. Click Select to choose it. Avoid spaces in the path, which must be at most 200 characters long. (topmg argument database-file-name)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
          <property name="text">
           <string>Database file: </string>
          </property>
@@ -187,6 +193,9 @@ p, li { white-space: pre-wrap; }
            <height>16777215</height>
           </size>
          </property>
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The protein database file in FASTA format (.fasta or .fa) to search; required, no default. Click Select to choose it. Avoid spaces in the path, which must be at most 200 characters long. (topmg argument database-file-name)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
          <property name="readOnly">
           <bool>true</bool>
          </property>
@@ -199,6 +208,9 @@ p, li { white-space: pre-wrap; }
            <width>85</width>
            <height>16777215</height>
           </size>
+         </property>
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The protein database file in FASTA format (.fasta or .fa) to search; required, no default. Click Select to choose it. Avoid spaces in the path, which must be at most 200 characters long. (topmg argument database-file-name)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
          <property name="text">
           <string>Select</string>
@@ -225,6 +237,9 @@ p, li { white-space: pre-wrap; }
            <height>0</height>
           </size>
          </property>
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The deconvoluted spectrum files (_ms2.msalign, written by TopFD or TopDIA) to search, one after another with the same parameters; at least one is needed. Add selects files and Remove removes the selected one. Each file's TopFD feature file (_ms2.feature) must be in the same folder unless Missing MS1 feature file is checked. (topmg argument spectrum-file-names)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
          <property name="text">
           <string>Spectrum files: </string>
          </property>
@@ -232,6 +247,9 @@ p, li { white-space: pre-wrap; }
        </item>
        <item>
         <widget class="QPushButton" name="addButton">
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Add one or more deconvoluted spectrum files (_ms2.msalign, written by TopFD or TopDIA) to the list. A file already in the list or with a path longer than 200 characters is not added. (topmg argument spectrum-file-names)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
          <property name="text">
           <string>Add</string>
          </property>
@@ -239,6 +257,9 @@ p, li { white-space: pre-wrap; }
        </item>
        <item>
         <widget class="QPushButton" name="delButton">
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Remove the selected spectrum file from the list. (topmg argument spectrum-file-names)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
          <property name="text">
           <string>Remove</string>
          </property>
@@ -264,13 +285,20 @@ p, li { white-space: pre-wrap; }
            <height>0</height>
           </size>
          </property>
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Optional name for combined results of all the spectrum files: after the files are searched, their spectra, features and PrSMs are merged into &amp;lt;name&amp;gt;_ms2.msalign and related files and the post-search steps are repeated on them, giving &amp;lt;name&amp;gt;_ms2_topmg_* results. A relative name is placed in the folder of the first spectrum file (sorted by path). Enabled when the list has two or more files; empty by default (no combined results). (topmg -c, --combined-file-name)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
          <property name="text">
           <string>Combined output file: </string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QLineEdit" name="combinedOutputEdit"/>
+        <widget class="QLineEdit" name="combinedOutputEdit">
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Optional name for combined results of all the spectrum files: after the files are searched, their spectra, features and PrSMs are merged into &amp;lt;name&amp;gt;_ms2.msalign and related files and the post-search steps are repeated on them, giving &amp;lt;name&amp;gt;_ms2_topmg_* results. A relative name is placed in the folder of the first spectrum file (sorted by path). Enabled when the list has two or more files; empty by default (no combined results). (topmg -c, --combined-file-name)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+        </widget>
        </item>
       </layout>
      </widget>
@@ -292,6 +320,9 @@ p, li { white-space: pre-wrap; }
            <height>0</height>
           </size>
          </property>
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Text file of the variable PTMs used to build the proteoform graphs, one per line as Name,Mass,Residues,Position,UnimodID; required, since TopMG has no built-in list. Click Select to choose it. (topmg -i, --mod-file-name)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
          <property name="text">
           <string>Variable PTM file:</string>
          </property>
@@ -302,6 +333,9 @@ p, li { white-space: pre-wrap; }
          <property name="enabled">
           <bool>true</bool>
          </property>
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Text file of the variable PTMs used to build the proteoform graphs, one per line as Name,Mass,Residues,Position,UnimodID; required, since TopMG has no built-in list. Click Select to choose it. (topmg -i, --mod-file-name)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
          <property name="readOnly">
           <bool>true</bool>
          </property>
@@ -311,6 +345,9 @@ p, li { white-space: pre-wrap; }
         <widget class="QPushButton" name="modFileButton">
          <property name="enabled">
           <bool>true</bool>
+         </property>
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Text file of the variable PTMs used to build the proteoform graphs, one per line as Name,Mass,Residues,Position,UnimodID; required, since TopMG has no built-in list. Click Select to choose it. (topmg -i, --mod-file-name)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
          <property name="text">
           <string>Select</string>
@@ -336,6 +373,9 @@ p, li { white-space: pre-wrap; }
       <layout class="QHBoxLayout" name="horizontalLayout_4">
        <item>
         <widget class="QLabel" name="label_4">
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Fixed modifications: NONE (the default), carbamidomethylation on cysteine (C57), carboxymethylation on cysteine (C58), or a fixed modification file chosen with the File button. (topmg -f, --fixed-mod)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
          <property name="text">
           <string>Fixed modifications:</string>
          </property>
@@ -343,6 +383,9 @@ p, li { white-space: pre-wrap; }
        </item>
        <item>
         <widget class="QComboBox" name="fixedModComboBox">
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Fixed modifications: NONE (the default), carbamidomethylation on cysteine (C57), carboxymethylation on cysteine (C58), or a fixed modification file chosen with the File button. (topmg -f, --fixed-mod)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
          <item>
           <property name="text">
            <string>NONE</string>
@@ -370,6 +413,9 @@ p, li { white-space: pre-wrap; }
          <property name="enabled">
           <bool>false</bool>
          </property>
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Text file of fixed modifications, in the format of the variable PTM file; used when Fixed modifications is set to A fixed modification file. Click File to choose it. (topmg -f, --fixed-mod)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
          <property name="readOnly">
           <bool>true</bool>
          </property>
@@ -385,6 +431,9 @@ p, li { white-space: pre-wrap; }
            <width>85</width>
            <height>16777215</height>
           </size>
+         </property>
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Text file of fixed modifications, in the format of the variable PTM file; used when Fixed modifications is set to A fixed modification file. Click File to choose it. (topmg -f, --fixed-mod)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
          <property name="text">
           <string>File</string>
@@ -405,6 +454,9 @@ p, li { white-space: pre-wrap; }
       <layout class="QVBoxLayout" name="verticalLayout_3">
        <item>
         <widget class="QCheckBox" name="decoyCheckBox">
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Also search a shuffled decoy protein database to estimate false discovery rates. Needed for the FDR cutoff types, and cannot be unchecked while one is selected. Default: off. (topmg -d, --decoy)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
          <property name="text">
           <string>Decoy database</string>
          </property>
@@ -412,6 +464,9 @@ p, li { white-space: pre-wrap; }
        </item>
        <item>
         <widget class="QCheckBox" name="wholeProteinCheckBox">
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Identify only proteoforms of whole proteins, that is, allow the proteoform type COMPLETE alone, without truncated (prefix, suffix or internal) proteoforms. Default: off. (topmg -w, --whole-protein-only)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
          <property name="text">
           <string>Whole proteins only</string>
          </property>
@@ -419,6 +474,9 @@ p, li { white-space: pre-wrap; }
        </item>
        <item>
         <widget class="QCheckBox" name="topfdFeatureCheckBox">
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Check when the TopFD feature file of a spectrum file (_ms2.feature in the same folder) is missing: TopMG then runs without it and clusters PrSMs into proteoforms by protein, precursor mass and sequence overlap instead of by feature. Unchecked, a missing feature file is an error. Default: off. (topmg -x, --no-topfd-feature)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
          <property name="text">
           <string>Missing MS1 feature file</string>
          </property>
@@ -444,6 +502,9 @@ p, li { white-space: pre-wrap; }
            <height>0</height>
           </size>
          </property>
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Error tolerance for precursor masses in ppm: a positive integer. Default: 10. (topmg -E, --prec-error-tolerance)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
                   <property name="text">
           <string>Precursor tolerance (PPM):</string>
          </property>
@@ -451,6 +512,9 @@ p, li { white-space: pre-wrap; }
        </item>
        <item>
         <widget class="QLineEdit" name="precErrorToleranceEdit">
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Error tolerance for precursor masses in ppm: a positive integer. Default: 10. (topmg -E, --prec-error-tolerance)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
          <property name="text">
           <string>10</string>
          </property>
@@ -476,6 +540,9 @@ p, li { white-space: pre-wrap; }
            <height>0</height>
           </size>
          </property>
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Error tolerance for fragment masses in ppm: a positive integer. Default: 10. (topmg -e, --frag-error-tolerance)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
          <property name="text">
           <string>Fragment tolerance (PPM):</string>
          </property>
@@ -483,6 +550,9 @@ p, li { white-space: pre-wrap; }
        </item>
        <item>
         <widget class="QLineEdit" name="errorToleranceEdit">
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Error tolerance for fragment masses in ppm: a positive integer. Default: 10. (topmg -e, --frag-error-tolerance)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
          <property name="text">
           <string>10</string>
          </property>
@@ -511,6 +581,9 @@ p, li { white-space: pre-wrap; }
          <height>41</height>
         </rect>
        </property>
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Spectrum-level cutoff: a PrSM is reported if its E-value (EVALUE) or spectrum-level FDR (FDR, needs Decoy database) is at most the value. Default: EVALUE, 0.01. (topmg -t, --spectrum-cutoff-type and -v, --spectrum-cutoff-value)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
        <property name="text">
         <string>Spectrum
 level:</string>
@@ -524,6 +597,9 @@ level:</string>
          <width>91</width>
          <height>41</height>
         </rect>
+       </property>
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Proteoform-level cutoff: a proteoform is reported if the E-value (EVALUE) or proteoform-level FDR (FDR, needs Decoy database) of its best PrSM is at most the value. Default: EVALUE, 0.01. (topmg -T, --proteoform-cutoff-type and -V, --proteoform-cutoff-value)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="text">
         <string>Proteoform
@@ -542,6 +618,9 @@ level:</string>
        <layout class="QVBoxLayout" name="verticalLayout">
         <item>
          <widget class="QComboBox" name="cutoffSpectralTypeComboBox">
+          <property name="toolTip">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Spectrum-level cutoff type for filtering PrSMs: EVALUE (E-value) or FDR (spectrum-level false discovery rate, needs Decoy database). Default: EVALUE. (topmg -t, --spectrum-cutoff-type)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
           <property name="editable">
            <bool>false</bool>
           </property>
@@ -559,6 +638,9 @@ level:</string>
         </item>
         <item>
          <widget class="QLineEdit" name="cutoffSpectralValueEdit">
+          <property name="toolTip">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Spectrum-level cutoff value: a PrSM is reported if its E-value or FDR (as the type above sets) is at most this value. A positive number with at most two decimal places. Default: 0.01. (topmg -v, --spectrum-cutoff-value)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
           <property name="text">
            <string>0.01</string>
           </property>
@@ -581,6 +663,9 @@ level:</string>
        <layout class="QVBoxLayout" name="verticalLayout_2">
         <item>
          <widget class="QComboBox" name="cutoffProteoformTypeComboBox">
+          <property name="toolTip">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Proteoform-level cutoff type for filtering proteoforms: EVALUE (E-value) or FDR (proteoform-level false discovery rate, needs Decoy database). Default: EVALUE. (topmg -T, --proteoform-cutoff-type)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
           <property name="editable">
            <bool>false</bool>
           </property>
@@ -598,6 +683,9 @@ level:</string>
         </item>
         <item>
          <widget class="QLineEdit" name="cutoffProteoformValueEdit">
+          <property name="toolTip">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Proteoform-level cutoff value: a proteoform is reported if the E-value or FDR (as the type above sets) of its best PrSM is at most this value. A positive number with at most two decimal places. Default: 0.01. (topmg -V, --proteoform-cutoff-value)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
           <property name="text">
            <string>0.01</string>
           </property>
@@ -617,6 +705,9 @@ level:</string>
          <height>41</height>
         </rect>
        </property>
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Protein-level cutoff: a protein is reported if the E-value (EVALUE) or protein-level FDR (FDR, needs Decoy database) of its best PrSM is at most the value; with FDR a protein is represented by its best proteoform. Default: EVALUE, 0.01. (topmg -y, --protein-cutoff-type and -Y, --protein-cutoff-value)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
        <property name="text">
         <string>Protein
 level:</string>
@@ -634,6 +725,9 @@ level:</string>
        <layout class="QVBoxLayout" name="verticalLayout_5">
         <item>
          <widget class="QComboBox" name="cutoffProteinTypeComboBox">
+          <property name="toolTip">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Protein-level cutoff type for filtering proteins: EVALUE (E-value) or FDR (protein-level false discovery rate, needs Decoy database); with FDR a protein is represented by its best proteoform (the lowest E-value). Default: EVALUE. (topmg -y, --protein-cutoff-type)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
           <property name="editable">
            <bool>false</bool>
           </property>
@@ -651,6 +745,9 @@ level:</string>
         </item>
         <item>
          <widget class="QLineEdit" name="cutoffProteinValueEdit">
+          <property name="toolTip">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Protein-level cutoff value: a protein is reported if the E-value or FDR (as the type above sets) of its best PrSM is at most this value. A positive number with at most two decimal places. Default: 0.01. (topmg -Y, --protein-cutoff-value)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
           <property name="text">
            <string>0.01</string>
           </property>
@@ -680,6 +777,9 @@ level:</string>
            <height>0</height>
           </size>
          </property>
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Error tolerance (Da) for clustering PrSMs into proteoforms: proteoforms of the same protein whose precursor masses agree within it are merged. A positive number. Default: 1.2. (topmg -p, --proteoform-error-tolerance)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
          <property name="text">
           <string>PrSM cluster error tolerance (Da):</string>
          </property>
@@ -687,6 +787,9 @@ level:</string>
        </item>
        <item>
         <widget class="QLineEdit" name="formErrorToleranceEdit">
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Error tolerance (Da) for clustering PrSMs into proteoforms: proteoforms of the same protein whose precursor masses agree within it are merged. A positive number. Default: 1.2. (topmg -p, --proteoform-error-tolerance)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
          <property name="text">
           <string>1.2</string>
          </property>
@@ -706,6 +809,9 @@ level:</string>
       <layout class="QVBoxLayout" name="verticalLayout_4">
        <item>
         <widget class="QCheckBox" name="keepDecoyCheckBox">
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Keep the decoy identifications in the result files instead of removing them after the FDR computation; used with Decoy database. Default: off. (topmg -K, --keep-decoy-ids)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
          <property name="text">
           <string>Keep decoy identifications</string>
          </property>
@@ -713,6 +819,9 @@ level:</string>
        </item>
        <item>
         <widget class="QCheckBox" name="keepTempCheckBox">
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Keep the intermediate files (_ms2.topmg_* and _ms2.msalign_*) instead of deleting them at the end of the run; the _ms2.topmg_raw_prsm file is always kept. Default: off. (topmg -k, --keep-temp-files)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
          <property name="text">
           <string>Keep intermediate files</string>
          </property>
@@ -738,6 +847,9 @@ level:</string>
            <height>0</height>
           </size>
          </property>
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Number of threads: a positive integer, at most the number of hardware threads. The protein filtering steps and the graph alignment may use fewer threads when memory is short. Default: 1. (topmg -u, --thread-number)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
          <property name="text">
           <string>Thread number:</string>
          </property>
@@ -750,6 +862,9 @@ level:</string>
            <width>110</width>
            <height>16777215</height>
           </size>
+         </property>
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Number of threads: a positive integer, at most the number of hardware threads. The protein filtering steps and the graph alignment may use fewer threads when memory is short. Default: 1. (topmg -u, --thread-number)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
          <property name="text">
           <string>1</string>
@@ -779,6 +894,9 @@ level:</string>
            <height>0</height>
           </size>
          </property>
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Deconvoluted masses whose confidence score (the EnvCNN score in TopFD files, the pseudo score in TopDIA files) is below this cutoff are removed before spectral filtering, database search and E-value computation. A number between 0 and 1. Default: 0.4. (topmg -F, --filter-by-score)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
          <property name="text">
           <string>Confidence score cutoff:</string>
          </property>
@@ -786,6 +904,9 @@ level:</string>
        </item>
        <item>
         <widget class="QLineEdit" name="envCnnCutoffEdit">
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Deconvoluted masses whose confidence score (the EnvCNN score in TopFD files, the pseudo score in TopDIA files) is below this cutoff are removed before spectral filtering, database search and E-value computation. A number between 0 and 1. Default: 0.4. (topmg -F, --filter-by-score)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
          <property name="text">
           <string>0.4</string>
          </property>
@@ -819,6 +940,9 @@ level:</string>
            <height>0</height>
           </size>
          </property>
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Fragmentation method of the MS/MS spectra: FILE (the default) takes it from each spectrum in the spectrum file; CID, ETD, ETCID, ETHCD, HCD, MPD or UVPD sets it for all spectra. ETCID (ETciD) and ETHCD (EThcD) are searched with the ion types of ETD (c and z-dot). (topmg -a, --activation)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
          <property name="text">
           <string>Fragmentation:</string>
          </property>
@@ -831,6 +955,9 @@ level:</string>
            <width>110</width>
            <height>16777215</height>
           </size>
+         </property>
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Fragmentation method of the MS/MS spectra: FILE (the default) takes it from each spectrum in the spectrum file; CID, ETD, ETCID, ETHCD, HCD, MPD or UVPD sets it for all spectra. ETCID (ETciD) and ETHCD (EThcD) are searched with the ion types of ETD (c and z-dot). (topmg -a, --activation)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
          <item>
           <property name="text">
@@ -894,6 +1021,9 @@ level:</string>
            <height>0</height>
           </size>
          </property>
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Maximum absolute mass (Da) of an unexpected mass shift: a positive number with at most two decimal places. Default: 500. (topmg -M, --max-shift)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
          <property name="text">
           <string>Maximum mass shift (Da):</string>
          </property>
@@ -906,6 +1036,9 @@ level:</string>
            <width>110</width>
            <height>16777215</height>
           </size>
+         </property>
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Maximum absolute mass (Da) of an unexpected mass shift: a positive number with at most two decimal places. Default: 500. (topmg -M, --max-shift)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
          <property name="text">
           <string>500</string>
@@ -929,6 +1062,9 @@ level:</string>
       <layout class="QHBoxLayout" name="horizontalLayout_9">
        <item>
         <widget class="QLabel" name="label_12">
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Maximum number of variable PTMs (from the variable PTM file) in a proteoform: 1 to 10. Default: 5. (topmg -P, --var-ptm)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
          <property name="text">
           <string>Maximum number of variable PTMs:</string>
          </property>
@@ -936,6 +1072,9 @@ level:</string>
        </item>
        <item>
         <widget class="QComboBox" name="numModComboBox">
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Maximum number of variable PTMs (from the variable PTM file) in a proteoform: 1 to 10. Default: 5. (topmg -P, --var-ptm)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
          <property name="editable">
           <bool>false</bool>
          </property>
@@ -1023,6 +1162,9 @@ level:</string>
           <property name="enabled">
            <bool>true</bool>
           </property>
+          <property name="toolTip">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Allow the protein N-terminal form NONE: no modification. At least one N-terminal form must be checked; all four are checked by default. (topmg -n, --n-terminal-form)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
           <property name="text">
            <string>NONE</string>
           </property>
@@ -1036,6 +1178,9 @@ level:</string>
         </item>
         <item row="1" column="0">
          <widget class="QCheckBox" name="NMECheckBox">
+          <property name="toolTip">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Allow the protein N-terminal form NME: N-terminal methionine excision. At least one N-terminal form must be checked; all four are checked by default. (topmg -n, --n-terminal-form)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
           <property name="text">
            <string>NME</string>
           </property>
@@ -1046,6 +1191,9 @@ level:</string>
         </item>
         <item row="0" column="1">
          <widget class="QCheckBox" name="NMEACCheckBox">
+          <property name="toolTip">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Allow the protein N-terminal form NME_ACETYLATION: N-terminal acetylation after the initiator methionine is removed. At least one N-terminal form must be checked; all four are checked by default. (topmg -n, --n-terminal-form)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
           <property name="text">
            <string>NME_ACETYLATION</string>
           </property>
@@ -1056,6 +1204,9 @@ level:</string>
         </item>
         <item row="1" column="1">
          <widget class="QCheckBox" name="MACCheckBox">
+          <property name="toolTip">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Allow the protein N-terminal form M_ACETYLATION: N-terminal methionine acetylation. At least one N-terminal form must be checked; all four are checked by default. (topmg -n, --n-terminal-form)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
           <property name="text">
            <string>M_ACETYLATION</string>
           </property>
@@ -1085,6 +1236,9 @@ level:</string>
            <height>0</height>
           </size>
          </property>
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Maximum number of unexpected mass shifts in a proteoform, in addition to the variable PTMs: 0, 1 or 2. Default: 1. (topmg -s, --num-shift)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
          <property name="text">
           <string>Maximum number of unknown mass shifts:</string>
          </property>
@@ -1092,6 +1246,9 @@ level:</string>
        </item>
        <item>
         <widget class="QComboBox" name="numUnknownShiftComboBox">
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Maximum number of unexpected mass shifts in a proteoform, in addition to the variable PTMs: 0, 1 or 2. Default: 1. (topmg -s, --num-shift)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
          <property name="editable">
           <bool>false</bool>
          </property>
@@ -1129,6 +1286,9 @@ level:</string>
       <layout class="QHBoxLayout" name="horizontalLayout_23">
        <item>
         <widget class="QCheckBox" name="asfDiagCheckBox">
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Add the ASF-Diagonal filtering step to the protein sequence filtering: more candidate proteins, more sensitive, but slower. Default: off. (topmg -D, --use-asf-diagonal)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
          <property name="text">
           <string>Use ASF-diagonal filtering</string>
          </property>
@@ -1148,6 +1308,9 @@ level:</string>
       <layout class="QGridLayout" name="gridLayout_2">
        <item row="0" column="0">
         <widget class="QLabel" name="label_15">
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Gap in constructing the proteoform graph: the maximum number of residues between two vertices whose mass difference is matched. Larger values consider more combinations at the cost of memory and time. A positive integer. Default: 40. (topmg -j, --proteo-graph-gap)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
          <property name="text">
           <string>Maximum gap length in the graph:</string>
          </property>
@@ -1161,6 +1324,9 @@ level:</string>
            <height>16777215</height>
           </size>
          </property>
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Gap in constructing the proteoform graph: the maximum number of residues between two vertices whose mass difference is matched. Larger values consider more combinations at the cost of memory and time. A positive integer. Default: 40. (topmg -j, --proteo-graph-gap)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
          <property name="text">
           <string>40</string>
          </property>
@@ -1171,6 +1337,9 @@ level:</string>
        </item>
        <item row="1" column="0">
         <widget class="QLabel" name="label_16">
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Maximum number of variable PTMs in a proteoform graph gap: a positive integer; a value above the maximum number of variable PTMs is lowered to it. Default: 5. (topmg -G, --var-ptm-in-gap)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
          <property name="text">
           <string>Maximum number of variable PTMs in a gap:</string>
          </property>
@@ -1183,6 +1352,9 @@ level:</string>
            <width>110</width>
            <height>16777215</height>
           </size>
+         </property>
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Maximum number of variable PTMs in a proteoform graph gap: a positive integer; a value above the maximum number of variable PTMs is lowered to it. Default: 5. (topmg -G, --var-ptm-in-gap)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
          <property name="text">
           <string>5</string>

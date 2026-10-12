@@ -48,6 +48,9 @@
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
       <widget class="QLabel" name="label">
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The spectrum files to deconvolute, processed one after another with the same parameters; the output files of each are written next to it. Centroided mzML or mzXML files, or with &quot;Text peak list input&quot; checked, text peak lists of one MS/MS spectrum each. File paths must not contain spaces. (topfd spectrum-file-names)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
        <property name="text">
         <string>Spectrum files: </string>
        </property>
@@ -67,6 +70,9 @@
          <height>16777215</height>
         </size>
        </property>
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Add spectrum files to the list. The file dialog lists mzML and mzXML files, or with &quot;Text peak list input&quot; checked, .txt and .mgf files (or all files). A file already in the list or with a path longer than 200 characters is not added. (topfd spectrum-file-names)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
        <property name="text">
         <string>Add</string>
        </property>
@@ -85,6 +91,9 @@
          <width>100</width>
          <height>16777215</height>
         </size>
+       </property>
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Remove the selected file from the spectrum file list. (topfd spectrum-file-names)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="text">
         <string>Remove</string>
@@ -111,6 +120,9 @@
      </property>
      <item>
       <widget class="QLabel" name="label_10">
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Fragmentation method of the MS/MS spectra: FILE, CID, ETD, ETCID, ETHCD, HCD, MPD or UVPD. FILE takes the method of each spectrum from the activation terms in the input file; choose a method when the file does not record it or records it wrongly. ETCID (ETciD) and ETHCD (EThcD) have the ion types of ETD. Default: FILE. (topfd -a, --activation)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
        <property name="text">
         <string>Fragmentation:</string>
        </property>
@@ -132,6 +144,9 @@
          <width>80</width>
          <height>16777215</height>
         </size>
+       </property>
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Fragmentation method of the MS/MS spectra: FILE, CID, ETD, ETCID, ETHCD, HCD, MPD or UVPD. FILE takes the method of each spectrum from the activation terms in the input file; choose a method when the file does not record it or records it wrongly. ETCID (ETciD) and ETHCD (EThcD) have the ion types of ETD. Default: FILE. (topfd -a, --activation)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="iconSize">
         <size>
@@ -210,6 +225,9 @@
          <height>0</height>
         </size>
        </property>
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Maximum charge state of precursor and fragment ions, an integer from 1 to 100. Default: 30. (topfd -c, --max-charge)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
        <property name="layoutDirection">
         <enum>Qt::LeftToRight</enum>
        </property>
@@ -234,6 +252,9 @@
          <width>70</width>
          <height>16777215</height>
         </size>
+       </property>
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Maximum charge state of precursor and fragment ions, an integer from 1 to 100. Default: 30. (topfd -c, --max-charge)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="text">
         <string>30</string>
@@ -266,6 +287,9 @@
          <height>0</height>
         </size>
        </property>
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Maximum monoisotopic mass of precursor and fragment ions in Daltons, an integer from 1 to 1000000. Default: 50000. (topfd -m, --max-mass)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
        <property name="text">
         <string>Maximum mass (Da): </string>
        </property>
@@ -284,6 +308,9 @@
          <width>70</width>
          <height>16777215</height>
         </size>
+       </property>
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Maximum monoisotopic mass of precursor and fragment ions in Daltons, an integer from 1 to 1000000. Default: 50000. (topfd -m, --max-mass)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="text">
         <string>70000</string>
@@ -310,6 +337,9 @@
          <height>0</height>
         </size>
        </property>
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Error tolerance of the m/z values of spectral peaks, in m/z units: a number from 0.0001 to 0.1. Default: 0.02. (topfd -e, --mz-error)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
        <property name="text">
         <string>M/z error: </string>
        </property>
@@ -328,6 +358,9 @@
          <width>70</width>
          <height>16777215</height>
         </size>
+       </property>
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Error tolerance of the m/z values of spectral peaks, in m/z units: a number from 0.0001 to 0.1. Default: 0.02. (topfd -e, --mz-error)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="text">
         <string>0.02</string>
@@ -354,6 +387,9 @@
          <height>0</height>
         </size>
        </property>
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Signal-to-noise ratio for MS1 spectra, a non-negative number with at most two decimal places. In MS1 deconvolution it sets the intensity threshold for the reference peak of an isotopic envelope; in feature detection, peaks below the ratio times the noise level are left out of the LC-MS map. Default: 3. (topfd -r, --ms-one-sn-ratio)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
        <property name="text">
         <string>MS1 S/N ratio: </string>
        </property>
@@ -372,6 +408,9 @@
          <width>70</width>
          <height>16777215</height>
         </size>
+       </property>
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Signal-to-noise ratio for MS1 spectra, a non-negative number with at most two decimal places. In MS1 deconvolution it sets the intensity threshold for the reference peak of an isotopic envelope; in feature detection, peaks below the ratio times the noise level are left out of the LC-MS map. Default: 3. (topfd -r, --ms-one-sn-ratio)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="text">
         <string>3.0</string>
@@ -469,6 +508,9 @@
          <height>0</height>
         </size>
        </property>
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Width of the precursor isolation window in m/z, used for the MS/MS spectra whose isolation window is not given in the input file. A positive number up to 10000 with at most two decimal places. Default: 3. (topfd -w, --precursor-window)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
        <property name="text">
         <string>Default prec window: </string>
        </property>
@@ -487,6 +529,9 @@
          <width>70</width>
          <height>16777215</height>
         </size>
+       </property>
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Width of the precursor isolation window in m/z, used for the MS/MS spectra whose isolation window is not given in the input file. A positive number up to 10000 with at most two decimal places. Default: 3. (topfd -w, --precursor-window)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="text">
         <string>3.0</string>
@@ -524,6 +569,9 @@ p, li { white-space: pre-wrap; }
     <layout class="QHBoxLayout" name="horizontalLayout_8">
      <item>
       <widget class="QLabel" name="label_7">
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Signal-to-noise ratio for MS/MS spectra, a non-negative number with at most two decimal places. Only peaks with an intensity of at least the ratio times the noise level can be the reference peak of an isotopic envelope; the other peaks of an envelope must be above the noise level (a ratio below 1 lowers both thresholds). Default: 1. (topfd -s, --ms-two-sn-ratio)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
        <property name="text">
         <string>MS2 S/N ratio:</string>
        </property>
@@ -536,6 +584,9 @@ p, li { white-space: pre-wrap; }
          <width>70</width>
          <height>16777215</height>
         </size>
+       </property>
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Signal-to-noise ratio for MS/MS spectra, a non-negative number with at most two decimal places. Only peaks with an intensity of at least the ratio times the noise level can be the reference peak of an isotopic envelope; the other peaks of an envelope must be above the noise level (a ratio below 1 lowers both thresholds). Default: 1. (topfd -s, --ms-two-sn-ratio)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="text">
         <string>1.0</string>
@@ -552,6 +603,9 @@ p, li { white-space: pre-wrap; }
       <width>901</width>
       <height>101</height>
      </rect>
+    </property>
+    <property name="toolTip">
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The spectrum files to deconvolute, processed one after another with the same parameters; the output files of each are written next to it. Centroided mzML or mzXML files, or with &quot;Text peak list input&quot; checked, text peak lists of one MS/MS spectrum each. File paths must not contain spaces. (topfd spectrum-file-names)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
     </property>
    </widget>
    <widget class="QWidget" name="horizontalLayoutWidget_10">
@@ -572,6 +626,9 @@ p, li { white-space: pre-wrap; }
          <height>0</height>
         </size>
        </property>
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Number of threads used in spectral deconvolution, a positive integer no larger than the number of hardware threads of the computer. Default: 1. (topfd -u, --thread-number)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
        <property name="text">
         <string>Thread number:</string>
        </property>
@@ -590,6 +647,9 @@ p, li { white-space: pre-wrap; }
          <width>70</width>
          <height>16777215</height>
         </size>
+       </property>
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Number of threads used in spectral deconvolution, a positive integer no larger than the number of hardware threads of the computer. Default: 1. (topfd -u, --thread-number)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="text">
         <string>1</string>
@@ -631,6 +691,9 @@ p, li { white-space: pre-wrap; }
         <property name="acceptDrops">
          <bool>false</bool>
         </property>
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Filter the fragment ion envelopes of each MS/MS spectrum based on the estimated number of fragment ions: the envelopes ranked highest are kept (by the EnvCNN score, or by the MS-Deconv score with &quot;Sort using MS-Deconv score&quot; checked). Used with the greedy and msdeconv MS2 deconvolution methods, not with flashdeconv. Default: unchecked. (topfd -j, --frag-num-filtering)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
         <property name="text">
          <string>Enable frag num-based filtering</string>
         </property>
@@ -658,6 +721,9 @@ p, li { white-space: pre-wrap; }
        <widget class="QCheckBox" name="missLevelOneCheckBox">
         <property name="acceptDrops">
          <bool>false</bool>
+        </property>
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Check when the input files have no MS1 spectra: MS1 deconvolution and feature detection are skipped, and each MS/MS spectrum is deconvoluted up to the maximum mass and charge, which are reported as its precursor mass and charge. Default: unchecked. (topfd -o, --missing-level-one)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
         <property name="text">
          <string>Missing MS1 spectra</string>
@@ -693,6 +759,9 @@ p, li { white-space: pre-wrap; }
         <property name="acceptDrops">
          <bool>false</bool>
         </property>
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Rank isotopic envelopes by the MS-Deconv score instead of the EnvCNN score. The ranking decides which envelopes &quot;Enable frag num-based filtering&quot; keeps; the EnvCNN cutoffs use the EnvCNN score either way. Default: unchecked (EnvCNN score). (topfd -n, --env-rank msdeconv; envcnn when unchecked)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
         <property name="text">
          <string>Sort using MS-Deconv score</string>
         </property>
@@ -720,6 +789,9 @@ p, li { white-space: pre-wrap; }
        <widget class="QCheckBox" name="disableAdditionalFeatureSearchCheckBox">
         <property name="acceptDrops">
          <bool>false</bool>
+        </property>
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Disable the additional proteoform feature search in the LC-MS map for MS/MS scans without a detected feature in their precursor isolation windows. The additional search, done when unchecked, sets the signal-to-noise ratio to 0, the minimum scan number to 1 and the ECScore cutoff to 0. Default: unchecked. (topfd -d, --disable-additional-feature-search)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
         <property name="text">
          <string>Disable additional feature search</string>
@@ -749,6 +821,9 @@ p, li { white-space: pre-wrap; }
         <property name="acceptDrops">
          <bool>false</bool>
         </property>
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Do not write the deconvoluted spectra to an SQLite database (.sqlite file). Leave it unchecked if TopPIC will search the spectra: its post mass matching, on by default, reads the MS/MS peaks from this database. While checked, &quot;MS1 3D visualization data&quot; is cleared and disabled. Default: unchecked. (topfd -N, --no-sql)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
         <property name="text">
          <string>Do not generate SQLite database</string>
         </property>
@@ -775,7 +850,7 @@ p, li { white-space: pre-wrap; }
       <item>
        <widget class="QCheckBox" name="sql3dCheckBox">
         <property name="toolTip">
-         <string>Also store the raw MS1 peaks for 3D visualization in the SQLite database (topfd --sql-3d).</string>
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Also store the raw MS1 peaks for 3D visualization in the SQLite database. Disabled while &quot;Do not generate SQLite database&quot; is checked; no effect with &quot;Missing MS1 spectra&quot; or &quot;Text peak list input&quot;. Default: unchecked. (topfd -D, --sql-3d)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
         <property name="acceptDrops">
          <bool>false</bool>
@@ -808,6 +883,9 @@ p, li { white-space: pre-wrap; }
         <property name="acceptDrops">
          <bool>false</bool>
         </property>
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Use the noise intensity level of each MS1 scan to filter out low-intensity peaks in proteoform feature detection, instead of the noise intensity level of the whole LC-MS map. Default: unchecked. (topfd -i, --single-scan-noise)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
         <property name="text">
          <string>Use single scan noise level</string>
         </property>
@@ -834,7 +912,7 @@ p, li { white-space: pre-wrap; }
       <item>
        <widget class="QCheckBox" name="textPeakListCheckBox">
         <property name="toolTip">
-         <string>Each input file is a text peak list of one MS/MS spectrum, one peak per line: m/z and intensity separated by a space (topfd --text-peak-list).</string>
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Each spectrum file is a text peak list of one MS/MS spectrum: one centroided peak per line, m/z and intensity separated by a space or a tab; lines that do not start with a number are skipped, so an MGF file of one spectrum can be used. Only the MS/MS deconvolution parameters apply. Add then lists .txt and .mgf files, and Start refuses mzML and mzXML files. Default: unchecked. (topfd -T, --text-peak-list)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
         <property name="acceptDrops">
          <bool>false</bool>
@@ -871,6 +949,9 @@ p, li { white-space: pre-wrap; }
          <height>0</height>
         </size>
        </property>
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;EnvCNN score cutoff for isotopic envelopes in MS1 spectra, a number from 0 to 1: envelopes with a lower EnvCNN score are not reported, except those added for precursor isolation windows; 0 reports every envelope. Used with both MS1 deconvolution methods. Default: 0.2. (topfd -f, --envcnn-cutoff-ms1)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
        <property name="text">
         <string>MS1 EnvCNN cutoff:</string>
        </property>
@@ -889,6 +970,9 @@ p, li { white-space: pre-wrap; }
          <width>70</width>
          <height>16777215</height>
         </size>
+       </property>
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;EnvCNN score cutoff for isotopic envelopes in MS1 spectra, a number from 0 to 1: envelopes with a lower EnvCNN score are not reported, except those added for precursor isolation windows; 0 reports every envelope. Used with both MS1 deconvolution methods. Default: 0.2. (topfd -f, --envcnn-cutoff-ms1)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="text">
         <string>0.2</string>
@@ -915,6 +999,9 @@ p, li { white-space: pre-wrap; }
          <height>0</height>
         </size>
        </property>
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;EnvCNN score cutoff for isotopic envelopes in MS/MS spectra, a number from 0 to 1: envelopes with a lower EnvCNN score are not reported. Used with the greedy and msdeconv MS2 deconvolution methods, not with flashdeconv. Default: 0 (all envelopes reported). (topfd -g, --envcnn-cutoff-ms2)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
        <property name="text">
         <string>MS2 EnvCNN cutoff:</string>
        </property>
@@ -933,6 +1020,9 @@ p, li { white-space: pre-wrap; }
          <width>70</width>
          <height>16777215</height>
         </size>
+       </property>
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;EnvCNN score cutoff for isotopic envelopes in MS/MS spectra, a number from 0 to 1: envelopes with a lower EnvCNN score are not reported. Used with the greedy and msdeconv MS2 deconvolution methods, not with flashdeconv. Default: 0 (all envelopes reported). (topfd -g, --envcnn-cutoff-ms2)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="text">
         <string>0</string>
@@ -959,6 +1049,9 @@ p, li { white-space: pre-wrap; }
          <height>0</height>
         </size>
        </property>
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;ECScore cutoff for proteoform features, a number from 0 to 1: features with a lower ECScore are removed. Default: 0.1. (topfd -t, --ecscore-cutoff)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
        <property name="text">
         <string>ECScore cutoff:</string>
        </property>
@@ -977,6 +1070,9 @@ p, li { white-space: pre-wrap; }
          <width>70</width>
          <height>16777215</height>
         </size>
+       </property>
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;ECScore cutoff for proteoform features, a number from 0 to 1: features with a lower ECScore are removed. Default: 0.1. (topfd -t, --ecscore-cutoff)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="text">
         <string>0.5</string>
@@ -1003,6 +1099,9 @@ p, li { white-space: pre-wrap; }
          <height>0</height>
         </size>
        </property>
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Minimum number of MS1 scans in which a proteoform feature must be detected: 1, 2 or 3. Default: 1. (topfd -b, --min-scan-number)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
        <property name="text">
         <string>Feature min scan num:</string>
        </property>
@@ -1021,6 +1120,9 @@ p, li { white-space: pre-wrap; }
          <width>70</width>
          <height>16777215</height>
         </size>
+       </property>
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Minimum number of MS1 scans in which a proteoform feature must be detected: 1, 2 or 3. Default: 1. (topfd -b, --min-scan-number)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="text">
         <string>3</string>
@@ -1047,6 +1149,9 @@ p, li { white-space: pre-wrap; }
          <height>0</height>
         </size>
        </property>
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Intensity ratio required to split one proteoform feature into two, a positive number with at most two decimal places. Default: 2.5. (topfd -l, --split-intensity-ratio)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
        <property name="text">
         <string>Feature split ratio:</string>
        </property>
@@ -1065,6 +1170,9 @@ p, li { white-space: pre-wrap; }
          <width>70</width>
          <height>16777215</height>
         </size>
+       </property>
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Intensity ratio required to split one proteoform feature into two, a positive number with at most two decimal places. Default: 2.5. (topfd -l, --split-intensity-ratio)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="text">
         <string>3</string>
@@ -1091,6 +1199,9 @@ p, li { white-space: pre-wrap; }
      </property>
      <item>
       <widget class="QLabel" name="ms1DeconvLabel">
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Deconvolution method of MS1 spectra: greedy, a greedy search that decides the charge state of the most intense peak with all the charge states of its mass and subtracts the mass's envelopes, or msdeconv, the MS-Deconv dynamic programming of earlier versions. Default: greedy. (topfd -p, --deconv-ms1)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
        <property name="text">
         <string>MS1 deconvolution:</string>
        </property>
@@ -1105,7 +1216,7 @@ p, li { white-space: pre-wrap; }
         </size>
        </property>
        <property name="toolTip">
-        <string>The deconvolution method of MS1 spectra (--deconv-ms1): greedy, a greedy search that decides the charge state of the most intense peak with all the charge states of its mass, or msdeconv, the MS-Deconv dynamic programming.</string>
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Deconvolution method of MS1 spectra: greedy, a greedy search that decides the charge state of the most intense peak with all the charge states of its mass and subtracts the mass's envelopes, or msdeconv, the MS-Deconv dynamic programming of earlier versions. Default: greedy. (topfd -p, --deconv-ms1)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <item>
         <property name="text">
@@ -1139,6 +1250,9 @@ p, li { white-space: pre-wrap; }
      </property>
      <item>
       <widget class="QLabel" name="ms2DeconvLabel">
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Deconvolution method of MS/MS spectra: greedy, the greedy search of MS1 spectra adapted to fragment ions; msdeconv, the MS-Deconv dynamic programming of earlier versions; or flashdeconv, the FLASHDeconv algorithm (experimental; not with &quot;Text peak list input&quot;). Default: greedy. (topfd -q, --deconv-ms2)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
        <property name="text">
         <string>MS2 deconvolution:</string>
        </property>
@@ -1153,7 +1267,7 @@ p, li { white-space: pre-wrap; }
         </size>
        </property>
        <property name="toolTip">
-        <string>The deconvolution method of MS/MS spectra (--deconv-ms2): greedy, the greedy search adapted to fragment ions; msdeconv, the MS-Deconv dynamic programming; or flashdeconv, the FLASHDeconv algorithm (experimental).</string>
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Deconvolution method of MS/MS spectra: greedy, the greedy search of MS1 spectra adapted to fragment ions; msdeconv, the MS-Deconv dynamic programming of earlier versions; or flashdeconv, the FLASHDeconv algorithm (experimental; not with &quot;Text peak list input&quot;). Default: greedy. (topfd -q, --deconv-ms2)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <item>
         <property name="text">

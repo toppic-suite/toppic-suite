@@ -54,6 +54,9 @@
          <height>16777215</height>
         </size>
        </property>
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The MS/MS spectrum files (*ms2.msalign) of the samples to compare, one per sample, at least two. For each file TopDiff reads the proteoform results of its TopPIC or TopMG search, &amp;lt;base&amp;gt;_post_ms2_&amp;lt;tool&amp;gt;_proteoform.xml or else &amp;lt;base&amp;gt;_ms2_&amp;lt;tool&amp;gt;_proteoform.xml; the first file is the reference sample of the retention-time alignment, and the output table is written into its directory. (topdiff spectrum-file-names)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
        <property name="text">
         <string>Spectrum files: </string>
        </property>
@@ -73,6 +76,9 @@
          <height>16777215</height>
         </size>
        </property>
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Add spectrum files (*ms2.msalign) to the end of the list, one per sample; a file already in the list is skipped. The first file in the list is the reference sample; paths must have at most 200 characters and no spaces. (topdiff spectrum-file-names)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
        <property name="text">
         <string>Add</string>
        </property>
@@ -91,6 +97,9 @@
          <width>100</width>
          <height>16777215</height>
         </size>
+       </property>
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Remove the selected spectrum file from the list. (topdiff spectrum-file-names)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="text">
         <string>Remove</string>
@@ -117,6 +126,9 @@
          <height>0</height>
         </size>
        </property>
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Precursor mass error tolerance in Dalton, a positive number; default 1.2. It is used to align the retention times of the samples and to match the same proteoform across samples (same protein, precursor masses within the tolerance). (topdiff -e, --error-tolerance)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
        <property name="text">
         <string>Precursor mass error tolerance (Dalton):</string>
        </property>
@@ -135,6 +147,9 @@
          <width>70</width>
          <height>16777215</height>
         </size>
+       </property>
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Precursor mass error tolerance in Dalton, a positive number; default 1.2. It is used to align the retention times of the samples and to match the same proteoform across samples (same protein, precursor masses within the tolerance). (topdiff -e, --error-tolerance)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="text">
         <string>1.2</string>
@@ -240,6 +255,9 @@ p, li { white-space: pre-wrap; }
       <height>171</height>
      </rect>
     </property>
+    <property name="toolTip">
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The MS/MS spectrum files (*ms2.msalign) of the samples to compare, one per sample, at least two. For each file TopDiff reads the proteoform results of its TopPIC or TopMG search, &amp;lt;base&amp;gt;_post_ms2_&amp;lt;tool&amp;gt;_proteoform.xml or else &amp;lt;base&amp;gt;_ms2_&amp;lt;tool&amp;gt;_proteoform.xml; the first file is the reference sample of the retention-time alignment, and the output table is written into its directory. (topdiff spectrum-file-names)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+    </property>
    </widget>
    <widget class="QWidget" name="horizontalLayoutWidget_6">
     <property name="geometry">
@@ -253,6 +271,9 @@ p, li { white-space: pre-wrap; }
     <layout class="QHBoxLayout" name="horizontalLayout_6">
      <item>
       <widget class="QLabel" name="label_3">
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Name of the output table (tab-separated), written into the directory of the first spectrum file; give a file name without spaces, not a path. Default sample_diff.tsv. (topdiff -o, --output)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
        <property name="text">
         <string>Output file:</string>
        </property>
@@ -260,6 +281,9 @@ p, li { white-space: pre-wrap; }
      </item>
      <item>
       <widget class="QLineEdit" name="outputEdit">
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Name of the output table (tab-separated), written into the directory of the first spectrum file; give a file name without spaces, not a path. Default sample_diff.tsv. (topdiff -o, --output)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
        <property name="text">
         <string>sample_diff.tsv</string>
        </property>
@@ -279,6 +303,9 @@ p, li { white-space: pre-wrap; }
     <layout class="QHBoxLayout" name="horizontalLayout_8">
      <item>
       <widget class="QLabel" name="label_6">
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Database search tool whose proteoform result files are read: toppic (the default) reads the *_toppic_proteoform.xml files, topmg the *_topmg_proteoform.xml files. (topdiff -t, --tool-name)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
        <property name="text">
         <string>Database search tool:</string>
        </property>
@@ -286,6 +313,9 @@ p, li { white-space: pre-wrap; }
      </item>
      <item>
       <widget class="QComboBox" name="toolComboBox">
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Database search tool whose proteoform result files are read: toppic (the default) reads the *_toppic_proteoform.xml files, topmg the *_topmg_proteoform.xml files. (topdiff -t, --tool-name)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
        <property name="currentText">
         <string>toppic</string>
        </property>
