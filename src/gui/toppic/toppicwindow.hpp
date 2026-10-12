@@ -125,8 +125,6 @@ class ToppicWindow : public QMainWindow {
 
   bool protTypeError();
 
-  bool event(QEvent* event);
-
   bool ableToAdd(QString spfile);
 };
 

@@ -877,7 +877,7 @@ level:</string>
         <item>
          <widget class="QLineEdit" name="cutoffSpectralValueEdit">
           <property name="toolTip">
-           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Spectrum-level cutoff value: a PrSM is reported when its E-value (or FDR, with the FDR type) is at most this value. A non-negative number with at most two decimals; default 0.01. (toppic -v, --spectrum-cutoff-value)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Spectrum-level cutoff value: a PrSM is reported when its E-value (or FDR, with the FDR type) is at most this value. A non-negative number such as 0.01, 0.001 or 1e-5; default 0.01. (toppic -v, --spectrum-cutoff-value)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
           </property>
           <property name="text">
            <string>0.01</string>
@@ -922,7 +922,7 @@ level:</string>
         <item>
          <widget class="QLineEdit" name="cutoffProteoformValueEdit">
           <property name="toolTip">
-           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Proteoform-level cutoff value: a proteoform is reported when the E-value of its best PrSM (or its FDR, with the FDR type) is at most this value. A non-negative number with at most two decimals; default 0.01. (toppic -V, --proteoform-cutoff-value)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Proteoform-level cutoff value: a proteoform is reported when the E-value of its best PrSM (or its FDR, with the FDR type) is at most this value. A non-negative number such as 0.01, 0.001 or 1e-5; default 0.01. (toppic -V, --proteoform-cutoff-value)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
           </property>
           <property name="text">
            <string>0.01</string>
@@ -984,7 +984,7 @@ level:</string>
         <item>
          <widget class="QLineEdit" name="cutoffProteinValueEdit">
           <property name="toolTip">
-           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Protein-level cutoff value: a protein is reported when the E-value of its best PrSM (or its FDR, with the FDR type) is at most this value. A non-negative number with at most two decimals; default 0.01. (toppic -Y, --protein-cutoff-value)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Protein-level cutoff value: a protein is reported when the E-value of its best PrSM (or its FDR, with the FDR type) is at most this value. A non-negative number such as 0.01, 0.001 or 1e-5; default 0.01. (toppic -Y, --protein-cutoff-value)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
           </property>
           <property name="text">
            <string>0.01</string>
@@ -1386,7 +1386,7 @@ level:</string>
            </size>
           </property>
           <property name="toolTip">
-           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;MIScore threshold of the modification characterization (with a PTM file for localization): a characterized modification is reported on the range of its sites whose MIScore is above the threshold, or, when no site reaches it, on the range of its sites with a positive MIScore. A number from 0 to 1 with at most two decimals; default 0.15. (toppic -H, --miscore-threshold)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;MIScore threshold of the modification characterization (with a PTM file for localization): a characterized modification is reported on the range of its sites whose MIScore is above the threshold, or, when no site reaches it, on the range of its sites with a positive MIScore. A number from 0 to 1 with at most four decimals; default 0.15. (toppic -H, --miscore-threshold)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
           </property>
           <property name="text">
            <string>MIScore threshold:</string>
@@ -1396,7 +1396,7 @@ level:</string>
         <item>
          <widget class="QLineEdit" name="miscoreThresholdEdit">
           <property name="toolTip">
-           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;MIScore threshold of the modification characterization (with a PTM file for localization): a characterized modification is reported on the range of its sites whose MIScore is above the threshold, or, when no site reaches it, on the range of its sites with a positive MIScore. A number from 0 to 1 with at most two decimals; default 0.15. (toppic -H, --miscore-threshold)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;MIScore threshold of the modification characterization (with a PTM file for localization): a characterized modification is reported on the range of its sites whose MIScore is above the threshold, or, when no site reaches it, on the range of its sites with a positive MIScore. A number from 0 to 1 with at most four decimals; default 0.15. (toppic -H, --miscore-threshold)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
           </property>
           <property name="text">
            <string>0.45</string>

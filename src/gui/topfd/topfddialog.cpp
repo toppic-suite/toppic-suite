@@ -30,6 +30,7 @@
 #include <map>
 #include <sstream>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include "common/util/file_util.hpp"
@@ -37,6 +38,7 @@
 #include "common/util/version.hpp"
 #include "gui/topfd/ui_topfddialog.h"
 #include "gui/util/command.hpp"
+#include "gui/util/gui_check.hpp"
 #include "gui/util/gui_message.hpp"
 
 TopFDDialog::TopFDDialog(QWidget* parent)
@@ -49,24 +51,27 @@ TopFDDialog::TopFDDialog(QWidget* parent)
   lastDir_ = ".";
   ui->maxChargeEdit->setValidator(new QIntValidator(1, 100, this));
   ui->maxMassEdit->setValidator(new QIntValidator(1, 1000000, this));
-  QRegularExpression rx1("^0\\.[0]\\d{0,2}[1-9]|0.1$");
-  QRegularExpressionValidator* validator1 = new QRegularExpressionValidator(rx1, this);
+  // 0.0001 to 0.1
+  QRegularExpression rx1("0\\.0\\d{0,2}[1-9]|0\\.1");
+  QRegularExpressionValidator* validator1 =
+      new QRegularExpressionValidator(rx1, this);
   ui->mzErrorEdit->setValidator(validator1);
-  QRegularExpression rx2("^\\d{1,6}\\.\\d{0,2}$");
-  QRegularExpressionValidator* validator2 = new QRegularExpressionValidator(rx2, this);
+  // non-negative, the decimal point optional (the defaults are "3" and "1")
+  QRegularExpression rx2("\\d{1,6}(\\.\\d{0,2})?");
+  QRegularExpressionValidator* validator2 =
+      new QRegularExpressionValidator(rx2, this);
   ui->ms1snRatioEdit->setValidator(validator2);
   ui->ms2snRatioEdit->setValidator(validator2);
-  ui->splitRatioEdit->setValidator(validator2);
-  ui->threadNumberEdit->setValidator(new QIntValidator(0, 1000, this));
+  ui->splitRatioEdit->setValidator(
+      new QDoubleValidator(0.01, 1000000, 2, this));
+  ui->threadNumberEdit->setValidator(new QIntValidator(1, 1000, this));
   ui->minScanNumEdit->setValidator(new QIntValidator(1, 3, this));
   ui->ecscoreCutoffEdit->setValidator(new QDoubleValidator(0.0, 1.0, 4, this));
   ui->ms1EnvCnnCutoffEdit->setValidator(
       new QDoubleValidator(0.0, 1.0, 4, this));
   ui->ms2EnvCnnCutoffEdit->setValidator(
       new QDoubleValidator(0.0, 1.0, 4, this));
-  QRegularExpression rx3("^\\d{1,4}\\.\\d{0,2}|10000$");
-  QRegularExpressionValidator* validator3 = new QRegularExpressionValidator(rx3, this);
-  ui->windowSizeEdit->setValidator(validator3);
+  ui->windowSizeEdit->setValidator(new QDoubleValidator(0.01, 10000, 2, this));
   QFont font;
   QFont outputFont;
 #if defined(_WIN32) || defined(_WIN64) || defined(__MINGW32__) || \
@@ -223,23 +228,8 @@ void TopFDDialog::on_delButton_clicked() {
 }
 
 void TopFDDialog::on_startButton_clicked() {
-  // topfd --text-peak-list reads every input file as a peak list; an
-  // mzML/mzXML file has no line that starts with a number and would give an
-  // empty spectrum, so refuse the run here.
-  if (ui->textPeakListCheckBox->isChecked()) {
-    for (int i = 0; i < ui->listWidget->count(); i++) {
-      QString spfile = ui->listWidget->item(i)->text();
-      if (spfile.endsWith(".mzML", Qt::CaseInsensitive) ||
-          spfile.endsWith(".mzXML", Qt::CaseInsensitive)) {
-        QMessageBox::warning(
-            this, tr("Warning"),
-            tr("Text peak list input is checked, but %1 is an mzML or mzXML "
-               "file. Remove it or uncheck the option.")
-                .arg(spfile),
-            QMessageBox::Yes);
-        return;
-      }
-    }
+  if (checkError()) {
+    return;
   }
   lockDialog();
   toppic::TopfdParaPtr paraPtr = this->getParaPtr();
@@ -434,77 +424,65 @@ void TopFDDialog::unlockDialog() {
 }
 
 bool TopFDDialog::checkError() {
-  if (ui->maxChargeEdit->text().isEmpty()) {
-    QMessageBox::warning(this, tr("Warning"), tr("Maximum charge is empty!"),
-                         QMessageBox::Yes);
-    return true;
-  }
-
-  if (ui->maxMassEdit->text().isEmpty()) {
-    QMessageBox::warning(this, tr("Warning"), tr("Maximum mass is empty!"),
-                         QMessageBox::Yes);
-    return true;
-  }
-
-  if (ui->mzErrorEdit->text().isEmpty()) {
+  if (ui->listWidget->count() == 0) {
     QMessageBox::warning(this, tr("Warning"),
-                         tr("M/z error tolerance is empty!"), QMessageBox::Yes);
-    return true;
-  }
-
-  if (ui->ms1snRatioEdit->text().isEmpty()) {
-    QMessageBox::warning(this, tr("Warning"), tr("MS1 S/N ratio is empty!"),
+                         tr("Please add at least one spectrum file!"),
                          QMessageBox::Yes);
     return true;
   }
-
-  if (ui->ms2snRatioEdit->text().isEmpty()) {
-    QMessageBox::warning(this, tr("Warning"), tr("MS2 S/N ratio is empty!"),
-                         QMessageBox::Yes);
-    return true;
+  for (int i = 0; i < ui->listWidget->count(); i++) {
+    if (toppic::gui_check::pathWithSpace(
+            this, ui->listWidget->item(i)->text(), tr("spectrum file"))) {
+      return true;
+    }
   }
 
-  if (ui->splitRatioEdit->text().isEmpty()) {
-    QMessageBox::warning(this, tr("Warning"),
-                         tr("Split feature ratio is empty!"), QMessageBox::Yes);
-    return true;
+  const std::vector<std::pair<QLineEdit*, QString>> edits = {
+      {ui->maxChargeEdit, tr("Maximum charge")},
+      {ui->maxMassEdit, tr("Maximum mass")},
+      {ui->mzErrorEdit, tr("M/z error")},
+      {ui->windowSizeEdit, tr("Default precursor window")},
+      {ui->ms1snRatioEdit, tr("MS1 S/N ratio")},
+      {ui->ms2snRatioEdit, tr("MS2 S/N ratio")},
+      {ui->threadNumberEdit, tr("Thread number")},
+      {ui->ms1EnvCnnCutoffEdit, tr("MS1 EnvCNN cutoff")},
+      {ui->ms2EnvCnnCutoffEdit, tr("MS2 EnvCNN cutoff")},
+      {ui->ecscoreCutoffEdit, tr("ECScore cutoff")},
+      {ui->splitRatioEdit, tr("Feature split ratio")},
+      {ui->minScanNumEdit, tr("Feature minimum scan number")}};
+  for (const auto& [edit, name] : edits) {
+    if (toppic::gui_check::invalidEdit(this, edit, name)) {
+      return true;
+    }
   }
 
-  if (ui->windowSizeEdit->text().isEmpty()) {
-    QMessageBox::warning(this, tr("Warning"),
-                         tr("Precursor window size is empty!"),
-                         QMessageBox::Yes);
-    return true;
-  }
-  if (ui->threadNumberEdit->text().isEmpty()) {
-    QMessageBox::warning(this, tr("Warning"), tr("Thread number is empty!"),
-                         QMessageBox::Yes);
-    return true;
-  }
-
-  if (ui->minScanNumEdit->text().isEmpty()) {
-    QMessageBox::warning(this, tr("Warning"),
-                         tr("Minimum scan number is empty!"), QMessageBox::Yes);
-    return true;
-  }
-
-  if (ui->ecscoreCutoffEdit->text().isEmpty()) {
-    QMessageBox::warning(this, tr("Warning"), tr("ECScore cutoff is empty!"),
-                         QMessageBox::Yes);
-    return true;
-  }
-
-  if (ui->ms1EnvCnnCutoffEdit->text().isEmpty()) {
-    QMessageBox::warning(this, tr("Warning"),
-                         tr("MS1 EnvCNN cutoff is empty!"), QMessageBox::Yes);
-    return true;
+  if (ui->textPeakListCheckBox->isChecked()) {
+    // topfd --text-peak-list reads every input file as a peak list; an
+    // mzML/mzXML file has no line that starts with a number and would give
+    // an empty spectrum
+    for (int i = 0; i < ui->listWidget->count(); i++) {
+      QString spfile = ui->listWidget->item(i)->text();
+      if (spfile.endsWith(".mzML", Qt::CaseInsensitive) ||
+          spfile.endsWith(".mzXML", Qt::CaseInsensitive)) {
+        QMessageBox::warning(
+            this, tr("Warning"),
+            tr("Text peak list input is checked, but %1 is an mzML or mzXML "
+               "file. Remove it or uncheck the option.")
+                .arg(spfile),
+            QMessageBox::Yes);
+        return true;
+      }
+    }
+    // the FLASHDeconv process reads mzML files only; topfd refuses the pair
+    if (ui->ms2DeconvComboBox->currentText() == "flashdeconv") {
+      QMessageBox::warning(this, tr("Warning"),
+                           tr("The MS2 deconvolution method flashdeconv "
+                              "cannot be used with text peak list input!"),
+                           QMessageBox::Yes);
+      return true;
+    }
   }
 
-  if (ui->ms2EnvCnnCutoffEdit->text().isEmpty()) {
-    QMessageBox::warning(this, tr("Warning"),
-                         tr("MS2 EnvCNN cutoff is empty!"), QMessageBox::Yes);
-    return true;
-  }
   if (ui->threadNumberEdit->text().toInt() >
       toppic::mem_check::getMaxThreads("topfd")) {
     int max_thread = toppic::mem_check::getMaxThreads("topfd");
@@ -513,7 +491,6 @@ bool TopFDDialog::checkError() {
         QString("Thread number is too large! Based on the memory size, up to "
                 "%1 threads can run on this computer. Are you sure you want to "
                 "proceed?")
-            .arg(max_thread)
             .arg(max_thread),
         QMessageBox::Yes | QMessageBox::No);
     if (reply == QMessageBox::No) {

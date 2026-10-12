@@ -17,6 +17,7 @@
 
 #include <QCloseEvent>
 #include <QDesktopServices>
+#include <QDoubleValidator>
 #include <QElapsedTimer>
 #include <QFileDialog>
 #include <QFontDatabase>
@@ -30,6 +31,7 @@
 #include "console/topdiff_argument.hpp"
 #include "gui/topdiff/ui_topdiffdialog.h"
 #include "gui/util/command.hpp"
+#include "gui/util/gui_check.hpp"
 #include "gui/util/gui_message.hpp"
 
 TopDiffDialog::TopDiffDialog(QWidget* parent)
@@ -39,6 +41,8 @@ TopDiffDialog::TopDiffDialog(QWidget* parent)
   QString qstr = QString::fromStdString(title);
   this->setWindowTitle(qstr);
   lastDir_ = ".";
+  ui->precErrorEdit->setValidator(
+      new QDoubleValidator(0.0001, 1000000, 4, this));
 
   QFont font;
   QFont outputFont;
@@ -149,6 +153,9 @@ void TopDiffDialog::on_delButton_clicked() {
 }
 
 void TopDiffDialog::on_startButton_clicked() {
+  if (checkError()) {
+    return;
+  }
   lockDialog();
   std::map<std::string, std::string> argument = this->getArguments();
   std::vector<std::string> spec_file_lst = this->getSpecFileList();
@@ -266,22 +273,42 @@ void TopDiffDialog::unlockDialog() {
 }
 
 bool TopDiffDialog::checkError() {
-  if (ui->listWidget->count() == 0) {
+  // topdiff compares samples: it refuses fewer than two spectrum files
+  if (ui->listWidget->count() < 2) {
     QMessageBox::warning(this, tr("Warning"),
-                         tr("Spectrum files are not selected!"),
+                         tr("Please add at least two spectrum files!"),
                          QMessageBox::Yes);
     return true;
   }
+  for (int i = 0; i < ui->listWidget->count(); i++) {
+    if (toppic::gui_check::pathWithSpace(
+            this, ui->listWidget->item(i)->text(), tr("spectrum file"))) {
+      return true;
+    }
+  }
 
-  if (ui->precErrorEdit->text().isEmpty()) {
-    QMessageBox::warning(this, tr("Warning"), tr("Error tolerance is empty!"),
-                         QMessageBox::Yes);
+  if (toppic::gui_check::invalidEdit(this, ui->precErrorEdit,
+                                     tr("Error tolerance"))) {
     return true;
   }
 
-  if (ui->outputEdit->text().isEmpty()) {
+  // the table is written next to the first spectrum file under this name
+  QString output = ui->outputEdit->text().trimmed();
+  if (output.isEmpty()) {
     QMessageBox::warning(this, tr("Warning"), tr("Output filename is empty!"),
                          QMessageBox::Yes);
+    return true;
+  }
+  if (output.contains('/') || output.contains('\\')) {
+    QMessageBox::warning(this, tr("Warning"),
+                         tr("The output filename %1 should be a file name, not "
+                            "a path: the table is written into the folder of "
+                            "the first spectrum file.")
+                             .arg(output),
+                         QMessageBox::Yes);
+    return true;
+  }
+  if (toppic::gui_check::pathWithSpace(this, output, tr("output filename"))) {
     return true;
   }
 

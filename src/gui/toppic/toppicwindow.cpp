@@ -26,9 +26,10 @@
 #include <QRegularExpression>
 #include <QRegularExpressionValidator>
 #include <QScrollBar>
-#include <QToolTip>
 
 #include <filesystem>
+#include <utility>
+#include <vector>
 
 #include "common/util/file_util.hpp"
 #include "common/util/mem_check.hpp"
@@ -37,6 +38,7 @@
 #include "gui/toppic/ui_toppicwindow.h"
 #include "prsm/prsm_post_mass_match.hpp"
 #include "gui/util/command.hpp"
+#include "gui/util/gui_check.hpp"
 #include "gui/util/gui_message.hpp"
 
 ToppicWindow::ToppicWindow(QWidget* parent)
@@ -46,28 +48,25 @@ ToppicWindow::ToppicWindow(QWidget* parent)
   QString qstr = QString::fromStdString(title);
   this->setWindowTitle(qstr);
   lastDir_ = ".";
-  QRegularExpression rx1("^\\d{1,8}\\.\\d{0,2}$");
+  ui->maxModEdit->setValidator(new QDoubleValidator(0.01, 100000, 2, this));
+  ui->minModEdit->setValidator(
+      new QDoubleValidator(-100000, 100000, 2, this));
+  // E-values and FDRs: any non-negative number, e.g. 0.001 or 1e-5
+  QRegularExpression rx1("\\d{1,8}(\\.\\d{0,12})?([eE]-?\\d{1,3})?");
   QRegularExpressionValidator* validator1 =
       new QRegularExpressionValidator(rx1, this);
-  ui->maxModEdit->setValidator(validator1);
   ui->cutoffSpectralValueEdit->setValidator(validator1);
   ui->cutoffProteoformValueEdit->setValidator(validator1);
   ui->cutoffProteinValueEdit->setValidator(validator1);
-  ui->numCombinedEdit->setValidator(new QIntValidator(0, 2147483647, this));
-  QRegularExpression rx2("^0\\.\\d{0,2}|1.00$");
-  QRegularExpressionValidator* validator2 =
-      new QRegularExpressionValidator(rx2, this);
-  ui->miscoreThresholdEdit->setValidator(validator2);
-  ui->threadNumberEdit->setValidator(new QIntValidator(0, 2147483647, this));
-  ui->errorToleranceEdit->setValidator(new QIntValidator(0, 2147483647, this));
+  ui->numCombinedEdit->setValidator(new QIntValidator(1, 100, this));
+  ui->miscoreThresholdEdit->setValidator(new QDoubleValidator(0, 1, 4, this));
+  ui->threadNumberEdit->setValidator(new QIntValidator(1, 1000, this));
+  ui->errorToleranceEdit->setValidator(new QIntValidator(1, 1000000, this));
   ui->precErrorToleranceEdit->setValidator(
-      new QIntValidator(0, 2147483647, this));
+      new QIntValidator(1, 1000000, this));
   ui->formErrorToleranceEdit->setValidator(
-      new QDoubleValidator(0, 2147483647, 4, this));
-  QRegularExpression rx3("^-?\\d{1,8}\\.\\d{0,2}$");
-  QRegularExpressionValidator* validator3 =
-      new QRegularExpressionValidator(rx3, this);
-  ui->minModEdit->setValidator(validator3);
+      new QDoubleValidator(0.0001, 1000000, 4, this));
+  ui->varPtmNumEdit->setValidator(new QIntValidator(0, 100, this));
   // the N-terminal label mass (-N): a non-negative number with up to six
   // decimals, e.g. 229.162932 for TMT
   QRegularExpression rx4("^\\d{1,6}(\\.\\d{0,6})?$");
@@ -225,6 +224,9 @@ void ToppicWindow::on_varPtmFileButton_clicked() {
 }
 
 void ToppicWindow::on_startButton_clicked() {
+  if (checkError()) {
+    return;
+  }
   lockDialog();
 
   std::map<std::string, std::string> argument = this->getArguments();
@@ -301,8 +303,11 @@ std::map<std::string, std::string> ToppicWindow::getArguments() {
   arguments_["oriDatabaseFileName"] =
       ui->databaseFileEdit->text().toStdString();
 
-  arguments_["combinedOutputName"] =
-      ui->combinedOutputEdit->text().trimmed().toStdString();
+  arguments_["combinedOutputName"] = "";
+  if (ui->listWidget->count() >= 2) {
+    arguments_["combinedOutputName"] =
+        ui->combinedOutputEdit->text().trimmed().toStdString();
+  }
   arguments_["activation"] =
       ui->activationComboBox->currentText().toStdString();
   if (ui->decoyCheckBox->isChecked()) {
@@ -606,113 +611,92 @@ bool ToppicWindow::checkError() {
                          QMessageBox::Yes);
     return true;
   }
-
   if (ui->databaseFileEdit->text().toStdString().length() > 200) {
     QMessageBox::warning(this, tr("Warning"),
                          tr("The protein database file path is too long!"),
                          QMessageBox::Yes);
     return true;
   }
+  if (toppic::gui_check::pathWithSpace(this, ui->databaseFileEdit->text(),
+                                       tr("protein database file"))) {
+    return true;
+  }
 
+  if (ui->listWidget->count() == 0) {
+    QMessageBox::warning(this, tr("Warning"),
+                         tr("Please add at least one spectrum file!"),
+                         QMessageBox::Yes);
+    return true;
+  }
   for (int i = 0; i < ui->listWidget->count(); i++) {
-    if (ui->listWidget->item(i)->text().toStdString().length() > 200) {
+    QString sp_file = ui->listWidget->item(i)->text();
+    if (sp_file.toStdString().length() > 200) {
       QMessageBox::warning(this, tr("Warning"),
-                           tr("The sepctrum file path is too long!"),
+                           tr("The spectrum file path is too long!"),
                            QMessageBox::Yes);
+      return true;
+    }
+    if (toppic::gui_check::pathWithSpace(this, sp_file, tr("spectrum file"))) {
+      return true;
+    }
+  }
+  if (ui->listWidget->count() >= 2) {
+    QString combined = ui->combinedOutputEdit->text().trimmed();
+    if (combined.toStdString().length() > 200) {
+      QMessageBox::warning(this, tr("Warning"),
+                           tr("The combined output filename is too long!"),
+                           QMessageBox::Yes);
+      return true;
+    }
+    if (toppic::gui_check::pathWithSpace(this, combined,
+                                         tr("combined output filename"))) {
       return true;
     }
   }
 
-  if (ui->combinedOutputEdit->text().toStdString().length() > 200) {
-    QMessageBox::warning(this, tr("Warning"),
-                         tr("The combined output filename is too long!"),
-                         QMessageBox::Yes);
+  // the click handlers keep one proteoform type and one N-terminal form
+  // checked; toppic refuses empty lists (-R, -n)
+  if (protTypeError() || nterminalError()) {
     return true;
   }
 
-  // toppic refuses an empty proteoform type list (-R)
-  if (!ui->CompleteCheckBox->isChecked() && !ui->PrefixCheckBox->isChecked() &&
-      !ui->SuffixCheckBox->isChecked() && !ui->InternalCheckBox->isChecked()) {
-    QMessageBox::warning(this, tr("Warning"),
-                         tr("Please select at least one proteoform type!"),
-                         QMessageBox::Yes);
+  if (ui->fixedModComboBox->currentIndex() == 3) {
+    if (ui->fixedModFileEdit->text().isEmpty()) {
+      QMessageBox::warning(this, tr("Warning"),
+                           tr("Please select a fixed modification file!"),
+                           QMessageBox::Yes);
+      return true;
+    }
+    if (toppic::gui_check::pathWithSpace(this, ui->fixedModFileEdit->text(),
+                                         tr("fixed modification file"))) {
+      return true;
+    }
+  }
+  if (toppic::gui_check::pathWithSpace(this, ui->varPtmFileEdit->text(),
+                                       tr("variable PTM file")) ||
+      toppic::gui_check::pathWithSpace(this, ui->modFileEdit->text(),
+                                       tr("PTM file for localization"))) {
     return true;
   }
 
-  if (ui->fixedModFileEdit->text().isEmpty() &&
-      ui->fixedModComboBox->currentIndex() == 3) {
-    QMessageBox::warning(this, tr("Warning"),
-                         tr("Please select a fixed modification file!"),
-                         QMessageBox::Yes);
-    return true;
-  }
-  if (ui->errorToleranceEdit->text().isEmpty()) {
-    QMessageBox::warning(this, tr("Warning"),
-                         tr("Fragment error tolerance is empty!"),
-                         QMessageBox::Yes);
-    return true;
-  }
-  if (ui->precErrorToleranceEdit->text().isEmpty()) {
-    QMessageBox::warning(this, tr("Warning"),
-                         tr("Precursor error tolerance is empty!"),
-                         QMessageBox::Yes);
-    return true;
-  }
-  if (ui->formErrorToleranceEdit->text().isEmpty()) {
-    QMessageBox::warning(this, tr("Warning"),
-                         tr("Proteoform error tolerance is empty!"),
-                         QMessageBox::Yes);
-    return true;
-  }
-  if (ui->maxModEdit->text().isEmpty()) {
-    QMessageBox::warning(this, tr("Warning"),
-                         tr("Maximum mass shift is empty!"), QMessageBox::Yes);
-    return true;
-  }
-  if (ui->minModEdit->text().isEmpty()) {
-    QMessageBox::warning(this, tr("Warning"),
-                         tr("Minimum mass shift is empty!"), QMessageBox::Yes);
-    return true;
-  }
-  if (ui->nTermLabelEdit->text().isEmpty()) {
-    QMessageBox::warning(this, tr("Warning"),
-                         tr("N-terminal label mass is empty!"),
-                         QMessageBox::Yes);
-    return true;
-  }
-  if (ui->cutoffSpectralValueEdit->text().isEmpty()) {
-    QMessageBox::warning(this, tr("Warning"),
-                         tr("Spectrum-level cutoff value is empty!"),
-                         QMessageBox::Yes);
-    return true;
-  }
-  if (ui->cutoffProteoformValueEdit->text().isEmpty()) {
-    QMessageBox::warning(this, tr("Warning"),
-                         tr("Proteoform-level cutoff value is empty!"),
-                         QMessageBox::Yes);
-    return true;
-  }
-  if (ui->cutoffProteinValueEdit->text().isEmpty()) {
-    QMessageBox::warning(this, tr("Warning"),
-                         tr("Protein-level cutoff value is empty!"),
-                         QMessageBox::Yes);
-    return true;
-  }
-  if (ui->numCombinedEdit->text().isEmpty()) {
-    QMessageBox::warning(this, tr("Warning"),
-                         tr("Number of combined spectra is empty!"),
-                         QMessageBox::Yes);
-    return true;
-  }
-  if (ui->miscoreThresholdEdit->text().isEmpty()) {
-    QMessageBox::warning(this, tr("Warning"), tr("MIScore threshold is empty!"),
-                         QMessageBox::Yes);
-    return true;
-  }
-  if (ui->threadNumberEdit->text().isEmpty()) {
-    QMessageBox::warning(this, tr("Warning"), tr("Thread number is empty!"),
-                         QMessageBox::Yes);
-    return true;
+  const std::vector<std::pair<QLineEdit*, QString>> edits = {
+      {ui->precErrorToleranceEdit, tr("Precursor error tolerance")},
+      {ui->errorToleranceEdit, tr("Fragment error tolerance")},
+      {ui->formErrorToleranceEdit, tr("PrSM cluster error tolerance")},
+      {ui->threadNumberEdit, tr("Thread number")},
+      {ui->varPtmNumEdit, tr("Maximum variable PTM number")},
+      {ui->cutoffSpectralValueEdit, tr("Spectrum-level cutoff value")},
+      {ui->cutoffProteoformValueEdit, tr("Proteoform-level cutoff value")},
+      {ui->cutoffProteinValueEdit, tr("Protein-level cutoff value")},
+      {ui->numCombinedEdit, tr("Number of combined spectra")},
+      {ui->maxModEdit, tr("Maximum mass shift")},
+      {ui->minModEdit, tr("Minimum mass shift")},
+      {ui->miscoreThresholdEdit, tr("MIScore threshold")},
+      {ui->nTermLabelEdit, tr("N-terminal label mass")}};
+  for (const auto& [edit, name] : edits) {
+    if (toppic::gui_check::invalidEdit(this, edit, name)) {
+      return true;
+    }
   }
   // Post mass matching reads the TopFD SQLite database of each spectrum file;
   // report a missing one before starting toppic.
@@ -993,20 +977,3 @@ bool ToppicWindow::continueToClose() {
   }
 }
 
-bool ToppicWindow::event(QEvent* event) {
-  if (event->type() == QEvent::ToolTip) {
-    QHelpEvent* helpEvent = static_cast<QHelpEvent*>(event);
-    if (QRect(800, 230, 60, 60).contains(helpEvent->pos()) &&
-        ui->tabWidget->currentIndex() == 1) {
-      QToolTip::showText(helpEvent->globalPos(),
-                         "To use an error tolerance other than \n5, 10, and 15 "
-                         "ppm, the checkbox \n\"Lookup table for E-value "
-                         "computation\" should not be selected!");
-    } else {
-      QToolTip::hideText();
-      event->ignore();
-    }
-    return true;
-  }
-  return QWidget::event(event);
-}

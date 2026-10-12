@@ -351,7 +351,7 @@ p, li { white-space: pre-wrap; }
         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Error tolerance for fragment masses in ppm, a positive integer; default 10. The index files do not depend on it, but their names include it: give the -e value of the TopPIC or TopMG searches that will use the index. (topindex -e, --frag-error-tolerance)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="text">
-        <string>15</string>
+        <string>10</string>
        </property>
        <property name="frame">
         <bool>true</bool>

@@ -4383,8 +4383,14 @@ NOT in `COMMON_SRCS`; each is its own `add_executable` that links
   the message HTML-escaped (`&lt;name&gt;`), the same text on a row's
   label and input, ending with the option it sets, e.g. `(topfd -c,
   --max-charge)`. Give a new control one, and change it with its option's
-  help. The forms' `checkError()` (empty fields, path lengths, missing
-  files) is not called by any `on_startButton_clicked` except topmerge's.
+  help. Start runs the form's `checkError()` first (every GUI since
+  2026-10-12; before, only topmerge called it, so an empty field crashed
+  topfd_gui and topdia_gui): the files (at least one, two for topdiff; no
+  path with a space, `gui_check::pathWithSpace`, because the command line is
+  split at spaces), and every line edit through `gui_check::invalidEdit`
+  (empty, or not accepted by its validator), so a field's validator must
+  accept exactly the values its option takes (the cutoff values take
+  0.001 and 1e-5; thread numbers and ppm tolerances start at 1).
 
 The `<tool>_argument.cpp` parsers are compiled into both the CLI tool and its
 GUI (each target compiles its own object — no shared lib for them). When

@@ -639,7 +639,7 @@ level:</string>
         <item>
          <widget class="QLineEdit" name="cutoffSpectralValueEdit">
           <property name="toolTip">
-           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Spectrum-level cutoff value: a PrSM is reported if its E-value or FDR (as the type above sets) is at most this value. A positive number with at most two decimal places. Default: 0.01. (topmg -v, --spectrum-cutoff-value)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Spectrum-level cutoff value: a PrSM is reported if its E-value or FDR (as the type above sets) is at most this value. A non-negative number such as 0.01, 0.001 or 1e-5. Default: 0.01. (topmg -v, --spectrum-cutoff-value)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
           </property>
           <property name="text">
            <string>0.01</string>
@@ -684,7 +684,7 @@ level:</string>
         <item>
          <widget class="QLineEdit" name="cutoffProteoformValueEdit">
           <property name="toolTip">
-           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Proteoform-level cutoff value: a proteoform is reported if the E-value or FDR (as the type above sets) of its best PrSM is at most this value. A positive number with at most two decimal places. Default: 0.01. (topmg -V, --proteoform-cutoff-value)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Proteoform-level cutoff value: a proteoform is reported if the E-value or FDR (as the type above sets) of its best PrSM is at most this value. A non-negative number such as 0.01, 0.001 or 1e-5. Default: 0.01. (topmg -V, --proteoform-cutoff-value)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
           </property>
           <property name="text">
            <string>0.01</string>
@@ -746,7 +746,7 @@ level:</string>
         <item>
          <widget class="QLineEdit" name="cutoffProteinValueEdit">
           <property name="toolTip">
-           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Protein-level cutoff value: a protein is reported if the E-value or FDR (as the type above sets) of its best PrSM is at most this value. A positive number with at most two decimal places. Default: 0.01. (topmg -Y, --protein-cutoff-value)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Protein-level cutoff value: a protein is reported if the E-value or FDR (as the type above sets) of its best PrSM is at most this value. A non-negative number such as 0.01, 0.001 or 1e-5. Default: 0.01. (topmg -Y, --protein-cutoff-value)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
           </property>
           <property name="text">
            <string>0.01</string>
