@@ -525,24 +525,24 @@ command emits `-y` and `-Y`). Facts to keep straight:
   hidden `--ms1-greedy-deconv` / `--ms2-greedy-deconv`, and the short-lived
   `--deconv-ms1-msdeconv` / `--deconv-ms2-msdeconv` of commit b3d71867.
   The letter `-F` is free in topfd.
-- **The envelope ranking score** (2026-10-12): topfd's `-n`/`--env-rank
-  <envcnn|msdeconv>` and topdia's `-n`/`--deconv-score <envcnn|msdeconv>`
-  (default `envcnn`; topfd's was `--deconv-score` for a few hours) replace
-  the flag `-n`/`--msdeconv` (unrecognised now). `TopfdPara` stores the name
+- **The envelope ranking score** (2026-10-12): `-n`/`--env-rank
+  <envcnn|msdeconv>` (default `envcnn`; `--deconv-score` for a few hours)
+  replaces the flag `-n`/`--msdeconv` (unrecognised now) in topfd and
+  topdia. `TopfdPara` stores the name
   (`deconv_score_`; `getDeconvScores()` lists the values, `setDeconvScore`
   returns false for any other, which both parsers report), and
   `isSortUseMsDeconv()` is `deconv_score_ == "msdeconv"`, so the
   deconvolutions and the parameter block's "Fragment envelope ranking" line
   are unchanged. The GUIs keep their checkboxes (topfd_gui "Sort using
   MS-Deconv score", topdia_gui "Use MS-Deconv score", `msDeconvCheckBox`),
-  and `gui/util/command.cpp` always emits `--env-rank <score>` (topfd) or
-  `--deconv-score <score>` (topdia). The ranking only decides which
-  envelopes `-v` (topdia `-d`) keeps; the EnvCNN cutoffs and the msalign
+  and `gui/util/command.cpp` always emits `--env-rank <score>`. The ranking
+  only decides which envelopes `--frag-num-filtering` (topfd `-v`, topdia
+  `-d`) keeps; the EnvCNN cutoffs and the msalign
   score column use the EnvCNN score with either value.
-- **The EnvCNN cutoffs** (2026-10-12): topfd's `-f`/`--envcnn-cutoff-ms1`
+- **The EnvCNN cutoffs** (2026-10-12): `-f`/`--envcnn-cutoff-ms1`
   (`TopfdPara::ms1_env_cnn_score_cutoff_`, default 0.2) and
-  `-g`/`--envcnn-cutoff-ms2` (`ms2_env_cnn_score_cutoff_`, default 0; was
-  `-v`/`--env-cnn-cutoff`), with the greedy and MS-Deconv deconvolutions
+  `-g`/`--envcnn-cutoff-ms2` (`ms2_env_cnn_score_cutoff_`, default 0; topfd's
+  `-v`/`--env-cnn-cutoff` before; topdia had none) of topfd and topdia, with the greedy and MS-Deconv deconvolutions
   only. MS1: the greedy search drops its envelopes below the larger of the
   cutoff and `GreedyPara::min_envcnn` (now 0; its default 0.2 became the
   option's), `DeconvSingleSp::postprocess` those of `deconvMsOne`'s
@@ -553,12 +553,14 @@ command emits `-y` and `-Y`). Facts to keep straight:
   (`DeconvSingleSp`, `greedy_ms2_deconv`; MS3 and `-T` too; not
   FLASHDeconv; PTCR keeps `TOPFD_PTCR_PARA`'s `min_envcnn`). The parameter
   block prints "MS1 envelope EnvCNN score cutoff" in the MS1 section.
-  TopDIA has no options for them and takes the same defaults, so its
-  default MS1 output (MS-Deconv) lost the envelopes below 0.2 too. The
-  letters of topfd's `--frag-num-filtering` (`-g` -> `-v`; `-F` for a few
-  hours) and `--disable-additional-feature-search` (`-f` -> `-d`) moved
-  for them; topfd_gui's command emits the new letters. `topfd -h` lists
-  `-f`, `-g`, `-n`, `-v` in that order after `-q`.
+  TopDIA takes the same defaults, so its default MS1 output (MS-Deconv)
+  lost the envelopes below 0.2 too. The letters of topfd's
+  `--frag-num-filtering` (`-g` -> `-v`; `-F` for a few hours) and
+  `--disable-additional-feature-search` (`-f` -> `-d`) moved for them;
+  topfd_gui's command emits the new letters. topdia's `-d`/`--final-filtering`
+  is `-d`/`--frag-num-filtering` (topdia's `-v` is `--pseudo-cutoff`).
+  `topfd -h` lists `-o -w -p -q -f -g -n -v`, `topdia -h` `-o -w -p -q -f
+  -g -n -d`.
 - **GUI wiring**: `topfddialog.ui` and `topdiadialog.ui` have
   `ms1DeconvComboBox` and `ms2DeconvComboBox`, whose item texts are the
   option values (as `activationComboBox`'s are), set from the dialog's

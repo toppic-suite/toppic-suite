@@ -130,7 +130,10 @@ bool Argument::parse(int argc, char* argv[]) {
   std::string deconv_ms1 = "";
   std::string deconv_ms2 = "";
   // the score that ranks the envelopes
-  std::string deconv_score = "";
+  std::string env_rank = "";
+  // the EnvCNN score cutoffs of the MS1 and MS/MS envelopes
+  std::string ms1_env_cnn_score_cutoff = "";
+  std::string ms2_env_cnn_score_cutoff = "";
 
   // Define and parse the program options
   try {
@@ -159,10 +162,10 @@ bool Argument::parse(int argc, char* argv[]) {
         "<a positive number>. Set the signal-to-noise ratio for MS/MS "
         "spectra. The default value is 1.")(
         "missing-level-one,o", "MS1 spectra are missing in the input file.")(
-        "deconv-score,n", po::value<std::string>(&deconv_score),
-        "<envcnn|msdeconv>. Set the score used to rank isotopic envelopes: "
-        "envcnn, the EnvCNN score, or msdeconv, the MS-Deconv score. The "
-        "default value is envcnn.")(
+        "precursor-window,w", po::value<std::string>(&prec_window),
+        "<a positive number>. Set the default precursor window size. The "
+        "default value is 4.0 m/z. When the input file contains the "
+        "information of precursor windows, the parameter will be ignored.")(
         "deconv-ms1,p", po::value<std::string>(&deconv_ms1),
         "<greedy|msdeconv>. Set the deconvolution method of MS1 spectra: "
         "msdeconv, the MS-Deconv dynamic programming, or greedy, TopFD's "
@@ -175,10 +178,29 @@ bool Argument::parse(int argc, char* argv[]) {
         "TopFD's default greedy search adapted to fragment ions; or "
         "flashdeconv, the FLASHDeconv algorithm (experimental). The default "
         "value is msdeconv.")(
-        "precursor-window,w", po::value<std::string>(&prec_window),
-        "<a positive number>. Set the default precursor window size. The "
-        "default value is 4.0 m/z. When the input file contains the "
-        "information of precursor windows, the parameter will be ignored.")(
+        "envcnn-cutoff-ms1,f",
+        po::value<std::string>(&ms1_env_cnn_score_cutoff),
+        "<a number in [0,1]>. Set the EnvCNN score cutoff for isotopic "
+        "envelopes in MS1 spectra: envelopes with a lower EnvCNN score are "
+        "not reported, except those added for precursor isolation windows. "
+        "Used with the greedy and msdeconv MS1 deconvolution methods. The "
+        "default value is 0.2.")(
+        "envcnn-cutoff-ms2,g",
+        po::value<std::string>(&ms2_env_cnn_score_cutoff),
+        "<a number in [0,1]>. Set the EnvCNN score cutoff for isotopic "
+        "envelopes in MS/MS spectra: envelopes with a lower EnvCNN score are "
+        "not reported. Used with the greedy and msdeconv MS/MS deconvolution "
+        "methods, not with flashdeconv. The default value is 0.")(
+        "env-rank,n", po::value<std::string>(&env_rank),
+        "<envcnn|msdeconv>. Set the score used to rank isotopic envelopes: "
+        "envcnn, the EnvCNN score, or msdeconv, the MS-Deconv score. The "
+        "ranking decides which envelopes -d keeps; the EnvCNN cutoffs (-f "
+        "and -g) use the EnvCNN score with either value. The default value "
+        "is envcnn.")(
+        "frag-num-filtering,d",
+        "Filter fragment ion envelopes in MS/MS scans based on the estimated "
+        "number of fragment ions: the envelopes ranked highest by the score "
+        "of -n are kept.")(
         "ms1-ecscore-cutoff,t", po::value<std::string>(&ms1_ecscore_cutoff),
         "<a number in [0,1]>. Set the MS1 ECScore cutoff value for proteoform "
         "features. The default value is 0.")(
@@ -210,9 +232,6 @@ bool Argument::parse(int argc, char* argv[]) {
         po::value<std::string>(&ms2_seed_env_inte_corr_tole_cutoff),
         "<a number in [0,1]>. Set the MS2 seed envelope intensity correlation "
         "cutoff value for extracting features. The default value is 0.5.")(
-        "final-filtering,d",
-        "Filter envelopes in MS/MS scans based on the estimated number of "
-        "fragment ions.")(
         "thread-number,u", po::value<std::string>(&thread_number),
         "<a positive integer>. Number of threads used in spectral "
         "deconvolution. Default value: 1.");
@@ -327,11 +346,32 @@ bool Argument::parse(int argc, char* argv[]) {
       topfd_para_ptr_->setMsTwoHarmonicCheck(false);
     }
 
-    if (vm.count("deconv-score") &&
-        !topfd_para_ptr_->setDeconvScore(deconv_score)) {
-      LOG_ERROR("Deconvolution score " << deconv_score
+    if (vm.count("env-rank") && !topfd_para_ptr_->setDeconvScore(env_rank)) {
+      LOG_ERROR("Envelope ranking score " << env_rank
                 << " should be envcnn or msdeconv.");
       return false;
+    }
+
+    if (vm.count("envcnn-cutoff-ms1")) {
+      double cutoff = 0;
+      if (!toDouble(ms1_env_cnn_score_cutoff, cutoff) || cutoff < 0 ||
+          cutoff > 1) {
+        LOG_ERROR("MS1 EnvCNN cutoff " << ms1_env_cnn_score_cutoff
+                                       << " should be a number in [0,1].");
+        return false;
+      }
+      topfd_para_ptr_->setMs1EnvCnnScoreCutoff(cutoff);
+    }
+
+    if (vm.count("envcnn-cutoff-ms2")) {
+      double cutoff = 0;
+      if (!toDouble(ms2_env_cnn_score_cutoff, cutoff) || cutoff < 0 ||
+          cutoff > 1) {
+        LOG_ERROR("MS/MS EnvCNN cutoff " << ms2_env_cnn_score_cutoff
+                                         << " should be a number in [0,1].");
+        return false;
+      }
+      topfd_para_ptr_->setMs2EnvCnnScoreCutoff(cutoff);
     }
 
     if (vm.count("deconv-ms1") &&
@@ -503,7 +543,7 @@ bool Argument::parse(int argc, char* argv[]) {
       topfd_para_ptr_->setThreadNum(num);
     }
 
-    if (vm.count("final-filtering")) {
+    if (vm.count("frag-num-filtering")) {
       topfd_para_ptr_->setAANumBasedFilter(true);
     }
   } catch (std::exception& e) {

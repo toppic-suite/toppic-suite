@@ -80,6 +80,10 @@ Key options (defaults): `-c` max charge 30, `-m` max mass 50000,
 for both; `msdeconv` is the MS-Deconv dynamic programming of earlier
 versions, `flashdeconv` FLASHDeconv, experimental, not with `-T`). TopDIA
 takes the same two options (`-p`, `-q`) with `msdeconv` as the default.
+`-f`/`-g` the MS1 and MS/MS EnvCNN cutoffs (0.2, 0; greedy and msdeconv
+only), `-n`/`--env-rank <envcnn|msdeconv>` the envelope ranking, `-v` the
+fragment-number filter (`-d` in topdia, which has the same `-f`, `-g`,
+`-n`).
 
 - **Do not use `-N` if TopPIC will search the spectra**: TopPIC's default
   post mass matching needs `sample.sqlite` and fails without it (or run
@@ -105,7 +109,8 @@ files, `sample.sqlite` (always) and intermediates (`_ms2_raw.msalign`,
 defaults (`-w` 4.0, `-t` 0, `-b` 2) plus fragment-feature and pseudo-spectrum
 options: `-T`/`-B` MS2 ECScore cutoff and min scans (0, 1), `-y`/`-Y`
 MS1/MS2 intensity-correlation cutoffs (0.5), `-v` pseudo score cutoff 0.55,
-`-V` fragments always added 25. No `-N`, `-D` or `-T`-peak-list mode.
+`-V` fragments always added 25; TopFD's `-v` (`--frag-num-filtering`) is
+`-d` in topdia. No `-N`, `-D` or `-T`-peak-list mode.
 **Search pseudo spectra with `toppic -D`** (post mass matching assumes one
 scan per spectrum). Never pass `-o`: the run aborts at the pseudo-spectrum
 step.

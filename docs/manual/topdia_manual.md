@@ -48,9 +48,9 @@ and runs five steps:
 1. **MS1 deconvolution.** Every MS1 scan is deconvoluted, by default with
    the MS-Deconv dynamic programming (`--deconv-ms1 msdeconv`); `--deconv-ms1
    greedy` selects TopFD's default greedy search. With either method, MS1
-   envelopes whose EnvCNN score is below 0.2 are not reported (TopFD's
-   `--envcnn-cutoff-ms1` default; TopDIA has no option for it), except
-   the envelopes of the precursor isolation windows.
+   envelopes whose EnvCNN score is below `--envcnn-cutoff-ms1` (`-f`,
+   default 0.2) are not reported, except the envelopes of the precursor
+   isolation windows.
 2. **MS1 feature detection.** The MS1 envelopes are linked across scans into
    proteoform features, scored with ECScore and filtered by
    `--ms1-ecscore-cutoff` and `--ms1-min-scan-number`.
@@ -58,7 +58,9 @@ and runs five steps:
    without precursor information, into `sample_ms2_raw.msalign`, by
    default with the MS-Deconv dynamic programming (`--deconv-ms2 msdeconv`;
    `greedy` selects TopFD's default greedy search and `flashdeconv` the
-   FLASHDeconv algorithm). For the dynamic programming TopDIA
+   FLASHDeconv algorithm). With `msdeconv` and `greedy`, envelopes whose
+   EnvCNN score is below `--envcnn-cutoff-ms2` (`-g`, default 0: all
+   reported) are not reported. For the dynamic programming TopDIA
    uses the parameters of version 1.9.0.0: a 12
    Dalton envelope ranking window, no harmonic check and a 1,500 Dalton mass
    group boundary. The 2.0.0.0 defaults of TopFD (2 Dalton, harmonic check,
@@ -122,10 +124,12 @@ Deconvolution:
 | `-r`, `--ms-one-sn-ratio <number>` | 3 | Signal-to-noise ratio for MS1 spectra. |
 | `-s`, `--ms-two-sn-ratio <number>` | 1 | Signal-to-noise ratio for MS/MS spectra. |
 | `-w`, `--precursor-window <number>` | 4.0 (TopFD: 3.0) | Default isolation window width (m/z), used only when the file records none. |
-| `-n`, `--deconv-score <envcnn\|msdeconv>` | envcnn | The score that ranks isotopic envelopes: `envcnn`, the EnvCNN score, or `msdeconv`, the MS-Deconv score. In `topdia_gui`: "Use MS-Deconv score" (`msdeconv` when checked). |
 | `-p`, `--deconv-ms1 <greedy\|msdeconv>` | msdeconv (TopFD: greedy) | MS1 deconvolution method (section 2, step 1). In `topdia_gui`: "MS1 deconvolution". |
 | `-q`, `--deconv-ms2 <greedy\|msdeconv\|flashdeconv>` | msdeconv (TopFD: greedy) | MS/MS deconvolution method (section 2, step 3); `flashdeconv` is experimental. In `topdia_gui`: "MS/MS deconvolution". |
-| `-d`, `--final-filtering` | off | Filter the envelopes of MS/MS scans by the estimated number of fragment ions. |
+| `-f`, `--envcnn-cutoff-ms1 <0..1>` | 0.2 | MS1 envelopes whose EnvCNN score is below the cutoff are not reported (section 2, step 1); not the envelopes of the precursor isolation windows. Used with both MS1 deconvolution methods. `-f 0` reports every envelope. |
+| `-g`, `--envcnn-cutoff-ms2 <0..1>` | 0 | MS/MS envelopes whose EnvCNN score is below the cutoff are not reported (section 2, step 3). Used with `-q msdeconv` and `greedy`, not with `flashdeconv`. |
+| `-n`, `--env-rank <envcnn\|msdeconv>` | envcnn | The score that ranks isotopic envelopes: `envcnn`, the EnvCNN score, or `msdeconv`, the MS-Deconv score. The ranking decides which envelopes `-d` keeps; the EnvCNN cutoffs `-f` and `-g` compare the EnvCNN score with either value. In `topdia_gui`: "Use MS-Deconv score" (`msdeconv` when checked). |
+| `-d`, `--frag-num-filtering` | off | Filter the envelopes of MS/MS scans by the estimated number of fragment ions: the envelopes ranked highest by the score of `-n` are kept. In `topdia_gui`: "Enable final filtering". |
 | `-o`, `--missing-level-one` | off | Accepted, but the run fails at the pseudo-spectrum step without MS1 scans (section 1). |
 | `-u`, `--thread-number <int>` | 1 | Number of threads. |
 

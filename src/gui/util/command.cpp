@@ -106,8 +106,7 @@ std::string geneTopdiaCommand(const TopfdParaPtr& topfd_para_ptr,
   oss << "-y " << topdia_para_ptr->getMs1SeedEnvInteCorrToleCutoff() << " ";
   oss << "-Y " << topdia_para_ptr->getMs2SeedEnvInteCorrToleCutoff() << " ";
   command = command + oss.str();
-  command =
-      command + "--deconv-score " + topfd_para_ptr->getDeconvScore() + " ";
+  command = command + "--env-rank " + topfd_para_ptr->getDeconvScore() + " ";
   if (topfd_para_ptr->isMissingLevelOne()) {
     command = command + "-o ";
   }
