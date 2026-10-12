@@ -121,7 +121,7 @@ TopPIC):
   MS/MS deconvolution (the default), which does not read `--ms2-rank-peak-distance` or
   `--disable-ms2-harmonic-check` (those act with `-q msdeconv`).
 - **The other noise filters trade fragments for purity:** at the default `-s 1`,
-  `-g 0.1` kept 12% of the masses and 70% of the fragments, `-v`
+  `-g 0.1` kept 12% of the masses and 70% of the fragments, `-j`
   (`--frag-num-filtering`) 3% and 47%,
   `-q msdeconv` 17% and 80%, `-q flashdeconv` 0.3% and 41% (no random match; the best
   TopPIC E-values when the sequence is in the database, too few masses for a search

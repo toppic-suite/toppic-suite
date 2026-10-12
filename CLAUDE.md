@@ -482,7 +482,7 @@ rows. `assignIntensity` (called before `mzRefine` and again after sorting)
 only splits an experimental peak among envelopes that share it; it never
 changes theoretical intensities. The greedy MS1 and MS/MS searches (TopFD's
 defaults) do not run this refinement. When touching any of this, validate
-with `topfd -T -v --deconv-ms2 msdeconv` on the myoglobin peak list (without
+with `topfd -T -j --deconv-ms2 msdeconv` on the myoglobin peak list (without
 the option `-T` runs the greedy search): compare the deconvoluted masses
 against the sequence's b/y ions (46 exact / 14 off-by-one-isotope is the
 reference), and count envelopes whose theoretical apex exceeds the observed
@@ -536,8 +536,8 @@ command emits `-y` and `-Y`). Facts to keep straight:
   are unchanged. The GUIs keep their checkboxes (topfd_gui "Sort using
   MS-Deconv score", topdia_gui "Use MS-Deconv score", `msDeconvCheckBox`),
   and `gui/util/command.cpp` always emits `--env-rank <score>`. The ranking
-  only decides which envelopes `--frag-num-filtering` (topfd `-v`, topdia
-  `-d`) keeps; the EnvCNN cutoffs and the msalign
+  only decides which envelopes `--frag-num-filtering` (`-j` in topfd and
+  topdia) keeps; the EnvCNN cutoffs and the msalign
   score column use the EnvCNN score with either value.
 - **The EnvCNN cutoffs** (2026-10-12): `-f`/`--envcnn-cutoff-ms1`
   (`TopfdPara::ms1_env_cnn_score_cutoff_`, default 0.2) and
@@ -555,12 +555,13 @@ command emits `-y` and `-Y`). Facts to keep straight:
   block prints "MS1 envelope EnvCNN score cutoff" in the MS1 section.
   TopDIA takes the same defaults, so its default MS1 output (MS-Deconv)
   lost the envelopes below 0.2 too. The letters of topfd's
-  `--frag-num-filtering` (`-g` -> `-v`; `-F` for a few hours) and
-  `--disable-additional-feature-search` (`-f` -> `-d`) moved for them;
-  topfd_gui's command emits the new letters. topdia's `-d`/`--final-filtering`
-  is `-d`/`--frag-num-filtering` (topdia's `-v` is `--pseudo-cutoff`).
-  `topfd -h` lists `-o -w -p -q -f -g -n -v`, `topdia -h` `-o -w -p -q -f
-  -g -n -d`.
+  `--frag-num-filtering` (`-g` -> `-v` -> `-j`; `-F` for a few hours) and
+  `--disable-additional-feature-search` (`-f` -> `-d`) moved for them.
+  topdia's `-d`/`--final-filtering` became `--frag-num-filtering`, and
+  both tools take `-j` for it (2026-10-12; topdia's `-v` is
+  `--pseudo-cutoff`, and topdia has no `-d` now); the commands of
+  topfd_gui and topdia_gui emit `-j`. `topfd -h` and `topdia -h` list `-o
+  -w -p -q -f -g -n -j`.
 - **GUI wiring**: `topfddialog.ui` and `topdiadialog.ui` have
   `ms1DeconvComboBox` and `ms2DeconvComboBox`, whose item texts are the
   option values (as `activationComboBox`'s are), set from the dialog's

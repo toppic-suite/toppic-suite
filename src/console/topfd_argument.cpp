@@ -154,10 +154,10 @@ bool Argument::parse(int argc, char* argv[]) {
         "env-rank,n", po::value<std::string>(&env_rank),
         "<envcnn|msdeconv>. Set the score used to rank isotopic envelopes: "
         "envcnn, the EnvCNN score, or msdeconv, the MS-Deconv score. The "
-        "ranking decides which envelopes -v keeps; the EnvCNN cutoffs (-f "
+        "ranking decides which envelopes -j keeps; the EnvCNN cutoffs (-f "
         "and -g) use the EnvCNN score with either value. The default value "
         "is envcnn.")(
-        "frag-num-filtering,v",
+        "frag-num-filtering,j",
         "Filter fragment ion envelopes in MS/MS scans based on the estimated "
         "number of fragment ions: the envelopes ranked highest by the score "
         "of -n are kept.")(
