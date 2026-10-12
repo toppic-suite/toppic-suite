@@ -652,7 +652,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
           </size>
          </property>
          <property name="toolTip">
-          <string>After the search, match the theoretical fragment masses of each PrSM that no deconvoluted mass matched against the centroided MS/MS peaks in the TopFD SQLite database (run TopFD with the SQLite database output enabled), and add the matched masses to the spectra.</string>
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;After the search, match the theoretical fragment masses of each PrSM that no deconvoluted mass matched against the centroided MS/MS peaks in the TopFD SQLite database (run TopFD with the SQLite database output enabled), and add the matched masses to the spectra.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
          <property name="text">
           <string>Post mass matching (needs the TopFD SQLite database)</string>
