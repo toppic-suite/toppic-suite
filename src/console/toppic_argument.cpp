@@ -647,7 +647,7 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
             "is used instead when it gives more identifications within the "
             "FDR cutoff. Note that the rescoring may underestimate the FDRs. "
             "Requires -d. Default value: false.")(
-            "approximate-spectra,A",
+            "approximate-spectra,X",
             "Use approximate spectra to increase the sensitivity in protein "
             "filtering. Default value: false.")(
             "local-ptm-file-name,B",
@@ -685,7 +685,7 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
             "<a positive integer>. Minimum number of observed isotopic peaks "
             "of a fragment mass matched by the post mass matching. Default "
             "value: 1.")(
-            "average-mass,g",
+            "average-mass,A",
             "The spectrum files report average masses of precursor and "
             "fragment ions (topfd --average-mass). Before the search, each "
             "file is converted to <name>_mono_ms2.msalign with monoisotopic "
@@ -704,7 +704,7 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
         "variable-ptm-num,S", po::value<std::string>(&variable_ptm_num), "")(
         "variable-ptm-file-name,b",
         po::value<std::string>(&variable_ptm_file_name),
-        "")("approximate-spectra,A", "")("decoy,d", "")(
+        "")("approximate-spectra,X", "")("decoy,d", "")(
         "frag-error-tolerance,e", po::value<std::string>(&frag_error_tole), "")(
         "prec-error-tolerance,E", po::value<std::string>(&prec_error_tole), "")(
         "prec-dalton-error", po::value<std::string>(&prec_dalton_error), "")(
@@ -735,7 +735,7 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
         "output-raw-prsm-table,o", "")("output-prsm-coverage,O", "")(
         "disable-post-match,D", "")(
         "post-min-peak-num,I", po::value<std::string>(&post_min_peak_num), "")(
-        "average-mass,g", "")("disable-zero-shift-prec-error", "")(
+        "average-mass,A", "")("disable-zero-shift-prec-error", "")(
         "enable-one-shift-prec-error", "")("enable-var-ptm-prec-error", "")(
         "fdr-groups", "")("rescore,q", "")(
         "disable-rescore-fallback", "")("disable-rescore-evalue-floor", "")(

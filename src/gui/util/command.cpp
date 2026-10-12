@@ -179,7 +179,7 @@ std::map<std::string, std::string> toppic_para{
     {"minShiftMass", "-m "},
     {"variablePtmNum", "-S "},
     {"variablePtmFileName", "-b "},
-    {"useApproxSpectra", "-A "},
+    {"useApproxSpectra", "-X "},
     {"cutoffSpectralType", "-t "},
     {"cutoffSpectralValue", "-v "},
     {"cutoffProteoformType", "-T "},
@@ -197,7 +197,7 @@ std::map<std::string, std::string> toppic_para{
     {"localPtmFileName", "-B "},
     {"localThreshold", "-H "},
     {"postMassMatch", "-D "},
-    {"averageMass", "-g "},
+    {"averageMass", "-A "},
     {"rescore", "--rescore "}};
 
 std::string geneToppicCommand(std::map<std::string, std::string> arguments_,
@@ -247,7 +247,7 @@ std::string geneToppicCommand(std::map<std::string, std::string> arguments_,
           command = command + toppic_para[it->first];
         }
       } else if (it->first == "averageMass") {
-        // -g (--average-mass): the spectrum files hold average masses
+        // -A (--average-mass): the spectrum files hold average masses
         if (it->second == "true") {
           command = command + toppic_para[it->first];
         }

@@ -262,9 +262,9 @@ Spectra and tolerances:
 | `-F`, `--filter-by-envcnn <0..1>` | 0.4 | Masses with an EnvCNN score below this are ignored during filtering, search and E-value computation. |
 | `-p`, `--proteoform-error-tolerance <number>` | 1.2 | Precursor mass tolerance (Da) for grouping PrSMs into proteoform clusters. |
 | `-r`, `--num-combined-spectra <int>` | 1 | Number of consecutive MS/MS spectra of one precursor searched together, for alternating fragmentation (2 for pairs, 3 for triplets). |
-| `-A`, `--approximate-spectra` | off | Use approximate spectra in protein filtering, for higher sensitivity. Only affects the variable PTM filtering step (`-b`). |
+| `-X`, `--approximate-spectra` | off | Use approximate spectra in protein filtering, for higher sensitivity. Only affects the variable PTM filtering step (`-b`). |
 | `-x`, `--no-topfd-feature` | off | Run without the TopFD feature file; proteoforms are then clustered by protein, precursor mass and sequence overlap (two PrSMs share a proteoform only if their proteoform sequences overlap by at least 70% of the shorter one, so equal masses at different positions of a protein stay apart), the `Feature ...` columns are `-` and the proteoform intensity is `-1`. |
-| `-g`, `--average-mass` | off | The spectrum files report average masses (`topfd --average-mass`): each is converted to `<name>_mono_ms2.msalign` with monoisotopic masses before the search (section 2). In `toppic_gui`, the checkbox "Spectrum files with average masses" on the Advanced Parameters tab turns this on. |
+| `-A`, `--average-mass` | off | The spectrum files report average masses (`topfd --average-mass`): each is converted to `<name>_mono_ms2.msalign` with monoisotopic masses before the search (section 2). In `toppic_gui`, the checkbox "Spectrum files with average masses" on the Advanced Parameters tab turns this on. |
 
 Post mass matching:
 
