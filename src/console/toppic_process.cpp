@@ -270,10 +270,11 @@ bool TopPIC_init(std::map<std::string, std::string>& arguments) {
       file_util::basename(arguments["spectrumFileName"]) + ".feature";
   if (arguments["useFeatureFile"] == "true") {
     if (!std::filesystem::exists(feature_file_name)) {
-      LOG_ERROR("TopFD feature file does not exist!.");
+      LOG_ERROR("TopFD feature file " << feature_file_name
+                                      << " does not exist!");
       LOG_ERROR(
-          "Please use -x option in command line or select 'Missing MS1 "
-          "feature file in GUI'.");
+          "Please use the -x option in the command line or check 'No TopFD "
+          "feature file' in the GUI.");
       return false;
     }
   }

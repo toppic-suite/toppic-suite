@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>920</width>
-    <height>700</height>
+    <height>720</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -19,13 +19,13 @@
   <property name="minimumSize">
    <size>
     <width>920</width>
-    <height>700</height>
+    <height>720</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
     <width>920</width>
-    <height>700</height>
+    <height>720</height>
    </size>
   </property>
   <property name="windowTitle">
@@ -40,7 +40,7 @@
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>450</y>
+      <y>470</y>
       <width>881</width>
       <height>201</height>
      </rect>
@@ -60,7 +60,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>650</y>
+      <y>670</y>
       <width>881</width>
       <height>55</height>
      </rect>
@@ -136,7 +136,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
       <x>20</x>
       <y>10</y>
       <width>881</width>
-      <height>431</height>
+      <height>451</height>
      </rect>
     </property>
     <property name="currentIndex">
@@ -156,7 +156,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
        </rect>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The deconvoluted MS/MS spectrum files (&amp;lt;name&amp;gt;_ms2.msalign, written by TopFD) to search, one after another with the same parameters. toppic also reads &amp;lt;name&amp;gt;_ms2.feature (unless Missing MS1 feature file is checked) and, for post mass matching, TopFD's SQLite database &amp;lt;name&amp;gt;.sqlite from the same folder. (toppic argument spectrum-file-names)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The deconvoluted MS/MS spectrum files (&amp;lt;name&amp;gt;_ms2.msalign, written by TopFD) to search, one after another with the same parameters. toppic also reads &amp;lt;name&amp;gt;_ms2.feature (unless No TopFD feature file is checked) and, for post mass matching, TopFD's SQLite database &amp;lt;name&amp;gt;.sqlite from the same folder. (toppic argument spectrum-file-names)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
      </widget>
      <widget class="QWidget" name="horizontalLayoutWidget">
@@ -241,7 +241,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
           </size>
          </property>
          <property name="toolTip">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The deconvoluted MS/MS spectrum files (&amp;lt;name&amp;gt;_ms2.msalign, written by TopFD) to search, one after another with the same parameters. toppic also reads &amp;lt;name&amp;gt;_ms2.feature (unless Missing MS1 feature file is checked) and, for post mass matching, TopFD's SQLite database &amp;lt;name&amp;gt;.sqlite from the same folder. (toppic argument spectrum-file-names)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The deconvoluted MS/MS spectrum files (&amp;lt;name&amp;gt;_ms2.msalign, written by TopFD) to search, one after another with the same parameters. toppic also reads &amp;lt;name&amp;gt;_ms2.feature (unless No TopFD feature file is checked) and, for post mass matching, TopFD's SQLite database &amp;lt;name&amp;gt;.sqlite from the same folder. (toppic argument spectrum-file-names)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
          <property name="text">
           <string>Spectrum files: </string>
@@ -792,7 +792,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Check it when the spectrum files have no TopFD feature file &amp;lt;name&amp;gt;_ms2.feature, or to search without it: proteoforms are then clustered by protein, precursor mass and sequence overlap instead of by TopFD feature, and the feature columns of the results show -. Off by default: the feature file is read and PrSMs whose spectrum has no feature are discarded. (toppic -x, --no-topfd-feature)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
          <property name="text">
-          <string>Missing MS1 feature file</string>
+          <string>No TopFD feature file</string>
          </property>
         </widget>
        </item>
@@ -1084,7 +1084,7 @@ level:</string>
       <property name="geometry">
        <rect>
         <x>500</x>
-        <y>190</y>
+        <y>184</y>
         <width>361</width>
         <height>33</height>
        </rect>
@@ -1305,7 +1305,7 @@ level:</string>
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>285</y>
+        <y>318</y>
         <width>851</width>
         <height>91</height>
        </rect>
@@ -1454,7 +1454,7 @@ level:</string>
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>216</y>
+        <y>252</y>
         <width>341</width>
         <height>30</height>
        </rect>
@@ -1482,7 +1482,7 @@ level:</string>
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>248</y>
+        <y>282</y>
         <width>451</width>
         <height>30</height>
        </rect>
@@ -1510,7 +1510,7 @@ level:</string>
       <property name="geometry">
        <rect>
         <x>500</x>
-        <y>248</y>
+        <y>282</y>
         <width>361</width>
         <height>30</height>
        </rect>
@@ -1532,7 +1532,7 @@ level:</string>
       <property name="geometry">
        <rect>
         <x>500</x>
-        <y>220</y>
+        <y>250</y>
         <width>361</width>
         <height>33</height>
        </rect>
@@ -1674,6 +1674,44 @@ level:</string>
          </property>
          <property name="text">
           <string>0</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+      <widget class="QWidget" name="horizontalLayoutWidget_scoreCutoff">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>218</y>
+        <width>341</width>
+        <height>33</height>
+       </rect>
+      </property>
+      <layout class="QHBoxLayout" name="horizontalLayout_scoreCutoff">
+       <item>
+        <widget class="QLabel" name="label_scoreCutoff">
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Deconvoluted masses whose confidence score (the EnvCNN score in TopFD files, the pseudo score in TopDIA files) is below this cutoff are removed before spectral filtering, database search and E-value computation; the reported matched masses are recounted on all masses. A number between 0 and 1. Default: 0.4. (toppic -F, --filter-by-score)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+         <property name="text">
+          <string>Confidence score cutoff:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="envCnnCutoffEdit">
+         <property name="maximumSize">
+          <size>
+           <width>110</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Deconvoluted masses whose confidence score (the EnvCNN score in TopFD files, the pseudo score in TopDIA files) is below this cutoff are removed before spectral filtering, database search and E-value computation; the reported matched masses are recounted on all masses. A number between 0 and 1. Default: 0.4. (toppic -F, --filter-by-score)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+         <property name="text">
+          <string>0.4</string>
          </property>
         </widget>
        </item>

@@ -279,11 +279,11 @@ Spectra and tolerances:
 | `-a`, `--activation <CID\|ETD\|ETCID\|ETHCD\|HCD\|MPD\|UVPD\|FILE>` | FILE | Fragmentation method; `FILE` takes it from each spectrum. ETCID (ETciD) and ETHCD (EThcD) are searched with the ion types of ETD (c, z-dot). |
 | `-e`, `--frag-error-tolerance <int>` | 10 | Error tolerance of fragment masses (ppm). |
 | `-E`, `--prec-error-tolerance <int>` | 10 | Error tolerance of precursor masses (ppm). |
-| `-F`, `--filter-by-score <0..1>` | 0.4 | Masses whose confidence score (the fourth column of the msalign file: the EnvCNN score in TopFD's files, the pseudo score in TopDIA's) is below this are ignored during filtering, search and E-value computation. |
+| `-F`, `--filter-by-score <0..1>` | 0.4 | Masses whose confidence score (the fourth column of the msalign file: the EnvCNN score in TopFD's files, the pseudo score in TopDIA's) is below this are ignored during filtering, search and E-value computation. In `toppic_gui`: "Confidence score cutoff" on the Advanced Parameters tab. |
 | `-p`, `--proteoform-error-tolerance <number>` | 1.2 | Precursor mass tolerance (Da) for grouping PrSMs into proteoform clusters. |
 | `-r`, `--num-combined-spectra <int>` | 1 | Number of consecutive MS/MS spectra of one precursor searched together, for alternating fragmentation (2 for pairs, 3 for triplets). |
 | `-X`, `--approximate-spectra` | off | Use approximate spectra in protein filtering, for higher sensitivity. Only affects the variable PTM filtering step (`-b`). |
-| `-x`, `--no-topfd-feature` | off | Run without the TopFD feature file; proteoforms are then clustered by protein, precursor mass and sequence overlap (two PrSMs share a proteoform only if their proteoform sequences overlap by at least 70% of the shorter one, so equal masses at different positions of a protein stay apart), the `Feature ...` columns are `-` and the proteoform intensity is `-1`. |
+| `-x`, `--no-topfd-feature` | off | Run without the TopFD feature file; proteoforms are then clustered by protein, precursor mass and sequence overlap (two PrSMs share a proteoform only if their proteoform sequences overlap by at least 70% of the shorter one, so equal masses at different positions of a protein stay apart), the `Feature ...` columns are `-` and the proteoform intensity is `-1`. In `toppic_gui`: "No TopFD feature file" on the Basic Parameters tab. |
 | `-A`, `--average-mass` | off | The spectrum files report average masses (`topfd --average-mass`): each is converted to `<name>_mono_ms2.msalign` with monoisotopic masses before the search (section 2). In `toppic_gui`, the checkbox "Spectrum files with average masses (TopFD --average-mass)" on the Advanced Parameters tab turns this on. |
 
 Post mass matching:

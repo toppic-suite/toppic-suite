@@ -162,8 +162,10 @@ int TopMG_identify(std::map<std::string, std::string>& arguments) {
     if (arguments["useFeatureFile"] == "true") {
       if (!std::filesystem::exists(feature_file_name)) {
         LOG_ERROR(
-            "TopFD feature file does not exist!. Please use -x option in "
-            "command line or select 'Missing MS1 feature file in GUI'.");
+            "TopFD feature file " << feature_file_name
+                                  << " does not exist! Please use the -x "
+                                     "option in the command line or check "
+                                     "'No TopFD feature file' in the GUI.");
         return 1;
       }
     }

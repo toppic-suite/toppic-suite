@@ -172,6 +172,7 @@ std::map<std::string, std::string> toppic_para{
     {"fixedMod", "-f "},
     {"allowProtMod", "-n "},
     {"nTermLabelMass", "-N "},
+    {"envCnnCutoff", "-F "},
     {"allowProtType", "-R "},
     {"searchType", "-d "},
     {"threadNumber", "-u "},

@@ -67,6 +67,7 @@ ToppicWindow::ToppicWindow(QWidget* parent)
   ui->formErrorToleranceEdit->setValidator(
       new QDoubleValidator(0.0001, 1000000, 4, this));
   ui->varPtmNumEdit->setValidator(new QIntValidator(0, 100, this));
+  ui->envCnnCutoffEdit->setValidator(new QDoubleValidator(0, 1, 4, this));
   // the N-terminal label mass (-N): a non-negative number with up to six
   // decimals, e.g. 229.162932 for TMT
   QRegularExpression rx4("^\\d{1,6}(\\.\\d{0,6})?$");
@@ -138,6 +139,8 @@ void ToppicWindow::on_defaultButton_clicked() {
   ui->maxModEdit->setText(QString::fromStdString(arguments_["maxShiftMass"]));
   ui->nTermLabelEdit->setText(
       QString::fromStdString(arguments_["nTermLabelMass"]));
+  ui->envCnnCutoffEdit->setText(
+      QString::fromStdString(arguments_["envCnnCutoff"]));
   ui->cutoffSpectralValueEdit->setText(
       QString::fromStdString(arguments_["cutoffSpectralValue"]));
   ui->cutoffProteoformValueEdit->setText(
@@ -388,6 +391,7 @@ std::map<std::string, std::string> ToppicWindow::getArguments() {
   arguments_["maxShiftMass"] = ui->maxModEdit->text().toStdString();
   arguments_["nTermLabelMass"] =
       ui->nTermLabelEdit->text().trimmed().toStdString();
+  arguments_["envCnnCutoff"] = ui->envCnnCutoffEdit->text().toStdString();
 
   if (ui->approxSpectraCheckBox->isChecked()) {
     arguments_["useApproxSpectra"] = "true";
@@ -424,10 +428,9 @@ std::map<std::string, std::string> ToppicWindow::getArguments() {
     arguments_["rescore"] = "false";
   }
   arguments_["localThreshold"] = ui->miscoreThresholdEdit->text().toStdString();
-  // the confidence score cutoff (-F) and the minimum isotopic peak number of
-  // post mass matching are not shown by the GUI, so the command line leaves
-  // them out and toppic applies its own defaults
-  arguments_.erase("envCnnCutoff");
+  // the minimum isotopic peak number of post mass matching is not shown by
+  // the GUI, so the command line leaves it out and toppic applies its own
+  // default
   arguments_.erase("postMinPeakNum");
   arguments_["groupSpectrumNumber"] = ui->numCombinedEdit->text().toStdString();
   arguments_["localPtmFileName"] = ui->modFileEdit->text().toStdString();
@@ -512,6 +515,7 @@ void ToppicWindow::lockDialog() {
   ui->maxModEdit->setEnabled(false);
   ui->minModEdit->setEnabled(false);
   ui->nTermLabelEdit->setEnabled(false);
+  ui->envCnnCutoffEdit->setEnabled(false);
   ui->cutoffSpectralValueEdit->setEnabled(false);
   ui->cutoffProteoformValueEdit->setEnabled(false);
   ui->cutoffProteinValueEdit->setEnabled(false);
@@ -564,6 +568,7 @@ void ToppicWindow::unlockDialog() {
   ui->maxModEdit->setEnabled(true);
   ui->minModEdit->setEnabled(true);
   ui->nTermLabelEdit->setEnabled(true);
+  ui->envCnnCutoffEdit->setEnabled(true);
   ui->cutoffSpectralValueEdit->setEnabled(true);
   ui->cutoffProteoformValueEdit->setEnabled(true);
   ui->cutoffProteinValueEdit->setEnabled(true);
@@ -692,7 +697,8 @@ bool ToppicWindow::checkError() {
       {ui->maxModEdit, tr("Maximum mass shift")},
       {ui->minModEdit, tr("Minimum mass shift")},
       {ui->miscoreThresholdEdit, tr("MIScore threshold")},
-      {ui->nTermLabelEdit, tr("N-terminal label mass")}};
+      {ui->nTermLabelEdit, tr("N-terminal label mass")},
+      {ui->envCnnCutoffEdit, tr("Confidence score cutoff")}};
   for (const auto& [edit, name] : edits) {
     if (toppic::gui_check::invalidEdit(this, edit, name)) {
       return true;

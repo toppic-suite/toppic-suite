@@ -153,7 +153,7 @@ p, li { white-space: pre-wrap; }
        </rect>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The deconvoluted spectrum files (_ms2.msalign, written by TopFD or TopDIA) to search, one after another with the same parameters; at least one is needed. Add selects files and Remove removes the selected one. Each file's TopFD feature file (_ms2.feature) must be in the same folder unless Missing MS1 feature file is checked. (topmg argument spectrum-file-names)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The deconvoluted spectrum files (_ms2.msalign, written by TopFD or TopDIA) to search, one after another with the same parameters; at least one is needed. Add selects files and Remove removes the selected one. Each file's TopFD feature file (_ms2.feature) must be in the same folder unless No TopFD feature file is checked. (topmg argument spectrum-file-names)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
      </widget>
      <widget class="QWidget" name="horizontalLayoutWidget">
@@ -238,7 +238,7 @@ p, li { white-space: pre-wrap; }
           </size>
          </property>
          <property name="toolTip">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The deconvoluted spectrum files (_ms2.msalign, written by TopFD or TopDIA) to search, one after another with the same parameters; at least one is needed. Add selects files and Remove removes the selected one. Each file's TopFD feature file (_ms2.feature) must be in the same folder unless Missing MS1 feature file is checked. (topmg argument spectrum-file-names)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The deconvoluted spectrum files (_ms2.msalign, written by TopFD or TopDIA) to search, one after another with the same parameters; at least one is needed. Add selects files and Remove removes the selected one. Each file's TopFD feature file (_ms2.feature) must be in the same folder unless No TopFD feature file is checked. (topmg argument spectrum-file-names)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
          <property name="text">
           <string>Spectrum files: </string>
@@ -478,7 +478,7 @@ p, li { white-space: pre-wrap; }
           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Check when the TopFD feature file of a spectrum file (_ms2.feature in the same folder) is missing: TopMG then runs without it and clusters PrSMs into proteoforms by protein, precursor mass and sequence overlap instead of by feature. Unchecked, a missing feature file is an error. Default: off. (topmg -x, --no-topfd-feature)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
          <property name="text">
-          <string>Missing MS1 feature file</string>
+          <string>No TopFD feature file</string>
          </property>
         </widget>
        </item>

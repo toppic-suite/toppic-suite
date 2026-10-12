@@ -4186,8 +4186,9 @@ above it, never the reverse:
   cutoff (`SpPara::getEnvCnnCutoff()`, whose own default is 0.2, but both
   toppic and topmg set the key from their `-F` (`--filter-by-score`; the
   fourth msalign column is TopFD's EnvCNN score or TopDIA's pseudo score;
-  `--filter-by-envcnn` until 2026-10-12; the parameter block and
-  topmg_gui say "Confidence score cutoff", "EnvCNN score cutoff" before),
+  `--filter-by-envcnn` until 2026-10-12; the parameter block, topmg_gui and
+  toppic_gui (Advanced Parameters tab, `envCnnCutoffEdit`, since 2026-10-12)
+  say "Confidence score cutoff", "EnvCNN score cutoff" before),
   which defaults to 0.4 in
   each): masses whose fourth
   msalign column is below it are skipped, keeping the file's peak ids. The
@@ -4383,7 +4384,9 @@ NOT in `COMMON_SRCS`; each is its own `add_executable` that links
   the message HTML-escaped (`&lt;name&gt;`), the same text on a row's
   label and input, ending with the option it sets, e.g. `(topfd -c,
   --max-charge)`. Give a new control one, and change it with its option's
-  help. Start runs the form's `checkError()` first (every GUI since
+  help. The `-x` checkbox of toppic_gui and topmg_gui is "No TopFD feature
+  file" ("Missing MS1 feature file" until 2026-10-12; it is the
+  `<base>_ms2.feature` file, not an MS1 file). Start runs the form's `checkError()` first (every GUI since
   2026-10-12; before, only topmerge called it, so an empty field crashed
   topfd_gui and topdia_gui): the files (at least one, two for topdiff; no
   path with a space, `gui_check::pathWithSpace`, because the command line is
