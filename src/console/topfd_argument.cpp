@@ -123,6 +123,18 @@ bool Argument::parse(int argc, char* argv[]) {
         "<a positive number>. Set the default precursor window size. The "
         "default value is 3.0 m/z. When the input file contains precursor "
         "window information, the parameter is ignored.")(
+        "deconv-ms1,p", po::value<std::string>(&deconv_ms1),
+        "<greedy|msdeconv>. Set the deconvolution method of MS1 spectra: "
+        "greedy, a greedy search that decides the charge state of the most "
+        "intense peak with all the charge states of its mass and subtracts "
+        "the mass's envelopes, or msdeconv, the MS-Deconv dynamic "
+        "programming of earlier versions. The default value is greedy.")(
+        "deconv-ms2,q", po::value<std::string>(&deconv_ms2),
+        "<greedy|msdeconv|flashdeconv>. Set the deconvolution method of "
+        "MS/MS spectra: greedy, the greedy search of MS1 spectra adapted to "
+        "fragment ions; msdeconv, the MS-Deconv dynamic programming of "
+        "earlier versions; or flashdeconv, the FLASHDeconv algorithm "
+        "(experimental). The default value is greedy.")(
         "msdeconv,n",
         "Use the MS-Deconv score to rank isotopic envelopes. The default "
         "method uses the EnvCNN score to rank isotopic envelopes.")(
@@ -170,19 +182,7 @@ bool Argument::parse(int argc, char* argv[]) {
         "peak per line, m/z and intensity separated by a space or a tab. "
         "Lines that do not start with a number are skipped, so an MGF file "
         "of one spectrum can be used. The output files are named after the "
-        "input file.")(
-        "deconv-ms1,p", po::value<std::string>(&deconv_ms1),
-        "<greedy|msdeconv>. Set the deconvolution method of MS1 spectra: "
-        "greedy, a greedy search that decides the charge state of the most "
-        "intense peak with all the charge states of its mass and subtracts "
-        "the mass's envelopes, or msdeconv, the MS-Deconv dynamic "
-        "programming of earlier versions. The default value is greedy.")(
-        "deconv-ms2,q", po::value<std::string>(&deconv_ms2),
-        "<greedy|msdeconv|flashdeconv>. Set the deconvolution method of "
-        "MS/MS spectra: greedy, the greedy search of MS1 spectra adapted to "
-        "fragment ions; msdeconv, the MS-Deconv dynamic programming of "
-        "earlier versions; or flashdeconv, the FLASHDeconv algorithm "
-        "(experimental). The default value is greedy.");
+        "input file.");
 
     // Advanced options accepted on the command line but hidden from the help
     // message; the positional spectrum file argument is also hidden here.
