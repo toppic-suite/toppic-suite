@@ -337,7 +337,7 @@ bool TopmgArgument::parse(int argc, char* argv[]) {
         "prec-error-tolerance,E", po::value<std::string>(&prec_error_tole),
         "<a positive integer>. Error tolerance for precursor masses in PPM. "
         "Default value: 10.")(
-        "filter-by-env-cnn,F", po::value<std::string>(&env_cnn_cutoff),
+        "filter-by-envcnn,F", po::value<std::string>(&env_cnn_cutoff),
         "<a number between 0 and 1>. Remove the deconvoluted masses whose "
         "EnvCNN score is below the cutoff before spectral filtering, "
         "database search and E-value computation. Default value: 0.4.")(
@@ -408,7 +408,7 @@ bool TopmgArgument::parse(int argc, char* argv[]) {
         "decoy,d", "")("frag-error-tolerance,e",
                        po::value<std::string>(&frag_error_tole), "")(
         "prec-error-tolerance,E", po::value<std::string>(&prec_error_tole), "")(
-        "filter-by-env-cnn,F", po::value<std::string>(&env_cnn_cutoff), "")(
+        "filter-by-envcnn,F", po::value<std::string>(&env_cnn_cutoff), "")(
         "proteoform-ppm-error,Q", "")("proteoform-error-tolerance,p",
                                       po::value<std::string>(&form_error_tole),
                                       "")(
@@ -529,7 +529,7 @@ bool TopmgArgument::parse(int argc, char* argv[]) {
       arguments_["precErrorTolerance"] = prec_error_tole;
     }
 
-    if (vm.count("filter-by-env-cnn")) {
+    if (vm.count("filter-by-envcnn")) {
       arguments_["envCnnCutoff"] = env_cnn_cutoff;
     }
 
