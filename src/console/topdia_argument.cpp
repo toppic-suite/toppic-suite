@@ -101,7 +101,7 @@ TopfdParaPtr Argument::getTopfdParaPtrForTopdia() {
 
 void Argument::showUsage(
     const boost::program_options::options_description& desc) {
-  std::cout << "Usage: topdia [options] spectrum-file-name" << std::endl;
+  std::cout << "Usage: topdia [options] spectrum-file-names" << std::endl;
   std::cout << desc << std::endl;
   std::cout << "Version: " << Version::getVersion() << std::endl;
 }
@@ -145,7 +145,7 @@ bool Argument::parse(int argc, char* argv[]) {
         "<CID|ETD|ETCID|ETHCD|HCD|MPD|UVPD|FILE>. Fragmentation method of "
         "MS/MS spectra. When FILE is used, the fragmentation methods of "
         "spectra are given in the input spectral data file. ETCID (ETciD) and "
-        "ETHCD (EThcD) have the ion types of ETD. Default value: FILE.")(
+        "ETHCD (EThcD) have the ion types of ETD. The default value is FILE.")(
         "max-charge,c", po::value<std::string>(&max_charge),
         "<a positive integer>. Set the maximum charge state of precursor and "
         "fragment ions. The default value is 30.")(
@@ -156,10 +156,10 @@ bool Argument::parse(int argc, char* argv[]) {
         "<a positive number>. Set the error tolerance of m/z values of "
         "spectral peaks. The default value is 0.02 m/z.")(
         "ms-one-sn-ratio,r", po::value<std::string>(&ms_one_sn_ratio),
-        "<a positive number>. Set the signal-to-noise ratio for MS1 spectra. "
-        "The default value is 3.")(
+        "<a non-negative number>. Set the signal-to-noise ratio for MS1 "
+        "spectra. The default value is 3.")(
         "ms-two-sn-ratio,s", po::value<std::string>(&ms_two_sn_ratio),
-        "<a positive number>. Set the signal-to-noise ratio for MS/MS "
+        "<a non-negative number>. Set the signal-to-noise ratio for MS/MS "
         "spectra. The default value is 1.")(
         "missing-level-one,o", "MS1 spectra are missing in the input file.")(
         "precursor-window,w", po::value<std::string>(&prec_window),
@@ -200,30 +200,37 @@ bool Argument::parse(int argc, char* argv[]) {
         "frag-num-filtering,j",
         "Filter fragment ion envelopes in MS/MS scans based on the estimated "
         "number of fragment ions: the envelopes ranked highest by the score "
-        "of -n are kept.")(
+        "of -n are kept. Used with the greedy and msdeconv MS/MS "
+        "deconvolution methods, not with flashdeconv.")(
         "ms1-ecscore-cutoff,t", po::value<std::string>(&ms1_ecscore_cutoff),
         "<a number in [0,1]>. Set the MS1 ECScore cutoff value for proteoform "
         "features. The default value is 0.")(
         "ms2-ecscore-cutoff,T", po::value<std::string>(&ms2_ecscore_cutoff),
-        "<a number in [0,1]>. Set the MS2 ECScore cutoff value for proteoform "
+        "<a number in [0,1]>. Set the MS2 ECScore cutoff value for fragment "
         "features. The default value is 0.")(
         "ms1-min-scan-number,b", po::value<std::string>(&ms1_min_scan_num),
         "<1|2|3>. The minimum number of MS1 scans in which a proteoform "
         "feature is detected. The default value is 2.")(
         "ms2-min-scan-number,B", po::value<std::string>(&ms2_min_scan_num),
-        "<1|2|3>. The minimum number of MS2 scans in which a proteoform "
+        "<1|2|3>. The minimum number of MS2 scans in which a fragment "
         "feature is detected. The default value is 1.")(
         "single-scan-noise,i",
-        "Use the peak intensity noise levels in single MS1 scans to filter "
-        "out low intensity peaks in proteoform feature detection. The default "
-        "method is to use the peak intensity noise level of the whole LC-MS "
-        "map to filter out low intensity peaks.")(
+        "Use the peak intensity noise levels in single scans (MS1 scans in "
+        "proteoform feature detection, MS/MS scans in fragment feature "
+        "detection) to filter out low intensity peaks. The default method is "
+        "to use the peak intensity noise level of the whole LC-MS map (for "
+        "fragment features, of the MS/MS scans of an isolation window) to "
+        "filter out low intensity peaks.")(
         "pseudo-cutoff,v", po::value<std::string>(&pseudo_score_cutoff),
         "<a number in [0,1]>. Set the Pseudo Score cutoff value for "
-        "generating pseudo-MS/MS spectrum. The default value is 0.55.")(
+        "generating pseudo-MS/MS spectra: once a pseudo-MS/MS spectrum has "
+        "the number of peaks of -V, fragment features with a lower Pseudo "
+        "Score are not added. The default value is 0.55.")(
         "pseudo-peak-number,V", po::value<std::string>(&pseudo_min_peaks),
         "<an integer of at least 10>. The minimum number of peaks in a "
-        "pseudo-MS/MS spectrum. The default value is 25.")(
+        "pseudo-MS/MS spectrum: until a spectrum has this number of peaks, "
+        "fragment features are added regardless of the Pseudo Score cutoff "
+        "(-v), when available. The default value is 25.")(
         "ms1-intensity-correlation-cutoff,y",
         po::value<std::string>(&ms1_seed_env_inte_corr_tole_cutoff),
         "<a number in [0,1]>. Set the MS1 seed envelope intensity correlation "
@@ -234,7 +241,7 @@ bool Argument::parse(int argc, char* argv[]) {
         "cutoff value for extracting features. The default value is 0.5.")(
         "thread-number,u", po::value<std::string>(&thread_number),
         "<a positive integer>. Number of threads used in spectral "
-        "deconvolution. Default value: 1.");
+        "deconvolution. The default value is 1.");
 
     // Advanced options accepted on the command line but hidden from the help
     // message; the positional spectrum file argument is also hidden here.
@@ -248,10 +255,11 @@ bool Argument::parse(int argc, char* argv[]) {
         "ms2-rank-peak-distance",
         po::value<std::string>(&ms2_rank_peak_distance),
         "<a positive number>. The same window for MS/MS spectra. The default "
-        "value is 2.")(
+        "value is 12.")(
         "disable-ms2-harmonic-check",
         "Skip the harmonic check of MS/MS spectra, which replaces an envelope "
-        "by a better scoring harmonic parent mass.")(
+        "by a better scoring harmonic parent mass. TopDIA skips it by "
+        "default.")(
         "keep,k",
         "Report monoisotopic masses extracted from low quality isotopic "
         "envelopes.")(

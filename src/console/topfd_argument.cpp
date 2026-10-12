@@ -61,7 +61,7 @@ Argument::Argument() { topfd_para_ptr_ = std::make_shared<TopfdPara>(); }
 
 void Argument::showUsage(
     const boost::program_options::options_description& desc) {
-  std::cout << "Usage: topfd [options] spectrum-file-name" << std::endl;
+  std::cout << "Usage: topfd [options] spectrum-file-names" << std::endl;
   std::cout << desc << std::endl;
   std::cout << "Version: " << Version::getVersion() << std::endl;
 }
@@ -116,10 +116,10 @@ bool Argument::parse(int argc, char* argv[]) {
         "<a positive number>. Set the error tolerance of m/z values of "
         "spectral peaks. The default value is 0.02 m/z.")(
         "ms-one-sn-ratio,r", po::value<std::string>(&ms_one_sn_ratio),
-        "<a positive number>. Set the signal-to-noise ratio for MS1 spectra. "
-        "The default value is 3.")(
+        "<a non-negative number>. Set the signal-to-noise ratio for MS1 "
+        "spectra. The default value is 3.")(
         "ms-two-sn-ratio,s", po::value<std::string>(&ms_two_sn_ratio),
-        "<a positive number>. Set the signal-to-noise ratio for MS/MS "
+        "<a non-negative number>. Set the signal-to-noise ratio for MS/MS "
         "spectra. The default value is 1.")(
         "missing-level-one,o", "MS1 spectra are missing in the input file.")(
         "precursor-window,w", po::value<std::string>(&prec_window),
@@ -160,7 +160,8 @@ bool Argument::parse(int argc, char* argv[]) {
         "frag-num-filtering,j",
         "Filter fragment ion envelopes in MS/MS scans based on the estimated "
         "number of fragment ions: the envelopes ranked highest by the score "
-        "of -n are kept.")(
+        "of -n are kept. Used with the greedy and msdeconv MS/MS "
+        "deconvolution methods, not with flashdeconv.")(
         "ecscore-cutoff,t", po::value<std::string>(&ecscore_cutoff),
         "<a number in [0,1]>. Set the ECScore cutoff value for proteoform "
         "features. The default value is 0.1.")(

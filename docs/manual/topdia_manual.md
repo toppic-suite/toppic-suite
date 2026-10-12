@@ -74,9 +74,10 @@ and runs five steps:
    `--ms2-ecscore-cutoff` and `--ms2-min-scan-number`.
 5. **Pseudo spectrum generation.** For each isolation window, the MS1
    features whose envelope lies mostly inside the window are taken in order
-   of decreasing intensity. For each such precursor, the fragment features of
-   the window that are lighter than the precursor and elute at the same time
-   (apex within a few MS1 cycles) are candidates. Each candidate gets a
+   of decreasing intensity, each charge state of a feature on its own. For
+   each such precursor, the fragment features of the window that are lighter
+   than the precursor and elute at the same time (apex within a few MS1
+   cycles) are candidates. Each candidate gets a
    **pseudo score** in 0 to 1 from a logistic model of its intensity rank,
    the ratio of its elution length to the precursor's, and the overlap of the
    two elution profiles. Candidates are added to the precursor's pseudo
@@ -93,10 +94,10 @@ For an input `sample.mzML`:
 
 | File | Contents |
 |---|---|
-| `sample_ms2.msalign` | **The pseudo-MS/MS spectra, the file to search with TopPIC or TopMG.** One spectrum per precursor feature and isolation window, with the precursor mass, charge, intensity and feature id in its header, and one line per fragment mass with its intensity, charge and pseudo score (followed by the elution-profile statistics behind the score). |
+| `sample_ms2.msalign` | **The pseudo-MS/MS spectra, the file to search with TopPIC or TopMG.** One spectrum per charge state of a precursor feature and isolation window, with the precursor mass, charge, intensity and feature id in its header, and one line per fragment mass with its intensity, charge and pseudo score (followed by the elution-profile statistics behind the score). |
 | `sample_ms2.feature` | TopFD's feature file for the DIA MS/MS scans: for each scan, the most intense MS1 feature in its isolation window. TopPIC and TopMG use it to attach feature intensities and elution times to the pseudo spectra through the `PRECURSOR_FEATURE_ID` in the msalign header; no special option is needed. |
 | `sample_ms1.msalign` | The deconvoluted MS1 spectra. |
-| `sample_ms1.feature`, `sample_feature.xml` | The proteoform features detected in the MS1 data, as text and as XML (the XML is read by TopPIC and TopMG when they combine fractions with `-c`). |
+| `sample_ms1.feature`, `sample_feature.xml` | The proteoform features detected in the MS1 data, as text and as XML (the XML is read by TopMG when it combines fractions with `-c`). |
 | `sample_ms2_raw.msalign` | The deconvoluted DIA MS/MS scans before pseudo-spectrum generation; intermediate. |
 | `sample_ms1.csv`, `sample_frac_ms1.mzrt.csv` | The MS1 feature ECScore table and the MS1 features with their elution profiles (BatMass format); intermediate. |
 | `sample_<window>_ms2.csv`, `sample_<window>_frac_ms2.mzrt.csv` | The same two tables for the fragment features of each isolation window, named by the window's lower m/z bound written with six decimals (`sample_400.000000_ms2.csv`); intermediate. |
@@ -129,7 +130,7 @@ Deconvolution:
 | `-f`, `--envcnn-cutoff-ms1 <0..1>` | 0.2 | MS1 envelopes whose EnvCNN score is below the cutoff are not reported (section 2, step 1); not the envelopes of the precursor isolation windows. Used with both MS1 deconvolution methods. `-f 0` reports every envelope. |
 | `-g`, `--envcnn-cutoff-ms2 <0..1>` | 0 | MS/MS envelopes whose EnvCNN score is below the cutoff are not reported (section 2, step 3). Used with `-q msdeconv` and `greedy`, not with `flashdeconv`. |
 | `-n`, `--env-rank <envcnn\|msdeconv>` | envcnn | The score that ranks isotopic envelopes: `envcnn`, the EnvCNN score, or `msdeconv`, the MS-Deconv score. The ranking decides which envelopes `-j` keeps; the EnvCNN cutoffs `-f` and `-g` compare the EnvCNN score with either value. In `topdia_gui`: "Use MS-Deconv score" (`msdeconv` when checked). |
-| `-j`, `--frag-num-filtering` | off | Filter the envelopes of MS/MS scans by the estimated number of fragment ions: the envelopes ranked highest by the score of `-n` are kept. In `topdia_gui`: "Enable frag num filtering". |
+| `-j`, `--frag-num-filtering` | off | Filter the envelopes of MS/MS scans by the estimated number of fragment ions: the envelopes ranked highest by the score of `-n` are kept. Not used with `-q flashdeconv`. In `topdia_gui`: "Enable frag num filtering". |
 | `-o`, `--missing-level-one` | off | Accepted, but the run fails at the pseudo-spectrum step without MS1 scans (section 1). |
 | `-u`, `--thread-number <int>` | 1 | Number of threads. |
 
@@ -141,7 +142,7 @@ Feature detection:
 | `-b`, `--ms1-min-scan-number <1\|2\|3>` | 2 (TopFD: 1) | Minimum number of MS1 scans of a proteoform feature. |
 | `-T`, `--ms2-ecscore-cutoff <0..1>` | 0 | ECScore cutoff for fragment features. |
 | `-B`, `--ms2-min-scan-number <1\|2\|3>` | 1 | Minimum number of MS/MS scans of a fragment feature. |
-| `-i`, `--single-scan-noise` | off | Use each MS1 scan's own noise level instead of the whole map's when filtering low-intensity peaks. |
+| `-i`, `--single-scan-noise` | off | Use each scan's own noise level instead of the whole map's when filtering low-intensity peaks: the MS1 scans for proteoform features and the MS/MS scans of an isolation window for fragment features. |
 | `-y`, `--ms1-intensity-correlation-cutoff <0..1>` | 0.5 | Minimum correlation between the intensities of a seed isotopic envelope and the theoretical ones for starting an MS1 proteoform feature. |
 | `-Y`, `--ms2-intensity-correlation-cutoff <0..1>` | 0.5 | The same cutoff for starting a fragment feature in an isolation window. |
 

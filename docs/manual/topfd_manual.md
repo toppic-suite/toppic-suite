@@ -111,7 +111,7 @@ FAIMS data `sample_<voltage>` per voltage level, e.g. `sample_-40`).
 | `sample_ms3.tsv` | One line per MS3 scan: its MS2 and MS1 scans, the MS2 precursor, the isolation window, how the precursor was determined (`ms2_species`: a species of the parent MS2 spectrum's deconvolution; `selected_ion`: the file's selected ion at every charge up to the MS2 precursor's), the precursor and the number of masses. |
 | `sample_ms1.feature` | Proteoform features detected in the LC-MS map: one line per feature with its mass, intensity, retention-time and scan range, charge range, apex and ECScore. |
 | `sample_ms2.feature` | The features assigned to each MS/MS spectrum (precursor mass, m/z, charge and intensity), one line per spectrum and feature. |
-| `sample_feature.xml` | The proteoform features in XML, with their per-charge envelope information; read by TopPIC and TopMG when they combine fractions (`-c`). |
+| `sample_feature.xml` | The proteoform features in XML, with their per-charge envelope information; read by TopMG when it combines fractions (`-c`). |
 | `sample.sqlite` | An SQLite database with the deconvoluted MS1 and MS/MS spectra and their peaks, for spectrum visualisation and for TopPIC's post mass matching (see the `-N` option). Not written with `--no-sql`. With `--sql-3d` it also holds the raw MS1 peak tables for 3D visualisation (`CONFIG` and `PEAKS0`, `PEAKS1`, ...). |
 
 The `msalign` format is a text format. Each spectrum is a `BEGIN IONS` ...
@@ -143,12 +143,12 @@ TopFD runs; they are merged into the final files and deleted at the end.
 
 **MS3 spectra.** An MS3 scan (the dissociation of an MS2 fragment ion,
 e.g. CID of a peptide and then CID of one of its fragments) is deconvoluted
-after the MS/MS spectra, when the file has such scans: its precursor is the
-species of the parent MS2 spectrum's deconvolution whose isotopic envelope
-falls in the MS3 isolation window (the most intense one, its monoisotopic
-mass checked against the MS2 spectrum's peaks one isotope below and above),
-or the selected
-ion of the file at every possible charge when the MS2 spectrum has no
+after the MS/MS spectra, when the file has such scans (not for FAIMS
+data): its precursor is the species of the parent MS2 spectrum's
+deconvolution whose isotopic envelope falls in the MS3 isolation window
+(the most intense one, its monoisotopic mass checked against the MS2
+spectrum's peaks one isotope below and above), or the selected ion of the
+file at every possible charge when the MS2 spectrum has no
 species there; the fragments are deconvoluted with the MS/MS method bounded
 by that precursor's mass and charge and written to `sample_ms3.msalign` and
 `sample_ms3.tsv`. The hidden option `--disable-ms3` turns the stage off.
@@ -196,8 +196,9 @@ larger of these and the features' bounds). Without an MS1 feature in the
 precursor window, the selected ion (its m/z and charge as the file gives
 them) is the precursor. An MSn scan (n > 2) is grouped with the last MS1
 scan before it. MSn scans without a proton transfer stage (a dissociation
-of fragments) are not read. ThermoRawFileParser writes only the proton
-transfer stage of an MS3 scan as its precursor; TopFD then takes the first
+of fragments) are not read as MS/MS spectra; the MS3 ones are the MS3
+spectra above. ThermoRawFileParser writes only the proton transfer stage
+of an MS3 scan as its precursor; TopFD then takes the first
 stage's isolation target and dissociation from the scan's filter string,
 with the default precursor window (`-w`). The same holds for a scan without
 any precursor (ThermoRawFileParser writes none when the scan's precursor
@@ -235,7 +236,7 @@ Parameters that apply to both MS1 and MS/MS deconvolution:
 | `-u`, `--thread-number <int>` | 1 | Number of threads. Must not exceed the number of hardware threads; TopFD warns (but still runs) when the available memory looks too small for the requested number. |
 | `-o`, `--missing-level-one` | off | The file has no MS1 spectra: skip MS1 deconvolution and feature detection. |
 | `-N`, `--no-sql` | off | Do not write the `.sqlite` database. **Do not use it if TopPIC will search the spectra**: TopPIC's post mass matching, which is on by default, reads the centroided MS/MS peaks from this database and stops with an error when it is missing (see the [TopPIC manual](toppic_manual.md); `toppic --disable-post-match` is the alternative). |
-| `-A`, `--average-mass` | off | Report average masses instead of monoisotopic masses for the precursor and fragment ions in `sample_ms2.msalign` (section 1.3). The MS1 msalign file, the feature files and the SQLite database keep monoisotopic masses. Search such a file with `toppic --average-mass`. Also applies to `-T`. |
+| `-A`, `--average-mass` | off | Report average masses instead of monoisotopic masses for the precursor and fragment ions in `sample_ms2.msalign` (section 1.3). The MS1 msalign file, the feature files and the SQLite database keep monoisotopic masses. Search such a file with `toppic --average-mass`. Also applies to `sample_ptcr.msalign`, `sample_ms3.msalign` and `-T`. |
 | `-D`, `--sql-3d` | off | Also store the raw MS1 peaks for 3D visualisation in the `.sqlite` database: `PEAKS0` holds every MS1 peak and `PEAKS1`, `PEAKS2`, ... progressively down-sampled copies, with one `CONFIG` row per table. Cannot be combined with `--no-sql`; has no effect with `-T` or `-o`. In `topfd_gui`, the checkbox "MS1 3D visualization data" under "Additional settings" turns this on (it is greyed out while "Do not generate SQLite database" is checked). |
 | `-T`, `--text-peak-list` | off | The input is a text peak list (one MS/MS spectrum), not an mzML file; lines that do not start with a number are skipped, so an MGF file of one spectrum can be used; see section 2. In `topfd_gui`, the checkbox "Text peak list input" under "Additional settings" turns this on; the Add button then lists `.txt` and `.mgf` files (or all files), and Start refuses to run while an mzML or mzXML file is in the list. |
 
@@ -262,7 +263,7 @@ MS/MS deconvolution:
 | `-q`, `--deconv-ms2 <greedy\|msdeconv\|flashdeconv>` | greedy | MS/MS deconvolution method (section 1.2): `greedy`, the greedy search adapted to fragment ions; `msdeconv`, the MS-Deconv dynamic programming, the default method of earlier versions; or `flashdeconv`, the FLASHDeconv algorithm (experimental; the output files are the same; not with `-T`). In `topfd_gui`: "MS2 deconvolution" (it replaces the former option `--ms2-flashdeconv`). |
 | `-g`, `--envcnn-cutoff-ms2 <0..1>` | 0 | MS/MS envelopes whose EnvCNN score is below the cutoff are not reported. Used with `-q greedy` and `msdeconv`, not with `flashdeconv`; also for MS3 spectra and `-T`. In `topfd_gui`: "MS2 EnvCNN cutoff". |
 | `-n`, `--env-rank <envcnn\|msdeconv>` | envcnn | The score that ranks isotopic envelopes: `envcnn`, the EnvCNN neural-network score, or `msdeconv`, the MS-Deconv score. The ranking decides which envelopes `-j` keeps; the EnvCNN cutoffs `-f` and `-g` compare the EnvCNN score with either value, and the score column of the msalign files is the EnvCNN score. In `topfd_gui`: "Sort using MS-Deconv score" (`msdeconv` when checked). |
-| `-j`, `--frag-num-filtering` | off | Limit the number of fragment envelopes in an MS/MS spectrum based on the estimated number of fragment ions: the envelopes ranked highest by the score of `-n` are kept. |
+| `-j`, `--frag-num-filtering` | off | Limit the number of fragment envelopes in an MS/MS spectrum based on the estimated number of fragment ions: the envelopes ranked highest by the score of `-n` are kept. Used with `-q greedy` and `msdeconv`, not with `flashdeconv`. In `topfd_gui`: "Enable frag num-based filtering". |
 
 ### 1.5 Examples
 

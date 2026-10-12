@@ -21,9 +21,10 @@ paths must be at most 200 characters long.
 
 **Protein database.** A FASTA file (`.fasta`, `.fa`, `.FASTA` or `.FA`).
 If two records share an accession (the header text up to the first
-space), the tool writes `<database>_dedup.fasta` next to the input,
-keeping the first record of each accession, prints a notice, and searches
-that file instead; its indexes go to `<database>_dedup.fasta_idx/`.
+whitespace), the tool writes a copy that keeps the first record of each
+accession next to the input (`proteins_dedup.fasta` for `proteins.fasta`),
+prints a notice, and searches that file instead; its indexes go to
+`proteins_dedup.fasta_idx/`.
 
 **Spectrum files.** One or more `_ms2.msalign` files written by TopFD (or
 by TopDIA, whose pseudo-MS/MS spectra use the same format). Several files
@@ -38,21 +39,23 @@ TopPIC also reads, from the same directory:
 | File | Needed when | Purpose |
 |---|---|---|
 | `sample_ms2.feature` | Always, unless `--no-topfd-feature` is given | The proteoform feature of each MS/MS spectrum, used to cluster the identifications of one proteoform across spectra and to report abundances. |
-| `sample.sqlite` | Always, unless `--disable-post-match` is given | The centroided MS/MS peaks, used by post mass matching (section 2, step 11). TopFD writes it unless run with `-N`. A missing database is an error, reported before the search starts. TopPIC only reads it: it searches its own copy, `sample_toppic.sqlite` (section 2). |
+| `sample.sqlite` | Always, unless `--disable-post-match` is given | The centroided MS/MS peaks, used by post mass matching (section 2, step 11). TopFD writes it unless run with `-N`. A missing database is an error, reported before the search starts. TopPIC only reads it: post mass matching works on TopPIC's own copy, `sample_toppic.sqlite` (section 2). |
 
 **Database indexes.** TopPIC does not require `topindex`. It prepares the
-database itself in a `<database>_idx/` directory next to the FASTA file, and
-builds the filtering indexes in memory for each run. Running `topindex` first
-with the same `-f`, `-n`, `-e` and `-d` settings stores those indexes on disk
-and saves time when the same database is searched repeatedly (see the
+database itself in a directory next to the FASTA file named after it
+(`proteins.fasta_idx/` for `proteins.fasta`), and builds the filtering
+indexes in memory for each run. Running `topindex` first with the same
+`-f`, `-n`, `-e` and `-d` settings stores those indexes on disk and saves
+time when the same database is searched repeatedly (see the
 [TopIndex manual](topindex_manual.md)).
 
 ## 2. What TopPIC does
 
 For each spectrum file TopPIC prints its parameters and runs these steps.
-Intermediate files carry the spectrum file name plus a `.toppic_*`
-extension and are deleted at the end unless `--keep-temp-files` is given,
-except the `toppic_record_prsm` file (section 3), which is always kept.
+Intermediate files carry the spectrum file name without `.msalign` plus a
+`.toppic_*` extension (for example `sample_ms2.toppic_raw_prsm`) and are
+deleted at the end unless `--keep-temp-files` is given, except the
+`toppic_record_prsm` file (section 3), which is always kept.
 
 **TopPIC's database.** Before a spectrum file `sample_ms2.msalign` is
 searched, TopPIC writes its own SQLite database, `sample_toppic.sqlite`: a
@@ -90,11 +93,12 @@ same copy as without the option. The result files are named after
    least 1): alignment allowing one unexpected mass shift between
    `--min-shift` and `--max-shift`.
 
-   With `--variable-ptm-file-name` the filters of steps 1-3 run as one step
-   over the index files, printed as `Zero unexpected shift, variable PTM and
-   one unexpected shift filtering` (or `Zero unexpected shift and variable
-   PTM filtering` with `--num-shift 0`), and the searches follow in the order
-   above; the candidates are the same as with separate filters.
+   With `--variable-ptm-file-name` (and `--variable-ptm-num` of at least 1)
+   and without `--approximate-spectra`, the filters of steps 1-3 run as one
+   step over the index files, printed as `Zero unexpected shift, variable
+   PTM and one unexpected shift filtering` (or `Zero unexpected shift and
+   variable PTM filtering` with `--num-shift 0`), and the searches follow in
+   the order above; the candidates are the same as with separate filters.
 4. **Merging PrSMs.** The proteoform-spectrum matches (PrSMs) of the
    searches above are merged.
 5. **E-value computation.** A generating-function method estimates the
@@ -141,9 +145,23 @@ same copy as without the option. The result files are named after
     masses and fragments grow; with `--rescore` the rescoring (step 13)
     uses the matched masses and fragments, so the FDRs can differ slightly.
 12. **PTM characterization** (only with `--local-ptm-file-name`). Each
-    unexpected mass shift is compared with the listed common modifications,
-    and the modification and its site are reported when the MIScore reaches
-    `--miscore-threshold`.
+    unexpected mass shift of a PrSM with one or two shifts is compared with
+    the listed common modifications: its explanations are the single
+    modifications and the pairs of modifications whose mass matches the
+    shift within the precursor error tolerance and that have a residue to
+    modify (a shift of a PrSM with two shifts on its own part of the
+    proteoform; the shift of a PrSM with one shift is left alone when it is
+    within 1 Da of zero). When a shift has no explanation and few fragments
+    match on its N- or C-terminal side, the proteoforms with the start or
+    end moved by up to five residues are tried as well. When exactly one
+    explanation is left (after rules that prefer, among others, fewer
+    modifications), the shift is replaced by its modifications, which
+    become variable PTMs located by their MIScore: on the range of the
+    sites whose MIScore is above `--miscore-threshold`, or, when no site
+    reaches it, on the range of the sites with a positive MIScore. A shift
+    with no explanation or several stays an unexpected shift, and the other
+    explanations of a shift are listed in the `Alternative PTM explanation`
+    column (section 3).
 13. **Rescoring** (only with `--rescore`, which needs `--decoy`). The best
     PrSM of every spectrum, target or decoy, gets a score from a linear
     support vector machine trained to separate the targets at 1% FDR from
@@ -198,7 +216,7 @@ after `<name>_ms2`. With `--average-mass` the names start with
 | `sample_post_ms2_toppic_proteoform.tsv`, `..._proteoform_single.tsv` | One PrSM per identified proteoform (the best one), passing the proteoform-level cutoff. |
 | `sample_post_ms2_toppic_protein.tsv`, `..._protein_single.tsv` | One PrSM per identified protein (the best one), passing the protein-level cutoff. |
 | `sample_post_ms2_toppic_prsm.xml`, `..._proteoform.xml`, `..._protein.xml` | The same three sets of PrSMs in XML, read by TopDiff and the visualization tools. Every PrSM records the TopPIC Suite version that wrote it, and TopDiff reads only the files of its own version. Every proteoform element has its classification, `<classification>` (the `Proteoform classification` column). |
-| `sample_toppic.sqlite` (the same name with every option) | TopPIC's database (section 2): a copy of TopFD's `sample.sqlite` with the envelopes added by post mass matching and the tables `prsm`, `proteoform`, `protein`, `prsm_mass_shift`, `prsm_protein_match` and `fasta_seq`, for visualization. The first three hold the PrSMs of the tables below, with the columns `precursor_id` and `proforma` for `Precursor ID` and `ProForma`. It is written again by every run on the spectrum file; TopFD's `sample.sqlite` is not changed. |
+| `sample_toppic.sqlite` (the same name with every option) | TopPIC's database (section 2): a copy of TopFD's `sample.sqlite` with the envelopes added by post mass matching and the tables `prsm`, `proteoform`, `protein`, `prsm_mass_shift`, `prsm_protein_match` and `fasta_seq`, for visualization. The first three hold the PrSMs of the tables below, with the columns `precursor_id` and `proforma` for `Precursor ID` and `ProForma` (there is no column for `Alternative PTM explanation`). It is written again by every run on the spectrum file; TopFD's `sample.sqlite` is not changed. |
 | `sample_post_ms2.toppic_record_prsm` | The best PrSM of every spectrum after the FDR computation and before the cutoffs, decoy identifications included. Always kept. |
 
 The `_single` tables have one line per PrSM. The tables without `_single`
@@ -219,9 +237,10 @@ columns are:
 | `Feature ID`, `Feature intensity`, `Feature score`, `Feature apex time` | The TopFD proteoform feature of the spectrum: id, abundance, ECScore and apex retention time (minutes). |
 | `# Protein hits`, `Protein accession`, `Protein description` | Number of proteins containing the proteoform, and the reported protein. |
 | `First residue`, `Last residue`, `Special amino acids`, `Database protein sequence`, `Previous amino acid`, `Proteoform`, `Next amino acid` | Position of the proteoform in the protein, the protein sequence, and the proteoform with its modifications (the annotation is explained in [Proteoform annotation](proteoform.md)). |
-| `ProForma` | The proteoform in the ProForma 2.1 notation of the HUPO-PSI (https://github.com/HUPO-PSI/ProForma), with the PTMs as Unimod names and accessions, for example `[Acetyl|UNIMOD:1]-SGREGM[Oxidation|UNIMOD:35]DEE...` (see [Proteoform annotation](proteoform.md), section 6). |
+| `ProForma` | The proteoform in the ProForma 2.1 notation of the HUPO-PSI (https://github.com/HUPO-PSI/ProForma), with the PTMs as Unimod names and accessions, for example `[Acetyl\|UNIMOD:1]-SGREGM[Oxidation\|UNIMOD:35]DEE...` (see [Proteoform annotation](proteoform.md), section 6). |
 | `Proteoform mass` | The monoisotopic mass of the proteoform. |
 | `Protein N-terminal form`, `Fixed PTMs`, `# Unexpected modifications`, `Unexpected modifications`, `# Variable PTMs`, `Variable PTMs`, `MIScore` | The N-terminal form, the modifications of the proteoform as `name:[position]` lists (see [Proteoform annotation](proteoform.md)), and the modification identification score of the PTM characterization. |
+| `Alternative PTM explanation` | When an unexpected shift has several explanations by the common modifications of `--local-ptm-file-name` (section 2, step 12), those on the reported proteoform other than the reported one (all of them when the shift is kept): each one lists the proteoform's variable PTMs and unexpected shifts under that explanation as `name:[position]` (`+mass:[position]` for a shift), separated by `;`, and the explanations are separated by ` \| `. Empty when there is none. |
 | `# Matched exp fragments`, `# Matched theo fragments`, `E-value` | The match statistics and the E-value. |
 | `Spectrum-level Q-value`, `Proteoform-level Q-value`, `Protein-level Q-value` | The FDR-based q-values (only with `--decoy`; `-` otherwise). |
 | `Proteoform classification` | The level of the proteoform in the five-level classification of proteoform identifications (Smith et al., Nat. Methods 16:939-940, 2019), from the unexpected modifications, the protein hits and the variable PTM sites. Without unexpected modifications: `1` in one protein (`# Protein hits` 1), `2D` in several proteins; `2A` and `3` instead when a variable PTM site is undecided (a variable PTM on a range of residues with more residues that can carry it than PTMs, see `Variable PTMs`). With unexpected modifications: `4` in one protein, `5` in several. Protein N-terminal forms and fixed PTMs do not change the level. |
@@ -250,13 +269,13 @@ Mass shifts and variable modifications:
 | `-b`, `--variable-ptm-file-name <file>` | none | A modification file (section 5) with the variable modifications to search. |
 | `-S`, `--variable-ptm-num <int>` | 3 | Maximum number of variable modifications in a proteoform. |
 | `-B`, `--local-ptm-file-name <file>` | none | A modification file with the common modifications used to characterize unexpected shifts. |
-| `-H`, `--miscore-threshold <0..1>` | 0.15 | Minimum MIScore for reporting a characterized modification. |
+| `-H`, `--miscore-threshold <0..1>` | 0.15 | MIScore threshold of the PTM characterization (section 2, step 12): a characterized modification is reported on the range of the sites whose MIScore is above it, or, when no site reaches it, on the range of the sites with a positive MIScore. |
 
 Spectra and tolerances:
 
 | Option | Default | Meaning |
 |---|---|---|
-| `-a`, `--activation <CID\|ETD\|ETCID\|ETHCD\|HCD\|UVPD\|FILE>` | FILE | Fragmentation method; `FILE` takes it from each spectrum. ETCID (ETciD) and ETHCD (EThcD) are searched with the ion types of ETD (c, z-dot). |
+| `-a`, `--activation <CID\|ETD\|ETCID\|ETHCD\|HCD\|MPD\|UVPD\|FILE>` | FILE | Fragmentation method; `FILE` takes it from each spectrum. ETCID (ETciD) and ETHCD (EThcD) are searched with the ion types of ETD (c, z-dot). |
 | `-e`, `--frag-error-tolerance <int>` | 10 | Error tolerance of fragment masses (ppm). |
 | `-E`, `--prec-error-tolerance <int>` | 10 | Error tolerance of precursor masses (ppm). |
 | `-F`, `--filter-by-envcnn <0..1>` | 0.4 | Masses with an EnvCNN score below this are ignored during filtering, search and E-value computation. |
@@ -264,7 +283,7 @@ Spectra and tolerances:
 | `-r`, `--num-combined-spectra <int>` | 1 | Number of consecutive MS/MS spectra of one precursor searched together, for alternating fragmentation (2 for pairs, 3 for triplets). |
 | `-X`, `--approximate-spectra` | off | Use approximate spectra in protein filtering, for higher sensitivity. Only affects the variable PTM filtering step (`-b`). |
 | `-x`, `--no-topfd-feature` | off | Run without the TopFD feature file; proteoforms are then clustered by protein, precursor mass and sequence overlap (two PrSMs share a proteoform only if their proteoform sequences overlap by at least 70% of the shorter one, so equal masses at different positions of a protein stay apart), the `Feature ...` columns are `-` and the proteoform intensity is `-1`. |
-| `-A`, `--average-mass` | off | The spectrum files report average masses (`topfd --average-mass`): each is converted to `<name>_mono_ms2.msalign` with monoisotopic masses before the search (section 2). In `toppic_gui`, the checkbox "Spectrum files with average masses" on the Advanced Parameters tab turns this on. |
+| `-A`, `--average-mass` | off | The spectrum files report average masses (`topfd --average-mass`): each is converted to `<name>_mono_ms2.msalign` with monoisotopic masses before the search (section 2). In `toppic_gui`, the checkbox "Spectrum files with average masses (TopFD --average-mass)" on the Advanced Parameters tab turns this on. |
 
 Post mass matching:
 
@@ -282,7 +301,7 @@ Cutoffs and output:
 | `-y`, `--protein-cutoff-type <EVALUE\|FDR>`, `-Y`, `--protein-cutoff-value <number>` | EVALUE, 0.01 | Cutoff for proteins; with `FDR` a protein is represented by its best proteoform. |
 | `-q`, `--rescore` | off | Rank the PrSMs by a rescore instead of the E-value in the FDR computation (section 2, steps 13 and 14): the best PrSM of every spectrum gets a score from a linear support vector machine trained on the target and decoy PrSMs with 3-fold cross-validation, and at each level the E-value is used instead when it gives more identifications within the FDR cutoff. Note that the rescoring may underestimate the FDRs. Requires `-d`; the `FDR` cutoffs and the q-value columns then follow the chosen FDRs, and the `EVALUE` cutoffs still compare E-values. In `toppic_gui`: the checkbox "Rescore PrSMs (needs the decoy database)" on the Advanced Parameters tab. |
 | `-c`, `--combined-file-name <name>` | none | Combine several fractions: after the files are searched, their spectra and best PrSMs per spectrum are merged under `<name>_ms2`, and the clustering (by protein, precursor mass and sequence overlap), rescoring (with `--rescore`), FDR computation, decoy removal, cutoffs and tables are repeated on the merged data; the files' results are then written with the proteoform ids of the combined results. A relative `<name>` is placed in the directory of the first spectrum file and must differ from the input file names. See the note below. |
-| `-u`, `--thread-number <int>` | 1 | Number of threads; must not exceed the number of hardware threads. Each protein filtering step may use fewer: it fits its thread number to the memory available when it starts (about 1.25 GiB per thread for zero-shift filtering, 1 GiB for variable-PTM and one-shift filtering, 0.5 GiB for multiple-shift filtering). The run starts with a warning listing the filtering steps that will use fewer threads and how many, and a step prints its number again if the memory available when it starts gives a different one. All other steps use the full number. |
+| `-u`, `--thread-number <int>` | 1 | Number of threads; must not exceed the number of hardware threads. Each protein filtering step may use fewer: it fits its thread number to the memory available when it starts (about 1.25 GiB per thread for zero-shift and variable-PTM filtering, also when they run as one step with one-shift filtering, 1 GiB for one-shift filtering, 0.5 GiB for multiple-shift filtering). The run starts with a warning listing the filtering steps that will use fewer threads and how many, and a step prints its number again if the memory available when it starts gives a different one. All other steps use the full number. |
 | `-k`, `--keep-temp-files` | off | Keep the intermediate files. |
 | `-K`, `--keep-decoy-ids` | off | Keep decoy identifications in the result tables. |
 

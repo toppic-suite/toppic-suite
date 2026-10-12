@@ -485,7 +485,7 @@ std::string ToppicArgument::outputTsvArguments(
 
 void ToppicArgument::showUsage(
     boost::program_options::options_description& desc) {
-  std::cout << "Usage: toppic [options] database-file-name spectrum-file-name"
+  std::cout << "Usage: toppic [options] database-file-name spectrum-file-names"
             << std::endl;
   std::cout << desc << std::endl;
   std::cout << "Version: " << Version::getVersion() << std::endl;
@@ -543,9 +543,9 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
 
     display_desc.add_options()("help,h", "Print the help message.")(
         "activation,a", po::value<std::string>(&activation),
-        "<CID|ETD|ETCID|ETHCD|HCD|UVPD|FILE>. Fragmentation method of MS/MS "
-        "spectra. When FILE is used, fragmentation methods of spectra are "
-        "given in the input spectral data file. ETCID (ETciD) and ETHCD "
+        "<CID|ETD|ETCID|ETHCD|HCD|MPD|UVPD|FILE>. Fragmentation method of "
+        "MS/MS spectra. When FILE is used, fragmentation methods of spectra "
+        "are given in the input spectral data file. ETCID (ETciD) and ETHCD "
         "(EThcD) are searched with the ion types of ETD (c and z-dot). Default "
         "value: FILE.")(
         "fixed-mod,f", po::value<std::string>(&fixed_mod),
@@ -616,7 +616,8 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
             "spectrum-cutoff-type,t",
             po::value<std::string>(&cutoff_spectral_type),
             "<EVALUE|FDR>. Spectrum-level cutoff type for filtering identified "
-            "proteoform-spectrum-matches. Default value: EVALUE.")(
+            "proteoform-spectrum-matches. FDR requires -d. Default value: "
+            "EVALUE.")(
             "spectrum-cutoff-value,v",
             po::value<std::string>(&cutoff_spectral_value),
             "<a positive number>. Spectrum-level cutoff value for filtering "
@@ -624,7 +625,8 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
             "proteoform-cutoff-type,T",
             po::value<std::string>(&cutoff_proteoform_type),
             "<EVALUE|FDR>. Proteoform-level cutoff type for filtering "
-            "identified proteoform-spectrum-matches. Default value: EVALUE.")(
+            "identified proteoform-spectrum-matches. FDR requires -d. Default "
+            "value: EVALUE.")(
             "proteoform-cutoff-value,V",
             po::value<std::string>(&cutoff_proteoform_value),
             "<a positive number>. Proteoform-level cutoff value for filtering "
@@ -632,9 +634,10 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
             "protein-cutoff-type,y",
             po::value<std::string>(&cutoff_protein_type),
             "<EVALUE|FDR>. Protein-level cutoff type for filtering identified "
-            "proteoform-spectrum-matches. With FDR, a protein is represented "
-            "by its best proteoform (the lowest E-value). Default value: "
-            "EVALUE.")(
+            "proteoform-spectrum-matches. FDR requires -d. With FDR, a "
+            "protein is represented by its best proteoform (the lowest "
+            "E-value, or with -q the highest rescore when the protein-level "
+            "FDRs are the rescored ones). Default value: EVALUE.")(
             "protein-cutoff-value,Y",
             po::value<std::string>(&cutoff_protein_value),
             "<a positive number>. Protein-level cutoff value for filtering "
@@ -648,8 +651,8 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
             "FDR cutoff. Note that the rescoring may underestimate the FDRs. "
             "Requires -d. Default value: false.")(
             "approximate-spectra,X",
-            "Use approximate spectra to increase the sensitivity in protein "
-            "filtering. Default value: false.")(
+            "Use approximate spectra to increase the sensitivity of the "
+            "variable PTM filtering (with -b). Default value: false.")(
             "local-ptm-file-name,B",
             po::value<std::string>(&local_ptm_file_name),
             "<a common modification file>. Specify a text file containing the "
@@ -657,16 +660,21 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
             "unexpected shifts.")(
             "miscore-threshold,H", po::value<std::string>(&local_threshold),
             "<a positive number between 0 and 1>. Score threshold "
-            "(modification identification score) for filtering results of "
-            "modification characterization. Default value: 0.15.")(
+            "(modification identification score, MIScore) of the modification "
+            "characterization (-B): a characterized modification is reported "
+            "on the range of its sites whose MIScore is above the threshold, "
+            "or, when no site reaches it, on the range of its sites with a "
+            "positive MIScore. Default value: 0.15.")(
             "thread-number,u", po::value<std::string>(&thread_number),
-            "<a positive integer>. Number of threads used in the computation. "
-            "Default value: 1.")(
+            "<a positive integer>. Number of threads used in the computation, "
+            "at most the number of hardware threads; the protein filtering "
+            "steps may use fewer to fit the available memory. Default value: "
+            "1.")(
             "num-combined-spectra,r", po::value<std::string>(&group_num),
             "<a positive integer>. Number of combined spectra. The parameter "
             "is set to 2 (or 3) for combining spectral pairs (or triplets) "
             "generated by the alternating fragmentation mode. Default value: "
-            "1")("combined-file-name,c",
+            "1.")("combined-file-name,c",
                  po::value<std::string>(&combined_output_name),
                  "Specify a file name for the combined spectrum data file and "
                  "analysis results.")(
@@ -677,10 +685,11 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
             "disable-post-match,D",
             "Disable post mass matching. By default, after the search, the "
             "theoretical fragment masses of each PrSM that no deconvoluted "
-            "mass matched are matched against the centroided MS/MS peaks in "
-            "the TopFD SQLite database (run topfd without -N) with the method "
-            "of MSPathFinderT, and the matched masses are added to the "
-            "spectra (written to <name>_post_ms2.msalign).")(
+            "mass matched are matched against the centroided MS/MS peaks of "
+            "the TopFD SQLite database <name>.sqlite (run topfd without -N), "
+            "read from toppic's copy <name>_toppic.sqlite, with the method of "
+            "MSPathFinderT, and the matched masses are added to the spectra "
+            "(written to <name>_post_ms2.msalign).")(
             "post-min-peak-num,I", po::value<std::string>(&post_min_peak_num),
             "<a positive integer>. Minimum number of observed isotopic peaks "
             "of a fragment mass matched by the post mass matching. Default "

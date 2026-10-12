@@ -138,14 +138,17 @@ bool TopIndexArgument::parse(int argc, char* argv[]) {
         "forms are allowed, they are separated by commas. Default value: "
         "NONE,NME,NME_ACETYLATION,M_ACETYLATION.")(
         "decoy,d",
-        "Use a shuffled decoy protein database to estimate false discovery "
-        "rates.")("frag-error-tolerance,e",
-                  po::value<std::string>(&frag_error_tole),
-                  "<a positive integer>. Error tolerance for fragment masses "
-                  "in PPM. Default value: 10.")(
+        "Index a database of the target proteins and shuffled decoy "
+        "proteins, for TopPIC and TopMG searches with -d (--decoy).")(
+        "frag-error-tolerance,e", po::value<std::string>(&frag_error_tole),
+        "<a positive integer>. Error tolerance for fragment masses in PPM. "
+        "The index files do not depend on it, but their names include it: "
+        "give the -e value of the TopPIC or TopMG searches that will use "
+        "them. Default value: 10.")(
         "prec-error-tolerance,E", po::value<std::string>(&prec_error_tole),
         "<a positive integer>. Error tolerance for precursor masses in PPM. "
-        "Default value: 10.")(
+        "Neither the index files nor their names depend on it. Default "
+        "value: 10.")(
         "thread-number,u", po::value<std::string>(&thread_number),
         "<a positive integer>. Number of threads used in the computation. "
         "Default value: 1.");

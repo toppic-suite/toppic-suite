@@ -265,7 +265,8 @@ std::string TopmgArgument::outputTsvArguments(
 
 void TopmgArgument::showUsage(
     boost::program_options::options_description& desc) {
-  std::cout << "Usage: topmg [options] database-file-name spectrum-file-name"
+  std::cout << "Usage: topmg [options] -i mod-file-name database-file-name "
+               "spectrum-file-names"
             << std::endl;
   std::cout << desc << std::endl;
   std::cout << "Version: " << Version::getVersion() << std::endl;
@@ -307,9 +308,9 @@ bool TopmgArgument::parse(int argc, char* argv[]) {
 
     display_desc.add_options()("help,h", "Print the help message.")(
         "activation,a", po::value<std::string>(&activation),
-        "<CID|ETD|ETCID|ETHCD|HCD|UVPD|FILE>. Fragmentation method of MS/MS "
-        "spectra. When FILE is used, fragmentation methods of spectra are "
-        "given in the input spectral data file. ETCID (ETciD) and ETHCD "
+        "<CID|ETD|ETCID|ETHCD|HCD|MPD|UVPD|FILE>. Fragmentation method of "
+        "MS/MS spectra. When FILE is used, fragmentation methods of spectra "
+        "are given in the input spectral data file. ETCID (ETciD) and ETHCD "
         "(EThcD) are searched with the ion types of ETD (c and z-dot). Default "
         "value: FILE.")(
         "fixed-mod,f", po::value<std::string>(&fixed_mod),
@@ -346,8 +347,8 @@ bool TopmgArgument::parse(int argc, char* argv[]) {
         "<a positive number>. Error tolerance for identifying PrSM clusters "
         "(in Dalton). Default value: 1.2 Dalton.")(
         "max-shift,M", po::value<std::string>(&max_shift_mass),
-        "<a positive number>. Maximum absolute value of the mass shift (in "
-        "Dalton). Default value: 500.")(
+        "<a positive number>. Maximum absolute value of an unexpected mass "
+        "shift (in Dalton). Default value: 500.")(
         "spectrum-cutoff-type,t", po::value<std::string>(&cutoff_spectral_type),
         "<EVALUE|FDR>. Spectrum-level cutoff type for filtering identified "
         "proteoform spectrum-matches. Default value: EVALUE.")(
@@ -372,25 +373,28 @@ bool TopmgArgument::parse(int argc, char* argv[]) {
         "identified proteoform spectrum-matches. Default value: 0.01.")(
         "mod-file-name,i", po::value<std::string>(&var_mod_file_name),
         "<a modification file>. Specify a text file containing the information "
-        "of common PTMs for constructing proteoform graphs.")(
+        "of common PTMs for constructing proteoform graphs. Required.")(
         "thread-number,u", po::value<std::string>(&thread_number),
         "<a positive integer>. Number of threads used in the computation. "
         "Default value: 1.")(
         "no-topfd-feature,x",
         "No TopFD feature file for proteoform identification.")(
         "proteo-graph-gap,j", po::value<std::string>(&proteo_graph_gap),
-        "<a positive number>. Gap in constructing proteoform graph. Default "
-        "value: 40.")("var-ptm-in-gap,G",
+        "<a positive integer>. Gap in constructing proteoform graph: the "
+        "maximum number of residues between two vertices whose mass "
+        "difference is matched. Default value: 40.")("var-ptm-in-gap,G",
                       po::value<std::string>(&var_ptm_in_gap),
-                      "<a positive number>. Maximum number of variable PTMs in "
-                      "a proteform graph gap. Default value: 5.")(
+                      "<a positive integer>. Maximum number of variable PTMs "
+                      "in a proteoform graph gap, at most --var-ptm. Default "
+                      "value: 5.")(
         "use-asf-diagonal,D",
         "Use the ASF-DIAGONAL method for protein sequence filtering.")(
         "var-ptm,P", po::value<std::string>(&var_ptm_num),
-        "<a positive number>. Maximum number of variable PTMs. Default value: "
-        "5.")("num-shift,s", po::value<std::string>(&shift_num),
-              "<0|1|2>. Maximum number of unexpected modifications in a "
-              "proteoform spectrum-match. Default value: 1.")(
+        "<a positive integer>. Maximum number of variable PTMs in a "
+        "proteoform. Default value: 5.")(
+        "num-shift,s", po::value<std::string>(&shift_num),
+        "<0|1|2>. Maximum number of unexpected modifications in a "
+        "proteoform spectrum-match. Default value: 1.")(
         "whole-protein-only,w",
         "Report only proteoforms from whole proteins, that is, allow the "
         "proteoform type COMPLETE alone.")(
@@ -428,7 +432,7 @@ bool TopmgArgument::parse(int argc, char* argv[]) {
         "protein-cutoff-value,Y", po::value<std::string>(&cutoff_protein_value),
         "")("filtering-result-number",
             po::value<std::string>(&filtering_result_num),
-            "ASF filtering result number. Default value: 15.")(
+            "ASF-Diagonal filtering result number. Default value: 15.")(
         "full-binary-path,b",
                                                            "Full binary path.")(
         "mod-file-name,i", po::value<std::string>(&var_mod_file_name), "")(

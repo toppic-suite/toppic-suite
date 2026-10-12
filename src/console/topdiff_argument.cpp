@@ -70,12 +70,14 @@ bool TopDiffArgument::parse(int argc, char* argv[]) {
     po::options_description display_desc("Options");
     display_desc.add_options()("help,h", "Print the help message.")(
         "error-tolerance,e", po::value<std::string>(&error_tole),
-        "Error tolerance of precursor masses for mapping identified "
-        "proteoforms. Default: 1.2 Dalton.")(
+        "Error tolerance of precursor masses for aligning retention times "
+        "and mapping identified proteoforms across samples. Default: 1.2 "
+        "Dalton.")(
         "tool-name,t", po::value<std::string>(&tool_name),
         "<toppic|topmg>. Database search tool name: toppic or topmg. Default: "
         "toppic.")("output,o", po::value<std::string>(&merged_output_name),
-                   "Output file name. Default: sample_diff.tsv.");
+                   "Output file name, written in the directory of the first "
+                   "spectrum file. Default: sample_diff.tsv.");
     po::options_description desc("Options");
 
     desc.add_options()("help,h", "")("error-tolerance,e",

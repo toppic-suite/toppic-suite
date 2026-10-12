@@ -68,8 +68,8 @@ class TopfdPara {
   double getMsTwoSnRatio() const { return ms_two_sn_ratio_; }
   double getSplitIntensityRatio() const { return split_intensity_ratio_; }
   double getPrecWindowWidth() const { return prec_window_; }
-  // the score that ranks the envelopes (topfd's --env-rank, topdia's
-  // --deconv-score): "envcnn" or "msdeconv"
+  // the score that ranks the envelopes (--env-rank of topfd and topdia):
+  // "envcnn" or "msdeconv"
   static const std::vector<std::string>& getDeconvScores();
   const std::string& getDeconvScore() const { return deconv_score_; }
   bool isSortUseMsDeconv() const { return deconv_score_ == "msdeconv"; }
@@ -274,8 +274,8 @@ class TopfdPara {
   std::string activation_ = "FILE";
   // keep unused peaks in dynamic programming
   bool keep_unused_peaks_ = false;
-  // the score that ranks the envelopes (topfd's --env-rank, topdia's
-  // --deconv-score): "envcnn" (the EnvCNN score, the default) or "msdeconv"
+  // the score that ranks the envelopes (--env-rank of topfd and topdia):
+  // "envcnn" (the EnvCNN score, the default) or "msdeconv"
   // (the MS-Deconv score)
   std::string deconv_score_ = "envcnn";
   // the EnvCNN score cutoffs of the MS1 and MS/MS envelopes (topfd's
@@ -304,7 +304,7 @@ class TopfdPara {
   int ms1_min_scan_num_ = 1;
   // Minimum correlation between a seed envelope's intensities and the
   // theoretical ones in feature detection (EcscorePara). TopDIA sets it per
-  // stage from its -p (MS1) / -P (MS2) options; TopFD uses the default.
+  // stage from its -y (MS1) / -Y (MS2) options; TopFD uses the default.
   double seed_env_inte_corr_tole_cutoff_ = 0.5;
   int ms2_min_scan_num_ = 1;
 

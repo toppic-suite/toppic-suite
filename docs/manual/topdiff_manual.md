@@ -12,7 +12,8 @@ topdiff [options] spectrum-file ...
 ```
 
 `topdiff -h` prints the option list. The GUI tool `topdiff_gui` offers the
-same function. Paths must not contain spaces.
+same function. Avoid spaces in paths (the directory of the `topdiff`
+executable must not contain spaces).
 
 ## 1. Input
 
@@ -23,18 +24,21 @@ name is derived from the spectrum file: the extension and a trailing `_ms2`
 or `_post_ms2` are removed, and TopDiff then looks for, in this order,
 
 1. `<base>_post_ms2_<tool>_proteoform.xml`, the results of a TopPIC run
-   with its default post mass matching, and
-2. `<base>_ms2_<tool>_proteoform.xml`, the results of TopMG or of TopPIC
-   run with `--disable-post-match`,
+   with its default post mass matching (or of TopMG run on TopPIC's
+   `<base>_post_ms2.msalign`), and
+2. `<base>_ms2_<tool>_proteoform.xml`, the results of TopMG run on
+   `<base>_ms2.msalign` or of TopPIC run with `--disable-post-match`,
 
 where `<tool>` is `toppic` (the default) or `topmg` (`--tool-name topmg`).
 So for a sample deconvoluted by TopFD into `sample_ms2.msalign` and
 searched by TopPIC, either `sample_ms2.msalign` or `sample_post_ms2.msalign`
-can be given, and `sample_post_ms2_toppic_proteoform.xml` is read. TopDiff
-prints the name of each result file it reads. When neither file exists, the
-sample contributes no identifications and a warning "does not contain any
-PrSM identifications" is printed, so check that the search finished for
-every sample.
+can be given, and `sample_post_ms2_toppic_proteoform.xml` is read. TopPIC
+run with `--average-mass` names its results after `sample_mono_post_ms2`
+(`sample_mono_ms2` with `--disable-post-match`); give its converted
+spectrum file `sample_mono_ms2.msalign`. TopDiff prints the name of each
+result file it reads. When neither file exists, the sample contributes no
+identifications and a warning "does not contain any PrSM identifications"
+is printed, so check that the search finished for every sample.
 
 - **Run TopPIC/TopMG with the TopFD feature file** (the default; not with
   `--no-topfd-feature`). Abundances and retention times come from the
@@ -69,9 +73,10 @@ accession, precursor mass and aligned retention time.
 5. **Writes** the table and prints the number of proteoform rows and how
    many of them were found in all samples.
 
-The console prints the result file read for each sample, then
-`Aligning retention times of sample <k> - started/finished` for samples 2
-to n and `Matching proteoforms across samples - started/finished`.
+The console prints, for each sample in turn, the result file it reads
+(`Reading <file>`) and, for samples 2 to n,
+`Aligning retention times of sample <k> - started/finished`, then
+`Matching proteoforms across samples - started/finished`.
 
 ## 3. Output
 

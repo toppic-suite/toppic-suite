@@ -346,7 +346,8 @@ writers, and nothing checks them against the code, so:
 - `topfd_manual.md` specifics: its examples use no `-a` (activation
   defaults to `FILE`), and `-T`-mode claims must be checked against
   `topfd_single_process.cpp` (that mode ignores the MS1/feature options).
-- TopDIA's `-p`/`-P` options set `TopfdPara::seed_env_inte_corr_tole_cutoff_`
+- TopDIA's `-y`/`-Y` options (`-p`/`-P` until 2026-10-08) set
+  `TopfdPara::seed_env_inte_corr_tole_cutoff_`
   (copied into `EcscorePara` by `env_coll_detect::processMs1/processMs2`)
   before each feature-detection stage; both default to 0.5, the value the
   detector had hard-coded, so default runs are unchanged. TopPIC's
@@ -1559,9 +1560,10 @@ instead of the input. Facts to keep straight:
   from the modification file itself, and `TopPIC_topmg_identify` searches
   every spectrum with an empty `raw_prsm_ext`.
 - **GUI wiring.** `toppicwindow.ui` has `postMassMatchCheckBox` (checked by
-  default from the parser's argument map, enables `postMinPeakNumEdit`) on the
-  bottom row of the Advanced Parameters tab; `gui/util/command.cpp` emits
-  `-D` when the box is **cleared** and `-I <n>` only while it is checked.
+  default from the parser's argument map) on the Basic Parameters tab;
+  `gui/util/command.cpp` emits `-D` when the box is **cleared**. The GUI has
+  no field for `-I`: `toppicwindow.cpp` erases `postMinPeakNum` from the
+  arguments, so toppic uses its default (1).
 - **Short options in `toppic_argument.cpp` are nearly exhausted.** Before
   adding one, list the letters in use with
   `grep -oE '"[a-z-]+,[A-Za-z]"' src/console/toppic_argument.cpp`; a clash is
