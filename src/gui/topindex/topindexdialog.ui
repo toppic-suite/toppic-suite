@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>920</width>
-    <height>602</height>
+    <height>522</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -19,13 +19,13 @@
   <property name="minimumSize">
    <size>
     <width>920</width>
-    <height>590</height>
+    <height>510</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
     <width>920</width>
-    <height>790</height>
+    <height>710</height>
    </size>
   </property>
   <property name="windowTitle">
@@ -40,7 +40,7 @@
     <property name="geometry">
      <rect>
       <x>30</x>
-      <y>540</y>
+      <y>460</y>
       <width>861</width>
       <height>41</height>
      </rect>
@@ -111,7 +111,7 @@
     <property name="geometry">
      <rect>
       <x>30</x>
-      <y>310</y>
+      <y>230</y>
       <width>861</width>
       <height>221</height>
      </rect>
@@ -230,7 +230,7 @@ p, li { white-space: pre-wrap; }
      <widget class="QWidget" name="horizontalLayoutWidget_precTole">
       <property name="geometry">
        <rect>
-      <x>386</x>
+      <x>333</x>
       <y>120</y>
       <width>321</width>
       <height>31</height>
@@ -283,7 +283,7 @@ p, li { white-space: pre-wrap; }
    <widget class="QWidget" name="horizontalLayoutWidget_14">
     <property name="geometry">
      <rect>
-        <x>386</x>
+        <x>333</x>
         <y>160</y>
         <width>321</width>
         <height>31</height>
@@ -336,43 +336,31 @@ p, li { white-space: pre-wrap; }
    <widget class="QWidget" name="horizontalLayoutWidget_22">
     <property name="geometry">
      <rect>
-      <x>386</x>
-      <y>200</y>
-      <width>321</width>
-      <height>31</height>
+      <x>697</x>
+      <y>120</y>
+      <width>194</width>
+      <height>33</height>
      </rect>
     </property>
     <layout class="QHBoxLayout" name="horizontalLayout_22">
      <item alignment="Qt::AlignLeft">
       <widget class="QLabel" name="label_23">
-       <property name="minimumSize">
-        <size>
-         <width>200</width>
-         <height>0</height>
-        </size>
-       </property>
-       <property name="maximumSize">
-        <size>
-         <width>200</width>
-         <height>16777215</height>
-        </size>
-       </property>
        <property name="text">
         <string>Thread number:</string>
        </property>
       </widget>
      </item>
-     <item alignment="Qt::AlignRight">
+     <item>
       <widget class="QLineEdit" name="threadNumberEdit">
        <property name="minimumSize">
         <size>
-         <width>110</width>
+         <width>80</width>
          <height>0</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
-         <width>110</width>
+         <width>80</width>
          <height>16777215</height>
         </size>
        </property>
@@ -389,8 +377,8 @@ p, li { white-space: pre-wrap; }
    <widget class="QWidget" name="horizontalLayoutWidget_21">
     <property name="geometry">
      <rect>
-      <x>386</x>
-      <y>240</y>
+      <x>697</x>
+      <y>160</y>
       <width>151</width>
       <height>33</height>
      </rect>
@@ -410,7 +398,7 @@ p, li { white-space: pre-wrap; }
      <rect>
       <x>30</x>
       <y>120</y>
-      <width>341</width>
+      <width>260</width>
       <height>91</height>
      </rect>
     </property>
@@ -422,7 +410,7 @@ p, li { white-space: pre-wrap; }
       <rect>
        <x>9</x>
        <y>17</y>
-       <width>321</width>
+       <width>241</width>
        <height>70</height>
       </rect>
      </property>
