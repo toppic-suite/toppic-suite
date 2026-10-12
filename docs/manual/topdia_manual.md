@@ -119,7 +119,7 @@ Deconvolution:
 | `-r`, `--ms-one-sn-ratio <number>` | 3 | Signal-to-noise ratio for MS1 spectra. |
 | `-s`, `--ms-two-sn-ratio <number>` | 1 | Signal-to-noise ratio for MS/MS spectra. |
 | `-w`, `--precursor-window <number>` | 4.0 (TopFD: 3.0) | Default isolation window width (m/z), used only when the file records none. |
-| `-n`, `--msdeconv` | off | Rank isotopic envelopes with the MS-Deconv score instead of EnvCNN. |
+| `-n`, `--deconv-score <envcnn\|msdeconv>` | envcnn | The score that ranks isotopic envelopes: `envcnn`, the EnvCNN score, or `msdeconv`, the MS-Deconv score. In `topdia_gui`: "Use MS-Deconv score" (`msdeconv` when checked). |
 | `-p`, `--deconv-ms1 <greedy\|msdeconv>` | msdeconv (TopFD: greedy) | MS1 deconvolution method (section 2, step 1). In `topdia_gui`: "MS1 deconvolution". |
 | `-q`, `--deconv-ms2 <greedy\|msdeconv\|flashdeconv>` | msdeconv (TopFD: greedy) | MS/MS deconvolution method (section 2, step 3); `flashdeconv` is experimental. In `topdia_gui`: "MS/MS deconvolution". |
 | `-d`, `--final-filtering` | off | Filter the envelopes of MS/MS scans by the estimated number of fragment ions. |

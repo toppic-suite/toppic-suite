@@ -47,9 +47,7 @@ std::string geneTopfdCommand(const TopfdParaPtr& para_ptr,
   oss << "-t " << para_ptr->getMs1EcscoreCutoff() << " ";
   oss << "-b " << para_ptr->getMs1MinScanNum() << " ";
   command = command + oss.str();
-  if (para_ptr->isSortUseMsDeconv()) {
-    command = command + "-n ";
-  }
+  command = command + "--deconv-score " + para_ptr->getDeconvScore() + " ";
   if (para_ptr->isMissingLevelOne()) {
     command = command + "-o ";
   }
@@ -108,9 +106,8 @@ std::string geneTopdiaCommand(const TopfdParaPtr& topfd_para_ptr,
   oss << "-y " << topdia_para_ptr->getMs1SeedEnvInteCorrToleCutoff() << " ";
   oss << "-Y " << topdia_para_ptr->getMs2SeedEnvInteCorrToleCutoff() << " ";
   command = command + oss.str();
-  if (topfd_para_ptr->isSortUseMsDeconv()) {
-    command = command + "-n ";
-  }
+  command =
+      command + "--deconv-score " + topfd_para_ptr->getDeconvScore() + " ";
   if (topfd_para_ptr->isMissingLevelOne()) {
     command = command + "-o ";
   }

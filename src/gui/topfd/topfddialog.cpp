@@ -336,7 +336,8 @@ toppic::TopfdParaPtr TopFDDialog::getParaPtr() {
       std::stoi(ui->minScanNumEdit->text().toStdString()));
   para_ptr_->setThreadNum(
       std::stoi(ui->threadNumberEdit->text().toStdString()));
-  para_ptr_->setSortUseMsDeconv(ui->msDeconvCheckBox->isChecked());
+  para_ptr_->setDeconvScore(
+      ui->msDeconvCheckBox->isChecked() ? "msdeconv" : "envcnn");
   para_ptr_->setActivation(ui->activationComboBox->currentText().toStdString());
   para_ptr_->setAANumBasedFilter(ui->fragNumFilteringCheckBox->isChecked());
 

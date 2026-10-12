@@ -91,6 +91,8 @@ bool Argument::parse(int argc, char* argv[]) {
   // deconvolution methods
   std::string deconv_ms1 = "";
   std::string deconv_ms2 = "";
+  // the score that ranks the envelopes
+  std::string deconv_score = "";
 
   // Define and parse the program options
   try {
@@ -135,9 +137,10 @@ bool Argument::parse(int argc, char* argv[]) {
         "fragment ions; msdeconv, the MS-Deconv dynamic programming of "
         "earlier versions; or flashdeconv, the FLASHDeconv algorithm "
         "(experimental). The default value is greedy.")(
-        "msdeconv,n",
-        "Use the MS-Deconv score to rank isotopic envelopes. The default "
-        "method uses the EnvCNN score to rank isotopic envelopes.")(
+        "deconv-score,n", po::value<std::string>(&deconv_score),
+        "<envcnn|msdeconv>. Set the score used to rank isotopic envelopes: "
+        "envcnn, the EnvCNN score, or msdeconv, the MS-Deconv score. The "
+        "default value is envcnn.")(
         "env-cnn-cutoff,v", po::value<std::string>(&ms2_env_cnn_score_cutoff),
         "<a number in [0,1]>. Set the cutoff value for the EnvCNN score to "
         "filter out low-quality isotopic envelopes in MS/MS spectra. The "
@@ -322,8 +325,11 @@ bool Argument::parse(int argc, char* argv[]) {
       topfd_para_ptr_->setKeepUnusedPeaks(true);
     }
 
-    if (vm.count("msdeconv")) {
-      topfd_para_ptr_->setSortUseMsDeconv(true);
+    if (vm.count("deconv-score") &&
+        !topfd_para_ptr_->setDeconvScore(deconv_score)) {
+      LOG_ERROR("Deconvolution score " << deconv_score
+                << " should be envcnn or msdeconv.");
+      return false;
     }
 
     if (vm.count("max-mass")) {

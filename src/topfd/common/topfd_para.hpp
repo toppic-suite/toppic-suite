@@ -68,7 +68,11 @@ class TopfdPara {
   double getMsTwoSnRatio() const { return ms_two_sn_ratio_; }
   double getSplitIntensityRatio() const { return split_intensity_ratio_; }
   double getPrecWindowWidth() const { return prec_window_; }
-  bool isSortUseMsDeconv() const { return sort_use_msdeconv_; }
+  // the score that ranks the envelopes (--deconv-score of topfd and
+  // topdia): "envcnn" or "msdeconv"
+  static const std::vector<std::string>& getDeconvScores();
+  const std::string& getDeconvScore() const { return deconv_score_; }
+  bool isSortUseMsDeconv() const { return deconv_score_ == "msdeconv"; }
   bool isAANumBasedFilter() const { return aa_num_based_filter_; }
   double getMs2EnvCnnScoreCutoff() const { return ms2_env_cnn_score_cutoff_; }
   const std::string& getActivation() const { return activation_; }
@@ -147,7 +151,8 @@ class TopfdPara {
   void setMsTwoSnRatio(double ratio) { ms_two_sn_ratio_ = ratio; }
   void setSplitIntensityRatio(double ratio) { split_intensity_ratio_ = ratio; }
   void setPrecWindowWidth(double window) { prec_window_ = window; }
-  void setSortUseMsDeconv(bool use) { sort_use_msdeconv_ = use; }
+  // false, and the score unchanged, for a name not in getDeconvScores()
+  bool setDeconvScore(const std::string& score);
   void setAANumBasedFilter(bool filter) { aa_num_based_filter_ = filter; }
   void setMs2EnvCnnScoreCutoff(double cutoff) {
     ms2_env_cnn_score_cutoff_ = cutoff;
@@ -265,8 +270,9 @@ class TopfdPara {
   std::string activation_ = "FILE";
   // keep unused peaks in dynamic programming
   bool keep_unused_peaks_ = false;
-  // sorting using msdeconv, the default method is env_cnn score
-  bool sort_use_msdeconv_ = false;
+  // the score that ranks the envelopes (option --deconv-score): "envcnn"
+  // (the EnvCNN score, the default) or "msdeconv" (the MS-Deconv score)
+  std::string deconv_score_ = "envcnn";
   double ms2_env_cnn_score_cutoff_ = 0.0;
   bool aa_num_based_filter_ = false;
   bool output_csv_feature_file_ = false;

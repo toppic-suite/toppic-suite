@@ -129,6 +129,8 @@ bool Argument::parse(int argc, char* argv[]) {
   // deconvolution methods
   std::string deconv_ms1 = "";
   std::string deconv_ms2 = "";
+  // the score that ranks the envelopes
+  std::string deconv_score = "";
 
   // Define and parse the program options
   try {
@@ -157,7 +159,10 @@ bool Argument::parse(int argc, char* argv[]) {
         "<a positive number>. Set the signal-to-noise ratio for MS/MS "
         "spectra. The default value is 1.")(
         "missing-level-one,o", "MS1 spectra are missing in the input file.")(
-        "msdeconv,n", "Use the MS-Deconv score to rank isotopic envelopes.")(
+        "deconv-score,n", po::value<std::string>(&deconv_score),
+        "<envcnn|msdeconv>. Set the score used to rank isotopic envelopes: "
+        "envcnn, the EnvCNN score, or msdeconv, the MS-Deconv score. The "
+        "default value is envcnn.")(
         "deconv-ms1,p", po::value<std::string>(&deconv_ms1),
         "<greedy|msdeconv>. Set the deconvolution method of MS1 spectra: "
         "msdeconv, the MS-Deconv dynamic programming, or greedy, TopFD's "
@@ -322,8 +327,11 @@ bool Argument::parse(int argc, char* argv[]) {
       topfd_para_ptr_->setMsTwoHarmonicCheck(false);
     }
 
-    if (vm.count("msdeconv")) {
-      topfd_para_ptr_->setSortUseMsDeconv(true);
+    if (vm.count("deconv-score") &&
+        !topfd_para_ptr_->setDeconvScore(deconv_score)) {
+      LOG_ERROR("Deconvolution score " << deconv_score
+                << " should be envcnn or msdeconv.");
+      return false;
     }
 
     if (vm.count("deconv-ms1") &&

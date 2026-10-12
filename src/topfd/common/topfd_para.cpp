@@ -62,6 +62,20 @@ const std::vector<std::string>& TopfdPara::getMs2DeconvMethods() {
   return methods;
 }
 
+const std::vector<std::string>& TopfdPara::getDeconvScores() {
+  static const std::vector<std::string> scores = {"envcnn", "msdeconv"};
+  return scores;
+}
+
+bool TopfdPara::setDeconvScore(const std::string& score) {
+  const std::vector<std::string>& scores = getDeconvScores();
+  if (std::find(scores.begin(), scores.end(), score) == scores.end()) {
+    return false;
+  }
+  deconv_score_ = score;
+  return true;
+}
+
 bool TopfdPara::setMs1DeconvMethod(const std::string& method) {
   const std::vector<std::string>& methods = getMs1DeconvMethods();
   if (std::find(methods.begin(), methods.end(), method) == methods.end()) {
@@ -297,7 +311,8 @@ std::string TopfdPara::getTopfdParaStr(const std::string& prefix,
   kv("Activation type:") << activation_ << std::endl;
   kv("MS/MS signal/noise ratio:") << ms_two_sn_ratio_ << std::endl;
   kv("Fragment envelope ranking:")
-      << (sort_use_msdeconv_ ? "MS-Deconv score" : "EnvCNN score") << std::endl;
+      << (isSortUseMsDeconv() ? "MS-Deconv score" : "EnvCNN score")
+      << std::endl;
   kv("Fragment envelope EnvCNN score cutoff:")
       << ms2_env_cnn_score_cutoff_ << std::endl;
   // the ranking window and the harmonic check belong to MS-Deconv's MS/MS

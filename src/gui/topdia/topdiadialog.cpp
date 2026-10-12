@@ -324,7 +324,8 @@ void TopDIADialog::getParaPtr() {
       std::stod(ui->windowSizeEdit->text().toStdString()));
   topfd_para_ptr_->setThreadNum(
       std::stoi(ui->threadNumberEdit->text().toStdString()));
-  topfd_para_ptr_->setSortUseMsDeconv(ui->msDeconvCheckBox->isChecked());
+  topfd_para_ptr_->setDeconvScore(
+      ui->msDeconvCheckBox->isChecked() ? "msdeconv" : "envcnn");
   topfd_para_ptr_->setActivation(
       ui->activationComboBox->currentText().toStdString());
   topfd_para_ptr_->setAANumBasedFilter(

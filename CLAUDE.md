@@ -525,6 +525,16 @@ command emits `-y` and `-Y`). Facts to keep straight:
   hidden `--ms1-greedy-deconv` / `--ms2-greedy-deconv`, and the short-lived
   `--deconv-ms1-msdeconv` / `--deconv-ms2-msdeconv` of commit b3d71867.
   The letter `-F` is free in topfd.
+- **The envelope ranking score** (2026-10-12): `-n`/`--deconv-score
+  <envcnn|msdeconv>` (default `envcnn`) replaces the flag `-n`/`--msdeconv`
+  (unrecognised now) in topfd and topdia. `TopfdPara` stores the name
+  (`deconv_score_`; `getDeconvScores()` lists the values, `setDeconvScore`
+  returns false for any other, which both parsers report), and
+  `isSortUseMsDeconv()` is `deconv_score_ == "msdeconv"`, so the
+  deconvolutions and the parameter block's "Fragment envelope ranking" line
+  are unchanged. The GUIs keep their checkboxes (topfd_gui "Sort using
+  MS-Deconv score", topdia_gui "Use MS-Deconv score", `msDeconvCheckBox`),
+  and `gui/util/command.cpp` always emits `--deconv-score <score>`.
 - **GUI wiring**: `topfddialog.ui` and `topdiadialog.ui` have
   `ms1DeconvComboBox` and `ms2DeconvComboBox`, whose item texts are the
   option values (as `activationComboBox`'s are), set from the dialog's
