@@ -564,7 +564,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
          <bool>false</bool>
         </property>
         <property name="text">
-         <string>Enable final filtering</string>
+         <string>Enable frag num filtering</string>
         </property>
         <property name="checkable">
          <bool>true</bool>
