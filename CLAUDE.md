@@ -23,29 +23,31 @@ in the same commit as the code (as this file was before 2026-10-12).
   - MS3 spectral deconvolution
   - Activation of MS/MS spectra
   - Isotope distributions
-- `.claude/tools/toppic.md` — TopPIC (also topindex's index files, topcalib, and the PrSM tables topmg shares):
-  - Post mass matching
-  - ProForma strings
-  - Average masses in msalign files
+- `.claude/tools/toppic_search.md` — TopPIC tolerances, filters and searches (also the index files topindex writes):
   - Precursor and fragment mass tolerances
   - Precursor error tolerance in Dalton
   - Precursor +-1 Da error per identification stage
-  - E-values of PrSMs found at a +-1 isotope offset
-  - E-values of the variable PTM PrSMs with modified residues
   - Precursor refinement of the variable PTM search
   - Precursor refinement of the shift searches
   - The filters' mass list
   - Tag filter
   - Second alignment of the shift searches
   - Large-shift penalty of the shift alignments
-  - Tolerance of the complementary PRM peaks in the E-values
   - Range of a variable PTM shift
-  - Deamidation or the -1 isotope offset
   - Truncation N-terminal modifications
+  - Index files version 2, the combined filter pass and the E-value stage (toppic_test experiment 150)
+- `.claude/tools/toppic_evalue.md` — TopPIC E-values and FDRs:
+  - E-values of PrSMs found at a +-1 isotope offset
+  - E-values of the variable PTM PrSMs with modified residues
+  - Tolerance of the complementary PRM peaks in the E-values
+  - Deamidation or the -1 isotope offset
+  - Rescoring of the PrSMs
+- `.claude/tools/toppic_output.md` — TopPIC after the search (also topcalib, and the PrSM tables topmg writes too):
+  - Post mass matching
+  - ProForma strings
+  - Average masses in msalign files
   - Proteoform classification
   - PTM localization by a variable PTM search
-  - Index files version 2, the combined filter pass and the E-value stage (toppic_test experiment 150)
-  - Rescoring of the PrSMs
   - The second precursor search
   - Two-pass m/z recalibration
 - `.claude/tools/topmg.md` — TopMG:
@@ -461,7 +463,7 @@ above it, never the reverse:
   `factory`, `env` (envelope detection), `feature`, `mzml`, `calib` (the
   two-pass m/z recalibration of topcalib and toppic `--mass-calib`, with
   the corrected database of `sqlite_mass_calib`, see
-  `.claude/tools/toppic.md`).
+  `.claude/tools/toppic_output.md`).
   `MsAlignReader` has a four-argument constructor taking an EnvCNN score
   cutoff (`SpPara::getEnvCnnCutoff()`, whose own default is 0.2, but both
   toppic and topmg set the key from their `-F` (`--filter-by-score`; the
@@ -536,7 +538,8 @@ above it, never the reverse:
   `prsm_sql_writer` (the same columns as `prsm`/`proteoform`/`protein` tables, plus
   `prsm_mass_shift` and `prsm_protein_match`) are built on it.
   `prsm_second_prec` is the second precursor search and `prsm_mass_calib`
-  reads the calibrants of `--mass-calib` (see `.claude/tools/toppic.md`).
+  reads the calibrants of `--mass-calib` (see
+  `.claude/tools/toppic_output.md`).
   `prsm_sql_output::write` is the one entry point that writes those tables
   plus `seq/fasta_sql_writer`'s `fasta_seq` table into the database it is
   given when it exists (toppic: its `<base>_toppic.sqlite`; topmg: the
@@ -625,7 +628,9 @@ above it, never the reverse:
   the PTM localization (`local`, and its alternative `local_align`) and
   the rescoring of the PrSMs before the FDR (`rescore`, `--rescore`);
   `tdgf/cluster_prot_corrector` is here rather than in `prsm` because it
-  recomputes E-values (all in `.claude/tools/toppic.md`).
+  recomputes E-values (see `.claude/tools/toppic_output.md` for the
+  localization and the correction, `.claude/tools/toppic_evalue.md` for
+  the E-values and the rescoring).
 - `src/merge` — the topdiff feature-merge backend (`feature_prsm`,
   `feature_sample_merge`), used by `console/topdiff_process`.
 - `src/toplib` — toplib_build's spectral library building and

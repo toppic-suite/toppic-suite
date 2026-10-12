@@ -3,9 +3,10 @@
 Facts to keep straight when changing topmg's graph alignment
 (`src/search/graph`, `src/search/graphalign`, `src/stat/mcmc`,
 `console/topmg_*`) and topmg_gui. toppic hosts the same identification
-with `--topmg`. The notes on what topmg shares with toppic (the
-filters' mass list, the tolerances, the PrSM tables, ProForma strings
-and the proteoform classification) are in `toppic.md`.
+with `--topmg`. The notes on what topmg shares with toppic are in the
+TopPIC files: the filters' mass list and the tolerances in
+`toppic_search.md`, the PrSM tables, ProForma strings and the proteoform
+classification in `toppic_output.md`.
 Moved out of the repository's `CLAUDE.md` on 2026-10-12; the code-wide
 conventions, the dependencies and the source layout are there.
 
@@ -112,8 +113,8 @@ not a variable PTM. Facts to keep straight:
   for toppic's own PrSMs.
 - **Truncation N-terminal modifications** (proteoform N-terminal variable
   PTMs, Position `N-term` of the PTM file; toppic's since experiment 100,
-  "Truncation N-terminal modifications" in `toppic.md`). The graph has no
-  edge for
+  "Truncation N-terminal modifications" in `toppic_search.md`). The graph
+  has no edge for
   them: `GraphAlign::getConsistentPairs` also matches each distance of the
   spectrum's zero vertex (the N-terminus) with proteoform distances m
   shorter (m: each N-term mass, `GraphAlignMng::n_term_int_masses_`, filled
@@ -177,7 +178,7 @@ A FASTA sequence can carry PTMs in the extended format, a residue followed
 by the PTM's abbreviation of `res/base_data/ptm_base.xml` in brackets
 (`M[Oxidation]`, `C[Carbamidomethyl]`; the names of earlier versions, such
 as `C[Carbamidomethylation]`, are no longer read, see "ProForma strings"
-in `toppic.md`).
+in `toppic_output.md`).
 `FastaSeq::compAcidPtmPairVec` takes a name up to the `]` that closes its
 `[`, counting nested pairs, so the 51 Unimod names with brackets can be
 written (`E[Cation:Mg[II]]`; it used to stop at the first `]`); an
