@@ -568,14 +568,21 @@ command emits `-y` and `-Y`). Facts to keep straight:
   default `TopfdPara` (TopFD: a default-constructed one; TopDIA:
   `Argument::getTopfdParaPtrForTopdia`) and read back with
   `setMs1DeconvMethod(currentText())`; `gui/util/command.cpp` always emits
-  `--deconv-ms1 <m> --deconv-ms2 <m>`. In topfd_gui they are the third
-  column's rows 2 and 3, under Thread number (they came in as rows 4 and 5,
+  `--deconv-ms1 <m> --deconv-ms2 <m>`. In topfd_gui they are the middle
+  column's rows 3 and 4, "MS1 deconvolution" and "MS2 deconvolution" (was
+  "MS/MS deconvolution"; they came in as the third column's rows 4 and 5,
   the window grew by 40 pixels, and the former "Use FLASHDeconv for MS/MS"
-  checkbox is gone; on 2026-10-12 the first column became maximum charge,
-  maximum mass, m/z error, "Default prec window" (was "Default precursor
-  window (m/z)", the third column's row 1) and fragmentation (the third
-  column's row 2), and "Feature min scan num" moved from the first column's
-  row 4 to the second column's row 5); in topdia_gui the middle
+  checkbox is gone). Since 2026-10-12 topfd_gui's parameters are three
+  columns of five rows, 281 pixels wide at x = 30, 340 and 650 (the check
+  box columns of "Additional settings" start at the same x): maximum
+  charge, maximum mass, m/z error, "Default prec window" (was "Default
+  precursor window (m/z)"), fragmentation; MS1 and MS2 S/N ratio, the two
+  deconvolution drop-downs (115 pixels: "flashdeconv" needs 111), thread
+  number; "MS1 EnvCNN cutoff" and "MS2 EnvCNN cutoff" (`ms1EnvCnnCutoffEdit`,
+  `ms2EnvCnnCutoffEdit`, set from `TopfdPara`'s defaults 0.2 and 0, read
+  back with `setMs1EnvCnnScoreCutoff` / `setMs2EnvCnnScoreCutoff`; the
+  command emits `-f` and `-g`), ECScore cutoff, feature split ratio,
+  feature min scan num. In topdia_gui the middle
   column's rows 3 and 4, above the MS1 and MS2 ECScore cutoffs ("Use
   single scan noise level" moved into the Additional settings box). The
   forms place widgets at fixed coordinates, so moving one means editing the

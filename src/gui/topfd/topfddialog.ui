@@ -98,7 +98,7 @@
      <rect>
       <x>30</x>
       <y>320</y>
-      <width>241</width>
+      <width>281</width>
       <height>42</height>
      </rect>
     </property>
@@ -191,7 +191,7 @@
      <rect>
       <x>30</x>
       <y>160</y>
-      <width>241</width>
+      <width>281</width>
       <height>42</height>
      </rect>
     </property>
@@ -247,7 +247,7 @@
      <rect>
       <x>30</x>
       <y>200</y>
-      <width>241</width>
+      <width>281</width>
       <height>42</height>
      </rect>
     </property>
@@ -297,7 +297,7 @@
      <rect>
       <x>30</x>
       <y>240</y>
-      <width>241</width>
+      <width>281</width>
       <height>42</height>
      </rect>
     </property>
@@ -339,9 +339,9 @@
    <widget class="QWidget" name="horizontalLayoutWidget_5">
     <property name="geometry">
      <rect>
-      <x>300</x>
+      <x>340</x>
       <y>160</y>
-      <width>271</width>
+      <width>281</width>
       <height>42</height>
      </rect>
     </property>
@@ -456,7 +456,7 @@
      <rect>
       <x>30</x>
       <y>280</y>
-      <width>241</width>
+      <width>281</width>
       <height>42</height>
      </rect>
     </property>
@@ -515,9 +515,9 @@ p, li { white-space: pre-wrap; }
    <widget class="QWidget" name="horizontalLayoutWidget_9">
     <property name="geometry">
      <rect>
-      <x>300</x>
+      <x>340</x>
       <y>200</y>
-      <width>271</width>
+      <width>281</width>
       <height>42</height>
      </rect>
     </property>
@@ -557,9 +557,9 @@ p, li { white-space: pre-wrap; }
    <widget class="QWidget" name="horizontalLayoutWidget_10">
     <property name="geometry">
      <rect>
-      <x>620</x>
-      <y>160</y>
-      <width>311</width>
+      <x>340</x>
+      <y>320</y>
+      <width>281</width>
       <height>42</height>
      </rect>
     </property>
@@ -581,13 +581,13 @@ p, li { white-space: pre-wrap; }
       <widget class="QLineEdit" name="threadNumberEdit">
        <property name="minimumSize">
         <size>
-         <width>75</width>
+         <width>70</width>
          <height>0</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
-         <width>75</width>
+         <width>70</width>
          <height>16777215</height>
         </size>
        </property>
@@ -675,7 +675,7 @@ p, li { white-space: pre-wrap; }
     <widget class="QWidget" name="horizontalLayoutWidget_15">
      <property name="geometry">
       <rect>
-       <x>590</x>
+       <x>620</x>
        <y>20</y>
        <width>234</width>
        <height>25</height>
@@ -709,7 +709,7 @@ p, li { white-space: pre-wrap; }
     <widget class="QWidget" name="horizontalLayoutWidget_16">
      <property name="geometry">
       <rect>
-       <x>270</x>
+       <x>310</x>
        <y>50</y>
        <width>270</width>
        <height>25</height>
@@ -737,7 +737,7 @@ p, li { white-space: pre-wrap; }
     <widget class="QWidget" name="horizontalLayoutWidget_20">
      <property name="geometry">
       <rect>
-       <x>270</x>
+       <x>310</x>
        <y>20</y>
        <width>270</width>
        <height>25</height>
@@ -767,7 +767,7 @@ p, li { white-space: pre-wrap; }
       <rect>
        <x>10</x>
        <y>80</y>
-       <width>320</width>
+       <width>271</width>
        <height>25</height>
       </rect>
      </property>
@@ -796,7 +796,7 @@ p, li { white-space: pre-wrap; }
     <widget class="QWidget" name="horizontalLayoutWidget_17">
      <property name="geometry">
       <rect>
-       <x>590</x>
+       <x>620</x>
        <y>50</y>
        <width>222</width>
        <height>25</height>
@@ -824,7 +824,7 @@ p, li { white-space: pre-wrap; }
     <widget class="QWidget" name="horizontalLayoutWidget_22">
      <property name="geometry">
       <rect>
-       <x>590</x>
+       <x>620</x>
        <y>80</y>
        <width>222</width>
        <height>25</height>
@@ -853,12 +853,100 @@ p, li { white-space: pre-wrap; }
      </layout>
     </widget>
    </widget>
-   <widget class="QWidget" name="horizontalLayoutWidget_6">
+   <widget class="QWidget" name="horizontalLayoutWidget_25">
     <property name="geometry">
      <rect>
-      <x>300</x>
+      <x>650</x>
+      <y>160</y>
+      <width>281</width>
+      <height>42</height>
+     </rect>
+    </property>
+    <layout class="QHBoxLayout" name="horizontalLayout_25">
+     <item>
+      <widget class="QLabel" name="label_13">
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>MS1 EnvCNN cutoff:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="ms1EnvCnnCutoffEdit">
+       <property name="minimumSize">
+        <size>
+         <width>40</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>70</width>
+         <height>16777215</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>0.2</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+    <widget class="QWidget" name="horizontalLayoutWidget_26">
+    <property name="geometry">
+     <rect>
+      <x>650</x>
+      <y>200</y>
+      <width>281</width>
+      <height>42</height>
+     </rect>
+    </property>
+    <layout class="QHBoxLayout" name="horizontalLayout_26">
+     <item>
+      <widget class="QLabel" name="label_14">
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>MS2 EnvCNN cutoff:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="ms2EnvCnnCutoffEdit">
+       <property name="minimumSize">
+        <size>
+         <width>40</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>70</width>
+         <height>16777215</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>0</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+    <widget class="QWidget" name="horizontalLayoutWidget_6">
+    <property name="geometry">
+     <rect>
+      <x>650</x>
       <y>240</y>
-      <width>271</width>
+      <width>281</width>
       <height>42</height>
      </rect>
     </property>
@@ -900,9 +988,9 @@ p, li { white-space: pre-wrap; }
    <widget class="QWidget" name="horizontalLayoutWidget_18">
     <property name="geometry">
      <rect>
-      <x>300</x>
+      <x>650</x>
       <y>320</y>
-      <width>271</width>
+      <width>281</width>
       <height>42</height>
      </rect>
     </property>
@@ -944,9 +1032,9 @@ p, li { white-space: pre-wrap; }
    <widget class="QWidget" name="horizontalLayoutWidget_19">
     <property name="geometry">
      <rect>
-      <x>300</x>
+      <x>650</x>
       <y>280</y>
-      <width>271</width>
+      <width>281</width>
       <height>42</height>
      </rect>
     </property>
@@ -988,9 +1076,9 @@ p, li { white-space: pre-wrap; }
    <widget class="QWidget" name="horizontalLayoutWidget_23">
     <property name="geometry">
      <rect>
-      <x>620</x>
-      <y>200</y>
-      <width>311</width>
+      <x>340</x>
+      <y>240</y>
+      <width>281</width>
       <height>42</height>
      </rect>
     </property>
@@ -1012,7 +1100,7 @@ p, li { white-space: pre-wrap; }
       <widget class="QComboBox" name="ms1DeconvComboBox">
        <property name="maximumSize">
         <size>
-         <width>100</width>
+         <width>115</width>
          <height>16777215</height>
         </size>
        </property>
@@ -1036,9 +1124,9 @@ p, li { white-space: pre-wrap; }
    <widget class="QWidget" name="horizontalLayoutWidget_24">
     <property name="geometry">
      <rect>
-      <x>620</x>
-      <y>240</y>
-      <width>311</width>
+      <x>340</x>
+      <y>280</y>
+      <width>281</width>
       <height>42</height>
      </rect>
     </property>
@@ -1052,7 +1140,7 @@ p, li { white-space: pre-wrap; }
      <item>
       <widget class="QLabel" name="ms2DeconvLabel">
        <property name="text">
-        <string>MS/MS deconvolution:</string>
+        <string>MS2 deconvolution:</string>
        </property>
       </widget>
      </item>
@@ -1060,7 +1148,7 @@ p, li { white-space: pre-wrap; }
       <widget class="QComboBox" name="ms2DeconvComboBox">
        <property name="maximumSize">
         <size>
-         <width>100</width>
+         <width>115</width>
          <height>16777215</height>
         </size>
        </property>

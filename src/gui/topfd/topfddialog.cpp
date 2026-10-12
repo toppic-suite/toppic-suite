@@ -60,6 +60,10 @@ TopFDDialog::TopFDDialog(QWidget* parent)
   ui->threadNumberEdit->setValidator(new QIntValidator(0, 1000, this));
   ui->minScanNumEdit->setValidator(new QIntValidator(1, 3, this));
   ui->ecscoreCutoffEdit->setValidator(new QDoubleValidator(0.0, 1.0, 4, this));
+  ui->ms1EnvCnnCutoffEdit->setValidator(
+      new QDoubleValidator(0.0, 1.0, 4, this));
+  ui->ms2EnvCnnCutoffEdit->setValidator(
+      new QDoubleValidator(0.0, 1.0, 4, this));
   QRegularExpression rx3("^\\d{1,4}\\.\\d{0,2}|10000$");
   QRegularExpressionValidator* validator3 = new QRegularExpressionValidator(rx3, this);
   ui->windowSizeEdit->setValidator(validator3);
@@ -124,6 +128,10 @@ void TopFDDialog::on_defaultButton_clicked() {
   ui->threadNumberEdit->setText(QString::number(para_ptr->getThreadNum()));
   ui->ecscoreCutoffEdit->setText(
       QString::number(para_ptr->getMs1EcscoreCutoff()));
+  ui->ms1EnvCnnCutoffEdit->setText(
+      QString::number(para_ptr->getMs1EnvCnnScoreCutoff()));
+  ui->ms2EnvCnnCutoffEdit->setText(
+      QString::number(para_ptr->getMs2EnvCnnScoreCutoff()));
   ui->minScanNumEdit->setText(QString::number(para_ptr->getMs1MinScanNum()));
   ui->msDeconvCheckBox->setChecked(para_ptr->isSortUseMsDeconv());
   ui->missLevelOneCheckBox->setChecked(para_ptr->isMissingLevelOne());
@@ -332,6 +340,10 @@ toppic::TopfdParaPtr TopFDDialog::getParaPtr() {
   para_ptr_->setMissingLevelOne(ui->missLevelOneCheckBox->isChecked());
   para_ptr_->setMs1EcscoreCutoff(
       std::stod(ui->ecscoreCutoffEdit->text().toStdString()));
+  para_ptr_->setMs1EnvCnnScoreCutoff(
+      std::stod(ui->ms1EnvCnnCutoffEdit->text().toStdString()));
+  para_ptr_->setMs2EnvCnnScoreCutoff(
+      std::stod(ui->ms2EnvCnnCutoffEdit->text().toStdString()));
   para_ptr_->setMs1MinScanNum(
       std::stoi(ui->minScanNumEdit->text().toStdString()));
   para_ptr_->setThreadNum(
@@ -377,6 +389,8 @@ void TopFDDialog::lockDialog() {
   ui->activationComboBox->setEnabled(false);
   ui->fragNumFilteringCheckBox->setEnabled(false);
   ui->ecscoreCutoffEdit->setEnabled(false);
+  ui->ms1EnvCnnCutoffEdit->setEnabled(false);
+  ui->ms2EnvCnnCutoffEdit->setEnabled(false);
   ui->disableAdditionalFeatureSearchCheckBox->setEnabled(false);
   ui->singleScanNoiseLevelCheckBox->setEnabled(false);
   ui->noSqlCheckBox->setEnabled(false);
@@ -408,6 +422,8 @@ void TopFDDialog::unlockDialog() {
   ui->activationComboBox->setEnabled(true);
   ui->fragNumFilteringCheckBox->setEnabled(true);
   ui->ecscoreCutoffEdit->setEnabled(true);
+  ui->ms1EnvCnnCutoffEdit->setEnabled(true);
+  ui->ms2EnvCnnCutoffEdit->setEnabled(true);
   ui->disableAdditionalFeatureSearchCheckBox->setEnabled(true);
   ui->singleScanNoiseLevelCheckBox->setEnabled(true);
   ui->noSqlCheckBox->setEnabled(true);
@@ -475,6 +491,18 @@ bool TopFDDialog::checkError() {
   if (ui->ecscoreCutoffEdit->text().isEmpty()) {
     QMessageBox::warning(this, tr("Warning"), tr("ECScore cutoff is empty!"),
                          QMessageBox::Yes);
+    return true;
+  }
+
+  if (ui->ms1EnvCnnCutoffEdit->text().isEmpty()) {
+    QMessageBox::warning(this, tr("Warning"),
+                         tr("MS1 EnvCNN cutoff is empty!"), QMessageBox::Yes);
+    return true;
+  }
+
+  if (ui->ms2EnvCnnCutoffEdit->text().isEmpty()) {
+    QMessageBox::warning(this, tr("Warning"),
+                         tr("MS2 EnvCNN cutoff is empty!"), QMessageBox::Yes);
     return true;
   }
   if (ui->threadNumberEdit->text().toInt() >
