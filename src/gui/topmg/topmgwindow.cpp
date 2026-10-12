@@ -571,7 +571,7 @@ bool TopmgWindow::checkError() {
   }
   if (ui->envCnnCutoffEdit->text().isEmpty()) {
     QMessageBox::warning(this, tr("Warning"),
-                         tr("EnvCNN score cutoff is empty!"), QMessageBox::Yes);
+                         tr("Confidence score cutoff is empty!"), QMessageBox::Yes);
     return true;
   }
   if (ui->formErrorToleranceEdit->text().isEmpty()) {

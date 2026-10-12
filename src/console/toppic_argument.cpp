@@ -376,7 +376,7 @@ void ToppicArgument::outputArguments(
   output << std::setw(gap) << std::left
          << "Error tolerance for fragment masses:" << sep
          << arguments["fragErrorTolerance"] << " ppm" << std::endl;
-  output << std::setw(gap) << std::left << "EnvCNN score cutoff:" << sep
+  output << std::setw(gap) << std::left << "Confidence score cutoff:" << sep
          << arguments["envCnnCutoff"] << std::endl;
   output << std::setw(gap) << std::left
          << "Fragment mass deduplication:" << sep
@@ -1498,13 +1498,13 @@ bool ToppicArgument::validateArguments() {
   try {
     double cutoff = std::stod(env_cnn_cutoff_value);
     if (cutoff < 0 || cutoff > 1) {
-      LOG_ERROR("EnvCNN score cutoff: "
+      LOG_ERROR("Confidence score cutoff: "
                 << env_cnn_cutoff_value
                 << " error! The value should be between 0 and 1.");
       return false;
     }
   } catch (const std::exception& ex) {
-    LOG_ERROR("EnvCNN score cutoff: " << env_cnn_cutoff_value
+    LOG_ERROR("Confidence score cutoff: " << env_cnn_cutoff_value
                                       << " should be a number.");
     return false;
   }

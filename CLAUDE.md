@@ -4186,7 +4186,9 @@ above it, never the reverse:
   cutoff (`SpPara::getEnvCnnCutoff()`, whose own default is 0.2, but both
   toppic and topmg set the key from their `-F` (`--filter-by-score`; the
   fourth msalign column is TopFD's EnvCNN score or TopDIA's pseudo score;
-  `--filter-by-envcnn` until 2026-10-12), which defaults to 0.4 in
+  `--filter-by-envcnn` until 2026-10-12; the parameter block and
+  topmg_gui say "Confidence score cutoff", "EnvCNN score cutoff" before),
+  which defaults to 0.4 in
   each): masses whose fourth
   msalign column is below it are skipped, keeping the file's peak ids. The
   filter, search and E-value/p-value stages (`filter/*`, `search/*`,

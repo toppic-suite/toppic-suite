@@ -775,12 +775,12 @@ level:</string>
         <widget class="QLabel" name="label_envCnn">
          <property name="minimumSize">
           <size>
-           <width>160</width>
+           <width>180</width>
            <height>0</height>
           </size>
          </property>
          <property name="text">
-          <string>EnvCNN score cutoff:</string>
+          <string>Confidence score cutoff:</string>
          </property>
         </widget>
        </item>

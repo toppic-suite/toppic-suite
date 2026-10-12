@@ -419,9 +419,9 @@ std::map<std::string, std::string> ToppicWindow::getArguments() {
     arguments_["rescore"] = "false";
   }
   arguments_["localThreshold"] = ui->miscoreThresholdEdit->text().toStdString();
-  // the EnvCNN score cutoff and the minimum isotopic peak number of post mass
-  // matching are not shown by the GUI, so the command line leaves them out and
-  // toppic applies its own defaults
+  // the confidence score cutoff (-F) and the minimum isotopic peak number of
+  // post mass matching are not shown by the GUI, so the command line leaves
+  // them out and toppic applies its own defaults
   arguments_.erase("envCnnCutoff");
   arguments_.erase("postMinPeakNum");
   arguments_["groupSpectrumNumber"] = ui->numCombinedEdit->text().toStdString();
