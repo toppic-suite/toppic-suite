@@ -645,7 +645,8 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
             "linear support vector machine trained on the target and decoy "
             "PrSMs with 3-fold cross-validation. At each level, the E-value "
             "is used instead when it gives more identifications within the "
-            "FDR cutoff. Requires -d. Default value: false.")(
+            "FDR cutoff. Note that the rescoring may underestimate the FDRs. "
+            "Requires -d. Default value: false.")(
             "approximate-spectra,A",
             "Use approximate spectra to increase the sensitivity in protein "
             "filtering. Default value: false.")(
