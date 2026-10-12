@@ -569,8 +569,13 @@ command emits `-y` and `-Y`). Facts to keep straight:
   `Argument::getTopfdParaPtrForTopdia`) and read back with
   `setMs1DeconvMethod(currentText())`; `gui/util/command.cpp` always emits
   `--deconv-ms1 <m> --deconv-ms2 <m>`. In topfd_gui they are the third
-  column's rows 4 and 5 (the window grew by 40 pixels, and the former "Use
-  FLASHDeconv for MS/MS" checkbox is gone); in topdia_gui the middle
+  column's rows 2 and 3, under Thread number (they came in as rows 4 and 5,
+  the window grew by 40 pixels, and the former "Use FLASHDeconv for MS/MS"
+  checkbox is gone; on 2026-10-12 the first column became maximum charge,
+  maximum mass, m/z error, "Default prec window" (was "Default precursor
+  window (m/z)", the third column's row 1) and fragmentation (the third
+  column's row 2), and "Feature min scan num" moved from the first column's
+  row 4 to the second column's row 5); in topdia_gui the middle
   column's rows 3 and 4, above the MS1 and MS2 ECScore cutoffs ("Use
   single scan noise level" moved into the Additional settings box). The
   forms place widgets at fixed coordinates, so moving one means editing the

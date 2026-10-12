@@ -96,9 +96,9 @@
    <widget class="QWidget" name="horizontalLayoutWidget_13">
     <property name="geometry">
      <rect>
-      <x>620</x>
-      <y>200</y>
-      <width>311</width>
+      <x>30</x>
+      <y>320</y>
+      <width>241</width>
       <height>42</height>
      </rect>
     </property>
@@ -129,7 +129,7 @@
        </property>
        <property name="maximumSize">
         <size>
-         <width>75</width>
+         <width>80</width>
          <height>16777215</height>
         </size>
        </property>
@@ -454,9 +454,9 @@
    <widget class="QWidget" name="horizontalLayoutWidget_8">
     <property name="geometry">
      <rect>
-      <x>620</x>
-      <y>160</y>
-      <width>311</width>
+      <x>30</x>
+      <y>280</y>
+      <width>241</width>
       <height>42</height>
      </rect>
     </property>
@@ -470,7 +470,7 @@
         </size>
        </property>
        <property name="text">
-        <string>Default precursor window (m/z): </string>
+        <string>Default prec window: </string>
        </property>
       </widget>
      </item>
@@ -478,13 +478,13 @@
       <widget class="QLineEdit" name="windowSizeEdit">
        <property name="minimumSize">
         <size>
-         <width>75</width>
+         <width>70</width>
          <height>0</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
-         <width>75</width>
+         <width>70</width>
          <height>16777215</height>
         </size>
        </property>
@@ -558,7 +558,7 @@ p, li { white-space: pre-wrap; }
     <property name="geometry">
      <rect>
       <x>620</x>
-      <y>240</y>
+      <y>160</y>
       <width>311</width>
       <height>42</height>
      </rect>
@@ -900,9 +900,9 @@ p, li { white-space: pre-wrap; }
    <widget class="QWidget" name="horizontalLayoutWidget_18">
     <property name="geometry">
      <rect>
-      <x>30</x>
-      <y>280</y>
-      <width>241</width>
+      <x>300</x>
+      <y>320</y>
+      <width>271</width>
       <height>42</height>
      </rect>
     </property>
@@ -989,7 +989,7 @@ p, li { white-space: pre-wrap; }
     <property name="geometry">
      <rect>
       <x>620</x>
-      <y>280</y>
+      <y>200</y>
       <width>311</width>
       <height>42</height>
      </rect>
@@ -1037,7 +1037,7 @@ p, li { white-space: pre-wrap; }
     <property name="geometry">
      <rect>
       <x>620</x>
-      <y>320</y>
+      <y>240</y>
       <width>311</width>
       <height>42</height>
      </rect>
