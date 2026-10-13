@@ -827,6 +827,16 @@ level:</string>
          </property>
         </widget>
        </item>
+       <item>
+        <widget class="QCheckBox" name="noSqlCheckBox">
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Do not write an SQLite database. By default, when TopFD's database &amp;lt;name&amp;gt;.sqlite exists, topmg writes &amp;lt;name&amp;gt;_topmg.sqlite with its MS/MS envelope tables and the PrSM, proteoform and protein tables, for the visualization of the identifications; TopFD's database is only read. When checked, no SQLite file is written or changed; the other result files are the same. Default: off. (topmg -z, --no-sql)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+         <property name="text">
+          <string>Do not generate SQLite database</string>
+         </property>
+        </widget>
+       </item>
       </layout>
      </widget>
      <widget class="QWidget" name="horizontalLayoutWidget_22">

@@ -162,6 +162,8 @@ void TopmgWindow::on_defaultButton_clicked() {
       QString::fromStdString(arguments_["varPtmNumInGap"]));
   ui->keepDecoyCheckBox->setChecked(false);
   ui->keepTempCheckBox->setChecked(false);
+  // the SQLite database is written by default (topmg -z, --no-sql)
+  ui->noSqlCheckBox->setChecked(arguments_["noSql"] == "true");
 }
 
 void TopmgWindow::updatedir(QString s) {
@@ -358,6 +360,11 @@ std::map<std::string, std::string> TopmgWindow::getArguments() {
   } else {
     arguments_["keepDecoyResults"] = "false";
   }
+  if (ui->noSqlCheckBox->isChecked()) {
+    arguments_["noSql"] = "true";
+  } else {
+    arguments_["noSql"] = "false";
+  }
   if (ui->asfDiagCheckBox->isChecked()) {
     arguments_["useAsfDiag"] = "true";
   } else {
@@ -471,6 +478,7 @@ void TopmgWindow::lockDialog() {
   ui->maxVarPTMGap->setEnabled(false);
   ui->keepDecoyCheckBox->setEnabled(false);
   ui->keepTempCheckBox->setEnabled(false);
+  ui->noSqlCheckBox->setEnabled(false);
   ui->asfDiagCheckBox->setEnabled(false);
 }
 
@@ -518,6 +526,7 @@ void TopmgWindow::unlockDialog() {
   ui->maxVarPTMGap->setEnabled(true);
   ui->keepDecoyCheckBox->setEnabled(true);
   ui->keepTempCheckBox->setEnabled(true);
+  ui->noSqlCheckBox->setEnabled(true);
   ui->asfDiagCheckBox->setEnabled(true);
 }
 
@@ -692,6 +701,7 @@ void TopmgWindow::showArguments() {
        "\nnumOfTopPrsms:" + arguments_["numOfTopPrsms"] +
        "\nmaxShiftMass:" + arguments_["maxShiftMass"] +
        "\nkeepTempFiles:" + arguments_["keepTempFiles"] +
+       "\nnoSql:" + arguments_["noSql"] +
        "\ngroupSpectrumNumber:" + arguments_["groupSpectrumNumber"] +
        "\nasfFilteringResultNumber:" + arguments_["asfFilteringResultNumber"] +
        "\nvarModFileName:" + arguments_["varModFileName"] +

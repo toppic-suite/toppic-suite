@@ -301,6 +301,7 @@ std::map<std::string, std::string> topmg_para{
     {"useFeatureFile", "-x "},
     {"keepTempFiles", "-k "},
     {"keepDecoyResults", "-K "},
+    {"noSql", "-z "},
     {"combinedOutputName", "-c "},
     {"fragErrorTolerance", "-e "},
     {"precErrorTolerance", "-E "},
@@ -342,6 +343,11 @@ std::string geneTopmgCommand(std::map<std::string, std::string> arguments_,
         }
       } else if (it->first == "keepTempFiles" ||
                  it->first == "keepDecoyResults") {
+        if (it->second == "true") {
+          command = command + topmg_para[it->first];
+        }
+      } else if (it->first == "noSql") {
+        // -z (--no-sql): no SQLite database is written
         if (it->second == "true") {
           command = command + topmg_para[it->first];
         }

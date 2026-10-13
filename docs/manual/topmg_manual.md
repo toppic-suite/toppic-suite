@@ -198,7 +198,7 @@ Cutoffs and output:
 | `-u`, `--thread-number <int>` | 1 | Number of threads; must not exceed the number of hardware threads. Each protein filtering step may use fewer: it fits its thread number to the memory available when it starts (about 1 GiB per thread for ASF-One PTM filtering, 0.5 GiB for ASF-Diagonal filtering). The run starts with a warning listing the filtering steps that will use fewer threads and how many, and a step prints its number again if the memory available when it starts gives a different one. The graph alignment also fits its thread number to the memory available when it starts (0.5 GiB per thread, times (`-s` + 1) x (`-P` + 1) / 8 when that is more than 1: 0.75 GiB with the defaults) and prints a warning when it uses fewer threads. All other steps use the full number. |
 | `-k`, `--keep-temp-files` | off | Keep the intermediate files. |
 | `-K`, `--keep-decoy-ids` | off | Keep decoy identifications in the result tables. |
-| `-z`, `--no-sql` | off | Write no SQLite database: no `sample_topmg.sqlite`, and the identifications are not written to a database. The other result files are the same as without the option. |
+| `-z`, `--no-sql` | off | Write no SQLite database: no `sample_topmg.sqlite`, and the identifications are not written to a database. The other result files are the same as without the option. In `topmg_gui`: "Do not generate SQLite database" on the Basic Parameters tab. |
 
 ## 5. Examples
 
