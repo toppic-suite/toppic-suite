@@ -1079,5 +1079,11 @@ view (`topfd -D`) are one table:
 - **Page fill**: SQLite balances the pages of a `WITHOUT ROWID` table (an
   index B-tree) on every split, also on appends in key order, so
   `ms1_peak` is written about 88% full; only a rowid table's appends fill
-  their pages. A `VACUUM` packs it: 843 MB with `-D` and 839 without, in
-  3-4 s on 480_F3_02 (not done by TopFD).
+  their pages (writing the MS1 records in spectrum order does not help).
+  A `VACUUM` packs it: 843 MB with `-D` and 839 without, in 3-4 s on
+  480_F3_02. So TopFD and TopDIA end each database with
+  `TopfdPara::closeSqlDb()`: `VACUUM` (its copy in a temporary file,
+  `temp_store = FILE`, not in memory as `MzmlMsSqlWriter`'s setting would
+  put it; a failure is a warning and leaves the file as written), then
+  close. topfd `-T` does not (one spectrum); its database is closed by
+  `createSqlDb` or the destructor as before.

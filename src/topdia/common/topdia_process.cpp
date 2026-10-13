@@ -92,6 +92,7 @@ void processOneFileWithFaims(const TopfdParaPtr& topfd_para_ptr,
   pseudo_genrator_ptr->process(topfd_para_ptr, topdia_para_ptr);
   pseudo_genrator_ptr = nullptr;
   std::cout << "Pseudo spectrum generation finished." << std::endl;
+  topfd_para_ptr->closeSqlDb();
 }
 
 void processOneFile(const TopfdParaPtr& topfd_para_ptr,

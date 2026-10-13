@@ -21,6 +21,7 @@
 #include <cstdlib>
 #include <filesystem>
 #include <iomanip>
+#include <iostream>
 #include <ostream>
 #include <sstream>
 #include <string>
@@ -109,6 +110,37 @@ void TopfdPara::setMzmlFileNameAndFaims(const std::string& mzml_file_name,
   if (gene_sql_) {
     createSqlDb(sql_file_name_);
   }
+}
+
+// SQLite fills the pages of a WITHOUT ROWID table such as ms1_peak only
+// about 88% on appends, also in key order, and VACUUM rewrites the file
+// packed (toppic_test experiment 165: 894 -> 843 MB on 480_F3_02 with -D,
+// 3 s). Its copy is built in a temporary file, not in memory
+// (MzmlMsSqlWriter sets temp_store = MEMORY). A failed VACUUM leaves the
+// database as it was, so it is reported and the file closed.
+void TopfdPara::closeSqlDb() {
+  if (sql_db_ == nullptr) {
+    return;
+  }
+  std::string name =
+      std::filesystem::path(sqlite3_db_filename(sql_db_, "main"))
+          .filename()
+          .string();
+  std::cout << "Compacting the SQLite database " << name << " started."
+            << std::endl;
+  char* err = nullptr;
+  int rc = sqlite3_exec(sql_db_, "PRAGMA temp_store = FILE; VACUUM;", nullptr,
+                        nullptr, &err);
+  if (rc == SQLITE_OK) {
+    std::cout << "Compacting the SQLite database " << name << " finished."
+              << std::endl;
+  } else {
+    LOG_WARN("VACUUM of the SQLite database " << name << " failed: "
+                                             << (err != nullptr ? err : ""));
+  }
+  sqlite3_free(err);
+  sqlite3_close(sql_db_);
+  sql_db_ = nullptr;
 }
 
 void TopfdPara::createSqlDb(const std::string& sql_db_name) {

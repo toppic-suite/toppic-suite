@@ -112,7 +112,7 @@ FAIMS data `sample_<voltage>` per voltage level, e.g. `sample_-40`).
 | `sample_ms1.feature` | Proteoform features detected in the LC-MS map: one line per feature with its mass, intensity, retention-time and scan range, charge range, apex and ECScore. |
 | `sample_ms2.feature` | The features assigned to each MS/MS spectrum (precursor mass, m/z, charge and intensity), one line per spectrum and feature. |
 | `sample_feature.xml` | The proteoform features in XML, with their per-charge envelope information; read by TopMG when it combines fractions (`-c`). |
-| `sample.sqlite` | An SQLite database with the deconvoluted MS1 and MS/MS spectra and their peaks, for spectrum visualisation and for TopPIC's post mass matching (see the `-N` option). Not written with `--no-sql`. With `--sql-3d` it also holds the levels of the 3D visualisation of the MS1 peaks: the `LEVEL` column of the table `ms1_peak` and the table `CONFIG` (earlier versions stored the levels as the tables `PEAKS0`, `PEAKS1`, ...). |
+| `sample.sqlite` | An SQLite database with the deconvoluted MS1 and MS/MS spectra and their peaks, for spectrum visualisation and for TopPIC's post mass matching (see the `-N` option). Not written with `--no-sql`. With `--sql-3d` it also holds the levels of the 3D visualisation of the MS1 peaks: the `LEVEL` column of the table `ms1_peak` and the table `CONFIG` (earlier versions stored the levels as the tables `PEAKS0`, `PEAKS1`, ...). TopFD compacts the database (SQLite `VACUUM`) when it is complete; this needs free space for a temporary copy of it in the temporary directory (`SQLITE_TMPDIR` or `TMPDIR`). |
 
 The `msalign` format is a text format. Each spectrum is a `BEGIN IONS` ...
 `END IONS` block with header lines (`FILE_NAME`, `MSALIGN_FILE_NAME` (the
