@@ -624,7 +624,7 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
             "confidence score (e.g., EnvCNN score) is below the cutoff before "
             "spectral filtering, database search and E-value computation. "
             "Default value: 0.4.")(
-            "proteoform-error-tolerance,p",
+            "cluster-error-tolerance,p",
             po::value<std::string>(&form_error_tole),
             "<a positive number>. Error tolerance for identifying PrSM "
             "clusters. Default value: 1.2 Dalton.")(
@@ -738,7 +738,7 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
         "prec-error-tolerance,E", po::value<std::string>(&prec_error_tole), "")(
         "prec-dalton-error", po::value<std::string>(&prec_dalton_error), "")(
         "filter-by-score,F", po::value<std::string>(&env_cnn_cutoff), "")(
-        "proteoform-ppm-error,P", "")("proteoform-error-tolerance,p",
+        "proteoform-ppm-error,P", "")("cluster-error-tolerance,p",
                                       po::value<std::string>(&form_error_tole),
                                       "")(
         "proteoform-type,R", po::value<std::string>(&allow_prot_type), "")(
@@ -924,7 +924,7 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
       arguments_["proteoformPpmError"] = "true";
     }
 
-    if (vm.count("proteoform-error-tolerance")) {
+    if (vm.count("cluster-error-tolerance")) {
       arguments_["proteoformErrorTolerance"] = form_error_tole;
     }
 

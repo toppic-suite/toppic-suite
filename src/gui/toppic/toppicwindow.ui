@@ -550,7 +550,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
        <item>
         <widget class="QLabel" name="label_14">
          <property name="toolTip">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Error tolerance in Dalton for clustering PrSMs into proteoforms: proteoforms of the same protein whose adjusted precursor masses agree within it are merged. A positive number; default 1.2. (toppic -p, --proteoform-error-tolerance)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Error tolerance in Dalton for clustering PrSMs into proteoforms: proteoforms of the same protein whose adjusted precursor masses agree within it are merged. A positive number; default 1.2. (toppic -p, --cluster-error-tolerance)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
          <property name="text">
           <string>PrSM cluster error tolerance (Da):</string>
@@ -560,7 +560,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
        <item>
         <widget class="QLineEdit" name="formErrorToleranceEdit">
          <property name="toolTip">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Error tolerance in Dalton for clustering PrSMs into proteoforms: proteoforms of the same protein whose adjusted precursor masses agree within it are merged. A positive number; default 1.2. (toppic -p, --proteoform-error-tolerance)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Error tolerance in Dalton for clustering PrSMs into proteoforms: proteoforms of the same protein whose adjusted precursor masses agree within it are merged. A positive number; default 1.2. (toppic -p, --cluster-error-tolerance)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
          <property name="text">
           <string>1.2</string>

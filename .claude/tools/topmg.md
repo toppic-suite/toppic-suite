@@ -380,8 +380,8 @@ copy (`sql_db_copy::writeEnvelopeDb`). See `.claude/tools/topfd.md`.
 ## Option names
 
 - **`--cluster-error-tolerance`** (`-p`, default 1.2 Da; 2026-10-13,
-  the user's request): was `--proteoform-error-tolerance`, unrecognised in
-  topmg now. toppic keeps `--proteoform-error-tolerance`. Both write the
-  arguments key `proteoformErrorTolerance`, and topmg_gui passes `-p`
-  (`gui/util/command.cpp`), so only the option name, the topmg_gui
-  tooltips and the TopMG manual changed.
+  the user's request): was `--proteoform-error-tolerance`, unrecognised
+  now. toppic followed later the same day (`-p` too). Both write the
+  arguments key `proteoformErrorTolerance`, and topmg_gui and toppic_gui
+  pass `-p` (`gui/util/command.cpp`), so only the option names, the GUI
+  tooltips and the two manuals changed.
