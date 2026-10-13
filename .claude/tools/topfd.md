@@ -167,8 +167,18 @@ command emits `-y` and `-Y`). Facts to keep straight:
   toppic_test experiment 164 amendment 2; `-N` before, unrecognised now):
   the letter toppic and topmg give their `--no-sql` (toppic's `-N` is
   `--n-terminal-label`). topfd_gui passes `-z` (`gui/util/command.cpp`);
-  toppic's missing-database message says "without -z". TopDIA has no
-  `--no-sql`.
+  toppic's missing-database message says "without -z". TopDIA has
+  `-z`, `--no-sql` too (2026-10-13, branch `topdia_no_sql`; it wrote
+  `<name>.sqlite` always before): `setGeneSql(false)` is set before
+  `setMzmlFileNameAndFaims`, so no database is created, and the MS1 and
+  MS/MS deconvolutions, which test `isGeneSql()`, write no rows. On 68
+  MS1 cycles of the tutorial's ecoli_800_880.mzML the other output files
+  were unchanged apart from the parameter line "SQLite database output:
+  No" in the `_ms1.msalign` and `_ms2_raw.msalign` headers (the pseudo
+  spectra byte for byte). TopDIA's database holds the
+  deconvoluted MS1 and DIA MS/MS scans (those of `_ms2_raw.msalign`),
+  never the pseudo spectra, and `toppic -D` does not read it (it then
+  writes no `<name>_toppic.sqlite`). topdia_gui has no checkbox for it.
 - **The envelope ranking score** (2026-10-12): `-n`/`--env-rank
   <envcnn|msdeconv>` (default `envcnn`; `--deconv-score` for a few hours)
   replaces the flag `-n`/`--msdeconv` (unrecognised now) in topfd and

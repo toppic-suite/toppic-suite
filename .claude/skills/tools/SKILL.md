@@ -103,13 +103,13 @@ toppic -D ... proteins.fasta sample_ms2.msalign    # search the pseudo spectra
 
 Needs MS1 and DIA MS/MS scans with recorded isolation windows. Writes the
 pseudo spectra as `sample_ms2.msalign` plus `sample_ms2.feature`, the MS1
-files, `sample.sqlite` (always) and intermediates (`_ms2_raw.msalign`,
+files, `sample.sqlite` (not with `-z`) and intermediates (`_ms2_raw.msalign`,
 `*.csv`) that are left in place. Options are TopFD's with different
 defaults (`-w` 4.0, `-t` 0, `-b` 2) plus fragment-feature and pseudo-spectrum
 options: `-T`/`-B` MS2 ECScore cutoff and min scans (0, 1), `-y`/`-Y`
 MS1/MS2 intensity-correlation cutoffs (0.5), `-v` pseudo score cutoff 0.55,
-`-V` fragments always added 25; `-j` (`--frag-num-filtering`) as in
-TopFD. No `-z`, `-D` or `-T`-peak-list mode.
+`-V` fragments always added 25; `-j` (`--frag-num-filtering`) and `-z`
+(`--no-sql`, no SQLite) as in TopFD. No `-D` or `-T`-peak-list mode.
 **Search pseudo spectra with `toppic -D`** (post mass matching assumes one
 scan per spectrum). Never pass `-o`: the run aborts at the pseudo-spectrum
 step.
