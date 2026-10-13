@@ -169,6 +169,30 @@ instead of the input. Facts to keep straight:
   with the model after `--mass-calib` (`TopPIC_mass_calib` passes the
   model file with or without `--no-sql`), and then opens toppic's database
   (its third argument, "" with `--no-sql`) to append the envelopes.
+  Results (report 0168; 3acb858f against main 04b96954 on main's TopFD
+  output, `-f C57 -d -t FDR -T FDR -y FDR -u 16`): on st_1 the default,
+  `-D`, `--mass-calib`, `--second-precursor`, `-c`, `-c -C`, `-A`, `-A
+  --mass-calib`, `-z` and `--mass-calib` on its first 165 spectra (one
+  precursor calibrant) and on 480_F3_02 setting d with and without
+  `--mass-calib` write main's result files (480: 3,374 / 2,004 / 440), and
+  every table of main's `<base>_toppic.sqlite` equals, row for row in rowid
+  order with the CREATE statement, the table taken from the branch's file
+  when it has it and from TopFD's otherwise (16 tables; 17 with
+  `--mass-calib`, all from the branch's file, `mass_calib` but its time);
+  the branch's file has `ms2_env`, `ms2_env_peak` and the six PrSM tables,
+  and the tables of main's with a model. TopFD's database keeps its md5 and
+  no branch run leaves `-wal` / `-shm` next to it (main's runs do; the
+  first commit 0790b910 did with `--mass-calib`, which 3acb858f fixed).
+  Sizes: st_1 114.2 -> 5.6 MB, 480_F3_02 setting d 915.3 -> 147.7 MB (TopFD's
+  843.3 MB), with `--mass-calib` 918.2 -> 869.1 MB (no
+  `ms2_peak_spec_id_index`). The envelope copy takes as long as the full
+  copy did (0.8 s on 480_F3_02); the post mass matching 13.1 s against
+  17.4 s (12.9 against 18.6 s with `--mass-calib`); wall time and peak
+  memory unchanged. TopMSV (topmsv_private branch `two_sqlite_files`
+  0370ae6) gives the same answer to every request for TopFD's file +
+  the branch's file as for main's file alone (st_1 default, `-D`,
+  `--mass-calib`, `--second-precursor`; 480_F3_02 setting d, 65,108
+  requests), at the same request times.
 - **A missing database is an error, not a skip.** TopFD's database of a
   spectrum file is `prsm_post_mass_match::sqlFileName(sp_file)`
   (`<base>.sqlite` for `<base>_ms2.msalign`; use it, do not re-derive the
