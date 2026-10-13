@@ -69,10 +69,10 @@ std::string process(const PrsmParaPtr& prsm_para_ptr,
 // TopFD's SQLite database of a spectrum file: <path>/<base>.sqlite, where
 // <base> is the file name without its extension and a trailing "_ms2"
 // (TopFD writes <base>_ms2.msalign and <base>.sqlite), and without "_resid"
-// before it. toppic only reads it (the argument check, the copy of its
-// envelope tables, or with --mass-calib of every table, into
-// toppicSqlFileName, and the post mass matching); topmg writes its PrSM
-// tables into it (not with --no-sql).
+// before it. toppic and topmg only read it (the argument check, the copy of
+// its envelope tables, or with toppic --mass-calib of every table, into
+// toppicSqlFileName or topmgSqlFileName, and toppic's post mass matching).
+// topmg wrote its PrSM tables into it before toppic_test experiment 170.
 std::string sqlFileName(const std::string& sp_file_name);
 
 // toppic's SQLite database of a spectrum file given to toppic,
@@ -86,6 +86,14 @@ std::string sqlFileName(const std::string& sp_file_name);
 // -A, --mass-calib and --second-precursor use the database of the given
 // file (TopPICProgress_multi_file passes it to every step).
 std::string toppicSqlFileName(const std::string& sp_file_name);
+
+// topmg's SQLite database of a spectrum file given to topmg,
+// <path>/<base>_topmg.sqlite for <base>_ms2.msalign and TopFD's <base>.sqlite
+// (toppic_test experiment 170): written again before each search of the
+// file with TopFD's tables ms2_env and ms2_env_peak; the report writes
+// topmg's PrSM tables into it. A reader takes a table it lacks from TopFD's
+// database.
+std::string topmgSqlFileName(const std::string& sp_file_name);
 
 // TopFD's base name of a spectrum file, <path>/<base> for <base>_ms2.msalign
 // and toppic's copies of it (the suffixes "_resid", "_calib" and "_mono"

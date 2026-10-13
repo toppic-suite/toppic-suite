@@ -95,9 +95,12 @@ std::map<std::string, std::string> TopmgArgument::initArguments() {
   arguments["varModFileName"] = "";
   arguments["threadNumber"] = "1";
   arguments["useFeatureFile"] = "true";
-  // --no-sql: the PrSM tables are not written into TopFD's database
-  // (toppic_test experiment 164)
+  // --no-sql: no SQLite file is written or changed: no <base>_topmg.sqlite
+  // (toppic_test experiments 164 and 170)
   arguments["noSql"] = "false";
+  // topmg's database of the file being reported, <base>_topmg.sqlite
+  // (TopMGProgress_multi_file); "" for the combined result of -c
+  arguments["topmgDbFileName"] = "";
   arguments["proteoGraphGap"] = "40";
   arguments["useAsfDiag"] = "false";
   arguments["varPtmNumber"] = "5";
@@ -412,9 +415,10 @@ bool TopmgArgument::parse(int argc, char* argv[]) {
         "results.")("keep-temp-files,k", "Keep intermediate files.")(
         "keep-decoy-ids,K", "Keep decoy identifications.")(
         "no-sql,z",
-        "Do not write the PrSM, proteoform and protein tables into the TopFD "
-        "SQLite database <name>.sqlite. By default, topmg adds them to it. "
-        "With this option, topmg writes or changes no SQLite file.");
+        "Do not write an SQLite database. By default, topmg writes "
+        "<name>_topmg.sqlite with the MS/MS envelope tables of the TopFD "
+        "database <name>.sqlite and the PrSM, proteoform and protein tables. "
+        "With this option, no SQLite file is written or changed.");
 
     po::options_description desc("Options");
 

@@ -72,9 +72,10 @@ instead of the input. Facts to keep straight:
   second run. Main up to
   e5c15398 wrote into TopFD's database without `-A` and `--mass-calib`
   (every run appended its envelopes again) and into `<base>_mono.sqlite`,
-  `<base>_calib.sqlite` or `<base>_mono_calib.sqlite` with them. topmg is
-  unchanged: it writes its PrSM tables into TopFD's database
-  (`sqlFileName` of its spectrum file, `_post_ms2` read as `_ms2`).
+  `<base>_calib.sqlite` or `<base>_mono_calib.sqlite` with them. topmg was
+  unchanged then (it wrote its PrSM tables into TopFD's database); since
+  toppic_test experiment 170 it writes `<base>_topmg.sqlite` the same way
+  (`topmg.md`).
   Results (toppic_test experiment 156, report 0156; 8f6cae30 against main
   e5c15398 on experiment 154's subsets of 480_F3_02, setting d, and the
   full 480_F3_02 and Bruker runs): every branch folder holds TopFD's
@@ -279,8 +280,9 @@ instead of the input. Facts to keep straight:
   spectrum file.** `prsm_decoy_filter`, `prsm_cutoff_selector`,
   `prsm_form_filter`, `prsm_prot_filter` and `prsm_sql_output::write` only
   ever name `<base>.<ext>` files (the SQL writer takes its database as an
-  argument: toppic's `toppicDbFileName`, topmg's `sqlFileName` of
-  `<base>_ms2.msalign`, `_post_ms2` read as `_ms2`), so their name argument
+  argument: toppic's `toppicDbFileName`, topmg's `topmgDbFileName`, the
+  `topmgSqlFileName` of `<base>_ms2.msalign`, `_post_ms2` read as `_ms2`),
+  so their name argument
   is
   `base_name`, the spectrum file name without its extension
   (`file_util::basename(sp_file)`); `TopPIC_report` and `TopMG_post`

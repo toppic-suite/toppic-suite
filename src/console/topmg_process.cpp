@@ -65,10 +65,27 @@
 #include "search/graphalign/graph_post_processor.hpp"
 #include "seq/fasta_reader.hpp"
 #include "seq/fasta_util.hpp"
+#include "sql/sql_db_copy.hpp"
 #include "stat/mcmc/mcmc_dpr_processor.hpp"
 #include "stat/mcmc/mcmc_mng.hpp"
 
 namespace toppic {
+
+namespace {
+
+// The spectrum file whose databases a topmg search uses: the file itself, or
+// <x>_ms2.msalign for toppic's post-matched <x>_post_ms2.msalign, so that
+// TopFD's database is <x>.sqlite and topmg's <x>_topmg.sqlite
+// (prsm_post_mass_match::sqlFileName and topmgSqlFileName).
+std::string dbSpFileName(const std::string& sp_file_name) {
+  std::string base = file_util::basename(sp_file_name);
+  if (str_util::endsWith(base, "_post_ms2")) {
+    base = base.substr(0, base.size() - 9) + "_ms2";
+  }
+  return base + ".msalign";
+}
+
+}  // namespace
 
 void cleanTopmgDir(const std::string& fa_name, const std::string& sp_name,
                    bool keep_temp_files) {
@@ -450,23 +467,19 @@ int TopMG_post(std::map<std::string, std::string>& arguments) {
     prot_out = nullptr;
     std::cout << "Outputting protein table - finished." << std::endl;
 
-    // topmg's identifications go into TopFD's database of the spectrum file
-    // (that of <x>_ms2.msalign for toppic's post-matched <x>_post_ms2.msalign);
-    // not with --no-sql
+    // topmg's identifications go into its database of the spectrum file,
+    // <x>_topmg.sqlite (TopMGProgress_multi_file; toppic_test experiment
+    // 170: into TopFD's database before it); none for the combined result
+    // of -c, nor with --no-sql
     if (arguments["noSql"] == "true") {
       std::cout << "The PrSM tables are not written to an SQLite database "
                    "(--no-sql)."
                 << std::endl;
     } else {
-      std::string sql_sp_base = base_name;
-      if (str_util::endsWith(sql_sp_base, "_post_ms2")) {
-        sql_sp_base = sql_sp_base.substr(0, sql_sp_base.size() - 9) + "_ms2";
-      }
-      prsm_sql_output::write(
-          prsm_para_ptr,
-          prsm_post_mass_match::sqlFileName(sql_sp_base + ".msalign"),
-          base_name, ori_db_file_name, "topmg_prsm_cutoff",
-          "topmg_form_cutoff_form", "topmg_prot_cutoff_prot");
+      prsm_sql_output::write(prsm_para_ptr, arguments["topmgDbFileName"],
+                             base_name, ori_db_file_name, "topmg_prsm_cutoff",
+                             "topmg_form_cutoff_form",
+                             "topmg_prot_cutoff_prot");
     }
 
   } catch (const char* e) {
@@ -524,6 +537,23 @@ int TopMGProgress_multi_file(std::map<std::string, std::string>& arguments,
     std::string start_time = buf;
     arguments["startTime"] = start_time;
     arguments["spectrumFileName"] = spec_file_lst[k];
+    // topmg's database of the file, <x>_topmg.sqlite (toppic_test experiment
+    // 170, as toppic's <x>_toppic.sqlite): an earlier one is deleted and,
+    // unless --no-sql, a new one written with TopFD's tables ms2_env and
+    // ms2_env_peak, into which TopMG_post writes the PrSM tables; TopFD's
+    // database is only read, and a reader takes its other tables from it
+    std::string db_sp_name = dbSpFileName(spec_file_lst[k]);
+    std::string topmg_db_name =
+        prsm_post_mass_match::topmgSqlFileName(db_sp_name);
+    if (sql_db_copy::removeDb(topmg_db_name)) {
+      std::cout << "Deleted the earlier database " << topmg_db_name << "."
+                << std::endl;
+    }
+    if (arguments["noSql"] != "true") {
+      sql_db_copy::writeEnvelopeDb(
+          prsm_post_mass_match::sqlFileName(db_sp_name), topmg_db_name);
+    }
+    arguments["topmgDbFileName"] = topmg_db_name;
     if (TopMGProcess(arguments) != 0) {
       return 1;
     }
@@ -572,6 +602,8 @@ int TopMGProgress_multi_file(std::map<std::string, std::string>& arguments,
     std::string sp_file_name = merged_file_name + "_ms2.msalign";
     arguments["spectrumFileName"] = sp_file_name;
     arguments["startTime"] = combined_start_time;
+    // the combined result has no database
+    arguments["topmgDbFileName"] = "";
     TopMG_post(arguments);
     cleanTopmgDir(ori_db_file_name, sp_file_name, keep_temp_files);
   }
