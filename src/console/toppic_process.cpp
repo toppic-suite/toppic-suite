@@ -1077,11 +1077,10 @@ std::string TopPIC_multi_ptm_search(
     PrsmStrPtrVec first_ptrs =
         prsm_reader_util::readAllPrsmStrs(base_name + ".toppic_pre_raw_prsm");
     double skip_evalue;
-    std::string skip_source;
     if (arguments["multiSkipEvalue"] != "") {
       skip_evalue = std::stod(arguments["multiSkipEvalue"]);
-      skip_source = "--multi-skip-evalue";
     } else if (arguments["searchType"] == "TARGET+DECOY") {
+      // the smallest E-value of a decoy PrSM
       skip_evalue = std::numeric_limits<double>::max();
       for (size_t i = 0; i < first_ptrs.size(); i++) {
         if (first_ptrs[i]->getSeqName().find("DECOY_") == 0 &&
@@ -1089,31 +1088,19 @@ std::string TopPIC_multi_ptm_search(
           skip_evalue = first_ptrs[i]->getEValue();
         }
       }
-      skip_source = "the smallest E-value of a decoy PrSM";
     } else {
+      // the default without a decoy database
       skip_evalue = 0.01;
-      skip_source = "the default without a decoy database";
     }
-    int skipped_target_num = 0;
-    int skipped_decoy_num = 0;
     for (size_t i = 0; i < first_ptrs.size(); i++) {
       if (first_ptrs[i]->getEValue() < skip_evalue) {
-        int spec_id = first_ptrs[i]->getSpectrumId();
-        if (identified_spec_ids.insert(spec_id).second) {
-          if (first_ptrs[i]->getSeqName().find("DECOY_") == 0) {
-            skipped_decoy_num++;
-          } else {
-            skipped_target_num++;
-          }
-        }
+        identified_spec_ids.insert(first_ptrs[i]->getSpectrumId());
       }
     }
     std::cout << "Multiple unexpected shifts stage - "
               << identified_spec_ids.size()
-              << " spectra identified by the earlier stages are skipped ("
-              << skipped_target_num << " target, " << skipped_decoy_num
-              << " decoy; first-pass E-value < " << skip_evalue << ", "
-              << skip_source << ")." << std::endl;
+              << " spectra identified by the earlier stages are skipped."
+              << std::endl;
 
     std::vector<std::string> input_exts;
     {

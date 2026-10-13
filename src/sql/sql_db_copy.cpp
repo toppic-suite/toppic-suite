@@ -15,10 +15,8 @@
 
 #include "sql/sql_db_copy.hpp"
 
-#include <chrono>
 #include <cstdlib>
 #include <filesystem>
-#include <iomanip>
 #include <iostream>
 #include <string>
 #include <system_error>
@@ -215,15 +213,7 @@ bool writeEnvelopeDb(const std::string& topfd_db_name,
               << std::endl;
     return false;
   }
-  auto start = std::chrono::steady_clock::now();
   copyTables(topfd_db_name, dest_name, {"ms2_env", "ms2_env_peak"});
-  double seconds =
-      std::chrono::duration<double>(std::chrono::steady_clock::now() - start)
-          .count();
-  std::cout << "Copied the tables ms2_env and ms2_env_peak of " << topfd_db_name
-            << " to " << dest_name << " (" << std::fixed
-            << std::setprecision(1) << seconds << " s)." << std::defaultfloat
-            << std::endl;
   return true;
 }
 

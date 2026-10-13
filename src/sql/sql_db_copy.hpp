@@ -66,9 +66,9 @@ void copyTables(const std::string& src_name, const std::string& dest_name,
                 const std::vector<std::string>& tables);
 
 // Writes dest_name with the tables ms2_env and ms2_env_peak of TopFD's
-// database topfd_db_name (copyTables) and prints "Copied the tables ...
-// (n s)."; when TopFD's database does not exist (topfd -z), prints a note
-// and writes nothing. Returns whether dest_name was written.
+// database topfd_db_name (copyTables); when TopFD's database does not exist
+// (topfd -z), prints a note and writes nothing. Returns whether dest_name was
+// written.
 bool writeEnvelopeDb(const std::string& topfd_db_name,
                      const std::string& dest_name);
 

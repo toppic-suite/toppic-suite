@@ -296,7 +296,8 @@ void ToppicArgument::outputArguments(
            << arguments["variablePtmNum"] << std::endl;
     output << std::setw(gap) << std::left
            << "Use approximate spectra in protein filtering:" << sep
-           << arguments["useApproxSpectra"] << std::endl;
+           << (arguments["useApproxSpectra"] == "true" ? "True" : "False")
+           << std::endl;
     if (arguments.count("secondPrecursor") > 0 &&
         arguments.at("secondPrecursor") == "true") {
       output << std::setw(gap) << std::left << "Second precursor search:"
@@ -312,12 +313,12 @@ void ToppicArgument::outputArguments(
     }
     if (arguments["deamidSelector"] == "true") {
       output << std::setw(gap) << std::left
-             << "Deamidation PrSM selection:" << sep << "true" << std::endl;
+             << "Deamidation PrSM selection:" << sep << "True" << std::endl;
     }
     if (arguments["varPtmEvalueModResidues"] == "false") {
       output << std::setw(gap) << std::left
              << "Variable PTM E-values with modified residues:" << sep
-             << "false" << std::endl;
+             << "False" << std::endl;
     }
     output << std::setw(gap) << std::left
            << "Variable modifications file name:" << sep
