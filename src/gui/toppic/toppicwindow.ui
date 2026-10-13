@@ -798,11 +798,39 @@ li.checked::marker { content: &quot;\2612&quot;; }
        </item>
       </layout>
      </widget>
-     <widget class="QGroupBox" name="groupBox_3">
+     <widget class="QWidget" name="horizontalLayoutWidget_noSql">
       <property name="geometry">
        <rect>
         <x>10</x>
         <y>250</y>
+        <width>451</width>
+        <height>33</height>
+       </rect>
+      </property>
+      <layout class="QHBoxLayout" name="horizontalLayout_noSql">
+       <item>
+        <widget class="QCheckBox" name="noSqlCheckBox">
+         <property name="minimumSize">
+          <size>
+           <width>120</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Do not write an SQLite database. By default, toppic writes &amp;lt;name&amp;gt;_toppic.sqlite with the MS/MS envelope tables of TopFD's database &amp;lt;name&amp;gt;.sqlite, the envelopes of the masses added by post mass matching, and the PrSM, proteoform and protein tables, for the visualization of the identifications. When checked, no SQLite file is written or changed; the other result files are the same. Post mass matching still reads TopFD's database. Default: unchecked. (toppic -z, --no-sql)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+         <property name="text">
+          <string>Do not generate SQLite database</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QGroupBox" name="groupBox_3">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>290</y>
         <width>861</width>
         <height>111</height>
        </rect>

@@ -197,6 +197,7 @@ std::map<std::string, std::string> toppic_para{
     {"localPtmFileName", "-B "},
     {"localThreshold", "-H "},
     {"postMassMatch", "-D "},
+    {"noSql", "-z "},
     {"averageMass", "-A "},
     {"rescore", "--rescore "}};
 
@@ -244,6 +245,11 @@ std::string geneToppicCommand(std::map<std::string, std::string> arguments_,
       } else if (it->first == "postMassMatch") {
         // on by default; -D (--disable-post-match) turns it off
         if (it->second == "false") {
+          command = command + toppic_para[it->first];
+        }
+      } else if (it->first == "noSql") {
+        // -z (--no-sql): no SQLite database is written
+        if (it->second == "true") {
           command = command + toppic_para[it->first];
         }
       } else if (it->first == "averageMass") {

@@ -181,6 +181,8 @@ void ToppicWindow::on_defaultButton_clicked() {
   ui->keepTempCheckBox->setChecked(false);
   // post mass matching is on by default (arguments_["postMassMatch"])
   ui->postMassMatchCheckBox->setChecked(arguments_["postMassMatch"] == "true");
+  // the SQLite database is written by default (toppic -z, --no-sql)
+  ui->noSqlCheckBox->setChecked(arguments_["noSql"] == "true");
   ui->averageMassCheckBox->setChecked(arguments_["averageMass"] == "true");
   // the rescoring (toppic --rescore) is off by default
   ui->rescoreCheckBox->setChecked(arguments_["rescore"] == "true");
@@ -417,6 +419,11 @@ std::map<std::string, std::string> ToppicWindow::getArguments() {
   } else {
     arguments_["postMassMatch"] = "false";
   }
+  if (ui->noSqlCheckBox->isChecked()) {
+    arguments_["noSql"] = "true";
+  } else {
+    arguments_["noSql"] = "false";
+  }
   if (ui->averageMassCheckBox->isChecked()) {
     arguments_["averageMass"] = "true";
   } else {
@@ -550,6 +557,7 @@ void ToppicWindow::lockDialog() {
   ui->keepDecoyCheckBox->setEnabled(false);
   ui->keepTempCheckBox->setEnabled(false);
   ui->postMassMatchCheckBox->setEnabled(false);
+  ui->noSqlCheckBox->setEnabled(false);
   ui->averageMassCheckBox->setEnabled(false);
   ui->rescoreCheckBox->setEnabled(false);
 }
@@ -605,6 +613,7 @@ void ToppicWindow::unlockDialog() {
   ui->keepDecoyCheckBox->setEnabled(true);
   ui->keepTempCheckBox->setEnabled(true);
   ui->postMassMatchCheckBox->setEnabled(true);
+  ui->noSqlCheckBox->setEnabled(true);
   ui->averageMassCheckBox->setEnabled(true);
   ui->rescoreCheckBox->setEnabled(true);
 }
@@ -784,7 +793,8 @@ void ToppicWindow::showArguments() {
        "\nlocalPtmFileName:" + arguments_["localPtmFileName"] +
        "\nthreadNumber:" + arguments_["threadNumber"] + "\nuseFeatureFile:" +
        arguments_["useFeatureFile"] + "\npostMassMatch:" +
-       arguments_["postMassMatch"] + "\naverageMass:" +
+       arguments_["postMassMatch"] + "\nnoSql:" + arguments_["noSql"] +
+       "\naverageMass:" +
        arguments_["averageMass"] + "\nrescore:" + arguments_["rescore"] +
        "\nskipList:" + arguments_["skipList"])
           .c_str(),

@@ -314,7 +314,7 @@ Cutoffs and output:
 | `-u`, `--thread-number <int>` | 1 | Number of threads; must not exceed the number of hardware threads. Each protein filtering step may use fewer: it fits its thread number to the memory available when it starts (about 1.25 GiB per thread for zero-shift and variable-PTM filtering, also when they run as one step with one-shift filtering, 1 GiB for one-shift filtering, 0.5 GiB for multiple-shift filtering). The run starts with a warning listing the filtering steps that will use fewer threads and how many, and a step prints its number again if the memory available when it starts gives a different one. All other steps use the full number. |
 | `-k`, `--keep-temp-files` | off | Keep the intermediate files. |
 | `-K`, `--keep-decoy-ids` | off | Keep decoy identifications in the result tables. |
-| `-z`, `--no-sql` | off | Write no SQLite database: no `<name>_toppic.sqlite`, and the identifications are not written to a database (section 2). The other result files are the same as without the option. |
+| `-z`, `--no-sql` | off | Write no SQLite database: no `<name>_toppic.sqlite`, and the identifications are not written to a database (section 2). The other result files are the same as without the option. In `toppic_gui`: "Do not generate SQLite database" on the Basic Parameters tab. |
 
 **Combining fractions.** With `-c`, each fraction is searched,
 post-matched, clustered and given its FDRs on its own first (post mass
