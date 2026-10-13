@@ -160,6 +160,10 @@ std::map<std::string, std::string> ToppicArgument::initArguments() {
   // experiment 164); the post mass matching reads TopFD's database read only
   // in any case
   arguments["noSql"] = "false";
+  // the hidden --disable-zstd: <base>_toppic.sqlite is written uncompressed
+  // (by default it is compressed at the end of the run, sql/zstd_db;
+  // toppic_test experiment 172)
+  arguments["disableZstd"] = "false";
   arguments["averageMass"] = "false";
   arguments["postMinPeakNum"] = "1";
   arguments["zeroShiftPrecOneDaError"] = "true";
@@ -760,7 +764,7 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
         "output-raw-prsm-table,o", "")("output-prsm-coverage,O", "")(
         "disable-post-match,D", "")(
         "post-min-peak-num,I", po::value<std::string>(&post_min_peak_num), "")(
-        "average-mass,A", "")("no-sql,z", "")("disable-zero-shift-prec-error", "")(
+        "average-mass,A", "")("no-sql,z", "")("disable-zstd", "")("disable-zero-shift-prec-error", "")(
         "enable-one-shift-prec-error", "")("enable-var-ptm-prec-error", "")(
         "fdr-groups", "")("rescore,q", "")(
         "disable-rescore-fallback", "")("disable-rescore-evalue-floor", "")(
@@ -1084,6 +1088,10 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
 
     if (vm.count("no-sql")) {
       arguments_["noSql"] = "true";
+    }
+
+    if (vm.count("disable-zstd")) {
+      arguments_["disableZstd"] = "true";
     }
 
     // hidden: the PTM localization of -B by the MIScore candidate search of

@@ -62,6 +62,7 @@
 #include "prsm/prsm_xml_writer.hpp"
 #include "prsm/theo_peak_util.hpp"
 #include "sql/sql_util.hpp"
+#include "sql/zstd_db.hpp"
 #include "topfd/envcnn/onnx_env_cnn.hpp"
 
 namespace toppic {
@@ -119,7 +120,9 @@ using PostMatchVec = std::vector<PostMatch>;
 // m/z (stable, in the table's order for equal m/z values, as the query's
 // ORDER BY mz). With a calibration model (--mass-calib), every m/z is
 // corrected with the MS/MS model at its spectrum's retention time, as
-// sqlite_mass_calib corrects toppic's copy.
+// sqlite_mass_calib corrects toppic's copy. A compressed database (topfd's
+// default, toppic_test experiment 172) gives the peaks of each spectrum from
+// its BLOB row, in the table's order as well.
 class LoadedPeakReader {
  public:
   LoadedPeakReader(sqlite3* db, const std::set<int>& scans,
@@ -137,6 +140,33 @@ class LoadedPeakReader {
       }
     }
     sqlite3_finalize(spec_stmt);
+    zstd_db::BlobTableReader blob(db, "main", "ms2_peak");
+    if (blob.exists()) {
+      const std::vector<std::string>& names = blob.columnNames();
+      auto colOf = [&names](const std::string& name) {
+        return static_cast<size_t>(
+            std::find(names.begin(), names.end(), name) - names.begin());
+      };
+      size_t peak_col = colOf("peak_id");
+      size_t mz_col = colOf("mz");
+      size_t inte_col = colOf("intensity");
+      for (auto& entry : peaks_) {
+        if (!blob.read(entry.first)) {
+          continue;
+        }
+        for (int r = 0; r < blob.rowNum(); r++) {
+          double mz = blob.realValue(mz_col, r);
+          if (model != nullptr) {
+            mz = model->correctMz(2, mz, rt_mins[entry.first]);
+          }
+          entry.second.push_back(
+              {static_cast<int>(blob.intValue(peak_col, r)), mz,
+               blob.realValue(inte_col, r)});
+        }
+      }
+      sortPeaks();
+      return;
+    }
     sqlite3_stmt* peak_stmt = sql_util::prepareSql(
         db, "SELECT spec_id, peak_id, mz, intensity FROM ms2_peak;");
     while (sqlite3_step(peak_stmt) == SQLITE_ROW) {
@@ -152,11 +182,7 @@ class LoadedPeakReader {
                             sqlite3_column_double(peak_stmt, 3)});
     }
     sqlite3_finalize(peak_stmt);
-    for (auto& entry : peaks_) {
-      std::stable_sort(
-          entry.second.begin(), entry.second.end(),
-          [](const RawPeak& a, const RawPeak& b) { return a.mz < b.mz; });
-    }
+    sortPeaks();
   }
 
   // The database id of the spectrum with the scan number, -1 if absent.
@@ -171,6 +197,14 @@ class LoadedPeakReader {
   }
 
  private:
+  void sortPeaks() {
+    for (auto& entry : peaks_) {
+      std::stable_sort(
+          entry.second.begin(), entry.second.end(),
+          [](const RawPeak& a, const RawPeak& b) { return a.mz < b.mz; });
+    }
+  }
+
   std::unordered_map<int, int> spec_ids_;
   std::unordered_map<int, RawPeakVec> peaks_;
 };

@@ -24,6 +24,7 @@ in the same commit as the code (as this file was before 2026-10-12).
   - Activation of MS/MS spectra
   - Isotope distributions
   - The MS1 peaks of the database and the 3D levels
+  - The compressed database (also `topzstd`)
 - `.claude/tools/toppic_search.md` — TopPIC tolerances, filters and searches (also the index files topindex writes):
   - Precursor and fragment mass tolerances
   - Precursor error tolerance in Dalton
@@ -51,11 +52,13 @@ in the same commit as the code (as this file was before 2026-10-12).
   - PTM localization by a variable PTM search
   - The second precursor search
   - Two-pass m/z recalibration
+  - Compressed databases
 - `.claude/tools/topmg.md` — TopMG:
   - Graph alignment tolerance
   - Protein N-terminal forms in TopMG
   - PTMs written in FASTA sequences in TopMG
   - Precursor refinement of TopMG's graph alignment
+  - Compressed databases
 - `.claude/tools/topdiff.md` — TopDiff:
   - TopDiff
 - `.claude/tools/toplib.md` — toplib_build and toplib_search:
@@ -323,9 +326,9 @@ copied or symlinked to run from `bin/`), then the compiled-in shared dir
 `CMAKE_INSTALL_PREFIX` (default `/usr/local`), so `DESTDIR` staging and a
 custom prefix both work:
 
-- `install(TARGETS ${TOPPIC_EXECUTABLES} ...)` puts the nine CLI tools and
-  the six `*_gui` counterparts (toplib_build, toplib_search and topcalib have
-  none) in `<prefix>/bin`. **When you add a new executable
+- `install(TARGETS ${TOPPIC_EXECUTABLES} ...)` puts the ten CLI tools and
+  the six `*_gui` counterparts (toplib_build, toplib_search, topcalib and
+  topzstd have none) in `<prefix>/bin`. **When you add a new executable
   target, append it to the `TOPPIC_EXECUTABLES` list** (end of the file) so it
   is installed and gets the rpath below — nothing else is needed. The one
   exception is a developer tool outside the default target, such as
@@ -386,7 +389,7 @@ One manual per command-line tool, linked from README.md's "Manuals" section:
 `topfd_manual.md`, `topdia_manual.md`, `topindex_manual.md`,
 `toppic_manual.md`, `topmg_manual.md`, `topdiff_manual.md`,
 `toplib_build_manual.md`, `toplib_search_manual.md`,
-`topcalib_manual.md`. Each follows the
+`topcalib_manual.md`, `topzstd_manual.md`. Each follows the
 same layout: overview and usage line, input (including the companion files a
 tool needs, e.g. TopPIC's `_ms2.feature` and `.sqlite`), the pipeline steps
 as the console prints them, the output files with their columns, option
@@ -459,7 +462,20 @@ above it, never the reverse:
   of the copy, such as a viewer, made toppic's next write stop with
   "database is locked", toppic_test experiment 156) and renamed when
   complete; `removeDb` deletes a database with its -journal, -wal and -shm
-  files) plus
+  files; a compressed TopFD database is read decoded: `copyTables` writes
+  its tables as rows, `openCopy` copies it decompressed), `zstd_db`
+  (compressed databases, toppic_test experiment 172: the format of TopMSV's
+  converter, which the sqlite-zstd extension reads -- the per-spectrum
+  tables as one row per spectrum of arrays in `_<table>_blob_zstd`,
+  `zstd_blob_columns` / `zstd_blob_tables`, a zstd dictionary per column,
+  "compact" magicless frames -- written and read with libzstd alone, since
+  the system SQLite (3.46) cannot load the extension (it needs >= 3.49.1):
+  `compressDb`, `decompressDb`, `compressInPlace`, and `BlobTableReader`
+  for readers of compressed tables; topfd, topdia, toppic and topmg
+  compress their database when complete unless the hidden
+  `--disable-zstd`, and every reader of TopFD's database in the suite
+  (`sql_db_copy`, the post mass matching) handles a compressed one -- a new
+  reader must too) plus
   `ms_sql_writer`, the
   MS1-peak levels for 3D visualization: `MsSqlWriter` builds level 0 (every
   MS1 peak of intensity > 0) and the down-sampled levels 1..n, and writes
@@ -660,8 +676,9 @@ NOT in `COMMON_SRCS`; each is its own `add_executable` that links
 
 - `src/console` — the command-line tools. Each is a `main()` (`topfd.cpp`,
   `topdia.cpp`, `topindex.cpp`, `toppic.cpp`, `topmg.cpp`, `topdiff.cpp`,
-  `toplib_build.cpp`, `toplib_search.cpp`; plus `topcalib.cpp`, a single
-  file with its options in it, and the developer tool
+  `toplib_build.cpp`, `toplib_search.cpp`; plus `topcalib.cpp` and
+  `topzstd.cpp`, single files with their options in them, and the developer
+  tool
   `theo_patt_gen.cpp`, a single file outside the default target) plus
   its `<tool>_argument.cpp` parser (`boost::program_options`) plus, for the four
   multi-step tools, its `<tool>_process.cpp` orchestrator. topfd/topdia have no

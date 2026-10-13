@@ -369,3 +369,10 @@ file; TopFD's database keeps its md5, `-z` deletes an earlier
 (a "TopFD + TopMG" dataset) as main's TopMSV showed TopFD's file after
 main's topmg: every one of about 22,000 requests the same.
 
+
+## Compressed databases (toppic_test experiment 172)
+
+topmg compresses each file's `<base>_topmg.sqlite` in place at the end of
+the run (`TopMGProgress_multi_file`), unless `--no-sql` or the hidden
+`--disable-zstd`, and reads a compressed TopFD database in its envelope
+copy (`sql_db_copy::writeEnvelopeDb`). See `.claude/tools/topfd.md`.

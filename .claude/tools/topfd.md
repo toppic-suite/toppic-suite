@@ -1132,3 +1132,46 @@ write the levels whenever they write the database; the option `-D`
   `--no-sql` does with its earlier `<base>_toppic.sqlite`: toppic's post
   mass matching would otherwise read the database of another run.
   `createSqlDb` removes the side files of an earlier database too.
+
+## The compressed database (`sql/zstd_db`, `topzstd`; toppic_test experiment 172)
+
+topfd and topdia compress their database when it is complete
+(`TopfdPara::closeSqlDb`: after the VACUUM, `zstd_db::compressInPlace`),
+unless the hidden `--disable-zstd` (`TopfdPara::setZstd(false)`; hidden,
+so not in the manuals). The format is TopMSV's converter's (`npm run
+compress`, toppic_test experiment 171), which the sqlite-zstd extension
+(v0.3.5) reads; the suite writes and reads it with libzstd alone, because
+the system SQLite (3.46.1 on Ubuntu 26.04) cannot load the extension (it
+needs >= 3.49.1).
+
+- Each per-spectrum table T (`ms1_peak`, `ms2_peak`, `ms1_env`,
+  `ms1_env_peak`, `ms2_env`, `ms2_env_peak`) becomes `_T_blob_zstd(spec_id
+  INTEGER PRIMARY KEY, n, one BLOB per column, _<col>_dict per column)`
+  behind the view `T_blob` (`zstd_decompress_col`, the extension's), with
+  its triggers, `_zstd_configs`, `_zstd_dicts` and the indexes
+  `_T_blob_<col>_dict_idx` (named after the table: the extension names them
+  after the column, which clashes between tables).
+- Codecs (`zstd_blob_columns`: tbl, col, pos, decl_type, codec, group_col,
+  min_value, max_value): `f4` when every value is exactly a float32 (TopFD's
+  peak m/z and intensities), else `f8`; `i1` / `i2` / `i4`; `seq` (not
+  stored: 0..n-1 per spectrum: peak_id, env_id) and `seqg` (an envelope
+  peak's peak_id, 0.. per env_id). `zstd_blob_tables` keeps each table's
+  CREATE statement for `decompressDb`.
+- Each column has a dictionary trained with `ZDICT_trainFromBuffer` on all
+  its arrays, of `(float)bytes * 0.01f` bytes (sqlite-zstd's
+  `dict_size_ratio`), none (arrays stored as is, `_<col>_dict` NULL) under
+  256 bytes; each array is one magicless frame without checksum, content
+  size or dictionary id, compressed with `ZSTD_compress2` and the column's
+  CDict at level 3 -- the calls sqlite-zstd makes (`src/basic.rs`).
+- sqlite-zstd v0.3.5 bundles zstd 1.5.2, the suite links the system's (1.5.7):
+  the frames decode both ways, but some dictionaries and compressed arrays
+  differ from TopMSV's files of the same source (experiment 172: st_1 5 of
+  22 dictionaries). sqlite-zstd also samples the training arrays at random
+  when its sample count rounds below the row count; the suite always uses
+  every array, so its output is deterministic.
+- The spectra are stored in spec_id order; TopFD inserts them in the order
+  its threads finish (st_1: `ms2_peak` goes back 15 times in rowid order),
+  so a decompressed database has the same rows with each spectrum's rows in
+  their order but the spectra in id order.
+- Sizes: st_1 107.7 -> 34.5 MB (6 s), 480_F3_02 843.3 -> about 295 MB
+  (experiment 171's numbers with TopMSV's converter: 294.8 MB, 1:46 in Node).

@@ -1162,3 +1162,18 @@ the method inside a search. Facts to keep straight:
       22,388 against 22,412, no change. The calibration search takes 1.6
       min (480) and 2.6 min (Bruker); with `-e 5` the 480 run takes as long
       as without the option at 10 ppm (11.3 against 11.2 min).
+
+## Compressed databases (`sql/zstd_db`; toppic_test experiment 172)
+
+toppic compresses `<base>_toppic.sqlite` in place at the end of the run
+(after the files' reports of `-c`, `TopPICProgress_multi_file`), unless
+`--no-sql` or the hidden `--disable-zstd`; a database already compressed
+(an earlier run's, kept with `-C`) stays so, the PrSM tables the report
+writes into it again being plain tables. TopFD's database may be
+compressed (topfd's default): `sql_db_copy::copyTables` decodes
+`ms2_env` / `ms2_env_peak` into rows of their CREATE statements
+(`zstd_db::BlobTableReader`), `openCopy` (`--mass-calib`) copies it
+decompressed (`zstd_db::decompressDb`), and the post mass matching's
+`LoadedPeakReader` decodes the BLOB rows of the PrSMs' spectra (same peaks
+in the same order as the row table). See `.claude/tools/topfd.md` for the
+format.

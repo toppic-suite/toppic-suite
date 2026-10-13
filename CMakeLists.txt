@@ -402,6 +402,8 @@ toppic_console_exe(topfd
 toppic_console_exe(topdia
   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topdia.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topdia_argument.cpp)
+toppic_console_exe(topzstd
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topzstd.cpp)
 toppic_console_exe(topindex
   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topindex.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topindex_argument.cpp
@@ -496,7 +498,7 @@ toppic_gui_exe(topdia_gui   topdia   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/top
 # ---------------------------------------------------------------------------
 set(TOPPIC_EXECUTABLES
   topfd topdia topindex toppic topmg topdiff toplib_build toplib_search
-  topcalib
+  topcalib topzstd
   topfd_gui topdia_gui topindex_gui toppic_gui topmg_gui topdiff_gui)
 
 install(TARGETS ${TOPPIC_EXECUTABLES}

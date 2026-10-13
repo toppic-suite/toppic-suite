@@ -31,6 +31,7 @@ The command-line tools are documented in `docs/manual/`:
 - [toplib_build](docs/manual/toplib_build_manual.md) — a spectral library of identified MS/MS spectra (the C++ port of TopLib's library building)
 - [toplib_search](docs/manual/toplib_search_manual.md) — identification of MS/MS spectra by searching a spectral library (the C++ port of TopLib's library search)
 - [topcalib](docs/manual/topcalib_manual.md) — two-pass m/z recalibration of TopFD's MS/MS msalign files from a first TopPIC search
+- [topzstd](docs/manual/topzstd_manual.md) — compression (and decompression) of the SQLite databases of TopFD, TopDIA, TopPIC and TopMG
 - [Proteoform annotation](docs/manual/proteoform.md) — how to read the annotated proteoform strings in TopPIC and TopMG results
 
 The GUI tools (`topfd_gui`, `topdia_gui`, `topindex_gui`, `toppic_gui`,

@@ -97,6 +97,7 @@
 #include "seq/fasta_reader.hpp"
 #include "seq/fasta_util.hpp"
 #include "sql/sql_db_copy.hpp"
+#include "sql/zstd_db.hpp"
 #include "stat/local/local_mng.hpp"
 #include "stat/local/local_processor.hpp"
 #include "stat/local_align/local_align_processor.hpp"
@@ -2246,6 +2247,17 @@ int TopPICProgress_multi_file(std::map<std::string, std::string>& arguments,
       cleanToppicDir(ori_db_file_name, spec_file_lst[k], keep_temp_files,
                      post_matched ? file_sp_name : "");
       std::cout << "Reporting " << file_sp_name << " - finished." << std::endl;
+    }
+  }
+
+  // each file's database compressed in place when complete, after the
+  // files' reports of a combined run (toppic_test experiment 172), unless
+  // --no-sql or the hidden --disable-zstd; with -C the earlier run's
+  // database may be compressed already, and stays so (the PrSM tables the
+  // report wrote into it again are plain tables)
+  if (arguments["noSql"] != "true" && arguments["disableZstd"] != "true") {
+    for (const std::string& name : toppic_db_lst) {
+      zstd_db::compressInPlace(name);
     }
   }
 

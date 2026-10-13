@@ -66,6 +66,7 @@
 #include "seq/fasta_reader.hpp"
 #include "seq/fasta_util.hpp"
 #include "sql/sql_db_copy.hpp"
+#include "sql/zstd_db.hpp"
 #include "stat/mcmc/mcmc_dpr_processor.hpp"
 #include "stat/mcmc/mcmc_mng.hpp"
 
@@ -532,6 +533,8 @@ int TopMGProgress_multi_file(std::map<std::string, std::string>& arguments,
   bool keep_temp_files = (arguments["keepTempFiles"] == "true");
   std::string ori_db_file_name = arguments["oriDatabaseFileName"];
 
+  // each file's database (<x>_topmg.sqlite), compressed at the end
+  std::vector<std::string> topmg_db_lst;
   for (size_t k = 0; k < spec_file_lst.size(); k++) {
     std::strftime(buf, 50, "%a %b %d %H:%M:%S %Y", std::localtime(&start));
     std::string start_time = buf;
@@ -554,6 +557,7 @@ int TopMGProgress_multi_file(std::map<std::string, std::string>& arguments,
           prsm_post_mass_match::sqlFileName(db_sp_name), topmg_db_name);
     }
     arguments["topmgDbFileName"] = topmg_db_name;
+    topmg_db_lst.push_back(topmg_db_name);
     if (TopMGProcess(arguments) != 0) {
       return 1;
     }
@@ -606,6 +610,14 @@ int TopMGProgress_multi_file(std::map<std::string, std::string>& arguments,
     arguments["topmgDbFileName"] = "";
     TopMG_post(arguments);
     cleanTopmgDir(ori_db_file_name, sp_file_name, keep_temp_files);
+  }
+
+  // each file's database compressed in place when complete (toppic_test
+  // experiment 172), unless --no-sql or the hidden --disable-zstd
+  if (arguments["noSql"] != "true" && arguments["disableZstd"] != "true") {
+    for (const std::string& name : topmg_db_lst) {
+      zstd_db::compressInPlace(name);
+    }
   }
 
   base_data::release();

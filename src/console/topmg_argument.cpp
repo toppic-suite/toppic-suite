@@ -98,6 +98,10 @@ std::map<std::string, std::string> TopmgArgument::initArguments() {
   // --no-sql: no SQLite file is written or changed: no <base>_topmg.sqlite
   // (toppic_test experiments 164 and 170)
   arguments["noSql"] = "false";
+  // the hidden --disable-zstd: <base>_topmg.sqlite is written uncompressed
+  // (by default it is compressed at the end of the run, sql/zstd_db;
+  // toppic_test experiment 172)
+  arguments["disableZstd"] = "false";
   // topmg's database of the file being reported, <base>_topmg.sqlite
   // (TopMGProgress_multi_file); "" for the combined result of -c
   arguments["topmgDbFileName"] = "";
@@ -464,6 +468,7 @@ bool TopmgArgument::parse(int argc, char* argv[]) {
         "num-shift,s", po::value<std::string>(&shift_num), "")(
         "whole-protein-only,w", "")("keep-temp-files,k", "")("keep-decoy-ids,K",
                                                              "")("no-sql,z", "")(
+        "disable-zstd", "")(
         "database-file-name",
         po::value<std::string>(&database_file_name)->required(),
         "Database file name with its path.")(
@@ -656,6 +661,10 @@ bool TopmgArgument::parse(int argc, char* argv[]) {
 
     if (vm.count("no-sql")) {
       arguments_["noSql"] = "true";
+    }
+
+    if (vm.count("disable-zstd")) {
+      arguments_["disableZstd"] = "true";
     }
   } catch (std::exception& e) {
     std::cerr << "Unhandled Exception in parsing command line " << e.what()

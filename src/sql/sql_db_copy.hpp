@@ -39,9 +39,11 @@ namespace sql_db_copy {
 // to it; it must not change meanwhile). toppic's own tables of an earlier run
 // (prsm, proteoform, protein, prsm_mass_shift, prsm_protein_match, fasta_seq;
 // written again by every run) are dropped, without a VACUUM, which may
-// renumber the rows of the tables without an INTEGER PRIMARY KEY. The copy
-// has no journal. Exits with an error message when a database cannot be
-// read or written.
+// renumber the rows of the tables without an INTEGER PRIMARY KEY. A
+// compressed src_name (topfd's default, toppic_test experiment 172) is
+// copied decompressed (zstd_db::decompressDb), with its peaks and envelopes
+// as rows. The copy has no journal. Exits with an error message when a
+// database cannot be read or written.
 sqlite3* openCopy(const std::string& src_name, const std::string& dest_name);
 
 // Closes a copy opened by openCopy in WAL mode (TopFD's journal mode, so that
@@ -55,8 +57,11 @@ void closeCopy(sqlite3* db, const std::string& dest_name);
 // src_name's own CREATE statement, src_name is attached read only as
 // immutable (no -wal / -shm files next to it; it must not change meanwhile),
 // and the new database is written under the temporary name and renamed as
-// closeCopy does, replacing an earlier file. Exits with an error message
-// when a database cannot be read or written or src_name lacks a table.
+// closeCopy does, replacing an earlier file. A table that a compressed
+// src_name (topfd's default, toppic_test experiment 172) stores as BLOB rows
+// is written as rows again, with its own CREATE statement
+// (zstd_db::BlobTableReader). Exits with an error message when a database
+// cannot be read or written or src_name lacks a table.
 void copyTables(const std::string& src_name, const std::string& dest_name,
                 const std::vector<std::string>& tables);
 

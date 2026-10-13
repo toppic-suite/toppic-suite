@@ -248,6 +248,11 @@ bool Argument::parse(int argc, char* argv[]) {
     // message; the positional spectrum file argument is also hidden here.
     po::options_description hidden_desc("Hidden options");
     hidden_desc.add_options()(
+        "disable-zstd",
+        "Write the SQLite database uncompressed. By default its peak and "
+        "envelope tables are compressed with zstd when it is complete "
+        "(the format of the sqlite-zstd extension; topzstd -d decompresses "
+        "it).")(
         "ms1-rank-peak-distance",
         po::value<std::string>(&ms1_rank_peak_distance),
         "<a positive number>. The window of the filtering-by-mz step for MS1 "
@@ -558,6 +563,10 @@ bool Argument::parse(int argc, char* argv[]) {
 
     if (vm.count("no-sql")) {
       topfd_para_ptr_->setGeneSql(false);
+    }
+
+    if (vm.count("disable-zstd")) {
+      topfd_para_ptr_->setZstd(false);
     }
   } catch (std::exception& e) {
     std::cerr << "Unhandled Exception in parsing command line " << e.what()

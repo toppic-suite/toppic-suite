@@ -102,7 +102,7 @@ For an input `sample.mzML`:
 | `sample_ms2_raw.msalign` | The deconvoluted DIA MS/MS scans before pseudo-spectrum generation; intermediate. |
 | `sample_ms1.csv`, `sample_frac_ms1.mzrt.csv` | The MS1 feature ECScore table and the MS1 features with their elution profiles (BatMass format); intermediate. |
 | `sample_<window>_ms2.csv`, `sample_<window>_frac_ms2.mzrt.csv` | The same two tables for the fragment features of each isolation window, named by the window's lower m/z bound written with six decimals (`sample_400.000000_ms2.csv`); intermediate. |
-| `sample.sqlite` | The SQLite database with the deconvoluted MS1 and MS/MS scans and their peaks, as written by TopFD, with the levels of the 3D visualisation of the MS1 peaks (the `LEVEL` column of `ms1_peak` and the table `CONFIG`, see the [TopFD manual](topfd_manual.md)). Not written with `-z` (`--no-sql`). |
+| `sample.sqlite` | The SQLite database with the deconvoluted MS1 and MS/MS scans and their peaks, as written by TopFD, with the levels of the 3D visualisation of the MS1 peaks (the `LEVEL` column of `ms1_peak` and the table `CONFIG`, see the [TopFD manual](topfd_manual.md)). Not written with `-z` (`--no-sql`). The database is compressed when complete: its peak and envelope tables become one zstd-compressed row per spectrum (about a third of the size; see the [topzstd manual](topzstd_manual.md), whose `topzstd -d` gives the rows back). TopPIC, TopMG and TopMSV (with the sqlite-zstd extension) read it. |
 
 The intermediate files are left in place. When searching the pseudo spectra
 with TopPIC, add `-D`: post mass matching looks up the

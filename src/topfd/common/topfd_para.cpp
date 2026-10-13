@@ -32,6 +32,7 @@
 #include "common/util/time_util.hpp"
 #include "sql/sql_db_copy.hpp"
 #include "sql/sql_util.hpp"
+#include "sql/zstd_db.hpp"
 
 namespace toppic {
 
@@ -130,10 +131,8 @@ void TopfdPara::closeSqlDb() {
   if (sql_db_ == nullptr) {
     return;
   }
-  std::string name =
-      std::filesystem::path(sqlite3_db_filename(sql_db_, "main"))
-          .filename()
-          .string();
+  std::string path = sqlite3_db_filename(sql_db_, "main");
+  std::string name = std::filesystem::path(path).filename().string();
   std::cout << "Compacting the SQLite database " << name << " started."
             << std::endl;
   char* err = nullptr;
@@ -149,6 +148,12 @@ void TopfdPara::closeSqlDb() {
   sqlite3_free(err);
   sqlite3_close(sql_db_);
   sql_db_ = nullptr;
+  // the per-spectrum tables as zstd-compressed BLOB rows (toppic_test
+  // experiment 172): readers load the sqlite-zstd extension (TopMSV) or
+  // decode them (toppic, topmg)
+  if (zstd_) {
+    zstd_db::compressInPlace(path);
+  }
 }
 
 void TopfdPara::createSqlDb(const std::string& sql_db_name) {

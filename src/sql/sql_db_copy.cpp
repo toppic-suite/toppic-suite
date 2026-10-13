@@ -26,6 +26,7 @@
 
 #include "common/util/logger.hpp"
 #include "sql/sql_util.hpp"
+#include "sql/zstd_db.hpp"
 
 namespace toppic {
 
@@ -53,6 +54,26 @@ sqlite3* openCopy(const std::string& src_name, const std::string& dest_name) {
   std::string tmp_name = tmpName(dest_name);
   for (const char* suffix : {"", "-journal", "-wal", "-shm"}) {
     removeFile(tmp_name + suffix);
+  }
+  // a compressed TopFD database (topfd's default, toppic_test experiment
+  // 172): the copy is its decompressed form, with the peaks and envelopes as
+  // rows to be corrected
+  if (zstd_db::isCompressed(src_name)) {
+    zstd_db::decompressDb(src_name, tmp_name);
+    sqlite3* db = nullptr;
+    if (sqlite3_open(tmp_name.c_str(), &db) != SQLITE_OK) {
+      LOG_ERROR("Cannot open the database " << tmp_name << ": "
+                                            << sqlite3_errmsg(db));
+      std::exit(EXIT_FAILURE);
+    }
+    sql_util::execSql(db, "PRAGMA journal_mode = OFF;");
+    sql_util::execSql(db, "PRAGMA synchronous = OFF;");
+    for (const std::string& table : kToppicTables) {
+      if (sql_util::hasTable(db, table)) {
+        sql_util::execSql(db, "DROP TABLE " + table + ";");
+      }
+    }
+    return db;
   }
   // read only as immutable: no -wal / -shm files next to TopFD's database
   sqlite3* src_db = nullptr;
@@ -139,8 +160,31 @@ void copyTables(const std::string& src_name, const std::string& dest_name,
     std::exit(EXIT_FAILURE);
   }
   sqlite3_finalize(stmt);
+  // a compressed source (topfd's default, toppic_test experiment 172): its
+  // per-spectrum tables are decoded into rows of their own CREATE statements
+  bool compressed = zstd_db::isCompressed(db, "src");
   sql_util::execSql(db, "BEGIN;");
   for (const std::string& table : tables) {
+    if (compressed) {
+      zstd_db::BlobTableReader reader(db, "src", table);
+      if (reader.exists()) {
+        sql_util::execSql(db, reader.createSql() + ";");
+        const std::vector<std::string>& names = reader.columnNames();
+        std::string sql = "INSERT INTO main." + table + " VALUES (";
+        for (size_t i = 0; i < names.size(); i++) sql += i > 0 ? ", ?" : "?";
+        sqlite3_stmt* ins = sql_util::prepareSql(db, sql + ");");
+        while (reader.next()) {
+          for (int r = 0; r < reader.rowNum(); r++) {
+            for (size_t c = 0; c < names.size(); c++) {
+              reader.bind(ins, static_cast<int>(c) + 1, c, r);
+            }
+            sql_util::stepAndReset(db, ins);
+          }
+        }
+        sqlite3_finalize(ins);
+        continue;
+      }
+    }
     stmt = sql_util::prepareSql(
         db,
         "SELECT sql FROM src.sqlite_master WHERE type = 'table' AND name = ?;");

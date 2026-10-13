@@ -48,11 +48,13 @@ class TopfdPara {
 
   void createSqlDb(const std::string& db_name);
 
-  // Compacts (VACUUM) and closes the SQLite database once it is complete;
+  // Compacts (VACUUM) and closes the SQLite database once it is complete,
+  // then compresses it in place (zstd_db::compressInPlace, toppic_test
+  // experiment 172) unless isZstd() is false (the hidden --disable-zstd);
   // nothing when none is open. TopFD and TopDIA call it at the end of each
   // file or FAIMS fraction (not topfd -T, whose database holds one
   // spectrum: createSqlDb and the destructor close a database still open
-  // without compacting it).
+  // without compacting or compressing it).
   void closeSqlDb();
 
   const std::string& getExeDir() const { return exe_dir_; }
@@ -85,6 +87,7 @@ class TopfdPara {
   double getMs2EnvCnnScoreCutoff() const { return ms2_env_cnn_score_cutoff_; }
   const std::string& getActivation() const { return activation_; }
   bool isGeneSql() const { return gene_sql_; }
+  bool isZstd() const { return zstd_; }
   bool isKeepUnusedPeaks() const { return keep_unused_peaks_; }
   bool isOutputAvgMass() const { return output_avg_mass_; }
   bool isOutputCsvFeatureFile() const { return output_csv_feature_file_; }
@@ -176,6 +179,7 @@ class TopfdPara {
     output_csv_feature_file_ = output;
   }
   void setGeneSql(bool gene_sql) { gene_sql_ = gene_sql; }
+  void setZstd(bool zstd) { zstd_ = zstd; }
   void setOutputDpEnvs(bool output) { output_dp_envs_ = output; }
   // false, and the method unchanged, for a name not in getMs1DeconvMethods()
   // (getMs2DeconvMethods())
@@ -297,6 +301,9 @@ class TopfdPara {
   // the database holds the MS1 peaks with their 3D levels (toppic_test
   // experiment 169)
   bool gene_sql_ = true;
+  // the database is compressed when complete (sqlite-zstd's format,
+  // sql/zstd_db; toppic_test experiment 172); false with --disable-zstd
+  bool zstd_ = true;
   // set per input file from MzmlProfile::hasPrecWindow()
   bool file_prec_window_ = false;
 
