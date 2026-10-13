@@ -632,14 +632,11 @@ Stat compressDb(const std::string& src_name, const std::string& dest_name,
     stmt = sql_util::prepareSql(db, select);
     bool have_spec = false;
     int64_t spec = 0;
-    int64_t rows = 0;
-    int64_t spectra = 0;
     while (sqlite3_step(stmt) == SQLITE_ROW) {
       int64_t s = sqlite3_column_int64(stmt, spec_col);
       if (!have_spec || s != spec) {
         have_spec = true;
         spec = s;
-        spectra++;
         for (Chooser& c : choosers) c.nextSpectrum();
       }
       for (size_t k = 0; k < data.size(); k++) {
@@ -653,7 +650,6 @@ Stat compressDb(const std::string& src_name, const std::string& dest_name,
         }
         choosers[k].add(v, integral, group);
       }
-      rows++;
     }
     sqlite3_finalize(stmt);
     std::vector<Codec> codecs(data.size());
@@ -761,13 +757,6 @@ Stat compressDb(const std::string& src_name, const std::string& dest_name,
     sqlite3_finalize(stmt);
     sqlite3_finalize(ins);
     sql_util::execSql(db, "COMMIT;");
-    std::cout << "  " << t.name << ": " << rows << " rows of " << spectra
-              << " spectra, codecs";
-    for (size_t k = 0; k < data.size(); k++) {
-      std::cout << (k > 0 ? ", " : " ") << cols[data[k]].name << " "
-                << codecName(codecs[k]);
-    }
-    std::cout << std::endl;
     blob_tables.push_back(bt);
   }
   sql_util::execSql(db, "DETACH DATABASE src;");

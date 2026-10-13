@@ -408,7 +408,9 @@ void DeconvMs1Process::process() {
     sql_writer_ptr->flush();
   }
   if (gene_sql_3d) {
-    std::cout << "Writing MS1 peaks for 3D visualization started."
+    // a new line ends the last progress line
+    std::cout << std::endl
+              << "Writing MS1 peaks for 3D visualization started."
               << std::endl;
     MsSqlWriter writer_3d(topfd_para_ptr_->getSqlDb());
     writer_3d.write(std::move(peaks_3d), ms1_scan_num_3d,

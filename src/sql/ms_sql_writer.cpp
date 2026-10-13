@@ -180,7 +180,6 @@ void MsSqlWriter::write(std::vector<MsSqlPeak> peaks, int ms1_scan_num,
   int level = 0;
   sortByRtMz(peaks);
   insertConfig(range);
-  std::cout << peaks.size() << " MS1 peaks in 3D level 0." << std::endl;
 
   // each level is down-sampled from the one below (last); level 0 is kept
   // for ms1_peak
@@ -203,8 +202,6 @@ void MsSqlWriter::write(std::vector<MsSqlPeak> peaks, int ms1_scan_num,
       levels[peak.pos] = static_cast<std::int8_t>(level);
     }
     insertConfig(layer_range);
-    std::cout << layer_peaks.size() << " MS1 peaks in 3D level " << level
-              << "." << std::endl;
     last_level = std::move(layer_peaks);
     last = &last_level;
   }
