@@ -319,3 +319,15 @@ calls `refinePrecursorByMatchedIons` like `PsAlign` and `PsAlignMultiType`;
       the refined precursor lets one ion match, the diagonal stays and the
       unexpected shift can exceed `max_ptm_mass_` (500 Da), so the PrSM is
       rejected (spectrum 712 of 480, THOC4, E 2.5e-8 with the old method).
+
+## SQLite output (`--no-sql`)
+
+topmg writes its PrSM tables (`prsm_sql_output::write`) into TopFD's
+database of the spectrum file (`prsm_post_mass_match::sqlFileName`, the
+`_post_ms2` of toppic's post-matched files read as `_ms2`) when it exists;
+it has no database of its own. The visible `--no-sql` (branch
+`no_sql_output`, toppic_test experiment 164; the same option as toppic's,
+see `toppic_output.md`) skips that write, so topmg writes or changes no
+SQLite file; the parameter block prints "SQLite database output: No" only
+when it is set.
+

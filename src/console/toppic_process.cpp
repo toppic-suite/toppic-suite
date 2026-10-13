@@ -1371,11 +1371,20 @@ int TopPIC_postprocess(std::map<std::string, std::string>& arguments,
       // the EnvCNN model scores the added masses
       onnx_env_cnn::initModel(resource_dir,
                               std::stoi(arguments["threadNumber"]));
-      // toppic's database of the file, <base>_toppic.sqlite (a copy of
-      // TopFD's, corrected with --mass-calib; TopPICProgress_multi_file)
-      sp_file_name = prsm_post_mass_match::process(
-          prsm_para_ptr, cur_suffix, cur_suffix, min_peak_num,
-          arguments["toppicDbFileName"]);
+      if (arguments["noSql"] == "true") {
+        // --no-sql: TopFD's database, read only, with the m/z values
+        // corrected in memory after --mass-calib (TopPIC_mass_calib)
+        sp_file_name = prsm_post_mass_match::processReadOnly(
+            prsm_para_ptr, cur_suffix, cur_suffix, min_peak_num,
+            arguments["topfdDbFileName"],
+            arguments["massCalibModelFileName"]);
+      } else {
+        // toppic's database of the file, <base>_toppic.sqlite (a copy of
+        // TopFD's, corrected with --mass-calib; TopPICProgress_multi_file)
+        sp_file_name = prsm_post_mass_match::process(
+            prsm_para_ptr, cur_suffix, cur_suffix, min_peak_num,
+            arguments["toppicDbFileName"]);
+      }
       // The steps below read the spectra with the added masses and the PrSMs
       // with the recounted matches, and name their files after the new
       // spectrum file.
@@ -1648,11 +1657,17 @@ int TopPIC_report(std::map<std::string, std::string>& arguments) {
     std::cout << "Outputting protein table - finished." << std::endl;
 
     // toppic's database of the file, <base>_toppic.sqlite; none for the
-    // combined result of -c
-    prsm_sql_output::write(prsm_para_ptr, arguments["toppicDbFileName"],
-                           base_name, ori_db_file_name, "toppic_prsm_cutoff",
-                           "toppic_form_cutoff_form",
-                           "toppic_prot_cutoff_prot");
+    // combined result of -c, nor with --no-sql
+    if (arguments["noSql"] == "true") {
+      std::cout << "The PrSM tables are not written to an SQLite database "
+                   "(--no-sql)."
+                << std::endl;
+    } else {
+      prsm_sql_output::write(prsm_para_ptr, arguments["toppicDbFileName"],
+                             base_name, ori_db_file_name, "toppic_prsm_cutoff",
+                             "toppic_form_cutoff_form",
+                             "toppic_prot_cutoff_prot");
+    }
 
   } catch (const char* e) {
     std::cout << "[Exception]" << std::endl;
@@ -1940,10 +1955,16 @@ std::string TopPIC_mass_calib(std::map<std::string, std::string>& arguments) {
                    arguments["keepTempFiles"] == "true", "", false);
     std::string topfd_db_name = arguments["topfdDbFileName"];
     std::string toppic_db_name = arguments["toppicDbFileName"];
+    bool no_sql = arguments["noSql"] == "true";
+    // with --no-sql the post mass matching corrects TopFD's peaks with the
+    // model file instead of reading a corrected copy; none without a model
+    arguments["massCalibModelFileName"] = "";
     if (set.prec.size() < 3 || set.frag.size() < 4) {
       std::cout << "WARNING: too few calibrants for the mass calibration; "
                 << sp_file_name << " is searched without it." << std::endl;
-      writeToppicDb(topfd_db_name, toppic_db_name);
+      if (!no_sql) {
+        writeToppicDb(topfd_db_name, toppic_db_name);
+      }
       return sp_file_name;
     }
     MassCalibModel model = mass_calib_fit::fitModel(set);
@@ -1969,8 +1990,11 @@ std::string TopPIC_mass_calib(std::map<std::string, std::string>& arguments) {
     }
     // TopFD's database, read only, and toppic's corrected copy of it for the
     // search of the corrected spectra (TopFD's masses are monoisotopic, also
-    // after -g)
-    if (std::filesystem::exists(topfd_db_name)) {
+    // after -g); with --no-sql no copy: the post mass matching corrects
+    // TopFD's peaks with the model
+    if (no_sql) {
+      arguments["massCalibModelFileName"] = model_file_name;
+    } else if (std::filesystem::exists(topfd_db_name)) {
       sqlite_mass_calib::process(model, topfd_db_name, toppic_db_name);
     } else {
       std::cout << "Mass calibration - the database " << topfd_db_name
@@ -2087,10 +2111,15 @@ int TopPICProgress_multi_file(std::map<std::string, std::string>& arguments,
       std::cout << "Deleted the earlier database " << toppic_db_lst[k] << "."
                 << std::endl;
     }
-    if (arguments["massCalib"] != "true") {
+    // --no-sql: no database is written (an earlier one is still deleted, so
+    // that none of another run sits next to the new results)
+    if (arguments["massCalib"] != "true" && arguments["noSql"] != "true") {
       writeToppicDb(topfd_db_lst[k], toppic_db_lst[k]);
     }
   }
+  // --mass-calib --no-sql: the calibration model of each file, which the
+  // post mass matching applies to TopFD's peaks
+  std::vector<std::string> calib_model_lst(spec_file_lst.size());
 
   // --mass-calib: every file is recalibrated before the searches, and every
   // step below, including the merge of a combined run, works on the
@@ -2115,6 +2144,7 @@ int TopPICProgress_multi_file(std::map<std::string, std::string>& arguments,
         return 1;
       }
       spec_file_lst[k] = calib_name;
+      calib_model_lst[k] = arguments["massCalibModelFileName"];
     }
   }
 
@@ -2124,7 +2154,9 @@ int TopPICProgress_multi_file(std::map<std::string, std::string>& arguments,
       std::string start_time = buf;
       arguments["startTime"] = start_time;
       arguments["spectrumFileName"] = spec_file_lst[k];
+      arguments["topfdDbFileName"] = topfd_db_lst[k];
       arguments["toppicDbFileName"] = toppic_db_lst[k];
+      arguments["massCalibModelFileName"] = calib_model_lst[k];
       if (toppic::TopPICProgress(arguments) != 0) {
         return 1;
       }

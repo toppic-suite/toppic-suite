@@ -67,7 +67,8 @@ clustering step. `--no-topfd-feature` (`-x`) runs without it, clustering
 proteoforms by protein, precursor mass and sequence overlap instead (two
 PrSMs share a proteoform only if their proteoform sequences overlap by at
 least 70% of the shorter one). If `sample.sqlite`
-exists, the identifications are also written into it; it is not required.
+exists, the identifications are also written into it (not with
+`--no-sql`); it is not required.
 
 **Database indexes.** `topindex` is optional. TopMG prepares the database in
 `<database>_idx/` next to the FASTA file and builds its filtering indexes in
@@ -122,7 +123,7 @@ deleted at the end unless `--keep-temp-files` is given;
     cutoff, the best PrSM per proteoform by the proteoform-level cutoff, and
     the best PrSM per protein by the protein-level cutoff.
 12. **Writing identifications to the SQLite database**, if `sample.sqlite`
-    exists.
+    exists (skipped with `--no-sql`).
 
 TopMG has no post mass matching step, so its result files keep the `_ms2`
 name.
@@ -137,7 +138,7 @@ For an input `sample_ms2.msalign`:
 | `sample_ms2_topmg_proteoform.tsv`, `..._proteoform_single.tsv` | One PrSM per identified proteoform, passing the proteoform-level cutoff. |
 | `sample_ms2_topmg_protein.tsv`, `..._protein_single.tsv` | One PrSM per identified protein, passing the protein-level cutoff. |
 | `sample_ms2_topmg_prsm.xml`, `..._proteoform.xml`, `..._protein.xml` | The same three sets in XML, read by TopDiff and the visualization tools. Every PrSM records the TopPIC Suite version that wrote it, and TopDiff reads only the files of its own version. |
-| `sample.sqlite` | TopFD's database, updated with the identification tables (`prsm`, `proteoform`, `protein`, `prsm_mass_shift`, `prsm_protein_match` and `fasta_seq`) when it exists. TopMG writes into TopFD's file itself, not into a copy as TopPIC does. |
+| `sample.sqlite` | TopFD's database, updated with the identification tables (`prsm`, `proteoform`, `protein`, `prsm_mass_shift`, `prsm_protein_match` and `fasta_seq`) when it exists. TopMG writes into TopFD's file itself, not into a copy as TopPIC does. With `--no-sql` it is not changed. |
 | `sample_ms2.topmg_raw_prsm` | The PrSMs before recounting and cutoffs. Always kept, even without `--keep-temp-files`; with `-c` the files' raw PrSMs are merged from it. |
 
 The tables have the same layout and columns as TopPIC's (see the
@@ -196,6 +197,7 @@ Cutoffs and output:
 | `-u`, `--thread-number <int>` | 1 | Number of threads; must not exceed the number of hardware threads. Each protein filtering step may use fewer: it fits its thread number to the memory available when it starts (about 1 GiB per thread for ASF-One PTM filtering, 0.5 GiB for ASF-Diagonal filtering). The run starts with a warning listing the filtering steps that will use fewer threads and how many, and a step prints its number again if the memory available when it starts gives a different one. The graph alignment also fits its thread number to the memory available when it starts (0.5 GiB per thread, times (`-s` + 1) x (`-P` + 1) / 8 when that is more than 1: 0.75 GiB with the defaults) and prints a warning when it uses fewer threads. All other steps use the full number. |
 | `-k`, `--keep-temp-files` | off | Keep the intermediate files. |
 | `-K`, `--keep-decoy-ids` | off | Keep decoy identifications in the result tables. |
+| `--no-sql` | off | Do not write the identification tables into TopFD's `sample.sqlite`: TopMG then writes or changes no SQLite file. The other result files are the same as without the option. |
 
 ## 5. Examples
 

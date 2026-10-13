@@ -451,16 +451,23 @@ int TopMG_post(std::map<std::string, std::string>& arguments) {
     std::cout << "Outputting protein table - finished." << std::endl;
 
     // topmg's identifications go into TopFD's database of the spectrum file
-    // (that of <x>_ms2.msalign for toppic's post-matched <x>_post_ms2.msalign)
-    std::string sql_sp_base = base_name;
-    if (str_util::endsWith(sql_sp_base, "_post_ms2")) {
-      sql_sp_base = sql_sp_base.substr(0, sql_sp_base.size() - 9) + "_ms2";
+    // (that of <x>_ms2.msalign for toppic's post-matched <x>_post_ms2.msalign);
+    // not with --no-sql
+    if (arguments["noSql"] == "true") {
+      std::cout << "The PrSM tables are not written to an SQLite database "
+                   "(--no-sql)."
+                << std::endl;
+    } else {
+      std::string sql_sp_base = base_name;
+      if (str_util::endsWith(sql_sp_base, "_post_ms2")) {
+        sql_sp_base = sql_sp_base.substr(0, sql_sp_base.size() - 9) + "_ms2";
+      }
+      prsm_sql_output::write(
+          prsm_para_ptr,
+          prsm_post_mass_match::sqlFileName(sql_sp_base + ".msalign"),
+          base_name, ori_db_file_name, "topmg_prsm_cutoff",
+          "topmg_form_cutoff_form", "topmg_prot_cutoff_prot");
     }
-    prsm_sql_output::write(
-        prsm_para_ptr,
-        prsm_post_mass_match::sqlFileName(sql_sp_base + ".msalign"),
-        base_name, ori_db_file_name, "topmg_prsm_cutoff",
-        "topmg_form_cutoff_form", "topmg_prot_cutoff_prot");
 
   } catch (const char* e) {
     LOG_ERROR("[Exception]" << e);
