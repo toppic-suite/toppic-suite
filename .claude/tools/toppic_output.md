@@ -959,9 +959,13 @@ the method inside a search. Facts to keep straight:
       (the spectrum table's `retention_time` in seconds / 60; SQL functions
       over `MassCalibModel::correctMz` / `correctMass`): the MS1 model for
       `ms1_peak.mz`, `ms1_env.mono_mass` / `ref_mass`, `ms1_env_peak.mz` and
-      the 3D tables of `topfd -D` (`PEAKS<k>.MZ` at `RETENTIONTIME` / 60,000,
-      each `CONFIG` row's `MZMIN` / `MZMAX` the range of its corrected layer;
-      the k-th row is layer k), the MS/MS model for `ms2_peak.mz`,
+      the 3D levels of `topfd -D`: since toppic_test experiment 165 the
+      `LEVEL` column of `ms1_peak`, corrected with it, and each `CONFIG`
+      row's `MZMIN` / `MZMAX` set to the range of its corrected level (the
+      k-th row is level k, the rows with `LEVEL` >= k; one `GROUP BY LEVEL`
+      pass over `ms1_peak`); in a file of an earlier TopFD the tables
+      `PEAKS<k>` (`MZ` corrected at `RETENTIONTIME` / 60,000, the k-th row
+      the range of `PEAKS<k>`), the MS/MS model for `ms2_peak.mz`,
       `ms2_env.mono_mass` / `ref_mass` and `ms2_env_peak.mz`. Not changed
       (the user's decision): the isolation windows (`ms2_spectrum.target_mz`,
       `begin_mz`, `end_mz`, the instrument's settings), nor intensities,

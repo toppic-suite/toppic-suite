@@ -299,9 +299,11 @@ void DeconvMs1Process::process() {
   }
   // One SQLite writer shared across the worker threads (it is internally
   // synchronized and batches inserts); created only when SQLite output is on.
+  // With --sql-3d, ms1_peak is written at the end with the 3D levels.
   MzmlMsSqlWriterPtr sql_writer_ptr =
       topfd_para_ptr_->isGeneSql()
-          ? std::make_shared<MzmlMsSqlWriter>(topfd_para_ptr_->getSqlDb())
+          ? std::make_shared<MzmlMsSqlWriter>(topfd_para_ptr_->getSqlDb(),
+                                              !topfd_para_ptr_->isSql3d())
           : nullptr;
   // init thread pool
   int thread_num = topfd_para_ptr_->getThreadNum();
@@ -337,8 +339,8 @@ void DeconvMs1Process::process() {
   };
 
   // With --sql-3d, the raw MS1 peaks are kept (main thread only) and written
-  // to the same database as the PEAKS0..n / CONFIG tables once
-  // deconvolution is done.
+  // to ms1_peak with their 3D levels, and CONFIG, once deconvolution is done
+  // (toppic_test experiment 165).
   bool gene_sql_3d = sql_writer_ptr != nullptr && topfd_para_ptr_->isSql3d();
   std::vector<MsSqlPeak> peaks_3d;
   int ms1_scan_num_3d = 0;
@@ -361,17 +363,19 @@ void DeconvMs1Process::process() {
       std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
     if (gene_sql_3d) {
+      // every peak, with the key MzmlMsSqlWriter would write (the peaks of
+      // intensity <= 0 get LEVEL -1)
       MzmlMsPtr ms_one_ptr = ms_group_ptr->getMsOnePtr();
-      int rt = static_cast<int>(
-          ms_one_ptr->getMsHeaderPtr()->getRetentionTime() * 1000);  // ms
-      for (const PeakPtr& peak_ptr : ms_one_ptr->getPeakPtrVec()) {
-        if (peak_ptr->getIntensity() <= 0.0) {
-          continue;
-        }
+      MsHeaderPtr header_ptr = ms_one_ptr->getMsHeaderPtr();
+      int rt = static_cast<int>(header_ptr->getRetentionTime() * 1000);  // ms
+      const PeakPtrVec& peak_ptrs = ms_one_ptr->getPeakPtrVec();
+      for (std::size_t i = 0; i < peak_ptrs.size(); i++) {
         MsSqlPeak peak;
-        peak.mz = peak_ptr->getPosition();
-        peak.inte = peak_ptr->getIntensity();
+        peak.mz = peak_ptrs[i]->getPosition();
+        peak.inte = peak_ptrs[i]->getIntensity();
         peak.rt = rt;
+        peak.spec_id = header_ptr->getSpecId();
+        peak.peak_id = static_cast<int>(i);
         peaks_3d.push_back(peak);
       }
       ms1_scan_num_3d++;

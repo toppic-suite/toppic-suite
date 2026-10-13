@@ -30,8 +30,10 @@ namespace sqlite_mass_calib {
 // since experiment 156), for the search of the corrected spectra:
 // - the MS1 model: ms1_peak.mz and ms1_env_peak.mz (m/z' = m/z (1 - e 1e-6)),
 //   ms1_env.mono_mass and ms1_env.ref_mass (mass - e 1e-6 (mass + z proton),
-//   e at the mass's m/z), and the 3D tables of topfd -D (PEAKS<k>.MZ, each
-//   CONFIG row's MZMIN / MZMAX the range of its corrected layer table);
+//   e at the mass's m/z), and the ranges of the 3D levels of topfd -D (each
+//   CONFIG row's MZMIN / MZMAX the range of its corrected level: since
+//   toppic_test experiment 165 the rows of ms1_peak with LEVEL >= k, before
+//   it the table PEAKS<k>, whose MZ is corrected too);
 // - the MS/MS model: ms2_peak.mz, ms2_env_peak.mz, ms2_env.mono_mass and
 //   ms2_env.ref_mass;
 // each at its own spectrum's retention time (the spectrum table's

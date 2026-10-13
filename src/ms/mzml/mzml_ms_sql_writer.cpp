@@ -38,7 +38,8 @@ void stepAndReset(sqlite3_stmt* stmt) {
 
 }  // namespace
 
-MzmlMsSqlWriter::MzmlMsSqlWriter(sqlite3* sql_db) : sql_db_(sql_db) {
+MzmlMsSqlWriter::MzmlMsSqlWriter(sqlite3* sql_db, bool write_ms1_peaks)
+    : sql_db_(sql_db), write_ms1_peaks_(write_ms1_peaks) {
   // Bulk-load PRAGMAs. WAL + synchronous=NORMAL removes the per-commit fsync
   // while staying crash-safe; the cache/mmap settings keep working pages in
   // memory. (This is a regenerable visualization database, so synchronous=OFF
@@ -54,8 +55,8 @@ MzmlMsSqlWriter::MzmlMsSqlWriter(sqlite3* sql_db) : sql_db_(sql_db) {
       "INSERT INTO ms1_spectrum(id, scan, retention_time, peak_num, env_num, "
       "base_inte, min_ref_inte) VALUES (?, ?, ?, ?, ?, ?, ?);");
   ms1_peak_stmt_ = sql_util::prepareSql(sql_db_,
-                           "INSERT INTO ms1_peak(spec_id, peak_id, mz, "
-                           "intensity) VALUES (?, ?, ?, ?);");
+                           "INSERT INTO ms1_peak(LEVEL, spec_id, peak_id, mz, "
+                           "intensity) VALUES (?, ?, ?, ?, ?);");
   ms1_env_stmt_ = sql_util::prepareSql(sql_db_,
       "INSERT INTO ms1_env(spec_id, env_id, mono_mass, ref_mass, charge, "
       "intensity, envcnn_score, peak_num) VALUES (?, ?, ?, ?, ?, ?, ?, ?);");
@@ -128,12 +129,17 @@ void MzmlMsSqlWriter::writeMs1(const MzmlMsPtr& ms_ptr,
   sqlite3_bind_double(ms1_spec_stmt_, 7, min_ref_inte);
   stepAndReset(ms1_spec_stmt_);
 
-  for (size_t i = 0; i < raw_peaks.size(); i++) {
-    sqlite3_bind_int(ms1_peak_stmt_, 1, spec_id);
-    sqlite3_bind_int(ms1_peak_stmt_, 2, static_cast<int>(i));
-    sqlite3_bind_double(ms1_peak_stmt_, 3, raw_peaks[i]->getPosition());
-    sqlite3_bind_double(ms1_peak_stmt_, 4, raw_peaks[i]->getIntensity());
-    stepAndReset(ms1_peak_stmt_);
+  if (write_ms1_peaks_) {
+    for (size_t i = 0; i < raw_peaks.size(); i++) {
+      // LEVEL 0, or -1 outside the 3D map
+      double inte = raw_peaks[i]->getIntensity();
+      sqlite3_bind_int(ms1_peak_stmt_, 1, inte > 0.0 ? 0 : -1);
+      sqlite3_bind_int(ms1_peak_stmt_, 2, spec_id);
+      sqlite3_bind_int(ms1_peak_stmt_, 3, static_cast<int>(i));
+      sqlite3_bind_double(ms1_peak_stmt_, 4, raw_peaks[i]->getPosition());
+      sqlite3_bind_double(ms1_peak_stmt_, 5, inte);
+      stepAndReset(ms1_peak_stmt_);
+    }
   }
 
   for (size_t i = 0; i < envs.size(); i++) {

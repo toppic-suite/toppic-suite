@@ -23,6 +23,7 @@ in the same commit as the code (as this file was before 2026-10-12).
   - MS3 spectral deconvolution
   - Activation of MS/MS spectra
   - Isotope distributions
+  - The MS1 peaks of the database and the 3D levels
 - `.claude/tools/toppic_search.md` — TopPIC tolerances, filters and searches (also the index files topindex writes):
   - Precursor and fragment mass tolerances
   - Precursor error tolerance in Dalton
@@ -230,7 +231,11 @@ path and linked into `toppic_common`:
   it destruct to flush the final transaction), **not** the old
   `mzml_ms_sql_writer::writeMs1/writeMs2(sqlite3*, ...)` free functions — the
   batching needs state a per-call free function can't hold. The caller still owns
-  the connection (opens it, creates the schema, closes it). When migrating the
+  the connection (opens it, creates the schema, closes it). `ms1_peak` is a
+  `WITHOUT ROWID` table keyed on `(LEVEL, spec_id, peak_id)` (toppic_test
+  experiment 165): the writer gives a peak `LEVEL` 0 (-1 for intensity <= 0),
+  and with topfd `--sql-3d` it writes no `ms1_peak` rows (its constructor's
+  `write_ms1_peaks`), because `MsSqlWriter` writes them with the 3D levels. When migrating the
   upstream topfd driver that wrote spectra, adopt the object; do not reintroduce
   per-call free-function wrappers (they would restore the per-scan
   transaction/prepare cost this rewrite removed).
@@ -452,11 +457,15 @@ above it, never the reverse:
   and renamed when complete; `removeDb` deletes a database with its
   -journal, -wal and -shm files) plus
   `ms_sql_writer`, the
-  MS1-peak tables for 3D visualization: `MsSqlWriter` writes a peak list as `PEAKS0`
-  (all peaks) plus down-sampled `PEAKS1..n` layer tables, one `CONFIG` row
-  per layer, and a colour bucket per peak, on a caller-owned connection like
-  the topfd writer below. topfd `--sql-3d` (in `deconv_ms1_process`) writes
-  them into the topfd `.sqlite` after MS1 deconvolution.
+  MS1-peak levels for 3D visualization: `MsSqlWriter` builds level 0 (every
+  MS1 peak of intensity > 0) and the down-sampled levels 1..n, and writes
+  them as the `LEVEL` column of `ms1_peak` (the highest level that keeps the
+  peak; the levels are nested) plus one `CONFIG` row per level, on a
+  caller-owned connection like the topfd writer below; readers compute the
+  colour bucket (before toppic_test experiment 165 the levels were the
+  tables `PEAKS0..n` with a `COLOR` column; see `.claude/tools/topfd.md`).
+  topfd `--sql-3d` (in `deconv_ms1_process`) writes them into the topfd
+  `.sqlite` after MS1 deconvolution.
 - `src/para` — analysis parameters (`sp_para`, `peak_tolerance`, `prsm_para`).
 - `src/seq` — sequence/proteoform layer.
 - `src/ms` — mass-spectrum layer: `spec` (peaks/spectra/msalign), `msmap`,

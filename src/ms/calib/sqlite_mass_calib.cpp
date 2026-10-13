@@ -15,10 +15,12 @@
 
 #include "ms/calib/sqlite_mass_calib.hpp"
 
+#include <algorithm>
 #include <chrono>
 #include <cstdlib>
 #include <iomanip>
 #include <iostream>
+#include <limits>
 #include <string>
 #include <unordered_map>
 #include <utility>
@@ -137,6 +139,68 @@ int update(sqlite3* db, const std::string& sql) {
   return sqlite3_changes(db);
 }
 
+bool hasColumn(sqlite3* db, const std::string& table,
+               const std::string& column) {
+  sqlite3_stmt* stmt =
+      sql_util::prepareSql(db, "PRAGMA table_info(" + table + ");");
+  bool found = false;
+  while (!found && sqlite3_step(stmt) == SQLITE_ROW) {
+    const unsigned char* name = sqlite3_column_text(stmt, 1);
+    found = name != nullptr &&
+            column == reinterpret_cast<const char*>(name);
+  }
+  sqlite3_finalize(stmt);
+  return found;
+}
+
+// The 3D levels of topfd -D since toppic_test experiment 165 are in
+// ms1_peak, whose m/z values are corrected already: level k is the rows with
+// LEVEL >= k, and its CONFIG row (inserted k-th, ms_sql_writer) gets the
+// corrected m/z range. One pass over ms1_peak in key order gives the range
+// of each LEVEL, and level k's is that of the LEVELs >= k. Returns the
+// number of CONFIG rows changed.
+int updateLevelRanges(sqlite3* db) {
+  sqlite3_stmt* stmt = sql_util::prepareSql(db, "SELECT COUNT(*) FROM CONFIG;");
+  int level_num = 0;
+  if (sqlite3_step(stmt) == SQLITE_ROW) {
+    level_num = sqlite3_column_int(stmt, 0);
+  }
+  sqlite3_finalize(stmt);
+  std::vector<double> mz_mins(level_num, std::numeric_limits<double>::max());
+  std::vector<double> mz_maxes(level_num,
+                               std::numeric_limits<double>::lowest());
+  stmt = sql_util::prepareSql(db,
+                              "SELECT LEVEL, MIN(mz), MAX(mz) FROM ms1_peak "
+                              "WHERE LEVEL >= 0 GROUP BY LEVEL;");
+  while (sqlite3_step(stmt) == SQLITE_ROW) {
+    int level = sqlite3_column_int(stmt, 0);
+    if (level < level_num) {
+      mz_mins[level] = sqlite3_column_double(stmt, 1);
+      mz_maxes[level] = sqlite3_column_double(stmt, 2);
+    }
+  }
+  sqlite3_finalize(stmt);
+  stmt = sql_util::prepareSql(
+      db, "UPDATE CONFIG SET MZMIN = ?, MZMAX = ? WHERE rowid = ?;");
+  int changed = 0;
+  for (int k = level_num - 1; k >= 0; k--) {
+    if (k + 1 < level_num) {
+      mz_mins[k] = std::min(mz_mins[k], mz_mins[k + 1]);
+      mz_maxes[k] = std::max(mz_maxes[k], mz_maxes[k + 1]);
+    }
+    if (mz_mins[k] > mz_maxes[k]) {
+      continue;  // a level without peaks
+    }
+    sqlite3_bind_double(stmt, 1, mz_mins[k]);
+    sqlite3_bind_double(stmt, 2, mz_maxes[k]);
+    sqlite3_bind_int(stmt, 3, k + 1);
+    sql_util::stepAndReset(db, stmt);
+    changed += sqlite3_changes(db);
+  }
+  sqlite3_finalize(stmt);
+  return changed;
+}
+
 }  // namespace
 
 void process(const MassCalibModel& model, const std::string& ori_db_name,
@@ -174,8 +238,8 @@ void process(const MassCalibModel& model, const std::string& ori_db_name,
         p + "env_peak", update(db, "UPDATE " + p + "env_peak SET mz = calib_mz" +
                                        l + "(spec_id, mz);"));
   }
-  // the 3D tables of topfd -D: layer k is PEAKS<k>, its range the CONFIG row
-  // inserted k-th (ms_sql_writer)
+  // the 3D tables of topfd -D before toppic_test experiment 165: layer k is
+  // PEAKS<k>, its range the CONFIG row inserted k-th (ms_sql_writer)
   bool has_config = sql_util::hasTable(db, "CONFIG");
   for (int layer = 0; sql_util::hasTable(db, "PEAKS" + std::to_string(layer));
        layer++) {
@@ -189,6 +253,11 @@ void process(const MassCalibModel& model, const std::string& ori_db_name,
                                 table + ") WHERE rowid = " +
                                 std::to_string(layer + 1) + ";");
     }
+  }
+  // since experiment 165: the levels in ms1_peak, corrected above
+  if (has_config && !sql_util::hasTable(db, "PEAKS0") &&
+      hasColumn(db, "ms1_peak", "LEVEL")) {
+    counts.emplace_back("CONFIG", updateLevelRanges(db));
   }
 
   sql_util::execSql(db,

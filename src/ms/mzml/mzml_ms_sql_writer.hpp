@@ -39,9 +39,14 @@ namespace toppic {
 // before constructing the writer and closes the database after destroying it.
 // The writer only manages the bulk-load PRAGMAs, prepared statements and the
 // chunked transactions on that connection.
+//
+// ms1_peak is keyed on (LEVEL, spec_id, peak_id): the writer gives a peak of
+// intensity > 0 LEVEL 0 and the others -1 (see MsSqlWriter). With
+// write_ms1_peaks false it writes no ms1_peak rows: topfd --sql-3d writes
+// them with their 3D levels (MsSqlWriter) after the deconvolution.
 class MzmlMsSqlWriter {
  public:
-  explicit MzmlMsSqlWriter(sqlite3* sql_db);
+  explicit MzmlMsSqlWriter(sqlite3* sql_db, bool write_ms1_peaks = true);
 
   ~MzmlMsSqlWriter();
 
@@ -61,6 +66,7 @@ class MzmlMsSqlWriter {
   void commit();  // commit the open transaction, if any (caller holds mutex_)
 
   sqlite3* sql_db_;   // not owned
+  bool write_ms1_peaks_;
   std::mutex mutex_;  // serializes writers sharing this object
 
   sqlite3_stmt* ms1_spec_stmt_ = nullptr;
