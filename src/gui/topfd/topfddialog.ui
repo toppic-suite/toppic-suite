@@ -822,41 +822,10 @@ p, li { white-space: pre-wrap; }
          <bool>false</bool>
         </property>
         <property name="toolTip">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Do not write the deconvoluted spectra to an SQLite database (.sqlite file). Leave it unchecked if TopPIC will search the spectra: its post mass matching, on by default, reads the MS/MS peaks from this database. While checked, &quot;MS1 3D visualization data&quot; is cleared and disabled. Default: unchecked. (topfd -z, --no-sql)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Do not write the deconvoluted spectra to an SQLite database (.sqlite file). Leave it unchecked if TopPIC will search the spectra: its post mass matching, on by default, reads the MS/MS peaks from this database. The database also holds the MS1 peaks for the 3D view of TopMSV. Default: unchecked. (topfd -z, --no-sql)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
         <property name="text">
          <string>Do not generate SQLite database</string>
-        </property>
-        <property name="checkable">
-         <bool>true</bool>
-        </property>
-        <property name="checked">
-         <bool>false</bool>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-    <widget class="QWidget" name="horizontalLayoutWidget_21">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>80</y>
-       <width>271</width>
-       <height>25</height>
-      </rect>
-     </property>
-     <layout class="QHBoxLayout" name="horizontalLayout_21">
-      <item>
-       <widget class="QCheckBox" name="sql3dCheckBox">
-        <property name="toolTip">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Also store the raw MS1 peaks for 3D visualization in the SQLite database. Disabled while &quot;Do not generate SQLite database&quot; is checked; no effect with &quot;Missing MS1 spectra&quot; or &quot;Text peak list input&quot;. Default: unchecked. (topfd -D, --sql-3d)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-        </property>
-        <property name="acceptDrops">
-         <bool>false</bool>
-        </property>
-        <property name="text">
-         <string>MS1 3D visualization data</string>
         </property>
         <property name="checkable">
          <bool>true</bool>
@@ -902,7 +871,7 @@ p, li { white-space: pre-wrap; }
     <widget class="QWidget" name="horizontalLayoutWidget_22">
      <property name="geometry">
       <rect>
-       <x>620</x>
+       <x>10</x>
        <y>80</y>
        <width>222</width>
        <height>25</height>

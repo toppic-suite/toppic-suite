@@ -66,8 +66,6 @@ std::string geneTopfdCommand(const TopfdParaPtr& para_ptr,
   }
   if (!para_ptr->isGeneSql()) {
     command = command + "-z ";
-  } else if (para_ptr->isSql3d()) {
-    command = command + "-D ";
   }
   command = command + "--deconv-ms1 " + para_ptr->getMs1DeconvMethod() +
             " --deconv-ms2 " + para_ptr->getMs2DeconvMethod() + " ";

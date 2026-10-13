@@ -192,8 +192,6 @@ bool Argument::parse(int argc, char* argv[]) {
         "such a file with its --average-mass option. The feature files and "
         "the SQLite database keep monoisotopic masses.")(
         "no-sql,z", "Do not write the deconvoluted spectra to an SQLite database.")(
-        "sql-3d,D",
-        "Add the MS1 peaks for 3D visualization to the SQLite database.")(
         "text-peak-list,T",
         "Deconvolute a single MS/MS spectrum given as a text peak list: one "
         "peak per line, m/z and intensity separated by a space or a tab. "
@@ -425,15 +423,6 @@ bool Argument::parse(int argc, char* argv[]) {
 
     if (vm.count("no-sql")) {
       topfd_para_ptr_->setGeneSql(false);
-    }
-
-    if (vm.count("sql-3d")) {
-      if (vm.count("no-sql")) {
-        std::cerr << "ERROR: --sql-3d cannot be used together with --no-sql."
-                  << std::endl;
-        return false;
-      }
-      topfd_para_ptr_->setSql3d(true);
     }
 
     if (vm.count("output-dp-envs")) {

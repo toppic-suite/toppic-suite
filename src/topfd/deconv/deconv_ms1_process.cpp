@@ -299,11 +299,11 @@ void DeconvMs1Process::process() {
   }
   // One SQLite writer shared across the worker threads (it is internally
   // synchronized and batches inserts); created only when SQLite output is on.
-  // With --sql-3d, ms1_peak is written at the end with the 3D levels.
+  // It writes no ms1_peak rows: those are written at the end with the 3D
+  // levels.
   MzmlMsSqlWriterPtr sql_writer_ptr =
       topfd_para_ptr_->isGeneSql()
-          ? std::make_shared<MzmlMsSqlWriter>(topfd_para_ptr_->getSqlDb(),
-                                              !topfd_para_ptr_->isSql3d())
+          ? std::make_shared<MzmlMsSqlWriter>(topfd_para_ptr_->getSqlDb())
           : nullptr;
   // init thread pool
   int thread_num = topfd_para_ptr_->getThreadNum();
@@ -338,10 +338,10 @@ void DeconvMs1Process::process() {
     sql_buffer_ptr->bytes = 0;
   };
 
-  // With --sql-3d, the raw MS1 peaks are kept (main thread only) and written
-  // to ms1_peak with their 3D levels, and CONFIG, once deconvolution is done
-  // (toppic_test experiment 165).
-  bool gene_sql_3d = sql_writer_ptr != nullptr && topfd_para_ptr_->isSql3d();
+  // With the database, the raw MS1 peaks are kept (main thread only) and
+  // written to ms1_peak with their 3D levels, and CONFIG, once deconvolution
+  // is done (toppic_test experiments 165 and 169).
+  bool gene_sql_3d = sql_writer_ptr != nullptr;
   std::vector<MsSqlPeak> peaks_3d;
   int ms1_scan_num_3d = 0;
 
@@ -363,7 +363,7 @@ void DeconvMs1Process::process() {
       std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
     if (gene_sql_3d) {
-      // every peak, with the key MzmlMsSqlWriter would write (the peaks of
+      // every peak, keyed on its spectrum and its index in it (the peaks of
       // intensity <= 0 get LEVEL -1)
       MzmlMsPtr ms_one_ptr = ms_group_ptr->getMsOnePtr();
       MsHeaderPtr header_ptr = ms_one_ptr->getMsHeaderPtr();
