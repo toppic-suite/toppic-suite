@@ -127,7 +127,7 @@ Deconvolution:
 | `-s`, `--ms2-sn-ratio <number>` | 1 | Signal-to-noise ratio for MS/MS spectra. |
 | `-w`, `--precursor-window <number>` | 4.0 (TopFD: 3.0) | Default isolation window width (m/z), used only when the file records none. |
 | `-p`, `--ms1-deconv <greedy\|msdeconv>` | msdeconv (TopFD: greedy) | MS1 deconvolution method (section 2, step 1). In `topdia_gui`: "MS1 deconvolution". |
-| `-q`, `--ms2-deconv <greedy\|msdeconv\|flashdeconv>` | msdeconv (TopFD: greedy) | MS/MS deconvolution method (section 2, step 3); `flashdeconv` is experimental. In `topdia_gui`: "MS/MS deconvolution". |
+| `-q`, `--ms2-deconv <greedy\|msdeconv\|flashdeconv>` | msdeconv (TopFD: greedy) | MS/MS deconvolution method (section 2, step 3); `flashdeconv` is experimental. In `topdia_gui`: "MS2 deconvolution". |
 | `-f`, `--ms1-envcnn-cutoff <0..1>` | 0.2 | MS1 envelopes whose EnvCNN score is below the cutoff are not reported (section 2, step 1); not the envelopes of the precursor isolation windows. Used with both MS1 deconvolution methods. `-f 0` reports every envelope. |
 | `-g`, `--ms2-envcnn-cutoff <0..1>` | 0 | MS/MS envelopes whose EnvCNN score is below the cutoff are not reported (section 2, step 3). Used with `-q msdeconv` and `greedy`, not with `flashdeconv`. |
 | `-n`, `--env-rank <envcnn\|msdeconv>` | envcnn | The score that ranks isotopic envelopes: `envcnn`, the EnvCNN score, or `msdeconv`, the MS-Deconv score. The ranking decides which envelopes `-j` keeps; the EnvCNN cutoffs `-f` and `-g` compare the EnvCNN score with either value. In `topdia_gui`: "Use MS-Deconv score" (`msdeconv` when checked). |

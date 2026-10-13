@@ -1246,7 +1246,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Deconvolution method of MS/MS spectra: msdeconv (default), the MS-Deconv dynamic programming; greedy, TopFD's default greedy search adapted to fragment ions; or flashdeconv, the FLASHDeconv algorithm (experimental). Frag num filtering is not used with flashdeconv. (topdia -q, --ms2-deconv)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="text">
-        <string>MS/MS deconvolution:</string>
+        <string>MS2 deconvolution:</string>
        </property>
       </widget>
      </item>

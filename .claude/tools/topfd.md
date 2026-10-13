@@ -240,7 +240,7 @@ moved from `-p` to `-y` for them and `--ms2-correlation-cutoff` from `-P` to
   `setMs1DeconvMethod(currentText())`; `gui/util/command.cpp` always emits
   `--ms1-deconv <m> --ms2-deconv <m>`. In topfd_gui they are the middle
   column's rows 3 and 4, "MS1 deconvolution" and "MS2 deconvolution" (was
-  "MS/MS deconvolution"; they came in as the third column's rows 4 and 5,
+  "MS/MS deconvolution", in topdia_gui until 2026-10-13; they came in as the third column's rows 4 and 5,
   the window grew by 40 pixels, and the former "Use FLASHDeconv for MS/MS"
   checkbox is gone). Since 2026-10-12 topfd_gui's parameters are three
   columns of five rows, 281 pixels wide at x = 30, 340 and 650 (the check
