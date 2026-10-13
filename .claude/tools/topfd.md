@@ -1065,3 +1065,19 @@ view (`topfd -D`) are one table:
 - **toppic `--mass-calib`** corrects `ms1_peak.mz` in place (`mz` is not a
   key column) and sets each `CONFIG` row's `MZMIN` / `MZMAX` from
   `ms1_peak` (`sqlite_mass_calib`; see `.claude/tools/toppic_output.md`).
+- **Checks (toppic_test experiment 165, report 0165)** against main
+  01d2db5a on st_1 and 480_F3_02, with and without `-D`: msalign and
+  feature files equal (but the time line), every other table the same
+  rows, `ms1_peak` row for row the conversion of main's file (levels from
+  `PEAKS<k>`, matched by retention time and m/z), `PEAKS0..n` rebuilt from
+  it with `COLOR` equal to main's, toppic's results equal.
+- **Size and time on 480_F3_02 `-D`**: 894 MB instead of 2,516 (`ms1_peak`
+  420 MB instead of 401 + 1,641); the 3D step 11 s instead of 16; peak
+  memory unchanged (feature detection, 5.2 GiB; the 3D step 3.8 instead of
+  3.6 GiB: level 0 is kept, and a peak carries its key). Without `-D` the
+  file is 881 MB instead of 875.
+- **Page fill**: SQLite balances the pages of a `WITHOUT ROWID` table (an
+  index B-tree) on every split, also on appends in key order, so
+  `ms1_peak` is written about 88% full; only a rowid table's appends fill
+  their pages. A `VACUUM` packs it: 843 MB with `-D` and 839 without, in
+  3-4 s on 480_F3_02 (not done by TopFD).
