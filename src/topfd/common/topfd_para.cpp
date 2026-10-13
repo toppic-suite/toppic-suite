@@ -30,6 +30,7 @@
 #include "common/util/file_util.hpp"
 #include "common/util/logger.hpp"
 #include "common/util/time_util.hpp"
+#include "sql/sql_db_copy.hpp"
 #include "sql/sql_util.hpp"
 
 namespace toppic {
@@ -109,6 +110,13 @@ void TopfdPara::setMzmlFileNameAndFaims(const std::string& mzml_file_name,
   sql_file_name_ = output_base_name_ + ".sqlite";
   if (gene_sql_) {
     createSqlDb(sql_file_name_);
+  } else if (sql_db_copy::removeDb(sql_file_name_)) {
+    // --no-sql: no database of an earlier run is left next to the new
+    // results, where toppic's post mass matching would read it (as toppic
+    // --no-sql deletes its earlier <base>_toppic.sqlite; toppic_test
+    // experiment 166)
+    std::cout << "Deleted the earlier database " << sql_file_name_ << "."
+              << std::endl;
   }
 }
 
@@ -149,9 +157,9 @@ void TopfdPara::createSqlDb(const std::string& sql_db_name) {
   if (sql_db_ != nullptr) {
     sqlite3_close(sql_db_);
   }
-  if (std::filesystem::exists(sql_db_name)) {
-    file_util::delFile(sql_db_name);
-  }
+  // an earlier database with its -journal, -wal and -shm files, whose pages
+  // must not be applied to the new one
+  sql_db_copy::removeDb(sql_db_name);
   rc = sqlite3_open(sql_db_name.c_str(), &sql_db_);
   if (rc) {
     LOG_ERROR("Can't open database: " << sqlite3_errmsg(sql_db_));
