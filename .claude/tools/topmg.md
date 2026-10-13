@@ -349,4 +349,19 @@ the same option as toppic's,
 see `toppic_output.md`) writes no `<base>_topmg.sqlite` (an earlier one
 is still deleted), so topmg writes or changes no SQLite file; the
 parameter block prints "SQLite database output: No" only when it is set.
+Results (report 0170; 7192ad40 against main ecf6fa9f, topmg -u 1 -f C57 -d
+-t FDR -T FDR -y FDR -i var_mods.txt on st_1): the default, `-c` (two
+copies of st_1; the merge needs each fraction's `<base>_feature.xml`), `-z`,
+no TopFD database and toppic's post-matched `st_1_post_ms2.msalign` write
+main's result files (114 / 38 / 28; `-c` 229 / 36 / 27; post-matched 133 /
+46 / 34); the branch's `<base>_topmg.sqlite` has `ms2_env`, `ms2_env_peak`
+and the six PrSM tables (5.5 MB on st_1), and every table of TopFD's
+database after main's run (main grows it from 107.7 to 110.3 MB) equals,
+row for row, the table taken from the branch's `_topmg` file or TopFD's
+file; TopFD's database keeps its md5, `-z` deletes an earlier
+`_topmg.sqlite`, and `-c` writes one per fraction. toppic with the shared
+`writeEnvelopeDb` writes main's files and `<base>_toppic.sqlite`. TopMSV
+(topmsv_private branch `sqlite_types`) shows TopFD's file + `_topmg` file
+(a "TopFD + TopMG" dataset) as main's TopMSV showed TopFD's file after
+main's topmg: every one of about 22,000 requests the same.
 
