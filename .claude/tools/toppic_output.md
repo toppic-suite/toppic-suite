@@ -91,8 +91,9 @@ instead of the input. Facts to keep straight:
   run made the first commit (4916bc98, the copy in rollback mode) stop with
   "database is locked"; with the WAL copy the run completes, as main does
   with the same reader on TopFD's database.
-- **`--no-sql` writes no SQLite file** (branch `no_sql_output`, toppic_test
-  experiment 164; visible in toppic and topmg, no short letter: topfd's
+- **`--no-sql` writes no SQLite file** (branch `no_sql_output`, merged into
+  main on 2026-10-12 as 4cdaa7a1, whose tree is the tested 94c36445;
+  toppic_test experiment 164; visible in toppic and topmg, no short letter: topfd's
   `-N, --no-sql` is `--n-terminal-label` in toppic). toppic
   (`arguments["noSql"]`): `TopPICProgress_multi_file` still deletes an
   earlier `<base>_toppic.sqlite` but writes none (`writeToppicDb`
@@ -117,7 +118,19 @@ instead of the input. Facts to keep straight:
   `sqlite_mass_calib` corrects the copy. No envelope is written. The
   parameter block prints "SQLite database output: No" only when the option
   is set. topmg (`topmg_process`) skips its `prsm_sql_output::write` into
-  TopFD's database. The GUIs have no control for it.
+  TopFD's database. The GUIs have no control for it. Checked (report 0164)
+  on st_1 against main 01d2db5a: without the option every result file and
+  `<base>_toppic.sqlite` (all tables; `mass_calib` but its time) equal
+  main's for the default, `-D`, `--mass-calib`, `--second-precursor`, `-c`
+  and `-c -C`, topmg (`-u 1`) too, with TopFD's database after topmg equal;
+  with it every result file equals the run without it (apart from the
+  parameter line), the folder holds TopFD's database alone with its md5
+  unchanged (no copy, no -wal / -shm), an earlier copy is deleted, and
+  without TopFD's database the run stops with the usual error (runs with
+  `-D`). 480_F3_02 setting a: the 15 result files of main (3,207 / 1,918 /
+  436), 947 MB of `<base>_toppic.sqlite` not written; post mass matching
+  13.1 s against 16.4 s, and the 5.4 s table write and the 0.9 s copy
+  gone.
 - **A missing database is an error, not a skip.** TopFD's database of a
   spectrum file is `prsm_post_mass_match::sqlFileName(sp_file)`
   (`<base>.sqlite` for `<base>_ms2.msalign`; use it, do not re-derive the
