@@ -101,7 +101,7 @@ For an input `sample.mzML`:
 | `sample_ms2_raw.msalign` | The deconvoluted DIA MS/MS scans before pseudo-spectrum generation; intermediate. |
 | `sample_ms1.csv`, `sample_frac_ms1.mzrt.csv` | The MS1 feature ECScore table and the MS1 features with their elution profiles (BatMass format); intermediate. |
 | `sample_<window>_ms2.csv`, `sample_<window>_frac_ms2.mzrt.csv` | The same two tables for the fragment features of each isolation window, named by the window's lower m/z bound written with six decimals (`sample_400.000000_ms2.csv`); intermediate. |
-| `sample.sqlite` | The SQLite database with the deconvoluted MS1 and MS/MS scans and their peaks, as written by TopFD. Not written with `-z` (`--no-sql`). |
+| `sample.sqlite` | The SQLite database with the deconvoluted MS1 and MS/MS scans and their peaks, as written by TopFD, with the levels of the 3D visualisation of the MS1 peaks (the `LEVEL` column of `ms1_peak` and the table `CONFIG`, see the [TopFD manual](topfd_manual.md)). Not written with `-z` (`--no-sql`). |
 
 The intermediate files are left in place. When searching the pseudo spectra
 with TopPIC, add `-D`: post mass matching looks up the
@@ -159,7 +159,7 @@ Output:
 |---|---|---|
 | `-z`, `--no-sql` | off | Do not write the `.sqlite` database (section 3); an earlier `sample.sqlite` in the output folder is deleted with its `-wal` and `-shm` files. `toppic -D`, the setting for pseudo spectra, does not read it, and then writes no `sample_toppic.sqlite` either. Without `-D`, TopPIC's post mass matching stops with an error when the database is missing. |
 
-TopDIA has no `--sql-3d` or text-peak-list mode; those are TopFD only.
+TopDIA has no text-peak-list mode; it is TopFD only.
 
 ## 5. Example
 

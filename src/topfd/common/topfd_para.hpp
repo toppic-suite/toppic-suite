@@ -85,7 +85,6 @@ class TopfdPara {
   double getMs2EnvCnnScoreCutoff() const { return ms2_env_cnn_score_cutoff_; }
   const std::string& getActivation() const { return activation_; }
   bool isGeneSql() const { return gene_sql_; }
-  bool isSql3d() const { return sql_3d_; }
   bool isKeepUnusedPeaks() const { return keep_unused_peaks_; }
   bool isOutputAvgMass() const { return output_avg_mass_; }
   bool isOutputCsvFeatureFile() const { return output_csv_feature_file_; }
@@ -177,7 +176,6 @@ class TopfdPara {
     output_csv_feature_file_ = output;
   }
   void setGeneSql(bool gene_sql) { gene_sql_ = gene_sql; }
-  void setSql3d(bool sql_3d) { sql_3d_ = sql_3d; }
   void setOutputDpEnvs(bool output) { output_dp_envs_ = output; }
   // false, and the method unchanged, for a name not in getMs1DeconvMethods()
   // (getMs2DeconvMethods())
@@ -296,9 +294,9 @@ class TopfdPara {
   double ms2_env_cnn_score_cutoff_ = 0.0;
   bool aa_num_based_filter_ = false;
   bool output_csv_feature_file_ = false;
+  // the database holds the MS1 peaks with their 3D levels (toppic_test
+  // experiment 169)
   bool gene_sql_ = true;
-  // also write the MS1 peak tables for 3D visualization (--sql-3d)
-  bool sql_3d_ = false;
   // set per input file from MzmlProfile::hasPrecWindow()
   bool file_prec_window_ = false;
 

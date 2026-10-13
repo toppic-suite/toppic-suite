@@ -176,9 +176,8 @@ void TopfdPara::createSqlDb(const std::string& sql_db_name) {
       "min_ref_inte REAL);";
   LOG_DEBUG("SQL: " << sql);
   sql_util::execSql(sql_db_, sql);
-  // LEVEL: the highest 3D level that keeps the peak (topfd --sql-3d; 0
-  // without it), -1 for a peak of intensity <= 0 (MsSqlWriter; toppic_test
-  // experiment 165)
+  // LEVEL: the highest 3D level that keeps the peak, -1 for a peak of
+  // intensity <= 0 (MsSqlWriter; toppic_test experiments 165 and 169)
   sql =
       "CREATE TABLE IF NOT EXISTS ms1_peak(LEVEL INTEGER NOT NULL,"
       "spec_id INTEGER NOT NULL,"
@@ -303,8 +302,6 @@ std::string TopfdPara::getTopfdParaStr(const std::string& prefix,
   kv("Peak m/z error tolerance:") << mz_error_ << " m/z" << std::endl;
   kv("Thread number:") << thread_num_ << std::endl;
   kv("SQLite database output:") << (gene_sql_ ? "Yes" : "No") << std::endl;
-  kv("MS1 peaks for 3D visualization:")
-      << (gene_sql_ && sql_3d_ ? "Yes" : "No") << std::endl;
 
   if (missing_level_one_) {
     kv("Miss MS1 spectra:") << "Yes" << std::endl;

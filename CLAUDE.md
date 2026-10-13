@@ -233,9 +233,9 @@ path and linked into `toppic_common`:
   batching needs state a per-call free function can't hold. The caller still owns
   the connection (opens it, creates the schema, closes it). `ms1_peak` is a
   `WITHOUT ROWID` table keyed on `(LEVEL, spec_id, peak_id)` (toppic_test
-  experiment 165): the writer gives a peak `LEVEL` 0 (-1 for intensity <= 0),
-  and with topfd `--sql-3d` it writes no `ms1_peak` rows (its constructor's
-  `write_ms1_peaks`), because `MsSqlWriter` writes them with the 3D levels. When migrating the
+  experiment 165), and this writer writes no `ms1_peak` rows: `MsSqlWriter`
+  writes them with the 3D levels after the MS1 deconvolution (toppic_test
+  experiment 169 removed the `LEVEL` 0 path and topfd `--sql-3d`). When migrating the
   upstream topfd driver that wrote spectra, adopt the object; do not reintroduce
   per-call free-function wrappers (they would restore the per-scan
   transaction/prepare cost this rewrite removed).
@@ -464,8 +464,9 @@ above it, never the reverse:
   caller-owned connection like the topfd writer below; readers compute the
   colour bucket (before toppic_test experiment 165 the levels were the
   tables `PEAKS0..n` with a `COLOR` column; see `.claude/tools/topfd.md`).
-  topfd `--sql-3d` (in `deconv_ms1_process`) writes them into the topfd
-  `.sqlite` after MS1 deconvolution.
+  topfd and topdia (in `deconv_ms1_process`) write them into the `.sqlite`
+  after MS1 deconvolution whenever the database is written (no option since
+  toppic_test experiment 169; topfd `-D` / `--sql-3d` before).
 - `src/para` — analysis parameters (`sp_para`, `peak_tolerance`, `prsm_para`).
 - `src/seq` — sequence/proteoform layer.
 - `src/ms` — mass-spectrum layer: `spec` (peaks/spectra/msalign), `msmap`,

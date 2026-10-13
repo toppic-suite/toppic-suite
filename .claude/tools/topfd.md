@@ -1032,11 +1032,13 @@ byte for byte (toppic_test experiment 112, in 2.5 s against `emass.py`'s
   mass minus k 32S masses (at least 0, so the lightest entries are S_k
   alone) and k S are added.
 
-## The MS1 peaks of the database and the 3D levels (`sql/ms_sql_writer`, `--sql-3d`)
+## The MS1 peaks of the database and the 3D levels (`sql/ms_sql_writer`)
 
 Since toppic_test experiment 165 (branch `merged_ms1_peak`, merged into
-main on 2026-10-13) the MS1 peaks and the levels of the 3D view
-(`topfd -D`) are one table:
+main on 2026-10-13) the MS1 peaks and the levels of the 3D view are one
+table, and since experiment 169 (branch `sql_3d_default`) topfd and topdia
+write the levels whenever they write the database; the option `-D`
+(`--sql-3d`), which turned them on before, is gone:
 
     ms1_peak(LEVEL, spec_id, peak_id, mz, intensity) WITHOUT ROWID,
       PRIMARY KEY(LEVEL, spec_id, peak_id)
@@ -1048,7 +1050,8 @@ main on 2026-10-13) the MS1 peaks and the levels of the 3D view
   each grid block of the one below, so the levels are nested. On
   480_F3_02 the tables were 1,641 of the file's 2,516 MB.
 - **`LEVEL`** is the highest level that keeps the peak; level k is the
-  rows with `LEVEL >= k`. Without `-D` every peak has `LEVEL` 0. A peak of
+  rows with `LEVEL >= k` (a run without `-D` gave every peak `LEVEL` 0
+  before experiment 169). A peak of
   intensity <= 0 is not in the map and has -1 (a guard: the mzML reader
   drops such peaks, `PwMsReader::parsePeaks`, so TopFD writes no -1 today).
   `CONFIG` is unchanged (row k + 1: the ranges and the `COUNT` of level k).
@@ -1063,12 +1066,16 @@ main on 2026-10-13) the MS1 peaks and the levels of the 3D view
   window's spectra: MS1 spectrum ids follow the retention time, so a
   retention-time range is a `spec_id` range. TopMSV tells the layouts
   apart by the `LEVEL` column (topmsv_private branch `merged_ms1_peak`).
-- **Who writes it**: without `-D`, `MzmlMsSqlWriter` as before, with
-  `LEVEL` 0 or -1. With `-D`, `deconv_ms1_process` keeps every MS1 peak with
-  its spectrum's id and its index (the key `MzmlMsSqlWriter` would write),
-  `MzmlMsSqlWriter` writes no `ms1_peak` rows, and `MsSqlWriter::write`
-  builds the levels, writes `CONFIG` and inserts `ms1_peak` in key order,
-  in one transaction after the deconvolution.
+- **Who writes it**: `deconv_ms1_process` keeps every MS1 peak with its
+  spectrum's id and its index, `MzmlMsSqlWriter` writes no `ms1_peak` rows
+  (it writes `ms1_spectrum`, the envelopes and the MS/MS tables), and
+  `MsSqlWriter::write` builds the levels, writes `CONFIG` and inserts
+  `ms1_peak` in key order, in one transaction after the deconvolution.
+  Until experiment 169 this was the path of `-D`; without it
+  `MzmlMsSqlWriter` wrote `ms1_peak` with `LEVEL` 0 or -1 during the
+  deconvolution (its `write_ms1_peaks` flag), and no `CONFIG`. topfd `-o`
+  (no MS1 spectra) and `-T` run no MS1 deconvolution, so their database has
+  no `ms1_peak` rows and no `CONFIG`.
 - **The levels are those of before only if their input order is.**
   `downsample` and `addRow` use `std::sort`, which is not stable, so the
   input order decides between peaks of equal retention time or m/z; a
