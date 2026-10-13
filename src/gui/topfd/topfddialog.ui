@@ -791,7 +791,7 @@ p, li { white-space: pre-wrap; }
          <bool>false</bool>
         </property>
         <property name="toolTip">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Disable the additional proteoform feature search in the LC-MS map for MS/MS scans without a detected feature in their precursor isolation windows. The additional search, done when unchecked, sets the signal-to-noise ratio to 0, the minimum scan number to 1 and the ECScore cutoff to 0. Default: unchecked. (topfd -d, --disable-additional-feature-search)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Disable the feature rescue, an additional proteoform feature search in the LC-MS map for MS/MS scans without a detected feature in their precursor isolation windows. The rescue, done when unchecked, sets the signal-to-noise ratio to 0, the minimum scan number to 1 and the ECScore cutoff to 0. Default: unchecked. (topfd -d, --disable-feature-rescue)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
         <property name="text">
          <string>Disable additional feature search</string>

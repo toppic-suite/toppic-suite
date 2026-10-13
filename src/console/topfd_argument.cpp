@@ -173,12 +173,12 @@ bool Argument::parse(int argc, char* argv[]) {
         "low-intensity peaks in proteoform feature detection. The default "
         "method is to use the noise intensity level of the whole LC-MS map to "
         "filter out low-intensity peaks.")(
-        "disable-additional-feature-search,d",
-        "Disable additional proteoform feature search in the LC-MS map for "
-        "MS/MS scans that do not have detected proteoform features in their "
-        "precursor isolation windows. In the additional search, the "
-        "signal-to-noise ratio is set to 0, the minimum scan number is set to "
-        "1, and the ECScore cutoff is set to 0.")(
+        "disable-feature-rescue,d",
+        "Disable the feature rescue, an additional proteoform feature search "
+        "in the LC-MS map for MS/MS scans that do not have detected "
+        "proteoform features in their precursor isolation windows. In the "
+        "rescue, the signal-to-noise ratio is set to 0, the minimum scan "
+        "number is set to 1, and the ECScore cutoff is set to 0.")(
         "split-intensity-ratio,l",
         po::value<std::string>(&split_intensity_ratio),
         "<a positive number>. Set the intensity ratio required to split one "
@@ -565,7 +565,7 @@ bool Argument::parse(int argc, char* argv[]) {
       topfd_para_ptr_->setUseSingleScanNoiseLevel(true);
     }
 
-    if (vm.count("disable-additional-feature-search")) {
+    if (vm.count("disable-feature-rescue")) {
       topfd_para_ptr_->setSearchPrecWindow(false);
     }
 

@@ -175,7 +175,11 @@ moved from `-p` to `-y` for them and `--ms2-correlation-cutoff` from `-P` to
   and `--ms1-correlation-cutoff` (`-y`, was
   `--ms1-intensity-correlation-cutoff`) and `--ms2-correlation-cutoff` (`-Y`,
   was `--ms2-intensity-correlation-cutoff`); topdia_gui emits
-  `--ms1-deconv`/`--ms2-deconv` too.
+  `--ms1-deconv`/`--ms2-deconv` too. topfd's `--disable-feature-rescue`
+  (`-d`, was `--disable-additional-feature-search`; the old name is
+  unrecognised) followed later the same day; topfd_gui's checkbox keeps
+  the text "Disable additional feature search", its tooltip names the
+  new option (topfd_gui passes `-d`).
 - **`--no-sql` is `-z`** (2026-10-13, branch `no_sql_short_option`,
   merged into main with `topdia_no_sql` as daa9098e; toppic_test
   experiment 164 amendment 2; `-N` before, unrecognised now):
@@ -226,7 +230,8 @@ moved from `-p` to `-y` for them and `--ms2-correlation-cutoff` from `-P` to
   TopDIA takes the same defaults, so its default MS1 output (MS-Deconv)
   lost the envelopes below 0.2 too. The letters of topfd's
   `--frag-num-filtering` (`-g` -> `-v` -> `-j`; `-F` for a few hours) and
-  `--disable-additional-feature-search` (`-f` -> `-d`) moved for them.
+  `--disable-feature-rescue` (`-f` -> `-d`; `--disable-additional-feature-search`
+  then) moved for them.
   topdia's `-d`/`--final-filtering` became `--frag-num-filtering`, and
   both tools take `-j` for it (2026-10-12; topdia's `-v` is
   `--pseudo-cutoff`, and topdia has no `-d` now); the commands of

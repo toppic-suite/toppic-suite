@@ -250,7 +250,7 @@ MS1 deconvolution and proteoform feature detection:
 | `-b`, `--min-scan-number <1\|2\|3>` | 1 | Minimum number of MS1 scans a feature must be detected in. |
 | `-l`, `--split-intensity-ratio <number>` | 2.5 | Intensity ratio required to split one feature into two. |
 | `-i`, `--single-scan-noise` | off | Use the noise level of each MS1 scan to filter low-intensity peaks, instead of the noise level of the whole LC-MS map. |
-| `-d`, `--disable-additional-feature-search` | off | By default, an MS/MS spectrum whose isolation window contains no detected feature triggers an extra search of the LC-MS map with the S/N ratio set to 0, the minimum scan number to 1 and the ECScore cutoff to 0. This option disables the extra search. |
+| `-d`, `--disable-feature-rescue` | off | By default, an MS/MS spectrum whose isolation window contains no detected feature triggers a feature rescue, an extra search of the LC-MS map with the S/N ratio set to 0, the minimum scan number to 1 and the ECScore cutoff to 0. This option disables the feature rescue. |
 
 MS/MS deconvolution:
 
