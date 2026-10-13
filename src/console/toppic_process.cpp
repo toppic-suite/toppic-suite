@@ -828,11 +828,10 @@ std::string TopPIC_topmg_identify(
       PrsmStrPtrVec prev_ptrs =
           prsm_reader_util::readAllPrsmStrs(base_name + "." + raw_prsm_ext);
       double skip_evalue;
-      std::string skip_source;
       if (arguments["multiSkipEvalue"] != "") {
         skip_evalue = std::stod(arguments["multiSkipEvalue"]);
-        skip_source = "--multi-skip-evalue";
       } else if (arguments["searchType"] == "TARGET+DECOY") {
+        // the smallest E-value of a decoy PrSM
         skip_evalue = std::numeric_limits<double>::max();
         for (size_t i = 0; i < prev_ptrs.size(); i++) {
           if (prev_ptrs[i]->getSeqName().find("DECOY_") == 0 &&
@@ -840,23 +839,13 @@ std::string TopPIC_topmg_identify(
             skip_evalue = prev_ptrs[i]->getEValue();
           }
         }
-        skip_source = "the smallest E-value of a decoy PrSM";
       } else {
+        // the default without a decoy database
         skip_evalue = 0.01;
-        skip_source = "the default without a decoy database";
       }
-      int skipped_target_num = 0;
-      int skipped_decoy_num = 0;
       for (size_t i = 0; i < prev_ptrs.size(); i++) {
         if (prev_ptrs[i]->getEValue() < skip_evalue) {
-          int spec_id = prev_ptrs[i]->getSpectrumId();
-          if (identified_spec_ids.insert(spec_id).second) {
-            if (prev_ptrs[i]->getSeqName().find("DECOY_") == 0) {
-              skipped_decoy_num++;
-            } else {
-              skipped_target_num++;
-            }
-          }
+          identified_spec_ids.insert(prev_ptrs[i]->getSpectrumId());
         }
       }
       for (size_t i = 0; i < spec_ids.size(); i++) {
@@ -866,9 +855,7 @@ std::string TopPIC_topmg_identify(
       }
       std::cout << "TopMG's identification - " << search_spec_ids.size()
                 << " spectra to search, " << identified_spec_ids.size()
-                << " identified by the earlier stages (" << skipped_target_num
-                << " target, " << skipped_decoy_num << " decoy; E-value < "
-                << skip_evalue << ", " << skip_source << ")." << std::endl;
+                << " identified by the earlier stages." << std::endl;
     }
 
     std::vector<std::string> input_exts;

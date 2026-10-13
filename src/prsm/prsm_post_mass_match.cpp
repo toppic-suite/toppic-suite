@@ -676,12 +676,8 @@ std::string process(const PrsmParaPtr& prsm_para_ptr,
     prsm_num++;
   }
   std::cout << "Post mass matching: " << match_num << " masses added to "
-            << prsm_num << " of " << prsm_ptrs.size() << " PrSMs from "
-            << topfd_db_name << " (read only"
-            << (calib_model_file_name.empty()
-                    ? ""
-                    : ", m/z corrected with " + calib_model_file_name)
-            << ")";
+            << prsm_num << " of " << prsm_ptrs.size() << " PrSMs."
+            << std::endl;
   if (!toppic_db_name.empty()) {
     sqlite3* toppic_db = nullptr;
     if (sqlite3_open(toppic_db_name.c_str(), &toppic_db) != SQLITE_OK) {
@@ -691,9 +687,7 @@ std::string process(const PrsmParaPtr& prsm_para_ptr,
     }
     writeSqlEnvs(toppic_db, sql_spec_matches);
     sqlite3_close(toppic_db);
-    std::cout << "; their envelopes written to " << toppic_db_name;
   }
-  std::cout << "." << std::endl;
 
   // PrSMs with the recounted matched masses and fragments, under the name of
   // the new spectrum file
