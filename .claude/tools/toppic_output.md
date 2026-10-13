@@ -151,7 +151,9 @@ instead of the input. Facts to keep straight:
   report writes the PrSM tables into it, as before. Only `--mass-calib`
   with a model writes every table (`sqlite_mass_calib`'s corrected copy,
   unchanged); with too few calibrants the database is the envelope copy
-  (the peaks are TopFD's). `-A` gets the envelope copy (TopFD's database
+  (the peaks are TopFD's); its source, TopFD's database, is opened read
+  only as immutable too (`openCopy`), so that no run leaves `-wal` / `-shm`
+  files next to it. `-A` gets the envelope copy (TopFD's database
   holds monoisotopic masses), `-A --mass-calib` the corrected copy; `-D`,
   `--second-precursor` and the fractions of `-c` the envelope copy; `-C`
   and `--no-sql` as before. A reader of toppic's database takes every

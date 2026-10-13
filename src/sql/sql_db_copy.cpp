@@ -51,8 +51,10 @@ sqlite3* openCopy(const std::string& src_name, const std::string& dest_name) {
   for (const char* suffix : {"", "-journal", "-wal", "-shm"}) {
     removeFile(tmp_name + suffix);
   }
+  // read only as immutable: no -wal / -shm files next to TopFD's database
   sqlite3* src_db = nullptr;
-  if (sqlite3_open_v2(src_name.c_str(), &src_db, SQLITE_OPEN_READONLY,
+  if (sqlite3_open_v2(sql_util::immutableUri(src_name).c_str(), &src_db,
+                      SQLITE_OPEN_READONLY | SQLITE_OPEN_URI,
                       nullptr) != SQLITE_OK) {
     LOG_ERROR("Cannot open the database " << src_name << ": "
                                           << sqlite3_errmsg(src_db));

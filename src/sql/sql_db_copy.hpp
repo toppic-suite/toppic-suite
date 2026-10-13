@@ -35,9 +35,9 @@ namespace sql_db_copy {
 // Opens a copy of src_name, written under the temporary name
 // dest_name + ".tmp" (an earlier temporary file is removed), for changes
 // before closeCopy. The copy goes through SQLite's backup API, not a file
-// copy: TopFD writes its database in WAL mode, and pages still in the -wal
-// file are part of it. toppic's own tables of an earlier run (prsm,
-// proteoform, protein, prsm_mass_shift, prsm_protein_match, fasta_seq;
+// copy; src_name is opened read only as immutable (no -wal / -shm files next
+// to it; it must not change meanwhile). toppic's own tables of an earlier run
+// (prsm, proteoform, protein, prsm_mass_shift, prsm_protein_match, fasta_seq;
 // written again by every run) are dropped, without a VACUUM, which may
 // renumber the rows of the tables without an INTEGER PRIMARY KEY. The copy
 // has no journal. Exits with an error message when a database cannot be
