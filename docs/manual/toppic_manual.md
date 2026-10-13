@@ -39,7 +39,7 @@ TopPIC also reads, from the same directory:
 | File | Needed when | Purpose |
 |---|---|---|
 | `sample_ms2.feature` | Always, unless `--no-topfd-feature` is given | The proteoform feature of each MS/MS spectrum, used to cluster the identifications of one proteoform across spectra and to report abundances. |
-| `sample.sqlite` | Always, unless `--disable-post-match` is given | The centroided MS/MS peaks, used by post mass matching (section 2, step 11). TopFD writes it unless run with `-z` (`--no-sql`). A missing database is an error, reported before the search starts. TopPIC only reads it: post mass matching works on TopPIC's own copy, `sample_toppic.sqlite` (section 2), or, with `--no-sql`, on TopFD's database itself, without changing it. |
+| `sample.sqlite` | Always, unless `--disable-post-match` is given | The centroided MS/MS peaks, used by post mass matching (section 2, step 11). TopFD writes it unless run with `-z` (`--no-sql`). A missing database is an error, reported before the search starts. TopPIC only reads it: post mass matching reads the peaks from it without changing it and adds the envelopes of the matched masses to TopPIC's own database `sample_toppic.sqlite` (section 2; not with `--no-sql`). |
 
 **Database indexes.** TopPIC does not require `topindex`. It prepares the
 database itself in a directory next to the FASTA file named after it

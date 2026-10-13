@@ -360,8 +360,8 @@ bool TopmgArgument::parse(int argc, char* argv[]) {
         "Default value: 0.4.")(
         "cluster-error-tolerance,p",
         po::value<std::string>(&form_error_tole),
-        "<a positive number>. Error tolerance for identifying PrSM clusters "
-        "(in Dalton). Default value: 1.2 Dalton.")(
+        "<a positive number>. Error tolerance for identifying PrSM clusters. "
+        "Default value: 1.2 Dalton.")(
         "max-shift,M", po::value<std::string>(&max_shift_mass),
         "<a positive number>. Maximum absolute value of an unexpected mass "
         "shift (in Dalton). Default value: 500.")(

@@ -250,7 +250,7 @@ MS1 deconvolution and proteoform feature detection:
 | `-b`, `--min-scan-number <1\|2\|3>` | 1 | Minimum number of MS1 scans a feature must be detected in. |
 | `-l`, `--split-intensity-ratio <number>` | 2.5 | Intensity ratio required to split one feature into two. |
 | `-i`, `--single-scan-noise` | off | Use the noise level of each MS1 scan to filter low-intensity peaks, instead of the noise level of the whole LC-MS map. |
-| `-d`, `--disable-feature-rescue` | off | By default, an MS/MS spectrum whose isolation window contains no detected feature triggers a feature rescue, an extra search of the LC-MS map with the S/N ratio set to 0, the minimum scan number to 1 and the ECScore cutoff to 0. This option disables the feature rescue. |
+| `-d`, `--disable-feature-rescue` | off | By default, an MS/MS spectrum whose isolation window contains no detected feature triggers a feature rescue, an extra search of the LC-MS map with the S/N ratio set to 0, the minimum scan number to 1 and the ECScore cutoff to 0. This option disables the feature rescue. In `topfd_gui`: "Disable feature rescue". |
 
 MS/MS deconvolution:
 
@@ -262,7 +262,7 @@ MS/MS deconvolution:
 | `-q`, `--ms2-deconv <greedy\|msdeconv\|flashdeconv>` | greedy | MS/MS deconvolution method (section 1.2): `greedy`, the greedy search adapted to fragment ions; `msdeconv`, the MS-Deconv dynamic programming, the default method of earlier versions; or `flashdeconv`, the FLASHDeconv algorithm (experimental; the output files are the same; not with `-T`). In `topfd_gui`: "MS2 deconvolution" (it replaces the former option `--ms2-flashdeconv`). |
 | `-g`, `--ms2-envcnn-cutoff <0..1>` | 0 | MS/MS envelopes whose EnvCNN score is below the cutoff are not reported. Used with `-q greedy` and `msdeconv`, not with `flashdeconv`; also for MS3 spectra and `-T`. In `topfd_gui`: "MS2 EnvCNN cutoff". |
 | `-n`, `--env-rank <envcnn\|msdeconv>` | envcnn | The score that ranks isotopic envelopes: `envcnn`, the EnvCNN neural-network score, or `msdeconv`, the MS-Deconv score. The ranking decides which envelopes `-j` keeps; the EnvCNN cutoffs `-f` and `-g` compare the EnvCNN score with either value, and the score column of the msalign files is the EnvCNN score. In `topfd_gui`: "Sort using MS-Deconv score" (`msdeconv` when checked). |
-| `-j`, `--frag-num-filtering` | off | Limit the number of fragment envelopes in an MS/MS spectrum based on the estimated number of fragment ions: the envelopes ranked highest by the score of `-n` are kept. Used with `-q greedy` and `msdeconv`, not with `flashdeconv`. In `topfd_gui`: "Enable frag num-based filtering". |
+| `-j`, `--frag-num-filtering` | off | Limit the number of fragment envelopes in an MS/MS spectrum based on the estimated number of fragment ions: the envelopes ranked highest by the score of `-n` are kept. Used with `-q greedy` and `msdeconv`, not with `flashdeconv`. In `topfd_gui`: "Enable fragment number based filtering". |
 
 ### 1.5 Examples
 

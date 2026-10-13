@@ -675,7 +675,7 @@ p, li { white-space: pre-wrap; }
       <rect>
        <x>10</x>
        <y>50</y>
-       <width>259</width>
+       <width>300</width>
        <height>25</height>
       </rect>
      </property>
@@ -684,7 +684,7 @@ p, li { white-space: pre-wrap; }
        <widget class="QCheckBox" name="fragNumFilteringCheckBox">
         <property name="maximumSize">
          <size>
-          <width>259</width>
+          <width>300</width>
           <height>16777215</height>
          </size>
         </property>
@@ -695,7 +695,7 @@ p, li { white-space: pre-wrap; }
          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Filter the fragment ion envelopes of each MS/MS spectrum based on the estimated number of fragment ions: the envelopes ranked highest are kept (by the EnvCNN score, or by the MS-Deconv score with &quot;Sort using MS-Deconv score&quot; checked). Used with the greedy and msdeconv MS2 deconvolution methods, not with flashdeconv. Default: unchecked. (topfd -j, --frag-num-filtering)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
         <property name="text">
-         <string>Enable frag num-based filtering</string>
+         <string>Enable fragment number based filtering</string>
         </property>
         <property name="checkable">
          <bool>true</bool>
@@ -760,7 +760,7 @@ p, li { white-space: pre-wrap; }
          <bool>false</bool>
         </property>
         <property name="toolTip">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Rank isotopic envelopes by the MS-Deconv score instead of the EnvCNN score. The ranking decides which envelopes &quot;Enable frag num-based filtering&quot; keeps; the EnvCNN cutoffs use the EnvCNN score either way. Default: unchecked (EnvCNN score). (topfd -n, --env-rank msdeconv; envcnn when unchecked)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Rank isotopic envelopes by the MS-Deconv score instead of the EnvCNN score. The ranking decides which envelopes &quot;Enable fragment number based filtering&quot; keeps; the EnvCNN cutoffs use the EnvCNN score either way. Default: unchecked (EnvCNN score). (topfd -n, --env-rank msdeconv; envcnn when unchecked)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
         <property name="text">
          <string>Sort using MS-Deconv score</string>
@@ -794,7 +794,7 @@ p, li { white-space: pre-wrap; }
          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Disable the feature rescue, an additional proteoform feature search in the LC-MS map for MS/MS scans without a detected feature in their precursor isolation windows. The rescue, done when unchecked, sets the signal-to-noise ratio to 0, the minimum scan number to 1 and the ECScore cutoff to 0. Default: unchecked. (topfd -d, --disable-feature-rescue)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
         <property name="text">
-         <string>Disable additional feature search</string>
+         <string>Disable feature rescue</string>
         </property>
         <property name="checkable">
          <bool>true</bool>
