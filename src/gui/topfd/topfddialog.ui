@@ -822,7 +822,7 @@ p, li { white-space: pre-wrap; }
          <bool>false</bool>
         </property>
         <property name="toolTip">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Do not write the deconvoluted spectra to an SQLite database (.sqlite file). Leave it unchecked if TopPIC will search the spectra: its post mass matching, on by default, reads the MS/MS peaks from this database. While checked, &quot;MS1 3D visualization data&quot; is cleared and disabled. Default: unchecked. (topfd -N, --no-sql)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Do not write the deconvoluted spectra to an SQLite database (.sqlite file). Leave it unchecked if TopPIC will search the spectra: its post mass matching, on by default, reads the MS/MS peaks from this database. While checked, &quot;MS1 3D visualization data&quot; is cleared and disabled. Default: unchecked. (topfd -z, --no-sql)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
         <property name="text">
          <string>Do not generate SQLite database</string>

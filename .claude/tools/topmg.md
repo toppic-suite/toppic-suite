@@ -325,7 +325,7 @@ calls `refinePrecursorByMatchedIons` like `PsAlign` and `PsAlignMultiType`;
 topmg writes its PrSM tables (`prsm_sql_output::write`) into TopFD's
 database of the spectrum file (`prsm_post_mass_match::sqlFileName`, the
 `_post_ms2` of toppic's post-matched files read as `_ms2`) when it exists;
-it has no database of its own. The visible `--no-sql` (branch
+it has no database of its own. The visible `-z`, `--no-sql` (branch
 `no_sql_output`, merged into main as 4cdaa7a1; toppic_test experiment 164;
 the same option as toppic's,
 see `toppic_output.md`) skips that write, so topmg writes or changes no

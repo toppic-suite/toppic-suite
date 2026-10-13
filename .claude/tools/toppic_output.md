@@ -55,7 +55,7 @@ instead of the input. Facts to keep straight:
   search) neither deletes nor writes it: it rewrites toppic's tables in the
   earlier run's database, which holds that run's post-matched envelopes; a
   missing one gives the "not found" note. Without TopFD's database (TopFD
-  `-N`, possible with `-D`) nothing is written and the PrSM tables are not
+  `-z`, possible with `-D`) nothing is written and the PrSM tables are not
   written to a database. The envelopes that toppic versions before this
   change appended to TopFD's database cannot be told apart from TopFD's and
   are copied with them; TopFD again gives a clean database. TopFD writes
@@ -93,8 +93,10 @@ instead of the input. Facts to keep straight:
   with the same reader on TopFD's database.
 - **`--no-sql` writes no SQLite file** (branch `no_sql_output`, merged into
   main on 2026-10-12 as 4cdaa7a1, whose tree is the tested 94c36445;
-  toppic_test experiment 164; visible in toppic and topmg, no short letter: topfd's
-  `-N, --no-sql` is `--n-terminal-label` in toppic). toppic
+  toppic_test experiment 164; visible in toppic and topmg; `-z` in toppic,
+  topmg and topfd since branch `no_sql_short_option` (2026-10-13, experiment 164
+  amendment 2; topfd's was `-N`, which is `--n-terminal-label` in toppic,
+  and topfd_gui passes `-z`)). toppic
   (`arguments["noSql"]`): `TopPICProgress_multi_file` still deletes an
   earlier `<base>_toppic.sqlite` but writes none (`writeToppicDb`
   skipped); `TopPIC_mass_calib` writes no corrected copy and passes the
@@ -135,7 +137,7 @@ instead of the input. Facts to keep straight:
   spectrum file is `prsm_post_mass_match::sqlFileName(sp_file)`
   (`<base>.sqlite` for `<base>_ms2.msalign`; use it, do not re-derive the
   name). It is checked in three places with the same message ("run TopFD
-  without disabling its SQLite database output (without -N) ..., or run
+  without disabling its SQLite database output (without -z) ..., or run
   TopPIC with --disable-post-match"): `ToppicArgument::validateArguments`
   (TopFD's database, so a run fails before the search), `process()` itself
   (toppic's copy it is given; abort), and `toppic_gui`'s `checkError()`
@@ -1013,7 +1015,7 @@ the method inside a search. Facts to keep straight:
       toppic versions before experiment 156 appended to TopFD's database
       cannot be told apart from TopFD's own (`ms2_spectrum` has no envelope
       count) and are copied and corrected with them. Without TopFD's
-      database (TopFD `-N`, possible with `-D`) a note is printed and there
+      database (TopFD `-z`, possible with `-D`) a note is printed and there
       is no corrected database.
     - **The search uses it.** The post mass matching
       (`prsm_post_mass_match::process`) reads the corrected database's peaks

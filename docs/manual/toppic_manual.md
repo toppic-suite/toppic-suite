@@ -39,7 +39,7 @@ TopPIC also reads, from the same directory:
 | File | Needed when | Purpose |
 |---|---|---|
 | `sample_ms2.feature` | Always, unless `--no-topfd-feature` is given | The proteoform feature of each MS/MS spectrum, used to cluster the identifications of one proteoform across spectra and to report abundances. |
-| `sample.sqlite` | Always, unless `--disable-post-match` is given | The centroided MS/MS peaks, used by post mass matching (section 2, step 11). TopFD writes it unless run with `-N`. A missing database is an error, reported before the search starts. TopPIC only reads it: post mass matching works on TopPIC's own copy, `sample_toppic.sqlite` (section 2), or, with `--no-sql`, on TopFD's database itself, without changing it. |
+| `sample.sqlite` | Always, unless `--disable-post-match` is given | The centroided MS/MS peaks, used by post mass matching (section 2, step 11). TopFD writes it unless run with `-z` (`--no-sql`). A missing database is an error, reported before the search starts. TopPIC only reads it: post mass matching works on TopPIC's own copy, `sample_toppic.sqlite` (section 2), or, with `--no-sql`, on TopFD's database itself, without changing it. |
 
 **Database indexes.** TopPIC does not require `topindex`. It prepares the
 database itself in a directory next to the FASTA file named after it
@@ -67,9 +67,9 @@ and adds its envelopes to it (step 11), and the identifications are
 written into it (step 17); TopFD's database is only read. The name is the
 same with every option (`--average-mass`, `--disable-post-match`, `-c`),
 so a TopFD and a TopPIC run leave two databases per spectrum file. Without
-TopFD's database (TopFD `-N`, possible with `--disable-post-match`) no
+TopFD's database (TopFD `-z`, possible with `--disable-post-match`) no
 copy is written and the identifications are not written to a database.
-With `--no-sql`, TopPIC writes no SQLite file at all: no copy is written
+With `-z` (`--no-sql`), TopPIC writes no SQLite file at all: no copy is written
 (an earlier `sample_toppic.sqlite` is still deleted, so that no database
 of another run remains next to the new results), post mass matching reads
 the peaks of TopFD's `sample.sqlite` directly, without changing it or
@@ -313,7 +313,7 @@ Cutoffs and output:
 | `-u`, `--thread-number <int>` | 1 | Number of threads; must not exceed the number of hardware threads. Each protein filtering step may use fewer: it fits its thread number to the memory available when it starts (about 1.25 GiB per thread for zero-shift and variable-PTM filtering, also when they run as one step with one-shift filtering, 1 GiB for one-shift filtering, 0.5 GiB for multiple-shift filtering). The run starts with a warning listing the filtering steps that will use fewer threads and how many, and a step prints its number again if the memory available when it starts gives a different one. All other steps use the full number. |
 | `-k`, `--keep-temp-files` | off | Keep the intermediate files. |
 | `-K`, `--keep-decoy-ids` | off | Keep decoy identifications in the result tables. |
-| `--no-sql` | off | Write no SQLite database: no `<name>_toppic.sqlite`, and the identifications are not written to a database (section 2). Post mass matching reads the centroided peaks of TopFD's `<name>.sqlite` without changing it. The other result files are the same as without the option. |
+| `-z`, `--no-sql` | off | Write no SQLite database: no `<name>_toppic.sqlite`, and the identifications are not written to a database (section 2). Post mass matching reads the centroided peaks of TopFD's `<name>.sqlite` without changing it. The other result files are the same as without the option. |
 
 **Combining fractions.** With `-c`, each fraction is searched,
 post-matched, clustered and given its FDRs on its own first (post mass

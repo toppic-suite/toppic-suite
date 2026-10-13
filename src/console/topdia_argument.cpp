@@ -241,7 +241,8 @@ bool Argument::parse(int argc, char* argv[]) {
         "cutoff value for extracting features. The default value is 0.5.")(
         "thread-number,u", po::value<std::string>(&thread_number),
         "<a positive integer>. Number of threads used in spectral "
-        "deconvolution. The default value is 1.");
+        "deconvolution. The default value is 1.")(
+        "no-sql,z", "Do not write the deconvoluted spectra to an SQLite database.");
 
     // Advanced options accepted on the command line but hidden from the help
     // message; the positional spectrum file argument is also hidden here.
@@ -553,6 +554,10 @@ bool Argument::parse(int argc, char* argv[]) {
 
     if (vm.count("frag-num-filtering")) {
       topfd_para_ptr_->setAANumBasedFilter(true);
+    }
+
+    if (vm.count("no-sql")) {
+      topfd_para_ptr_->setGeneSql(false);
     }
   } catch (std::exception& e) {
     std::cerr << "Unhandled Exception in parsing command line " << e.what()

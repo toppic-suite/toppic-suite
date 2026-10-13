@@ -378,7 +378,7 @@ std::string toleranceStr(double value) {
 
 // Writes toppic's database of a spectrum file, toppic_db_name
 // (<base>_toppic.sqlite), as a copy of TopFD's topfd_db_name (sql_db_copy),
-// or prints a note when TopFD's database does not exist (TopFD -N, possible
+// or prints a note when TopFD's database does not exist (TopFD -z, possible
 // with -D): the run then writes no database.
 void writeToppicDb(const std::string& topfd_db_name,
                    const std::string& toppic_db_name) {
