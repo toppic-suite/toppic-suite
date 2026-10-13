@@ -74,7 +74,7 @@ Key options (defaults): `-c` max charge 30, `-m` max mass 50000,
 `-e` m/z error 0.02, `-a` activation FILE, `-u` threads 1,
 `-r`/`-s` MS1/MS2 S/N ratio 3/1, `-t` ECScore cutoff 0.1, `-b` min scans 1,
 `-o` no MS1 scans (no features, precursor set to the `-m`/`-c` limits),
-`-N` no SQLite, `-D` also store raw MS1 peaks for 3D views,
+`-z` (`--no-sql`; `-N` until 2026-10-13) no SQLite, `-D` also store raw MS1 peaks for 3D views,
 `-p`/`--deconv-ms1 <greedy|msdeconv>` and `-q`/`--deconv-ms2
 <greedy|msdeconv|flashdeconv>` the deconvolution methods (default greedy
 for both; `msdeconv` is the MS-Deconv dynamic programming of earlier
@@ -84,7 +84,7 @@ takes the same two options (`-p`, `-q`) with `msdeconv` as the default.
 only), `-n`/`--env-rank <envcnn|msdeconv>` the envelope ranking, `-j` the
 fragment-number filter (topdia has the same `-f`, `-g`, `-n` and `-j`).
 
-- **Do not use `-N` if TopPIC will search the spectra**: TopPIC's default
+- **Do not use `-z` if TopPIC will search the spectra**: TopPIC's default
   post mass matching needs `sample.sqlite` and fails without it (or run
   `toppic -D`).
 - `-T` mode: only the MS/MS options apply; the peak list need not be
@@ -109,7 +109,7 @@ defaults (`-w` 4.0, `-t` 0, `-b` 2) plus fragment-feature and pseudo-spectrum
 options: `-T`/`-B` MS2 ECScore cutoff and min scans (0, 1), `-y`/`-Y`
 MS1/MS2 intensity-correlation cutoffs (0.5), `-v` pseudo score cutoff 0.55,
 `-V` fragments always added 25; `-j` (`--frag-num-filtering`) as in
-TopFD. No `-N`, `-D` or `-T`-peak-list mode.
+TopFD. No `-z`, `-D` or `-T`-peak-list mode.
 **Search pseudo spectra with `toppic -D`** (post mass matching assumes one
 scan per spectrum). Never pass `-o`: the run aborts at the pseudo-spectrum
 step.

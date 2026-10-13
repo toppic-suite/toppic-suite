@@ -663,7 +663,7 @@ std::string processImpl(const PrsmParaPtr& prsm_para_ptr,
               << sql_file_name << " for " << sp_file_name
               << " is missing! Post mass matching needs the centroided MS/MS "
                  "peaks of TopFD's database: run TopFD without disabling its "
-                 "SQLite database output (without -N) to deconvolute the "
+                 "SQLite database output (without -z) to deconvolute the "
                  "spectra, or run TopPIC with --disable-post-match.");
     exit(EXIT_FAILURE);
   } else {

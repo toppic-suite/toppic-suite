@@ -191,7 +191,7 @@ bool Argument::parse(int argc, char* argv[]) {
         "precursor and fragment ions in the MS/MS msalign file. TopPIC reads "
         "such a file with its --average-mass option. The feature files and "
         "the SQLite database keep monoisotopic masses.")(
-        "no-sql,N", "Do not write the deconvoluted spectra to an SQLite database.")(
+        "no-sql,z", "Do not write the deconvoluted spectra to an SQLite database.")(
         "sql-3d,D",
         "Add the MS1 peaks for 3D visualization to the SQLite database.")(
         "text-peak-list,T",

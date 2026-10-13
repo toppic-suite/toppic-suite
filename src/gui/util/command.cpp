@@ -65,7 +65,7 @@ std::string geneTopfdCommand(const TopfdParaPtr& para_ptr,
     command = command + "-i ";
   }
   if (!para_ptr->isGeneSql()) {
-    command = command + "-N ";
+    command = command + "-z ";
   } else if (para_ptr->isSql3d()) {
     command = command + "-D ";
   }

@@ -163,6 +163,12 @@ command emits `-y` and `-Y`). Facts to keep straight:
   hidden `--ms1-greedy-deconv` / `--ms2-greedy-deconv`, and the short-lived
   `--deconv-ms1-msdeconv` / `--deconv-ms2-msdeconv` of commit b3d71867.
   The letter `-F` is free in topfd.
+- **`--no-sql` is `-z`** (2026-10-13, branch `no_sql_short_option`,
+  toppic_test experiment 164 amendment 2; `-N` before, unrecognised now):
+  the letter toppic and topmg give their `--no-sql` (toppic's `-N` is
+  `--n-terminal-label`). topfd_gui passes `-z` (`gui/util/command.cpp`);
+  toppic's missing-database message says "without -z". TopDIA has no
+  `--no-sql`.
 - **The envelope ranking score** (2026-10-12): `-n`/`--env-rank
   <envcnn|msdeconv>` (default `envcnn`; `--deconv-score` for a few hours)
   replaces the flag `-n`/`--msdeconv` (unrecognised now) in topfd and

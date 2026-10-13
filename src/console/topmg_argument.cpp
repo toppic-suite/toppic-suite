@@ -411,7 +411,7 @@ bool TopmgArgument::parse(int argc, char* argv[]) {
         "Specify a file name for the combined spectrum data file and analysis "
         "results.")("keep-temp-files,k", "Keep intermediate files.")(
         "keep-decoy-ids,K", "Keep decoy identifications.")(
-        "no-sql",
+        "no-sql,z",
         "Do not write the PrSM, proteoform and protein tables into the TopFD "
         "SQLite database <name>.sqlite. By default, topmg adds them to it. "
         "With this option, topmg writes or changes no SQLite file.");
@@ -459,7 +459,7 @@ bool TopmgArgument::parse(int argc, char* argv[]) {
         "var-ptm,P", po::value<std::string>(&var_ptm_num), "")(
         "num-shift,s", po::value<std::string>(&shift_num), "")(
         "whole-protein-only,w", "")("keep-temp-files,k", "")("keep-decoy-ids,K",
-                                                             "")("no-sql", "")(
+                                                             "")("no-sql,z", "")(
         "database-file-name",
         po::value<std::string>(&database_file_name)->required(),
         "Database file name with its path.")(

@@ -696,7 +696,7 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
             "Disable post mass matching. By default, after the search, the "
             "theoretical fragment masses of each PrSM that no deconvoluted "
             "mass matched are matched against the centroided MS/MS peaks of "
-            "the TopFD SQLite database <name>.sqlite (run topfd without -N), "
+            "the TopFD SQLite database <name>.sqlite (run topfd without -z), "
             "read from toppic's copy <name>_toppic.sqlite, with the method of "
             "MSPathFinderT, and the matched masses are added to the spectra "
             "(written to <name>_post_ms2.msalign).")(
@@ -709,7 +709,7 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
             "fragment ions (topfd --average-mass). Before the search, each "
             "file is converted to <name>_mono_ms2.msalign with monoisotopic "
             "masses, which is then searched.")(
-            "no-sql",
+            "no-sql,z",
             "Do not write an SQLite database. By default, toppic writes "
             "<name>_toppic.sqlite, a copy of the TopFD database <name>.sqlite "
             "with the matched masses of the post mass matching and the PrSM, "
@@ -761,7 +761,7 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
         "output-raw-prsm-table,o", "")("output-prsm-coverage,O", "")(
         "disable-post-match,D", "")(
         "post-min-peak-num,I", po::value<std::string>(&post_min_peak_num), "")(
-        "average-mass,A", "")("no-sql", "")("disable-zero-shift-prec-error", "")(
+        "average-mass,A", "")("no-sql,z", "")("disable-zero-shift-prec-error", "")(
         "enable-one-shift-prec-error", "")("enable-var-ptm-prec-error", "")(
         "fdr-groups", "")("rescore,q", "")(
         "disable-rescore-fallback", "")("disable-rescore-evalue-floor", "")(
@@ -1246,7 +1246,7 @@ bool ToppicArgument::validateArguments() {
                   << sql_file_name << " for " << spec_file_list_[k]
                   << " is missing! Post mass matching needs the centroided "
                      "MS/MS peaks stored in it: run TopFD without disabling "
-                     "its SQLite database output (without -N) to deconvolute "
+                     "its SQLite database output (without -z) to deconvolute "
                      "the spectra, or run TopPIC with --disable-post-match.");
         return false;
       }
