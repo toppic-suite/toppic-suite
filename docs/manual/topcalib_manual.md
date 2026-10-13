@@ -117,11 +117,11 @@ the other header lines) are copied unchanged. A spectrum without
   next to the run's other TopFD files (`<base>_ms2.msalign` in another
   directory, with `<base>_ms2.feature` linked or copied there and
   `<base>.sqlite` copied there), so that TopPIC finds the feature file and
-  its post mass matching finds the database. TopPIC only reads it: it
-  searches its own copy, `<base>_toppic.sqlite`, written next to the
-  spectrum file, which also receives its result tables. The post mass
-  matching uses the raw peaks of the database, which are not corrected; its
-  fragment tolerance is TopPIC's `-e`.
+  its post mass matching finds the database. TopPIC only reads it; its own
+  database, `<base>_toppic.sqlite`, written next to the spectrum file,
+  receives the envelopes of the post mass matching and the result tables.
+  The post mass matching uses the raw peaks of the database, which are not
+  corrected; its fragment tolerance is TopPIC's `-e`.
 
 ## 4. Options
 

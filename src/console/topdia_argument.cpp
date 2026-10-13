@@ -151,7 +151,7 @@ bool Argument::parse(int argc, char* argv[]) {
         "fragment ions. The default value is 30.")(
         "max-mass,m", po::value<std::string>(&max_mass),
         "<a positive number>. Set the maximum monoisotopic mass of precursor "
-        "and fragment ions. The default value is 50,000 Dalton.")(
+        "and fragment ions. The default value is 50,000 Daltons.")(
         "mz-error,e", po::value<std::string>(&mz_error),
         "<a positive number>. Set the error tolerance of m/z values of "
         "spectral peaks. The default value is 0.02 m/z.")(
@@ -164,8 +164,8 @@ bool Argument::parse(int argc, char* argv[]) {
         "missing-level-one,o", "MS1 spectra are missing in the input file.")(
         "precursor-window,w", po::value<std::string>(&prec_window),
         "<a positive number>. Set the default precursor window size. The "
-        "default value is 4.0 m/z. When the input file contains the "
-        "information of precursor windows, the parameter will be ignored.")(
+        "default value is 4.0 m/z. When the input file contains precursor "
+        "window information, the parameter is ignored.")(
         "ms1-deconv,p", po::value<std::string>(&deconv_ms1),
         "<greedy|msdeconv>. Set the deconvolution method of MS1 spectra: "
         "msdeconv, the MS-Deconv dynamic programming, or greedy, TopFD's "
