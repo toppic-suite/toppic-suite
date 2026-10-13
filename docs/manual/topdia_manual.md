@@ -157,7 +157,7 @@ Output:
 
 | Option | Default | Meaning |
 |---|---|---|
-| `-z`, `--no-sql` | off | Do not write the `.sqlite` database (section 3). `toppic -D`, the setting for pseudo spectra, does not read it, and then writes no `sample_toppic.sqlite` either. Without `-D`, TopPIC's post mass matching stops with an error when the database is missing. |
+| `-z`, `--no-sql` | off | Do not write the `.sqlite` database (section 3); an earlier `sample.sqlite` in the output folder is deleted with its `-wal` and `-shm` files. `toppic -D`, the setting for pseudo spectra, does not read it, and then writes no `sample_toppic.sqlite` either. Without `-D`, TopPIC's post mass matching stops with an error when the database is missing. |
 
 TopDIA has no `--sql-3d` or text-peak-list mode; those are TopFD only.
 

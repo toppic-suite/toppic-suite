@@ -1105,3 +1105,11 @@ main on 2026-10-13) the MS1 peaks and the levels of the 3D view
   put it; a failure is a warning and leaves the file as written), then
   close. topfd `-T` does not (one spectrum); its database is closed by
   `createSqlDb` or the destructor as before.
+- **`-z` (`--no-sql`)** opens no database, so `closeSqlDb()` returns at
+  once (toppic_test experiment 166: one file, two files, FAIMS; 23
+  checks). `setMzmlFileNameAndFaims` deletes an earlier `<base>.sqlite`
+  with its `-journal`, `-wal` and `-shm` files (`sql_db_copy::removeDb`,
+  "Deleted the earlier database ...") in topfd, topdia and `-T`, as toppic
+  `--no-sql` does with its earlier `<base>_toppic.sqlite`: toppic's post
+  mass matching would otherwise read the database of another run.
+  `createSqlDb` removes the side files of an earlier database too.
