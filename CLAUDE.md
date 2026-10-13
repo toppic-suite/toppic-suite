@@ -543,7 +543,8 @@ above it, never the reverse:
   `prsm_sql_output::write` is the one entry point that writes those tables
   plus `seq/fasta_sql_writer`'s `fasta_seq` table into the database it is
   given when it exists (toppic: its `<base>_toppic.sqlite`; topmg: the
-  topfd `.sqlite` of the spectrum file); toppic and topmg both call it after
+  topfd `.sqlite` of the spectrum file; neither with `--no-sql`, see
+  `.claude/tools/toppic_output.md`); toppic and topmg both call it after
   their protein table, passing their own cutoff file extensions — do not duplicate
   the open/write/close sequence in a driver. Keep the TSV and SQL columns in
   step when changing either. `prsm`/`simple_prsm`/`expected_value`/

@@ -155,6 +155,10 @@ std::map<std::string, std::string> ToppicArgument::initArguments() {
   arguments["outputRawPrsmTable"] = "false";
   arguments["outputPrsmCoverage"] = "false";
   arguments["postMassMatch"] = "true";
+  // --no-sql: no SQLite file is written or changed: no <base>_toppic.sqlite,
+  // the post mass matching reads TopFD's database read only, and the PrSM
+  // tables are not written to a database (toppic_test experiment 164)
+  arguments["noSql"] = "false";
   arguments["averageMass"] = "false";
   arguments["postMinPeakNum"] = "1";
   arguments["zeroShiftPrecOneDaError"] = "true";
@@ -408,6 +412,11 @@ void ToppicArgument::outputArguments(
   } else {
     output << std::setw(gap) << std::left << "Post mass matching:" << sep
            << "False" << std::endl;
+  }
+  // printed only when set, so that the default output files do not change
+  if (arguments["noSql"] == "true") {
+    output << std::setw(gap) << std::left << "SQLite database output:" << sep
+           << "No" << std::endl;
   }
   if (arguments["proteoformPpmError"] == "false") {
     output << std::setw(gap) << std::left
@@ -699,7 +708,14 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
             "The spectrum files report average masses of precursor and "
             "fragment ions (topfd --average-mass). Before the search, each "
             "file is converted to <name>_mono_ms2.msalign with monoisotopic "
-            "masses, which is then searched.");
+            "masses, which is then searched.")(
+            "no-sql",
+            "Do not write an SQLite database. By default, toppic writes "
+            "<name>_toppic.sqlite, a copy of the TopFD database <name>.sqlite "
+            "with the matched masses of the post mass matching and the PrSM, "
+            "proteoform and protein tables. With this option, no SQLite file "
+            "is written or changed: the post mass matching reads the "
+            "centroided peaks of the TopFD database without changing it.");
 
     po::options_description desc("Options");
 
@@ -745,7 +761,7 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
         "output-raw-prsm-table,o", "")("output-prsm-coverage,O", "")(
         "disable-post-match,D", "")(
         "post-min-peak-num,I", po::value<std::string>(&post_min_peak_num), "")(
-        "average-mass,A", "")("disable-zero-shift-prec-error", "")(
+        "average-mass,A", "")("no-sql", "")("disable-zero-shift-prec-error", "")(
         "enable-one-shift-prec-error", "")("enable-var-ptm-prec-error", "")(
         "fdr-groups", "")("rescore,q", "")(
         "disable-rescore-fallback", "")("disable-rescore-evalue-floor", "")(
@@ -1065,6 +1081,10 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
 
     if (vm.count("disable-post-match")) {
       arguments_["postMassMatch"] = "false";
+    }
+
+    if (vm.count("no-sql")) {
+      arguments_["noSql"] = "true";
     }
 
     // hidden: the PTM localization of -B by the MIScore candidate search of

@@ -18,8 +18,10 @@
 #include <sqlite3.h>
 
 #include <algorithm>
+#include <cctype>
 #include <cmath>
 #include <cstddef>
+#include <cstdio>
 #include <cstdlib>
 #include <filesystem>
 #include <fstream>
@@ -28,6 +30,7 @@
 #include <memory>
 #include <set>
 #include <string>
+#include <unordered_map>
 #include <utility>
 #include <vector>
 
@@ -37,6 +40,7 @@
 #include "common/util/file_util.hpp"
 #include "common/util/logger.hpp"
 #include "common/util/str_util.hpp"
+#include "ms/calib/mass_calib_model.hpp"
 #include "ms/env/env.hpp"
 #include "ms/env/env_base.hpp"
 #include "ms/env/exp_env.hpp"
@@ -160,6 +164,95 @@ class RawPeakReader {
   sqlite3_stmt* id_stmt_;
   sqlite3_stmt* peak_stmt_;
 };
+
+// The centroided MS/MS peaks of the spectra with the given scan numbers, read
+// from TopFD's database in one pass without changing it (toppic --no-sql,
+// toppic_test experiment 164): RawPeakReader's per-spectrum query needs an
+// index on ms2_peak.spec_id, which TopFD does not write and a read-only
+// connection cannot create. The spectrum of a scan is the first one in id
+// order, as the query's; the peaks of a spectrum are sorted by m/z (stable,
+// in the table's order for equal m/z values). With a calibration model
+// (--mass-calib), every m/z is corrected with the MS/MS model at its
+// spectrum's retention time, as sqlite_mass_calib corrects toppic's copy.
+class LoadedPeakReader {
+ public:
+  LoadedPeakReader(sqlite3* db, const std::set<int>& scans,
+                   const MassCalibModel* model) {
+    std::unordered_map<int, double> rt_mins;
+    sqlite3_stmt* spec_stmt = sql_util::prepareSql(
+        db, "SELECT id, scan, retention_time FROM ms2_spectrum ORDER BY id;");
+    while (sqlite3_step(spec_stmt) == SQLITE_ROW) {
+      int id = sqlite3_column_int(spec_stmt, 0);
+      int scan = sqlite3_column_int(spec_stmt, 1);
+      if (scans.count(scan) > 0 && spec_ids_.count(scan) == 0) {
+        spec_ids_[scan] = id;
+        rt_mins[id] = sqlite3_column_double(spec_stmt, 2) / 60;
+        peaks_[id];
+      }
+    }
+    sqlite3_finalize(spec_stmt);
+    sqlite3_stmt* peak_stmt = sql_util::prepareSql(
+        db, "SELECT spec_id, peak_id, mz, intensity FROM ms2_peak;");
+    while (sqlite3_step(peak_stmt) == SQLITE_ROW) {
+      auto it = peaks_.find(sqlite3_column_int(peak_stmt, 0));
+      if (it == peaks_.end()) {
+        continue;
+      }
+      double mz = sqlite3_column_double(peak_stmt, 2);
+      if (model != nullptr) {
+        mz = model->correctMz(2, mz, rt_mins[it->first]);
+      }
+      it->second.push_back({sqlite3_column_int(peak_stmt, 1), mz,
+                            sqlite3_column_double(peak_stmt, 3)});
+    }
+    sqlite3_finalize(peak_stmt);
+    for (auto& entry : peaks_) {
+      std::stable_sort(
+          entry.second.begin(), entry.second.end(),
+          [](const RawPeak& a, const RawPeak& b) { return a.mz < b.mz; });
+    }
+  }
+
+  // The database id of the spectrum with the scan number, -1 if absent.
+  int getSpecId(int scan) const {
+    auto it = spec_ids_.find(scan);
+    return it == spec_ids_.end() ? -1 : it->second;
+  }
+
+  RawPeakVec getPeaks(int spec_id) const {
+    auto it = peaks_.find(spec_id);
+    return it == peaks_.end() ? RawPeakVec() : it->second;
+  }
+
+ private:
+  std::unordered_map<int, int> spec_ids_;
+  std::unordered_map<int, RawPeakVec> peaks_;
+};
+
+// The URI that opens a database file read only as immutable (SQLite's
+// immutable=1): no locks and no -wal / -shm files next to it, which a
+// read-only connection to a database in WAL mode (TopFD's) leaves otherwise.
+// The file must not change during the run.
+std::string immutableUri(const std::string& file_name) {
+  std::string path = std::filesystem::path(file_name).generic_string();
+  std::string uri;
+  for (char c : path) {
+    if (c == '%' || c == '?' || c == '#') {
+      char buf[4];
+      std::snprintf(buf, sizeof(buf), "%%%02X",
+                    static_cast<unsigned char>(c));
+      uri += buf;
+    } else {
+      uri += c;
+    }
+  }
+  // a Windows drive letter needs an empty authority: file:///C:/...
+  if (uri.size() >= 2 && std::isalpha(static_cast<unsigned char>(uri[0])) &&
+      uri[1] == ':') {
+    uri = "///" + uri;
+  }
+  return "file:" + uri + "?immutable=1";
+}
 
 // Index of the most intense peak within mz +- tole, -1 if there is none.
 int findPeak(const RawPeakVec& peaks, double mz, double tole) {
@@ -540,10 +633,17 @@ std::string postBaseName(const std::string& sp_file_name) {
   return base + "_post_ms2";
 }
 
-std::string process(const PrsmParaPtr& prsm_para_ptr,
-                    const std::string& input_file_ext,
-                    const std::string& output_file_ext, int min_peak_num,
-                    const std::string& sql_file_name) {
+namespace {
+
+// process() and processReadOnly(): with read_only, sql_file_name (TopFD's
+// database) is opened read only as immutable, its peaks are read in one pass
+// (LoadedPeakReader, corrected with the model in calib_model_file_name when
+// it is not empty) and no envelope is written.
+std::string processImpl(const PrsmParaPtr& prsm_para_ptr,
+                        const std::string& input_file_ext,
+                        const std::string& output_file_ext, int min_peak_num,
+                        const std::string& sql_file_name, bool read_only,
+                        const std::string& calib_model_file_name) {
   std::string sp_file_name = prsm_para_ptr->getSpectrumFileName();
   std::string post_base_name = postBaseName(sp_file_name);
   std::string post_sp_file_name = post_base_name + ".msalign";
@@ -568,13 +668,17 @@ std::string process(const PrsmParaPtr& prsm_para_ptr,
     exit(EXIT_FAILURE);
   } else {
     sqlite3* db = nullptr;
-    if (sqlite3_open(sql_file_name.c_str(), &db) != SQLITE_OK) {
+    int rc = read_only
+                 ? sqlite3_open_v2(immutableUri(sql_file_name).c_str(), &db,
+                                   SQLITE_OPEN_READONLY | SQLITE_OPEN_URI,
+                                   nullptr)
+                 : sqlite3_open(sql_file_name.c_str(), &db);
+    if (rc != SQLITE_OK) {
       LOG_ERROR("Cannot open the database " << sql_file_name << ": "
                                             << sqlite3_errmsg(db));
       exit(EXIT_FAILURE);
     }
-    {
-      RawPeakReader reader(db);
+    auto match_all = [&](auto& reader) {
       for (size_t i = 0; i < prsm_ptrs.size(); i++) {
         PrsmPtr prsm_ptr = prsm_ptrs[i];
         MsHeaderPtr header_ptr =
@@ -601,13 +705,39 @@ std::string process(const PrsmParaPtr& prsm_para_ptr,
         match_num += static_cast<int>(matches.size());
         prsm_num++;
       }
+    };
+    if (read_only) {
+      std::unique_ptr<MassCalibModel> model;
+      if (!calib_model_file_name.empty()) {
+        model = std::make_unique<MassCalibModel>(
+            MassCalibModel::read(calib_model_file_name));
+      }
+      std::set<int> scans;
+      for (const PrsmPtr& prsm_ptr : prsm_ptrs) {
+        scans.insert(prsm_ptr->getDeconvMsPtrVec()[0]
+                         ->getMsHeaderPtr()
+                         ->getFirstScanNum());
+      }
+      LoadedPeakReader reader(db, scans, model.get());
+      match_all(reader);
+    } else {
+      RawPeakReader reader(db);
+      match_all(reader);
       writeSqlEnvs(db, sql_spec_matches);
     }
     sqlite3_close(db);
   }
   std::cout << "Post mass matching: " << match_num << " masses added to "
             << prsm_num << " of " << prsm_ptrs.size() << " PrSMs from "
-            << sql_file_name << "." << std::endl;
+            << sql_file_name;
+  if (read_only) {
+    std::cout << " (read only"
+              << (calib_model_file_name.empty()
+                      ? ""
+                      : ", m/z corrected with " + calib_model_file_name)
+              << ")";
+  }
+  std::cout << "." << std::endl;
 
   // PrSMs with the recounted matched masses and fragments, under the name of
   // the new spectrum file
@@ -631,6 +761,27 @@ std::string process(const PrsmParaPtr& prsm_para_ptr,
         std::filesystem::copy_options::overwrite_existing);
   }
   return post_sp_file_name;
+}
+
+}  // namespace
+
+std::string process(const PrsmParaPtr& prsm_para_ptr,
+                    const std::string& input_file_ext,
+                    const std::string& output_file_ext, int min_peak_num,
+                    const std::string& sql_file_name) {
+  return processImpl(prsm_para_ptr, input_file_ext, output_file_ext,
+                     min_peak_num, sql_file_name, false, "");
+}
+
+std::string processReadOnly(const PrsmParaPtr& prsm_para_ptr,
+                            const std::string& input_file_ext,
+                            const std::string& output_file_ext,
+                            int min_peak_num,
+                            const std::string& topfd_db_name,
+                            const std::string& calib_model_file_name) {
+  return processImpl(prsm_para_ptr, input_file_ext, output_file_ext,
+                     min_peak_num, topfd_db_name, true,
+                     calib_model_file_name);
 }
 
 }  // namespace prsm_post_mass_match

@@ -95,6 +95,9 @@ std::map<std::string, std::string> TopmgArgument::initArguments() {
   arguments["varModFileName"] = "";
   arguments["threadNumber"] = "1";
   arguments["useFeatureFile"] = "true";
+  // --no-sql: the PrSM tables are not written into TopFD's database
+  // (toppic_test experiment 164)
+  arguments["noSql"] = "false";
   arguments["proteoGraphGap"] = "40";
   arguments["useAsfDiag"] = "false";
   arguments["varPtmNumber"] = "5";
@@ -238,6 +241,11 @@ void TopmgArgument::outputArguments(
   } else {
     output << std::setw(gap) << std::left << "Use TopFD feature file:" << sep
            << "False" << std::endl;
+  }
+  // printed only when set, so that the default output files do not change
+  if (arguments["noSql"] == "true") {
+    output << std::setw(gap) << std::left << "SQLite database output:" << sep
+           << "No" << std::endl;
   }
 
   output << std::setw(gap) << std::left << "Thread number:" << sep
@@ -402,7 +410,11 @@ bool TopmgArgument::parse(int argc, char* argv[]) {
         "combined-file-name,c", po::value<std::string>(&combined_output_name),
         "Specify a file name for the combined spectrum data file and analysis "
         "results.")("keep-temp-files,k", "Keep intermediate files.")(
-        "keep-decoy-ids,K", "Keep decoy identifications.");
+        "keep-decoy-ids,K", "Keep decoy identifications.")(
+        "no-sql",
+        "Do not write the PrSM, proteoform and protein tables into the TopFD "
+        "SQLite database <name>.sqlite. By default, topmg adds them to it. "
+        "With this option, topmg writes or changes no SQLite file.");
 
     po::options_description desc("Options");
 
@@ -447,7 +459,7 @@ bool TopmgArgument::parse(int argc, char* argv[]) {
         "var-ptm,P", po::value<std::string>(&var_ptm_num), "")(
         "num-shift,s", po::value<std::string>(&shift_num), "")(
         "whole-protein-only,w", "")("keep-temp-files,k", "")("keep-decoy-ids,K",
-                                                             "")(
+                                                             "")("no-sql", "")(
         "database-file-name",
         po::value<std::string>(&database_file_name)->required(),
         "Database file name with its path.")(
@@ -636,6 +648,10 @@ bool TopmgArgument::parse(int argc, char* argv[]) {
 
     if (vm.count("keep-decoy-ids")) {
       arguments_["keepDecoyResults"] = "true";
+    }
+
+    if (vm.count("no-sql")) {
+      arguments_["noSql"] = "true";
     }
   } catch (std::exception& e) {
     std::cerr << "Unhandled Exception in parsing command line " << e.what()

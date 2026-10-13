@@ -59,11 +59,29 @@ std::string process(const PrsmParaPtr& prsm_para_ptr,
                     const std::string& output_file_ext, int min_peak_num,
                     const std::string& sql_file_name);
 
+// The same without writing or changing an SQLite file (toppic --no-sql,
+// toppic_test experiment 164): the peaks are read from TopFD's database
+// topfd_db_name (sqlFileName of the file given to toppic), opened read only
+// as immutable (no -wal / -shm files; it must not change during the run), in
+// one pass over its ms2_peak table, and no envelope is written. With
+// --mass-calib, calib_model_file_name is the calibration model
+// (<base>_mass_calib.json) and every peak's m/z is corrected with its MS/MS
+// model, as in toppic's corrected copy of the database; otherwise it is
+// empty. The output files are those of process(); a missing database is the
+// same error.
+std::string processReadOnly(const PrsmParaPtr& prsm_para_ptr,
+                            const std::string& input_file_ext,
+                            const std::string& output_file_ext,
+                            int min_peak_num,
+                            const std::string& topfd_db_name,
+                            const std::string& calib_model_file_name);
+
 // TopFD's SQLite database of a spectrum file: <path>/<base>.sqlite, where
 // <base> is the file name without its extension and a trailing "_ms2"
 // (TopFD writes <base>_ms2.msalign and <base>.sqlite), and without "_resid"
 // before it. toppic only reads it (the argument check, the copy into
-// toppicSqlFileName); topmg writes its PrSM tables into it.
+// toppicSqlFileName, and with --no-sql the post mass matching); topmg writes
+// its PrSM tables into it (not with --no-sql).
 std::string sqlFileName(const std::string& sp_file_name);
 
 // toppic's SQLite database of a spectrum file given to toppic,

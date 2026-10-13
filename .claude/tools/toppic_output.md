@@ -91,6 +91,33 @@ instead of the input. Facts to keep straight:
   run made the first commit (4916bc98, the copy in rollback mode) stop with
   "database is locked"; with the WAL copy the run completes, as main does
   with the same reader on TopFD's database.
+- **`--no-sql` writes no SQLite file** (branch `no_sql_output`, toppic_test
+  experiment 164; visible in toppic and topmg, no short letter: topfd's
+  `-N, --no-sql` is `--n-terminal-label` in toppic). toppic
+  (`arguments["noSql"]`): `TopPICProgress_multi_file` still deletes an
+  earlier `<base>_toppic.sqlite` but writes none (`writeToppicDb`
+  skipped); `TopPIC_mass_calib` writes no corrected copy and passes the
+  model file instead (`arguments["massCalibModelFileName"]`, the
+  `<base>_mass_calib.json` it writes with %.17g; "" without a model, e.g.
+  too few calibrants), per file through `calib_model_lst`; the post mass
+  matching calls `prsm_post_mass_match::processReadOnly` on TopFD's
+  database (`arguments["topfdDbFileName"]`, now set for every file before
+  `TopPICProgress`), and `TopPIC_report` skips `prsm_sql_output::write`
+  ("The PrSM tables are not written to an SQLite database (--no-sql).").
+  `processReadOnly` opens the database as `file:<path>?immutable=1`
+  (`SQLITE_OPEN_READONLY | SQLITE_OPEN_URI`; no locks, no `-wal`/`-shm`
+  files next to TopFD's WAL database, which `mode=ro` would leave; the file
+  must not change during the run), and `LoadedPeakReader` reads the peaks
+  of the PrSMs' scans in one pass over `ms2_peak` (the spectrum of a scan is
+  the first in id order, as `RawPeakReader`'s query; the peaks are
+  stable-sorted by m/z), because the per-spectrum query needs the index on
+  `ms2_peak.spec_id` that TopFD does not write and a read-only connection
+  cannot create; with a model, every m/z is corrected with
+  `MassCalibModel::correctMz(2, mz, retention_time / 60)`, as
+  `sqlite_mass_calib` corrects the copy. No envelope is written. The
+  parameter block prints "SQLite database output: No" only when the option
+  is set. topmg (`topmg_process`) skips its `prsm_sql_output::write` into
+  TopFD's database. The GUIs have no control for it.
 - **A missing database is an error, not a skip.** TopFD's database of a
   spectrum file is `prsm_post_mass_match::sqlFileName(sp_file)`
   (`<base>.sqlite` for `<base>_ms2.msalign`; use it, do not re-derive the
