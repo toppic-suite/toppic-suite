@@ -324,7 +324,8 @@ calls `refinePrecursorByMatchedIons` like `PsAlign` and `PsAlignMultiType`;
 
 topmg writes its own database `<base>_topmg.sqlite`
 (`prsm_post_mass_match::topmgSqlFileName`; branch `topmg_db` from main
-ecf6fa9f, toppic_test experiment 170, the user's request: "Apply the same
+ecf6fa9f, merged into main as bc8be441 on 2026-10-13, toppic_test
+experiment 170, the user's request: "Apply the same
 sqlite generation methods to topmg and the use _topmg.sqlite for output
 sqlite filename"), as toppic writes `<base>_toppic.sqlite` (see
 `toppic_output.md`): `TopMGProgress_multi_file`, for each spectrum file
