@@ -113,7 +113,7 @@ deleted at the end unless `--keep-temp-files` is given;
    score, of at least `--filter-by-score`).
 9. **Proteoform and protein clustering.** PrSMs sharing a TopFD feature form
    one proteoform; proteoforms of the same protein whose precursor masses
-   agree within `--proteoform-error-tolerance` are merged; proteoforms are
+   agree within `--cluster-error-tolerance` are merged; proteoforms are
    then grouped by protein.
 10. **FDR computation** (only with `--decoy`). Spectrum-, proteoform- and
     protein-level false discovery rates are estimated from the decoy hits;
@@ -184,7 +184,7 @@ Spectra and tolerances:
 | `-e`, `--frag-error-tolerance <int>` | 10 | Error tolerance of fragment masses (ppm). |
 | `-E`, `--prec-error-tolerance <int>` | 10 | Error tolerance of precursor masses (ppm). |
 | `-F`, `--filter-by-score <0..1>` | 0.4 | Masses whose confidence score (the fourth column of the msalign file: the EnvCNN score in TopFD's files, the pseudo score in TopDIA's) is below this are ignored during filtering, search and E-value computation. In `topmg_gui`: "Confidence score cutoff". |
-| `-p`, `--proteoform-error-tolerance <number>` | 1.2 | Precursor mass tolerance (Da) for grouping PrSMs into proteoforms. |
+| `-p`, `--cluster-error-tolerance <number>` | 1.2 | Precursor mass tolerance (Da) for grouping PrSMs into proteoforms. |
 | `-x`, `--no-topfd-feature` | off | Run without the TopFD feature file. In `topmg_gui`: "No TopFD feature file". |
 
 Cutoffs and output:

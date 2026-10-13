@@ -778,7 +778,7 @@ level:</string>
           </size>
          </property>
          <property name="toolTip">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Error tolerance (Da) for clustering PrSMs into proteoforms: proteoforms of the same protein whose precursor masses agree within it are merged. A positive number. Default: 1.2. (topmg -p, --proteoform-error-tolerance)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Error tolerance (Da) for clustering PrSMs into proteoforms: proteoforms of the same protein whose precursor masses agree within it are merged. A positive number. Default: 1.2. (topmg -p, --cluster-error-tolerance)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
          <property name="text">
           <string>PrSM cluster error tolerance (Da):</string>
@@ -788,7 +788,7 @@ level:</string>
        <item>
         <widget class="QLineEdit" name="formErrorToleranceEdit">
          <property name="toolTip">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Error tolerance (Da) for clustering PrSMs into proteoforms: proteoforms of the same protein whose precursor masses agree within it are merged. A positive number. Default: 1.2. (topmg -p, --proteoform-error-tolerance)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Error tolerance (Da) for clustering PrSMs into proteoforms: proteoforms of the same protein whose precursor masses agree within it are merged. A positive number. Default: 1.2. (topmg -p, --cluster-error-tolerance)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
          <property name="text">
           <string>1.2</string>

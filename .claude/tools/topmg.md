@@ -376,3 +376,12 @@ topmg compresses each file's `<base>_topmg.sqlite` in place at the end of
 the run (`TopMGProgress_multi_file`), unless `--no-sql` or the hidden
 `--disable-zstd`, and reads a compressed TopFD database in its envelope
 copy (`sql_db_copy::writeEnvelopeDb`). See `.claude/tools/topfd.md`.
+
+## Option names
+
+- **`--cluster-error-tolerance`** (`-p`, default 1.2 Da; 2026-10-13,
+  the user's request): was `--proteoform-error-tolerance`, unrecognised in
+  topmg now. toppic keeps `--proteoform-error-tolerance`. Both write the
+  arguments key `proteoformErrorTolerance`, and topmg_gui passes `-p`
+  (`gui/util/command.cpp`), so only the option name, the topmg_gui
+  tooltips and the TopMG manual changed.

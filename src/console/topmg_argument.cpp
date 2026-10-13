@@ -358,7 +358,7 @@ bool TopmgArgument::parse(int argc, char* argv[]) {
         "confidence score (e.g., EnvCNN score) is below the cutoff before "
         "spectral filtering, database search and E-value computation. "
         "Default value: 0.4.")(
-        "proteoform-error-tolerance,p",
+        "cluster-error-tolerance,p",
         po::value<std::string>(&form_error_tole),
         "<a positive number>. Error tolerance for identifying PrSM clusters "
         "(in Dalton). Default value: 1.2 Dalton.")(
@@ -434,7 +434,7 @@ bool TopmgArgument::parse(int argc, char* argv[]) {
                        po::value<std::string>(&frag_error_tole), "")(
         "prec-error-tolerance,E", po::value<std::string>(&prec_error_tole), "")(
         "filter-by-score,F", po::value<std::string>(&env_cnn_cutoff), "")(
-        "proteoform-ppm-error,Q", "")("proteoform-error-tolerance,p",
+        "proteoform-ppm-error,Q", "")("cluster-error-tolerance,p",
                                       po::value<std::string>(&form_error_tole),
                                       "")(
         // hidden (not in display_desc): the graph alignment's error tolerance
@@ -563,7 +563,7 @@ bool TopmgArgument::parse(int argc, char* argv[]) {
       arguments_["proteoformPpmError"] = "true";
     }
 
-    if (vm.count("proteoform-error-tolerance")) {
+    if (vm.count("cluster-error-tolerance")) {
       arguments_["proteoformErrorTolerance"] = form_error_tole;
     }
 
