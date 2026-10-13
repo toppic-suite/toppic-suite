@@ -164,7 +164,8 @@ command emits `-y` and `-Y`). Facts to keep straight:
   `--deconv-ms1-msdeconv` / `--deconv-ms2-msdeconv` of commit b3d71867.
   The letter `-F` is free in topfd.
 - **`--no-sql` is `-z`** (2026-10-13, branch `no_sql_short_option`,
-  toppic_test experiment 164 amendment 2; `-N` before, unrecognised now):
+  merged into main with `topdia_no_sql` as daa9098e; toppic_test
+  experiment 164 amendment 2; `-N` before, unrecognised now):
   the letter toppic and topmg give their `--no-sql` (toppic's `-N` is
   `--n-terminal-label`). topfd_gui passes `-z` (`gui/util/command.cpp`);
   toppic's missing-database message says "without -z". TopDIA has

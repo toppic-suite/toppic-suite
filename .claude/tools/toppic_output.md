@@ -95,7 +95,7 @@ instead of the input. Facts to keep straight:
   main on 2026-10-12 as 4cdaa7a1, whose tree is the tested 94c36445;
   toppic_test experiment 164; visible in toppic and topmg; `-z` in toppic,
   topmg and topfd since branch `no_sql_short_option` (2026-10-13, experiment 164
-  amendment 2; topfd's was `-N`, which is `--n-terminal-label` in toppic,
+  amendment 2; merged into main with `topdia_no_sql` as daa9098e; topfd's was `-N`, which is `--n-terminal-label` in toppic,
   and topfd_gui passes `-z`)). toppic
   (`arguments["noSql"]`): `TopPICProgress_multi_file` still deletes an
   earlier `<base>_toppic.sqlite` but writes none (`writeToppicDb`
