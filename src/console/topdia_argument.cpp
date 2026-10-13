@@ -161,7 +161,7 @@ bool Argument::parse(int argc, char* argv[]) {
         "ms2-sn-ratio,s", po::value<std::string>(&ms_two_sn_ratio),
         "<a non-negative number>. Set the signal-to-noise ratio for MS/MS "
         "spectra. The default value is 1.")(
-        "missing-level-one,o", "MS1 spectra are missing in the input file.")(
+        "missing-ms1,o", "MS1 spectra are missing in the input file.")(
         "precursor-window,w", po::value<std::string>(&prec_window),
         "<a positive number>. Set the default precursor window size. The "
         "default value is 4.0 m/z. When the input file contains precursor "
@@ -440,7 +440,7 @@ bool Argument::parse(int argc, char* argv[]) {
       topfd_para_ptr_->setMsOneSnRatio(sn_ratio);
     }
 
-    if (vm.count("missing-level-one")) {
+    if (vm.count("missing-ms1")) {
       topfd_para_ptr_->setMissingLevelOne(true);
     }
 

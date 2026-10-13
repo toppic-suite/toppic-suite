@@ -171,7 +171,8 @@ moved from `-p` to `-y` for them and `--ms2-correlation-cutoff` from `-P` to
   was `--envcnn-cutoff-ms1`) and `--ms2-envcnn-cutoff` (`-g`, was
   `--envcnn-cutoff-ms2`); the old names are unrecognised. topfd_gui emits
   `--ms1-deconv`/`--ms2-deconv` (`gui/util/command.cpp`). topdia: the same
-  six renames later the same day (it keeps `--missing-level-one`, `-o`),
+  six renames later the same day (its `--missing-level-one`, `-o`, became
+  `--missing-ms1` after them),
   and `--ms1-correlation-cutoff` (`-y`, was
   `--ms1-intensity-correlation-cutoff`) and `--ms2-correlation-cutoff` (`-Y`,
   was `--ms2-intensity-correlation-cutoff`); topdia_gui emits
