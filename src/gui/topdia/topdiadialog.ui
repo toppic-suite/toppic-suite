@@ -624,7 +624,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Filter the isotopic envelopes of MS/MS scans by the estimated number of fragment ions: the envelopes ranked highest by the score chosen with Use MS-Deconv score are kept. MS1 envelopes are not filtered, and the filter is not used with the flashdeconv MS/MS deconvolution. Unchecked by default. (topdia -j, --frag-num-filtering)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
         <property name="text">
-         <string>Enable fragment num based filtering</string>
+         <string>Enable fragment number based filtering</string>
         </property>
         <property name="checkable">
          <bool>true</bool>
