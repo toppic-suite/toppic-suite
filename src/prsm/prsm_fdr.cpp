@@ -206,14 +206,11 @@ void computeProteinFdr(PrsmStrPtrVec2D& target_proteins,
 
 namespace {
 
-// the targets within a level's cutoff, and the search's target and decoy
-// PrSMs
+// the targets within a level's cutoff
 struct PassCounts {
   int prsm = 0;
   int proteoform = 0;
   int protein = 0;
-  size_t target_prsm_num = 0;
-  size_t decoy_prsm_num = 0;
 };
 
 // The spectrum-, proteoform- and protein-level FDRs of one search's PrSMs,
@@ -245,8 +242,6 @@ PassCounts computeFdrs(const PrsmStrPtrVec& prsms, FdrKey key,
   computeProteinFdr(target_proteins, decoy_proteins, key);
 
   PassCounts counts;
-  counts.target_prsm_num = target_prsms.size();
-  counts.decoy_prsm_num = decoy_prsms.size();
   for (const PrsmStrPtr& prsm_ptr : target_prsms) {
     if (prsm_ptr->getFdr() <= cutoffs.prsm) {
       counts.prsm++;
@@ -339,10 +334,6 @@ void process(const std::string& spec_file_name,
           computeFdrs(evalue_by_tool[tool_prsms.first], eValueKey, cutoffs);
     }
     PassCounts counts = computeFdrs(tool_prsms.second, key, cutoffs);
-
-    std::cout << tool_prsms.first << " target_prsms: "
-              << counts.target_prsm_num
-              << ", decoy_prsms: " << counts.decoy_prsm_num << std::endl;
 
     if (two_rounds) {
       // at each level the E-value's FDRs when they give more targets
