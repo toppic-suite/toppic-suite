@@ -156,8 +156,9 @@ std::map<std::string, std::string> ToppicArgument::initArguments() {
   arguments["outputPrsmCoverage"] = "false";
   arguments["postMassMatch"] = "true";
   // --no-sql: no SQLite file is written or changed: no <base>_toppic.sqlite,
-  // the post mass matching reads TopFD's database read only, and the PrSM
-  // tables are not written to a database (toppic_test experiment 164)
+  // no post-matched envelopes and no PrSM tables in a database (toppic_test
+  // experiment 164); the post mass matching reads TopFD's database read only
+  // in any case
   arguments["noSql"] = "false";
   arguments["averageMass"] = "false";
   arguments["postMinPeakNum"] = "1";
@@ -696,10 +697,9 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
             "Disable post mass matching. By default, after the search, the "
             "theoretical fragment masses of each PrSM that no deconvoluted "
             "mass matched are matched against the centroided MS/MS peaks of "
-            "the TopFD SQLite database <name>.sqlite (run topfd without -z), "
-            "read from toppic's copy <name>_toppic.sqlite, with the method of "
-            "MSPathFinderT, and the matched masses are added to the spectra "
-            "(written to <name>_post_ms2.msalign).")(
+            "the TopFD SQLite database <name>.sqlite (run topfd without -z) "
+            "with the method of MSPathFinderT, and the matched masses are "
+            "added to the spectra (written to <name>_post_ms2.msalign).")(
             "post-min-peak-num,I", po::value<std::string>(&post_min_peak_num),
             "<a positive integer>. Minimum number of observed isotopic peaks "
             "of a fragment mass matched by the post mass matching. Default "
@@ -711,11 +711,10 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
             "masses, which is then searched.")(
             "no-sql,z",
             "Do not write an SQLite database. By default, toppic writes "
-            "<name>_toppic.sqlite, a copy of the TopFD database <name>.sqlite "
-            "with the matched masses of the post mass matching and the PrSM, "
-            "proteoform and protein tables. With this option, no SQLite file "
-            "is written or changed: the post mass matching reads the "
-            "centroided peaks of the TopFD database without changing it.");
+            "<name>_toppic.sqlite with the MS/MS envelope tables of the TopFD "
+            "database <name>.sqlite, the envelopes of the masses added by the "
+            "post mass matching, and the PrSM, proteoform and protein tables. "
+            "With this option, no SQLite file is written or changed.");
 
     po::options_description desc("Options");
 

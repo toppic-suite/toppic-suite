@@ -58,24 +58,26 @@ deleted at the end unless `--keep-temp-files` is given, except the
 `toppic_record_prsm` file (section 3), which is always kept.
 
 **TopPIC's database.** Before a spectrum file `sample_ms2.msalign` is
-searched, TopPIC writes its own SQLite database, `sample_toppic.sqlite`: a
-copy of TopFD's `sample.sqlite` with all its tables (spectra, peaks,
-deconvoluted masses and their envelopes, and the other tables TopFD
-wrote). An earlier `sample_toppic.sqlite` is deleted first, so every run
-starts from TopFD's data. Post mass matching reads the peaks of the copy
-and adds its envelopes to it (step 11), and the identifications are
-written into it (step 17); TopFD's database is only read. The name is the
-same with every option (`--average-mass`, `--disable-post-match`, `-c`),
-so a TopFD and a TopPIC run leave two databases per spectrum file. Without
-TopFD's database (TopFD `-z`, possible with `--disable-post-match`) no
-copy is written and the identifications are not written to a database.
-With `-z` (`--no-sql`), TopPIC writes no SQLite file at all: no copy is written
-(an earlier `sample_toppic.sqlite` is still deleted, so that no database
-of another run remains next to the new results), post mass matching reads
-the peaks of TopFD's `sample.sqlite` directly, without changing it or
-leaving `-wal` and `-shm` files next to it, and the identifications are
-not written to a database (step 17 is skipped). TopFD's database is still
-needed for post mass matching.
+searched, TopPIC writes its own SQLite database, `sample_toppic.sqlite`,
+with the deconvoluted MS/MS masses and their envelopes of TopFD's
+`sample.sqlite` (the tables `ms2_env` and `ms2_env_peak`). An earlier
+`sample_toppic.sqlite` is deleted first, so every run starts from TopFD's
+data. Post mass matching reads the centroided peaks of TopFD's database
+and adds its envelopes to TopPIC's (step 11), and the identifications are
+written into it (step 17); TopFD's database is only read, and no `-wal`
+or `-shm` file is left next to it. The spectra, the peaks, the MS1
+envelopes and the other tables stay in TopFD's database only, so a viewer
+of the identifications (TopMSV) needs both files: it reads a table from
+`sample_toppic.sqlite` when that file has it and from `sample.sqlite`
+otherwise. The name is the same with every option (`--average-mass`,
+`--disable-post-match`, `-c`), so a TopFD and a TopPIC run leave two
+databases per spectrum file. Without TopFD's database (TopFD `-z`,
+possible with `--disable-post-match`) no database is written and the
+identifications are not written to a database. With `-z` (`--no-sql`),
+TopPIC writes no SQLite file at all (an earlier `sample_toppic.sqlite` is
+still deleted, so that no database of another run remains next to the new
+results), and the identifications are not written to a database (step 17
+is skipped). TopFD's database is still needed for post mass matching.
 
 With `--average-mass`, every spectrum file is first converted: the average
 precursor and fragment masses of `sample_ms2.msalign` are converted back to
@@ -85,8 +87,8 @@ monoisotopic masses with the theoretical isotopic distributions TopFD used
 records the conversion), `sample_ms2.feature` is copied to
 `sample_mono_ms2.feature`, and the steps below, the result file names and
 the merge of a `-c` run all use the converted file. TopFD keeps the
-monoisotopic masses in its database, so `sample_toppic.sqlite` is the
-same copy as without the option. The result files are named after
+monoisotopic masses in its database, so `sample_toppic.sqlite` has the
+same tables as without the option. The result files are named after
 `sample_mono_post_ms2`, or `sample_mono_ms2` with `--disable-post-match`.
 
 1. **Zero unexpected shift filtering and search.** Protein candidates are
@@ -139,9 +141,8 @@ same copy as without the option. The result files are named after
     the best PrSM of every spectrum, target or decoy, after the clustering,
     the cluster protein correction and the recount, the theoretical
     fragment masses that no deconvoluted mass matched are searched in the
-    centroided MS/MS peaks of the spectrum, stored in TopPIC's copy of the
-    TopFD SQLite database (`sample_toppic.sqlite`; with `--no-sql`, in
-    TopFD's `sample.sqlite`, read without changing it), using the isotopic-envelope test of MSPathFinderT: an envelope
+    centroided MS/MS peaks of the spectrum, stored in the TopFD SQLite
+    database `sample.sqlite` (read without changing it), using the isotopic-envelope test of MSPathFinderT: an envelope
     is accepted when its most abundant peak and at least
     `--post-min-peak-num` of its peaks are present and its intensities fit
     the theoretical ones. Each accepted fragment adds one mass to the
@@ -225,7 +226,7 @@ after `<name>_ms2`. With `--average-mass` the names start with
 | `sample_post_ms2_toppic_proteoform.tsv`, `..._proteoform_single.tsv` | One PrSM per identified proteoform (the best one), passing the proteoform-level cutoff. |
 | `sample_post_ms2_toppic_protein.tsv`, `..._protein_single.tsv` | One PrSM per identified protein (the best one), passing the protein-level cutoff. |
 | `sample_post_ms2_toppic_prsm.xml`, `..._proteoform.xml`, `..._protein.xml` | The same three sets of PrSMs in XML, read by TopDiff and the visualization tools. Every PrSM records the TopPIC Suite version that wrote it, and TopDiff reads only the files of its own version. Every proteoform element has its classification, `<classification>` (the `Proteoform classification` column). |
-| `sample_toppic.sqlite` (the same name with every option) | TopPIC's database (section 2): a copy of TopFD's `sample.sqlite` with the envelopes added by post mass matching and the tables `prsm`, `proteoform`, `protein`, `prsm_mass_shift`, `prsm_protein_match` and `fasta_seq`, for visualization. The first three hold the PrSMs of the tables below, with the columns `precursor_id` and `proforma` for `Precursor ID` and `ProForma` (there is no column for `Alternative PTM explanation`). It is written again by every run on the spectrum file; TopFD's `sample.sqlite` is not changed. Not written with `--no-sql`. |
+| `sample_toppic.sqlite` (the same name with every option) | TopPIC's database (section 2): the tables `ms2_env` and `ms2_env_peak` of TopFD's `sample.sqlite` with the envelopes added by post mass matching, and the tables `prsm`, `proteoform`, `protein`, `prsm_mass_shift`, `prsm_protein_match` and `fasta_seq`, for visualization together with TopFD's `sample.sqlite`, which has the spectra and peaks. The first three hold the PrSMs of the tables below, with the columns `precursor_id` and `proforma` for `Precursor ID` and `ProForma` (there is no column for `Alternative PTM explanation`). It is written again by every run on the spectrum file; TopFD's `sample.sqlite` is not changed. Not written with `--no-sql`. |
 | `sample_post_ms2.toppic_record_prsm` | The best PrSM of every spectrum after the FDR computation and before the cutoffs, decoy identifications included. Always kept. |
 
 The `_single` tables have one line per PrSM. The tables without `_single`
@@ -313,7 +314,7 @@ Cutoffs and output:
 | `-u`, `--thread-number <int>` | 1 | Number of threads; must not exceed the number of hardware threads. Each protein filtering step may use fewer: it fits its thread number to the memory available when it starts (about 1.25 GiB per thread for zero-shift and variable-PTM filtering, also when they run as one step with one-shift filtering, 1 GiB for one-shift filtering, 0.5 GiB for multiple-shift filtering). The run starts with a warning listing the filtering steps that will use fewer threads and how many, and a step prints its number again if the memory available when it starts gives a different one. All other steps use the full number. |
 | `-k`, `--keep-temp-files` | off | Keep the intermediate files. |
 | `-K`, `--keep-decoy-ids` | off | Keep decoy identifications in the result tables. |
-| `-z`, `--no-sql` | off | Write no SQLite database: no `<name>_toppic.sqlite`, and the identifications are not written to a database (section 2). Post mass matching reads the centroided peaks of TopFD's `<name>.sqlite` without changing it. The other result files are the same as without the option. |
+| `-z`, `--no-sql` | off | Write no SQLite database: no `<name>_toppic.sqlite`, and the identifications are not written to a database (section 2). The other result files are the same as without the option. |
 
 **Combining fractions.** With `-c`, each fraction is searched,
 post-matched, clustered and given its FDRs on its own first (post mass

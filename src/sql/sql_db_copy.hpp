@@ -19,15 +19,18 @@
 #include <sqlite3.h>
 
 #include <string>
+#include <vector>
 
 namespace toppic {
 
 namespace sql_db_copy {
 
-// toppic's copy of TopFD's database, <base>_toppic.sqlite, which toppic
-// searches in place of TopFD's (toppic_test experiments 154 and 156): a
-// plain copy, or the corrected copy of --mass-calib (sqlite_mass_calib).
-// TopFD's database is only read.
+// toppic's database of a spectrum file, <base>_toppic.sqlite, built from
+// TopFD's (toppic_test experiments 154, 156 and 168): the tables ms2_env and
+// ms2_env_peak (copyTables), to which the post mass matching appends its
+// envelopes, or with --mass-calib the corrected copy of every table
+// (openCopy and closeCopy, sqlite_mass_calib). TopFD's database is only
+// read.
 
 // Opens a copy of src_name, written under the temporary name
 // dest_name + ".tmp" (an earlier temporary file is removed), for changes
@@ -47,8 +50,15 @@ sqlite3* openCopy(const std::string& src_name, const std::string& dest_name);
 // partial file under that name.
 void closeCopy(sqlite3* db, const std::string& dest_name);
 
-// openCopy and closeCopy with no change in between.
-void copy(const std::string& src_name, const std::string& dest_name);
+// Writes dest_name, a new database with the tables of src_name (rowid
+// tables) and their rows in rowid order: each table is created with
+// src_name's own CREATE statement, src_name is attached read only as
+// immutable (no -wal / -shm files next to it; it must not change meanwhile),
+// and the new database is written under the temporary name and renamed as
+// closeCopy does, replacing an earlier file. Exits with an error message
+// when a database cannot be read or written or src_name lacks a table.
+void copyTables(const std::string& src_name, const std::string& dest_name,
+                const std::vector<std::string>& tables);
 
 // Deletes the database name with its -journal, -wal and -shm files, if they
 // exist. Returns whether name existed.

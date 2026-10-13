@@ -107,8 +107,55 @@ void closeCopy(sqlite3* db, const std::string& dest_name) {
   }
 }
 
-void copy(const std::string& src_name, const std::string& dest_name) {
-  closeCopy(openCopy(src_name, dest_name), dest_name);
+void copyTables(const std::string& src_name, const std::string& dest_name,
+                const std::vector<std::string>& tables) {
+  std::string tmp_name = tmpName(dest_name);
+  for (const char* suffix : {"", "-journal", "-wal", "-shm"}) {
+    removeFile(tmp_name + suffix);
+  }
+  sqlite3* db = nullptr;
+  if (sqlite3_open_v2(
+          tmp_name.c_str(), &db,
+          SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | SQLITE_OPEN_URI,
+          nullptr) != SQLITE_OK) {
+    LOG_ERROR("Cannot open the database " << tmp_name << ": "
+                                          << sqlite3_errmsg(db));
+    std::exit(EXIT_FAILURE);
+  }
+  // a new file under a temporary name: no journal is needed
+  sql_util::execSql(db, "PRAGMA journal_mode = OFF;");
+  sql_util::execSql(db, "PRAGMA synchronous = OFF;");
+  sqlite3_stmt* stmt = sql_util::prepareSql(db, "ATTACH DATABASE ? AS src;");
+  std::string src_uri = sql_util::immutableUri(src_name);
+  sqlite3_bind_text(stmt, 1, src_uri.c_str(), -1, SQLITE_TRANSIENT);
+  if (sqlite3_step(stmt) != SQLITE_DONE) {
+    LOG_ERROR("Cannot open the database " << src_name << ": "
+                                          << sqlite3_errmsg(db));
+    std::exit(EXIT_FAILURE);
+  }
+  sqlite3_finalize(stmt);
+  sql_util::execSql(db, "BEGIN;");
+  for (const std::string& table : tables) {
+    stmt = sql_util::prepareSql(
+        db,
+        "SELECT sql FROM src.sqlite_master WHERE type = 'table' AND name = ?;");
+    sqlite3_bind_text(stmt, 1, table.c_str(), -1, SQLITE_TRANSIENT);
+    if (sqlite3_step(stmt) != SQLITE_ROW) {
+      LOG_ERROR("The database " << src_name << " has no table " << table
+                                << ".");
+      std::exit(EXIT_FAILURE);
+    }
+    std::string create_sql =
+        reinterpret_cast<const char*>(sqlite3_column_text(stmt, 0));
+    sqlite3_finalize(stmt);
+    // the statement names no schema: the table is created in main
+    sql_util::execSql(db, create_sql + ";");
+    sql_util::execSql(db, "INSERT INTO main." + table + " SELECT * FROM src." +
+                              table + " ORDER BY rowid;");
+  }
+  sql_util::execSql(db, "COMMIT;");
+  sql_util::execSql(db, "DETACH DATABASE src;");
+  closeCopy(db, dest_name);
 }
 
 bool removeDb(const std::string& name) {
