@@ -131,15 +131,6 @@ void process(const std::string& spec_file_name,
     PrsmStrPtrVec2D decoy_proteins =
         prsm_fdr::getProteinGroups(decoy_proteoforms);
     prsm_fdr::computeProteinFdr(target_proteins, decoy_proteins);
-
-    for (int group = 0; group < kGroupNum; group++) {
-      if (target_prsms[group].empty() && decoy_prsms[group].empty()) {
-        continue;
-      }
-      std::cout << tool_prsms.first << " group " << group + 1
-                << " target_prsms: " << target_prsms[group].size()
-                << ", decoy_prsms: " << decoy_prsms[group].size() << std::endl;
-    }
   }
 
   std::string output_file_name = base_name + "." + output_file_ext;
