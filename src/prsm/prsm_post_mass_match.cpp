@@ -18,10 +18,8 @@
 #include <sqlite3.h>
 
 #include <algorithm>
-#include <cctype>
 #include <cmath>
 #include <cstddef>
-#include <cstdio>
 #include <cstdlib>
 #include <filesystem>
 #include <fstream>
@@ -111,69 +109,17 @@ struct PostMatch {
 
 using PostMatchVec = std::vector<PostMatch>;
 
-// Centroided MS/MS peaks of the TopFD SQLite database, read by scan number.
-class RawPeakReader {
- public:
-  explicit RawPeakReader(sqlite3* db) : db_(db) {
-    // TopFD writes ms2_peak without an index; without one every spectrum's
-    // peak query scans the whole table (4.5 M rows on 480_F3_02, 11 of the
-    // 18 minutes of a default toppic run).
-    sql_util::execSql(db_,
-                      "CREATE INDEX IF NOT EXISTS ms2_peak_spec_id_index "
-                      "ON ms2_peak(spec_id);");
-    id_stmt_ = sql_util::prepareSql(
-        db_, "SELECT id FROM ms2_spectrum WHERE scan = ?;");
-    peak_stmt_ = sql_util::prepareSql(
-        db_,
-        "SELECT peak_id, mz, intensity FROM ms2_peak WHERE spec_id = ? "
-        "ORDER BY mz;");
-  }
-
-  ~RawPeakReader() {
-    sqlite3_finalize(id_stmt_);
-    sqlite3_finalize(peak_stmt_);
-  }
-
-  // The database id of the spectrum with the scan number, -1 if absent.
-  int getSpecId(int scan) {
-    sqlite3_bind_int(id_stmt_, 1, scan);
-    int spec_id = -1;
-    if (sqlite3_step(id_stmt_) == SQLITE_ROW) {
-      spec_id = sqlite3_column_int(id_stmt_, 0);
-    }
-    sqlite3_clear_bindings(id_stmt_);
-    sqlite3_reset(id_stmt_);
-    return spec_id;
-  }
-
-  RawPeakVec getPeaks(int spec_id) {
-    RawPeakVec peaks;
-    sqlite3_bind_int(peak_stmt_, 1, spec_id);
-    while (sqlite3_step(peak_stmt_) == SQLITE_ROW) {
-      peaks.push_back({sqlite3_column_int(peak_stmt_, 0),
-                       sqlite3_column_double(peak_stmt_, 1),
-                       sqlite3_column_double(peak_stmt_, 2)});
-    }
-    sqlite3_clear_bindings(peak_stmt_);
-    sqlite3_reset(peak_stmt_);
-    return peaks;
-  }
-
- private:
-  sqlite3* db_;
-  sqlite3_stmt* id_stmt_;
-  sqlite3_stmt* peak_stmt_;
-};
-
 // The centroided MS/MS peaks of the spectra with the given scan numbers, read
-// from TopFD's database in one pass without changing it (toppic --no-sql,
-// toppic_test experiment 164): RawPeakReader's per-spectrum query needs an
-// index on ms2_peak.spec_id, which TopFD does not write and a read-only
-// connection cannot create. The spectrum of a scan is the first one in id
-// order, as the query's; the peaks of a spectrum are sorted by m/z (stable,
-// in the table's order for equal m/z values). With a calibration model
-// (--mass-calib), every m/z is corrected with the MS/MS model at its
-// spectrum's retention time, as sqlite_mass_calib corrects toppic's copy.
+// from TopFD's database in one pass without changing it (toppic_test
+// experiments 164 and 168): a per-spectrum query would need an index on
+// ms2_peak.spec_id, which TopFD does not write and a read-only connection
+// cannot create (main up to toppic_test experiment 168 created one in
+// toppic's copy of the database and queried each spectrum). The spectrum of
+// a scan is the first one in id order; the peaks of a spectrum are sorted by
+// m/z (stable, in the table's order for equal m/z values, as the query's
+// ORDER BY mz). With a calibration model (--mass-calib), every m/z is
+// corrected with the MS/MS model at its spectrum's retention time, as
+// sqlite_mass_calib corrects toppic's copy.
 class LoadedPeakReader {
  public:
   LoadedPeakReader(sqlite3* db, const std::set<int>& scans,
@@ -228,31 +174,6 @@ class LoadedPeakReader {
   std::unordered_map<int, int> spec_ids_;
   std::unordered_map<int, RawPeakVec> peaks_;
 };
-
-// The URI that opens a database file read only as immutable (SQLite's
-// immutable=1): no locks and no -wal / -shm files next to it, which a
-// read-only connection to a database in WAL mode (TopFD's) leaves otherwise.
-// The file must not change during the run.
-std::string immutableUri(const std::string& file_name) {
-  std::string path = std::filesystem::path(file_name).generic_string();
-  std::string uri;
-  for (char c : path) {
-    if (c == '%' || c == '?' || c == '#') {
-      char buf[4];
-      std::snprintf(buf, sizeof(buf), "%%%02X",
-                    static_cast<unsigned char>(c));
-      uri += buf;
-    } else {
-      uri += c;
-    }
-  }
-  // a Windows drive letter needs an empty authority: file:///C:/...
-  if (uri.size() >= 2 && std::isalpha(static_cast<unsigned char>(uri[0])) &&
-      uri[1] == ':') {
-    uri = "///" + uri;
-  }
-  return "file:" + uri + "?immutable=1";
-}
 
 // Index of the most intense peak within mz +- tole, -1 if there is none.
 int findPeak(const RawPeakVec& peaks, double mz, double tole) {
@@ -633,17 +554,12 @@ std::string postBaseName(const std::string& sp_file_name) {
   return base + "_post_ms2";
 }
 
-namespace {
-
-// process() and processReadOnly(): with read_only, sql_file_name (TopFD's
-// database) is opened read only as immutable, its peaks are read in one pass
-// (LoadedPeakReader, corrected with the model in calib_model_file_name when
-// it is not empty) and no envelope is written.
-std::string processImpl(const PrsmParaPtr& prsm_para_ptr,
-                        const std::string& input_file_ext,
-                        const std::string& output_file_ext, int min_peak_num,
-                        const std::string& sql_file_name, bool read_only,
-                        const std::string& calib_model_file_name) {
+std::string process(const PrsmParaPtr& prsm_para_ptr,
+                    const std::string& input_file_ext,
+                    const std::string& output_file_ext, int min_peak_num,
+                    const std::string& topfd_db_name,
+                    const std::string& calib_model_file_name,
+                    const std::string& toppic_db_name) {
   std::string sp_file_name = prsm_para_ptr->getSpectrumFileName();
   std::string post_base_name = postBaseName(sp_file_name);
   std::string post_sp_file_name = post_base_name + ".msalign";
@@ -652,90 +568,91 @@ std::string processImpl(const PrsmParaPtr& prsm_para_ptr,
   PrsmPtrVec prsm_ptrs =
       prsm_reader_util::readPrsmsWithSpectra(prsm_para_ptr, input_file_ext);
 
+  if (!std::filesystem::exists(topfd_db_name)) {
+    LOG_ERROR("The SQLite database "
+              << topfd_db_name << " for " << sp_file_name
+              << " is missing! Post mass matching needs the centroided MS/MS "
+                 "peaks of TopFD's database: run TopFD without disabling its "
+                 "SQLite database output (without -z) to deconvolute the "
+                 "spectra, or run TopPIC with --disable-post-match.");
+    exit(EXIT_FAILURE);
+  }
+  if (!toppic_db_name.empty() && !std::filesystem::exists(toppic_db_name)) {
+    LOG_ERROR("The SQLite database " << toppic_db_name << " for "
+                                     << sp_file_name << " is missing!");
+    exit(EXIT_FAILURE);
+  }
+  std::unique_ptr<MassCalibModel> model;
+  if (!calib_model_file_name.empty()) {
+    model = std::make_unique<MassCalibModel>(
+        MassCalibModel::read(calib_model_file_name));
+  }
+  std::set<int> scans;
+  for (const PrsmPtr& prsm_ptr : prsm_ptrs) {
+    scans.insert(
+        prsm_ptr->getDeconvMsPtrVec()[0]->getMsHeaderPtr()->getFirstScanNum());
+  }
+  // TopFD's database, read only and unchanged; the peaks of the PrSMs'
+  // spectra are read before any envelope is written
+  sqlite3* topfd_db = nullptr;
+  if (sqlite3_open_v2(sql_util::immutableUri(topfd_db_name).c_str(), &topfd_db,
+                      SQLITE_OPEN_READONLY | SQLITE_OPEN_URI,
+                      nullptr) != SQLITE_OK) {
+    LOG_ERROR("Cannot open the database " << topfd_db_name << ": "
+                                          << sqlite3_errmsg(topfd_db));
+    exit(EXIT_FAILURE);
+  }
+  LoadedPeakReader reader(topfd_db, scans, model.get());
+  sqlite3_close(topfd_db);
+
   // spectrum id -> matched masses (for the msalign file); database spectrum
   // id -> matched masses (for the SQLite envelope tables)
   std::map<int, PostMatchVec> spec_matches;
   std::map<int, PostMatchVec> sql_spec_matches;
   int match_num = 0;
   int prsm_num = 0;
-  if (!std::filesystem::exists(sql_file_name)) {
-    LOG_ERROR("The SQLite database "
-              << sql_file_name << " for " << sp_file_name
-              << " is missing! Post mass matching needs the centroided MS/MS "
-                 "peaks of TopFD's database: run TopFD without disabling its "
-                 "SQLite database output (without -z) to deconvolute the "
-                 "spectra, or run TopPIC with --disable-post-match.");
-    exit(EXIT_FAILURE);
-  } else {
-    sqlite3* db = nullptr;
-    int rc = read_only
-                 ? sqlite3_open_v2(immutableUri(sql_file_name).c_str(), &db,
-                                   SQLITE_OPEN_READONLY | SQLITE_OPEN_URI,
-                                   nullptr)
-                 : sqlite3_open(sql_file_name.c_str(), &db);
-    if (rc != SQLITE_OK) {
-      LOG_ERROR("Cannot open the database " << sql_file_name << ": "
-                                            << sqlite3_errmsg(db));
-      exit(EXIT_FAILURE);
+  for (size_t i = 0; i < prsm_ptrs.size(); i++) {
+    PrsmPtr prsm_ptr = prsm_ptrs[i];
+    MsHeaderPtr header_ptr = prsm_ptr->getDeconvMsPtrVec()[0]->getMsHeaderPtr();
+    int sql_spec_id = reader.getSpecId(header_ptr->getFirstScanNum());
+    if (sql_spec_id < 0) {
+      LOG_WARN("Scan " << header_ptr->getFirstScanNum()
+                       << " is not in the SQLite database.");
+      continue;
     }
-    auto match_all = [&](auto& reader) {
-      for (size_t i = 0; i < prsm_ptrs.size(); i++) {
-        PrsmPtr prsm_ptr = prsm_ptrs[i];
-        MsHeaderPtr header_ptr =
-            prsm_ptr->getDeconvMsPtrVec()[0]->getMsHeaderPtr();
-        int sql_spec_id = reader.getSpecId(header_ptr->getFirstScanNum());
-        if (sql_spec_id < 0) {
-          LOG_WARN("Scan " << header_ptr->getFirstScanNum()
-                           << " is not in the SQLite database.");
-          continue;
-        }
-        RawPeakVec peaks = reader.getPeaks(sql_spec_id);
-        PostMatchVec matches =
-            matchPrsm(prsm_ptr, peaks, sp_para_ptr, min_peak_num);
-        if (matches.empty()) {
-          continue;
-        }
-        compEnvCnnScores(peaks, matches);
-        addMatchesToPrsm(prsm_ptr, matches, sp_para_ptr);
-        int sp_id = header_ptr->getSpecId();
-        PostMatchVec& spec_vec = spec_matches[sp_id];
-        spec_vec.insert(spec_vec.end(), matches.begin(), matches.end());
-        PostMatchVec& sql_vec = sql_spec_matches[sql_spec_id];
-        sql_vec.insert(sql_vec.end(), matches.begin(), matches.end());
-        match_num += static_cast<int>(matches.size());
-        prsm_num++;
-      }
-    };
-    if (read_only) {
-      std::unique_ptr<MassCalibModel> model;
-      if (!calib_model_file_name.empty()) {
-        model = std::make_unique<MassCalibModel>(
-            MassCalibModel::read(calib_model_file_name));
-      }
-      std::set<int> scans;
-      for (const PrsmPtr& prsm_ptr : prsm_ptrs) {
-        scans.insert(prsm_ptr->getDeconvMsPtrVec()[0]
-                         ->getMsHeaderPtr()
-                         ->getFirstScanNum());
-      }
-      LoadedPeakReader reader(db, scans, model.get());
-      match_all(reader);
-    } else {
-      RawPeakReader reader(db);
-      match_all(reader);
-      writeSqlEnvs(db, sql_spec_matches);
+    RawPeakVec peaks = reader.getPeaks(sql_spec_id);
+    PostMatchVec matches =
+        matchPrsm(prsm_ptr, peaks, sp_para_ptr, min_peak_num);
+    if (matches.empty()) {
+      continue;
     }
-    sqlite3_close(db);
+    compEnvCnnScores(peaks, matches);
+    addMatchesToPrsm(prsm_ptr, matches, sp_para_ptr);
+    int sp_id = header_ptr->getSpecId();
+    PostMatchVec& spec_vec = spec_matches[sp_id];
+    spec_vec.insert(spec_vec.end(), matches.begin(), matches.end());
+    PostMatchVec& sql_vec = sql_spec_matches[sql_spec_id];
+    sql_vec.insert(sql_vec.end(), matches.begin(), matches.end());
+    match_num += static_cast<int>(matches.size());
+    prsm_num++;
   }
   std::cout << "Post mass matching: " << match_num << " masses added to "
             << prsm_num << " of " << prsm_ptrs.size() << " PrSMs from "
-            << sql_file_name;
-  if (read_only) {
-    std::cout << " (read only"
-              << (calib_model_file_name.empty()
-                      ? ""
-                      : ", m/z corrected with " + calib_model_file_name)
-              << ")";
+            << topfd_db_name << " (read only"
+            << (calib_model_file_name.empty()
+                    ? ""
+                    : ", m/z corrected with " + calib_model_file_name)
+            << ")";
+  if (!toppic_db_name.empty()) {
+    sqlite3* toppic_db = nullptr;
+    if (sqlite3_open(toppic_db_name.c_str(), &toppic_db) != SQLITE_OK) {
+      LOG_ERROR("Cannot open the database " << toppic_db_name << ": "
+                                            << sqlite3_errmsg(toppic_db));
+      exit(EXIT_FAILURE);
+    }
+    writeSqlEnvs(toppic_db, sql_spec_matches);
+    sqlite3_close(toppic_db);
+    std::cout << "; their envelopes written to " << toppic_db_name;
   }
   std::cout << "." << std::endl;
 
@@ -761,27 +678,6 @@ std::string processImpl(const PrsmParaPtr& prsm_para_ptr,
         std::filesystem::copy_options::overwrite_existing);
   }
   return post_sp_file_name;
-}
-
-}  // namespace
-
-std::string process(const PrsmParaPtr& prsm_para_ptr,
-                    const std::string& input_file_ext,
-                    const std::string& output_file_ext, int min_peak_num,
-                    const std::string& sql_file_name) {
-  return processImpl(prsm_para_ptr, input_file_ext, output_file_ext,
-                     min_peak_num, sql_file_name, false, "");
-}
-
-std::string processReadOnly(const PrsmParaPtr& prsm_para_ptr,
-                            const std::string& input_file_ext,
-                            const std::string& output_file_ext,
-                            int min_peak_num,
-                            const std::string& topfd_db_name,
-                            const std::string& calib_model_file_name) {
-  return processImpl(prsm_para_ptr, input_file_ext, output_file_ext,
-                     min_peak_num, topfd_db_name, true,
-                     calib_model_file_name);
 }
 
 }  // namespace prsm_post_mass_match

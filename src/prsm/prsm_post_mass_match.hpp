@@ -43,55 +43,48 @@ namespace prsm_post_mass_match {
 //                              msalign file is left untouched),
 //   <base>_post_ms2.<output_file_ext>  the PrSMs with the recounted matched
 //                              masses and fragments,
-//   sql_file_name               the added masses as new rows of the ms2_env
-//                              and ms2_env_peak tables,
 //   <base>_post_ms2.feature    a copy of the TopFD feature file, so the
-//                              downstream steps find it under the new name.
-// Returns the name of the new spectrum file, which the downstream steps read
-// instead of the input one. sql_file_name is toppic's database of the
-// spectrum file, <base>_toppic.sqlite (toppicSqlFileName of the file given
-// to toppic, a copy of TopFD's database, corrected with --mass-calib),
-// whose peaks are read as they are; if it is missing the run stops with an
-// error. The EnvCNN model must have been loaded with
+//                              downstream steps find it under the new name,
+// and, when toppic_db_name is not empty, appends the added masses as new rows
+// of the ms2_env and ms2_env_peak tables of toppic_db_name, toppic's database
+// of the spectrum file (toppicSqlFileName of the file given to toppic;
+// empty with --no-sql). Returns the name of the new spectrum file, which the
+// downstream steps read instead of the input one. The peaks are read from
+// TopFD's database topfd_db_name (sqlFileName of the file given to toppic),
+// opened read only as immutable (no -wal / -shm files; it must not change
+// during the run), in one pass over its ms2_peak table (toppic_test
+// experiments 164 and 168). With --mass-calib, calib_model_file_name is the
+// calibration model (<base>_mass_calib.json) and every peak's m/z is
+// corrected with its MS/MS model, as in toppic's corrected copy of the
+// database; otherwise it is empty. If TopFD's database is missing the run
+// stops with an error. The EnvCNN model must have been loaded with
 // onnx_env_cnn::initModel.
 std::string process(const PrsmParaPtr& prsm_para_ptr,
                     const std::string& input_file_ext,
                     const std::string& output_file_ext, int min_peak_num,
-                    const std::string& sql_file_name);
-
-// The same without writing or changing an SQLite file (toppic --no-sql,
-// toppic_test experiment 164): the peaks are read from TopFD's database
-// topfd_db_name (sqlFileName of the file given to toppic), opened read only
-// as immutable (no -wal / -shm files; it must not change during the run), in
-// one pass over its ms2_peak table, and no envelope is written. With
-// --mass-calib, calib_model_file_name is the calibration model
-// (<base>_mass_calib.json) and every peak's m/z is corrected with its MS/MS
-// model, as in toppic's corrected copy of the database; otherwise it is
-// empty. The output files are those of process(); a missing database is the
-// same error.
-std::string processReadOnly(const PrsmParaPtr& prsm_para_ptr,
-                            const std::string& input_file_ext,
-                            const std::string& output_file_ext,
-                            int min_peak_num,
-                            const std::string& topfd_db_name,
-                            const std::string& calib_model_file_name);
+                    const std::string& topfd_db_name,
+                    const std::string& calib_model_file_name,
+                    const std::string& toppic_db_name);
 
 // TopFD's SQLite database of a spectrum file: <path>/<base>.sqlite, where
 // <base> is the file name without its extension and a trailing "_ms2"
 // (TopFD writes <base>_ms2.msalign and <base>.sqlite), and without "_resid"
-// before it. toppic only reads it (the argument check, the copy into
-// toppicSqlFileName, and with --no-sql the post mass matching); topmg writes
-// its PrSM tables into it (not with --no-sql).
+// before it. toppic only reads it (the argument check, the copy of its
+// envelope tables, or with --mass-calib of every table, into
+// toppicSqlFileName, and the post mass matching); topmg writes its PrSM
+// tables into it (not with --no-sql).
 std::string sqlFileName(const std::string& sp_file_name);
 
 // toppic's SQLite database of a spectrum file given to toppic,
 // <path>/<base>_toppic.sqlite for <base>_ms2.msalign and TopFD's
 // <base>.sqlite (toppic_test experiment 156): written again before each
-// search of the file, a copy of TopFD's database (every table) or, with
-// --mass-calib, its corrected copy; the post mass matching appends its
-// envelopes to it and the report writes toppic's tables into it. -g,
-// --mass-calib and --second-precursor use the database of the given file
-// (TopPICProgress_multi_file passes it to every step).
+// search of the file, with TopFD's tables ms2_env and ms2_env_peak (toppic_test
+// experiment 168; every table before it) or, with --mass-calib when it fits
+// a model, the corrected copy of every table of TopFD's database; the post
+// mass matching appends its envelopes to it and the report writes toppic's
+// tables into it. A reader takes a table it lacks from TopFD's database.
+// -A, --mass-calib and --second-precursor use the database of the given
+// file (TopPICProgress_multi_file passes it to every step).
 std::string toppicSqlFileName(const std::string& sp_file_name);
 
 // TopFD's base name of a spectrum file, <path>/<base> for <base>_ms2.msalign
@@ -101,7 +94,7 @@ std::string topfdBaseName(const std::string& sp_file_name);
 
 // the base name of the post-matched files of a spectrum file: the spectrum
 // file's base name with "_post_ms2", <base>_post_ms2,
-// <base>_mono_post_ms2 for the copy of -g, <base>_calib_post_ms2 and
+// <base>_mono_post_ms2 for the copy of -A, <base>_calib_post_ms2 and
 // <base>_mono_calib_post_ms2 for the corrected spectra of --mass-calib; the
 // residual spectra of --second-precursor keep "_resid":
 // <base>_resid_post_ms2, <base>_mono_calib_resid_post_ms2

@@ -15,7 +15,10 @@
 
 #include "sql/sql_util.hpp"
 
+#include <cctype>
+#include <cstdio>
 #include <cstdlib>
+#include <filesystem>
 #include <string>
 
 #include "common/util/logger.hpp"
@@ -63,6 +66,26 @@ bool hasTable(sqlite3* sql_db, const std::string& name) {
   bool found = sqlite3_step(stmt) == SQLITE_ROW;
   sqlite3_finalize(stmt);
   return found;
+}
+
+std::string immutableUri(const std::string& file_name) {
+  std::string path = std::filesystem::path(file_name).generic_string();
+  std::string uri;
+  for (char c : path) {
+    if (c == '%' || c == '?' || c == '#') {
+      char buf[4];
+      std::snprintf(buf, sizeof(buf), "%%%02X", static_cast<unsigned char>(c));
+      uri += buf;
+    } else {
+      uri += c;
+    }
+  }
+  // a Windows drive letter needs an empty authority: file:///C:/...
+  if (uri.size() >= 2 && std::isalpha(static_cast<unsigned char>(uri[0])) &&
+      uri[1] == ':') {
+    uri = "///" + uri;
+  }
+  return "file:" + uri + "?immutable=1";
 }
 
 }  // namespace sql_util

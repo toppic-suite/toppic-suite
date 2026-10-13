@@ -448,14 +448,17 @@ above it, never the reverse:
   (isotope distributions; see `.claude/tools/topfd.md`).
 - `src/sql` — thin SQLite helper (`sql_util`: `execSql`, `prepareSql`,
   `stepAndReset`, `hasTable`, all abort on error — use them rather than
-  re-implementing the prepare/step boilerplate), `sql_db_copy` (toppic's
-  copy of TopFD's database, `<base>_toppic.sqlite`, plain or corrected by
-  `--mass-calib`: backup API, toppic's tables dropped, written with no
-  journal under a temporary name, closed in WAL mode (TopFD's journal mode:
-  in rollback mode a reader of the copy, such as a viewer, made toppic's
-  next write stop with "database is locked", toppic_test experiment 156)
-  and renamed when complete; `removeDb` deletes a database with its
-  -journal, -wal and -shm files) plus
+  re-implementing the prepare/step boilerplate; `immutableUri` opens a
+  database read only as immutable), `sql_db_copy` (toppic's database,
+  `<base>_toppic.sqlite`: TopFD's tables `ms2_env` and `ms2_env_peak`
+  (`copyTables`, toppic_test experiment 168), or with `--mass-calib` the
+  corrected copy of every table (`openCopy` / `closeCopy`: backup API,
+  toppic's tables dropped); written with no journal under a temporary
+  name, closed in WAL mode (TopFD's journal mode: in rollback mode a reader
+  of the copy, such as a viewer, made toppic's next write stop with
+  "database is locked", toppic_test experiment 156) and renamed when
+  complete; `removeDb` deletes a database with its -journal, -wal and -shm
+  files) plus
   `ms_sql_writer`, the
   MS1-peak levels for 3D visualization: `MsSqlWriter` builds level 0 (every
   MS1 peak of intensity > 0) and the down-sampled levels 1..n, and writes

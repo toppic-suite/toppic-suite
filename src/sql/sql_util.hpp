@@ -37,6 +37,13 @@ void stepAndReset(sqlite3* sql_db, sqlite3_stmt* stmt);
 // Whether the database has a table of that name.
 bool hasTable(sqlite3* sql_db, const std::string& name);
 
+// The URI that opens a database file read only as immutable (SQLite's
+// immutable=1), for sqlite3_open_v2 with SQLITE_OPEN_URI or an ATTACH on such
+// a connection: no locks and no -wal / -shm files next to it, which a
+// read-only connection to a database in WAL mode (TopFD's) leaves otherwise.
+// The file must not change while it is open.
+std::string immutableUri(const std::string& file_name);
+
 }  // namespace sql_util
 
 }  // namespace toppic
