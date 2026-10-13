@@ -119,8 +119,8 @@ std::string geneTopdiaCommand(const TopfdParaPtr& topfd_para_ptr,
   if (topfd_para_ptr->isUseSingleScanNoiseLevel()) {
     command = command + "-i ";
   }
-  command = command + "--deconv-ms1 " + topfd_para_ptr->getMs1DeconvMethod() +
-            " --deconv-ms2 " + topfd_para_ptr->getMs2DeconvMethod() + " ";
+  command = command + "--ms1-deconv " + topfd_para_ptr->getMs1DeconvMethod() +
+            " --ms2-deconv " + topfd_para_ptr->getMs2DeconvMethod() + " ";
   for (size_t i = 0; i < spec_file_lst.size(); i++) {
     command = command + spec_file_lst[i] + " ";
   }

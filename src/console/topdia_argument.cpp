@@ -88,8 +88,8 @@ TopfdParaPtr Argument::getTopfdParaPtrForTopdia() {
   topfd_para_ptr->setMassGroupBoundary(TOPDIA_MASS_GROUP_BOUNDARY);
   // TopDIA also keeps MS-Deconv's MS1 and MS/MS deconvolution by default:
   // TopFD's default greedy searches were measured on DDA data only
-  // (toppic_test experiments 104, 106 and 109). --deconv-ms1 and
-  // --deconv-ms2 select them.
+  // (toppic_test experiments 104, 106 and 109). --ms1-deconv and
+  // --ms2-deconv select them.
   topfd_para_ptr->setMs1DeconvMethod("msdeconv");
   topfd_para_ptr->setMs2DeconvMethod("msdeconv");
   // nor does it correct precursor isotopes with fragment pairs (TopFD's
@@ -155,10 +155,10 @@ bool Argument::parse(int argc, char* argv[]) {
         "mz-error,e", po::value<std::string>(&mz_error),
         "<a positive number>. Set the error tolerance of m/z values of "
         "spectral peaks. The default value is 0.02 m/z.")(
-        "ms-one-sn-ratio,r", po::value<std::string>(&ms_one_sn_ratio),
+        "ms1-sn-ratio,r", po::value<std::string>(&ms_one_sn_ratio),
         "<a non-negative number>. Set the signal-to-noise ratio for MS1 "
         "spectra. The default value is 3.")(
-        "ms-two-sn-ratio,s", po::value<std::string>(&ms_two_sn_ratio),
+        "ms2-sn-ratio,s", po::value<std::string>(&ms_two_sn_ratio),
         "<a non-negative number>. Set the signal-to-noise ratio for MS/MS "
         "spectra. The default value is 1.")(
         "missing-level-one,o", "MS1 spectra are missing in the input file.")(
@@ -166,26 +166,26 @@ bool Argument::parse(int argc, char* argv[]) {
         "<a positive number>. Set the default precursor window size. The "
         "default value is 4.0 m/z. When the input file contains the "
         "information of precursor windows, the parameter will be ignored.")(
-        "deconv-ms1,p", po::value<std::string>(&deconv_ms1),
+        "ms1-deconv,p", po::value<std::string>(&deconv_ms1),
         "<greedy|msdeconv>. Set the deconvolution method of MS1 spectra: "
         "msdeconv, the MS-Deconv dynamic programming, or greedy, TopFD's "
         "default greedy search, which decides the charge state of the most "
         "intense peak with all the charge states of its mass and subtracts "
         "the mass's envelopes. The default value is msdeconv.")(
-        "deconv-ms2,q", po::value<std::string>(&deconv_ms2),
+        "ms2-deconv,q", po::value<std::string>(&deconv_ms2),
         "<greedy|msdeconv|flashdeconv>. Set the deconvolution method of "
         "MS/MS spectra: msdeconv, the MS-Deconv dynamic programming; greedy, "
         "TopFD's default greedy search adapted to fragment ions; or "
         "flashdeconv, the FLASHDeconv algorithm (experimental). The default "
         "value is msdeconv.")(
-        "envcnn-cutoff-ms1,f",
+        "ms1-envcnn-cutoff,f",
         po::value<std::string>(&ms1_env_cnn_score_cutoff),
         "<a number in [0,1]>. Set the EnvCNN score cutoff for isotopic "
         "envelopes in MS1 spectra: envelopes with a lower EnvCNN score are "
         "not reported, except those added for precursor isolation windows. "
         "Used with the greedy and msdeconv MS1 deconvolution methods. The "
         "default value is 0.2.")(
-        "envcnn-cutoff-ms2,g",
+        "ms2-envcnn-cutoff,g",
         po::value<std::string>(&ms2_env_cnn_score_cutoff),
         "<a number in [0,1]>. Set the EnvCNN score cutoff for isotopic "
         "envelopes in MS/MS spectra: envelopes with a lower EnvCNN score are "
@@ -231,11 +231,11 @@ bool Argument::parse(int argc, char* argv[]) {
         "pseudo-MS/MS spectrum: until a spectrum has this number of peaks, "
         "fragment features are added regardless of the Pseudo Score cutoff "
         "(-v), when available. The default value is 25.")(
-        "ms1-intensity-correlation-cutoff,y",
+        "ms1-correlation-cutoff,y",
         po::value<std::string>(&ms1_seed_env_inte_corr_tole_cutoff),
         "<a number in [0,1]>. Set the MS1 seed envelope intensity correlation "
         "cutoff value for extracting features. The default value is 0.5.")(
-        "ms2-intensity-correlation-cutoff,Y",
+        "ms2-correlation-cutoff,Y",
         po::value<std::string>(&ms2_seed_env_inte_corr_tole_cutoff),
         "<a number in [0,1]>. Set the MS2 seed envelope intensity correlation "
         "cutoff value for extracting features. The default value is 0.5.")(
@@ -361,7 +361,7 @@ bool Argument::parse(int argc, char* argv[]) {
       return false;
     }
 
-    if (vm.count("envcnn-cutoff-ms1")) {
+    if (vm.count("ms1-envcnn-cutoff")) {
       double cutoff = 0;
       if (!toDouble(ms1_env_cnn_score_cutoff, cutoff) || cutoff < 0 ||
           cutoff > 1) {
@@ -372,7 +372,7 @@ bool Argument::parse(int argc, char* argv[]) {
       topfd_para_ptr_->setMs1EnvCnnScoreCutoff(cutoff);
     }
 
-    if (vm.count("envcnn-cutoff-ms2")) {
+    if (vm.count("ms2-envcnn-cutoff")) {
       double cutoff = 0;
       if (!toDouble(ms2_env_cnn_score_cutoff, cutoff) || cutoff < 0 ||
           cutoff > 1) {
@@ -383,14 +383,14 @@ bool Argument::parse(int argc, char* argv[]) {
       topfd_para_ptr_->setMs2EnvCnnScoreCutoff(cutoff);
     }
 
-    if (vm.count("deconv-ms1") &&
+    if (vm.count("ms1-deconv") &&
         !topfd_para_ptr_->setMs1DeconvMethod(deconv_ms1)) {
       LOG_ERROR("MS1 deconvolution method " << deconv_ms1
                 << " should be greedy or msdeconv.");
       return false;
     }
 
-    if (vm.count("deconv-ms2") &&
+    if (vm.count("ms2-deconv") &&
         !topfd_para_ptr_->setMs2DeconvMethod(deconv_ms2)) {
       LOG_ERROR("MS/MS deconvolution method " << deconv_ms2
                 << " should be greedy, msdeconv or flashdeconv.");
@@ -415,7 +415,7 @@ bool Argument::parse(int argc, char* argv[]) {
       topfd_para_ptr_->setMzError(error);
     }
 
-    if (vm.count("ms-two-sn-ratio")) {
+    if (vm.count("ms2-sn-ratio")) {
       double sn_ratio = 0;
       if (!toDouble(ms_two_sn_ratio, sn_ratio) || sn_ratio < 0) {
         LOG_ERROR("MS/MS S/N ratio " << ms_two_sn_ratio
@@ -425,7 +425,7 @@ bool Argument::parse(int argc, char* argv[]) {
       topfd_para_ptr_->setMsTwoSnRatio(sn_ratio);
     }
 
-    if (vm.count("ms-one-sn-ratio")) {
+    if (vm.count("ms1-sn-ratio")) {
       double sn_ratio = 0;
       if (!toDouble(ms_one_sn_ratio, sn_ratio) || sn_ratio < 0) {
         LOG_ERROR("MS1 S/N ratio " << ms_one_sn_ratio
@@ -513,7 +513,7 @@ bool Argument::parse(int argc, char* argv[]) {
       topdia_para_ptr_->setPseudoMinPeaks(n);
     }
 
-    if (vm.count("ms1-intensity-correlation-cutoff")) {
+    if (vm.count("ms1-correlation-cutoff")) {
       double cutoff = 0;
       if (!toDouble(ms1_seed_env_inte_corr_tole_cutoff, cutoff) || cutoff < 0 ||
           cutoff > 1) {
@@ -525,7 +525,7 @@ bool Argument::parse(int argc, char* argv[]) {
       topdia_para_ptr_->setMs1SeedEnvInteCorrToleCutoff(cutoff);
     }
 
-    if (vm.count("ms2-intensity-correlation-cutoff")) {
+    if (vm.count("ms2-correlation-cutoff")) {
       double cutoff = 0;
       if (!toDouble(ms2_seed_env_inte_corr_tole_cutoff, cutoff) || cutoff < 0 ||
           cutoff > 1) {

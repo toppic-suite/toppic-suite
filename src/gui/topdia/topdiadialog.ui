@@ -289,7 +289,7 @@
         </size>
        </property>
        <property name="toolTip">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Signal-to-noise ratio for MS1 spectra, used in MS1 deconvolution and proteoform feature detection: a non-negative number with at most two decimals. Default: 3. (topdia -r, --ms-one-sn-ratio)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Signal-to-noise ratio for MS1 spectra, used in MS1 deconvolution and proteoform feature detection: a non-negative number with at most two decimals. Default: 3. (topdia -r, --ms1-sn-ratio)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="text">
         <string>MS1 S/N ratio: </string>
@@ -311,7 +311,7 @@
         </size>
        </property>
        <property name="toolTip">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Signal-to-noise ratio for MS1 spectra, used in MS1 deconvolution and proteoform feature detection: a non-negative number with at most two decimals. Default: 3. (topdia -r, --ms-one-sn-ratio)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Signal-to-noise ratio for MS1 spectra, used in MS1 deconvolution and proteoform feature detection: a non-negative number with at most two decimals. Default: 3. (topdia -r, --ms1-sn-ratio)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="text">
         <string>3.0</string>
@@ -474,7 +474,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
      <item>
       <widget class="QLabel" name="label_7">
        <property name="toolTip">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Signal-to-noise ratio for MS/MS spectra, used in MS/MS deconvolution and fragment feature detection: a non-negative number with at most two decimals. Default: 1. (topdia -s, --ms-two-sn-ratio)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Signal-to-noise ratio for MS/MS spectra, used in MS/MS deconvolution and fragment feature detection: a non-negative number with at most two decimals. Default: 1. (topdia -s, --ms2-sn-ratio)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="text">
         <string>MS2 S/N ratio:</string>
@@ -490,7 +490,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
         </size>
        </property>
        <property name="toolTip">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Signal-to-noise ratio for MS/MS spectra, used in MS/MS deconvolution and fragment feature detection: a non-negative number with at most two decimals. Default: 1. (topdia -s, --ms-two-sn-ratio)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Signal-to-noise ratio for MS/MS spectra, used in MS/MS deconvolution and fragment feature detection: a non-negative number with at most two decimals. Default: 1. (topdia -s, --ms2-sn-ratio)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="text">
         <string>1.0</string>
@@ -893,7 +893,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
         </size>
        </property>
        <property name="toolTip">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Minimum correlation between the intensities of a seed isotopic envelope and the theoretical ones for starting an MS1 proteoform feature: a number in [0, 1]. Default: 0.5. (topdia -y, --ms1-intensity-correlation-cutoff)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Minimum correlation between the intensities of a seed isotopic envelope and the theoretical ones for starting an MS1 proteoform feature: a number in [0, 1]. Default: 0.5. (topdia -y, --ms1-correlation-cutoff)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="text">
         <string>MS1 envelope intensity correlation cutoff:</string>
@@ -915,7 +915,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
         </size>
        </property>
        <property name="toolTip">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Minimum correlation between the intensities of a seed isotopic envelope and the theoretical ones for starting an MS1 proteoform feature: a number in [0, 1]. Default: 0.5. (topdia -y, --ms1-intensity-correlation-cutoff)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Minimum correlation between the intensities of a seed isotopic envelope and the theoretical ones for starting an MS1 proteoform feature: a number in [0, 1]. Default: 0.5. (topdia -y, --ms1-correlation-cutoff)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="text">
         <string>0.5</string>
@@ -943,7 +943,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
         </size>
        </property>
        <property name="toolTip">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Minimum correlation between the intensities of a seed isotopic envelope and the theoretical ones for starting a fragment feature in an isolation window: a number in [0, 1]. Default: 0.5. (topdia -Y, --ms2-intensity-correlation-cutoff)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Minimum correlation between the intensities of a seed isotopic envelope and the theoretical ones for starting a fragment feature in an isolation window: a number in [0, 1]. Default: 0.5. (topdia -Y, --ms2-correlation-cutoff)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="text">
         <string>MS2 envelope intensity correlation cutoff:</string>
@@ -965,7 +965,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
         </size>
        </property>
        <property name="toolTip">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Minimum correlation between the intensities of a seed isotopic envelope and the theoretical ones for starting a fragment feature in an isolation window: a number in [0, 1]. Default: 0.5. (topdia -Y, --ms2-intensity-correlation-cutoff)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Minimum correlation between the intensities of a seed isotopic envelope and the theoretical ones for starting a fragment feature in an isolation window: a number in [0, 1]. Default: 0.5. (topdia -Y, --ms2-correlation-cutoff)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="text">
         <string>0</string>
@@ -1192,7 +1192,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
      <item>
       <widget class="QLabel" name="ms1DeconvLabel">
        <property name="toolTip">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Deconvolution method of MS1 spectra: msdeconv (default), the MS-Deconv dynamic programming, or greedy, TopFD's default greedy search, which decides the charge state of the most intense peak with all the charge states of its mass and subtracts the mass's envelopes. (topdia -p, --deconv-ms1)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Deconvolution method of MS1 spectra: msdeconv (default), the MS-Deconv dynamic programming, or greedy, TopFD's default greedy search, which decides the charge state of the most intense peak with all the charge states of its mass and subtracts the mass's envelopes. (topdia -p, --ms1-deconv)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="text">
         <string>MS1 deconvolution:</string>
@@ -1208,7 +1208,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
         </size>
        </property>
        <property name="toolTip">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Deconvolution method of MS1 spectra: msdeconv (default), the MS-Deconv dynamic programming, or greedy, TopFD's default greedy search, which decides the charge state of the most intense peak with all the charge states of its mass and subtracts the mass's envelopes. (topdia -p, --deconv-ms1)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Deconvolution method of MS1 spectra: msdeconv (default), the MS-Deconv dynamic programming, or greedy, TopFD's default greedy search, which decides the charge state of the most intense peak with all the charge states of its mass and subtracts the mass's envelopes. (topdia -p, --ms1-deconv)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <item>
         <property name="text">
@@ -1243,7 +1243,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
      <item>
       <widget class="QLabel" name="ms2DeconvLabel">
        <property name="toolTip">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Deconvolution method of MS/MS spectra: msdeconv (default), the MS-Deconv dynamic programming; greedy, TopFD's default greedy search adapted to fragment ions; or flashdeconv, the FLASHDeconv algorithm (experimental). Frag num filtering is not used with flashdeconv. (topdia -q, --deconv-ms2)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Deconvolution method of MS/MS spectra: msdeconv (default), the MS-Deconv dynamic programming; greedy, TopFD's default greedy search adapted to fragment ions; or flashdeconv, the FLASHDeconv algorithm (experimental). Frag num filtering is not used with flashdeconv. (topdia -q, --ms2-deconv)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="text">
         <string>MS/MS deconvolution:</string>
@@ -1259,7 +1259,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
         </size>
        </property>
        <property name="toolTip">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Deconvolution method of MS/MS spectra: msdeconv (default), the MS-Deconv dynamic programming; greedy, TopFD's default greedy search adapted to fragment ions; or flashdeconv, the FLASHDeconv algorithm (experimental). Frag num filtering is not used with flashdeconv. (topdia -q, --deconv-ms2)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Deconvolution method of MS/MS spectra: msdeconv (default), the MS-Deconv dynamic programming; greedy, TopFD's default greedy search adapted to fragment ions; or flashdeconv, the FLASHDeconv algorithm (experimental). Frag num filtering is not used with flashdeconv. (topdia -q, --ms2-deconv)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <item>
         <property name="text">

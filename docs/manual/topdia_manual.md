@@ -34,7 +34,8 @@ another. FAIMS data is recognized automatically and each compensation voltage
 is processed as a separate fraction, with the integer voltage appended to the
 output file names (`sample_-40_ms2.msalign`).
 
-The `--missing-level-one` option is accepted for compatibility with TopFD,
+The `--missing-level-one` option (`-o`; TopFD's `--missing-ms1`) is accepted
+for compatibility with TopFD,
 but pseudo spectra need the MS1 features: with it TopDIA still deconvolutes
 the MS/MS scans and then stops with an error (`msalign file sample_ms1.msalign
 does not exist.`) at the pseudo-spectrum step. Do not use it.
@@ -46,9 +47,9 @@ parameters followed by the TopDIA feature and pseudo-spectrum parameters,
 and runs five steps:
 
 1. **MS1 deconvolution.** Every MS1 scan is deconvoluted, by default with
-   the MS-Deconv dynamic programming (`--deconv-ms1 msdeconv`); `--deconv-ms1
+   the MS-Deconv dynamic programming (`--ms1-deconv msdeconv`); `--ms1-deconv
    greedy` selects TopFD's default greedy search. With either method, MS1
-   envelopes whose EnvCNN score is below `--envcnn-cutoff-ms1` (`-f`,
+   envelopes whose EnvCNN score is below `--ms1-envcnn-cutoff` (`-f`,
    default 0.2) are not reported, except the envelopes of the precursor
    isolation windows.
 2. **MS1 feature detection.** The MS1 envelopes are linked across scans into
@@ -56,10 +57,10 @@ and runs five steps:
    `--ms1-ecscore-cutoff` and `--ms1-min-scan-number`.
 3. **MS/MS deconvolution.** Every DIA MS/MS scan is deconvoluted on its own,
    without precursor information, into `sample_ms2_raw.msalign`, by
-   default with the MS-Deconv dynamic programming (`--deconv-ms2 msdeconv`;
+   default with the MS-Deconv dynamic programming (`--ms2-deconv msdeconv`;
    `greedy` selects TopFD's default greedy search and `flashdeconv` the
    FLASHDeconv algorithm). With `msdeconv` and `greedy`, envelopes whose
-   EnvCNN score is below `--envcnn-cutoff-ms2` (`-g`, default 0: all
+   EnvCNN score is below `--ms2-envcnn-cutoff` (`-g`, default 0: all
    reported) are not reported. For the dynamic programming TopDIA
    uses the parameters of version 1.9.0.0: a 12
    Dalton envelope ranking window, no harmonic check and a 1,500 Dalton mass
@@ -122,13 +123,13 @@ Deconvolution:
 | `-c`, `--max-charge <int>` | 30 | Maximum charge state of precursor and fragment ions. |
 | `-m`, `--max-mass <number>` | 50000 | Maximum monoisotopic mass (Da) of precursor and fragment ions. |
 | `-e`, `--mz-error <number>` | 0.02 | Error tolerance of peak m/z values. |
-| `-r`, `--ms-one-sn-ratio <number>` | 3 | Signal-to-noise ratio for MS1 spectra. |
-| `-s`, `--ms-two-sn-ratio <number>` | 1 | Signal-to-noise ratio for MS/MS spectra. |
+| `-r`, `--ms1-sn-ratio <number>` | 3 | Signal-to-noise ratio for MS1 spectra. |
+| `-s`, `--ms2-sn-ratio <number>` | 1 | Signal-to-noise ratio for MS/MS spectra. |
 | `-w`, `--precursor-window <number>` | 4.0 (TopFD: 3.0) | Default isolation window width (m/z), used only when the file records none. |
-| `-p`, `--deconv-ms1 <greedy\|msdeconv>` | msdeconv (TopFD: greedy) | MS1 deconvolution method (section 2, step 1). In `topdia_gui`: "MS1 deconvolution". |
-| `-q`, `--deconv-ms2 <greedy\|msdeconv\|flashdeconv>` | msdeconv (TopFD: greedy) | MS/MS deconvolution method (section 2, step 3); `flashdeconv` is experimental. In `topdia_gui`: "MS/MS deconvolution". |
-| `-f`, `--envcnn-cutoff-ms1 <0..1>` | 0.2 | MS1 envelopes whose EnvCNN score is below the cutoff are not reported (section 2, step 1); not the envelopes of the precursor isolation windows. Used with both MS1 deconvolution methods. `-f 0` reports every envelope. |
-| `-g`, `--envcnn-cutoff-ms2 <0..1>` | 0 | MS/MS envelopes whose EnvCNN score is below the cutoff are not reported (section 2, step 3). Used with `-q msdeconv` and `greedy`, not with `flashdeconv`. |
+| `-p`, `--ms1-deconv <greedy\|msdeconv>` | msdeconv (TopFD: greedy) | MS1 deconvolution method (section 2, step 1). In `topdia_gui`: "MS1 deconvolution". |
+| `-q`, `--ms2-deconv <greedy\|msdeconv\|flashdeconv>` | msdeconv (TopFD: greedy) | MS/MS deconvolution method (section 2, step 3); `flashdeconv` is experimental. In `topdia_gui`: "MS/MS deconvolution". |
+| `-f`, `--ms1-envcnn-cutoff <0..1>` | 0.2 | MS1 envelopes whose EnvCNN score is below the cutoff are not reported (section 2, step 1); not the envelopes of the precursor isolation windows. Used with both MS1 deconvolution methods. `-f 0` reports every envelope. |
+| `-g`, `--ms2-envcnn-cutoff <0..1>` | 0 | MS/MS envelopes whose EnvCNN score is below the cutoff are not reported (section 2, step 3). Used with `-q msdeconv` and `greedy`, not with `flashdeconv`. |
 | `-n`, `--env-rank <envcnn\|msdeconv>` | envcnn | The score that ranks isotopic envelopes: `envcnn`, the EnvCNN score, or `msdeconv`, the MS-Deconv score. The ranking decides which envelopes `-j` keeps; the EnvCNN cutoffs `-f` and `-g` compare the EnvCNN score with either value. In `topdia_gui`: "Use MS-Deconv score" (`msdeconv` when checked). |
 | `-j`, `--frag-num-filtering` | off | Filter the envelopes of MS/MS scans by the estimated number of fragment ions: the envelopes ranked highest by the score of `-n` are kept. Not used with `-q flashdeconv`. In `topdia_gui`: "Enable frag num filtering". |
 | `-o`, `--missing-level-one` | off | Accepted, but the run fails at the pseudo-spectrum step without MS1 scans (section 1). |
@@ -143,8 +144,8 @@ Feature detection:
 | `-T`, `--ms2-ecscore-cutoff <0..1>` | 0 | ECScore cutoff for fragment features. |
 | `-B`, `--ms2-min-scan-number <1\|2\|3>` | 1 | Minimum number of MS/MS scans of a fragment feature. |
 | `-i`, `--single-scan-noise` | off | Use each scan's own noise level instead of the whole map's when filtering low-intensity peaks: the MS1 scans for proteoform features and the MS/MS scans of an isolation window for fragment features. |
-| `-y`, `--ms1-intensity-correlation-cutoff <0..1>` | 0.5 | Minimum correlation between the intensities of a seed isotopic envelope and the theoretical ones for starting an MS1 proteoform feature. |
-| `-Y`, `--ms2-intensity-correlation-cutoff <0..1>` | 0.5 | The same cutoff for starting a fragment feature in an isolation window. |
+| `-y`, `--ms1-correlation-cutoff <0..1>` | 0.5 | Minimum correlation between the intensities of a seed isotopic envelope and the theoretical ones for starting an MS1 proteoform feature. |
+| `-Y`, `--ms2-correlation-cutoff <0..1>` | 0.5 | The same cutoff for starting a fragment feature in an isolation window. |
 
 Pseudo spectra:
 

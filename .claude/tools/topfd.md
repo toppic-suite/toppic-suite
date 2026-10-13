@@ -130,13 +130,13 @@ apex by > 20% (77 of 611 before the core fit, 1 after).
 
 topfd and topdia choose the deconvolution of each spectrum level with two
 visible options: `--ms1-deconv <greedy|msdeconv>` and `--ms2-deconv
-<greedy|msdeconv|flashdeconv>` (topdia: `--deconv-ms1`, `--deconv-ms2`)
-(`greedy`: the greedy searches of the next sections; `msdeconv`: MS-Deconv's dynamic programming, `DeconvSingleSp`;
+<greedy|msdeconv|flashdeconv>` (`greedy`: the greedy searches of the next
+sections; `msdeconv`: MS-Deconv's dynamic programming, `DeconvSingleSp`;
 `flashdeconv`: the FLASHDeconv port below). Both tools also take the
 short names `-p` and `-q` (2026-10-08; in topfd briefly `-x` and `-y`); in
-topdia `--ms1-intensity-correlation-cutoff` moved from `-p` to `-y` for
-them and `--ms2-intensity-correlation-cutoff` from `-P` to `-Y` (topdia_gui's
-command emits `-y` and `-Y`). Facts to keep straight:
+topdia `--ms1-correlation-cutoff` (then `--ms1-intensity-correlation-cutoff`)
+moved from `-p` to `-y` for them and `--ms2-correlation-cutoff` from `-P` to
+`-Y` (topdia_gui's command emits `-y` and `-Y`). Facts to keep straight:
 
 - **`TopfdPara` stores the names** (`ms1_deconv_method_`,
   `ms2_deconv_method_`; `getMs1DeconvMethods()` / `getMs2DeconvMethods()`
@@ -170,8 +170,12 @@ command emits `-y` and `-Y`). Facts to keep straight:
   `--ms2-deconv` (`-q`, was `--deconv-ms2`), `--ms1-envcnn-cutoff` (`-f`,
   was `--envcnn-cutoff-ms1`) and `--ms2-envcnn-cutoff` (`-g`, was
   `--envcnn-cutoff-ms2`); the old names are unrecognised. topfd_gui emits
-  `--ms1-deconv`/`--ms2-deconv` (`gui/util/command.cpp`). topdia keeps the
-  old names (its parser, manual, topdia_gui command and tooltips).
+  `--ms1-deconv`/`--ms2-deconv` (`gui/util/command.cpp`). topdia: the same
+  six renames later the same day (it keeps `--missing-level-one`, `-o`),
+  and `--ms1-correlation-cutoff` (`-y`, was
+  `--ms1-intensity-correlation-cutoff`) and `--ms2-correlation-cutoff` (`-Y`,
+  was `--ms2-intensity-correlation-cutoff`); topdia_gui emits
+  `--ms1-deconv`/`--ms2-deconv` too.
 - **`--no-sql` is `-z`** (2026-10-13, branch `no_sql_short_option`,
   merged into main with `topdia_no_sql` as daa9098e; toppic_test
   experiment 164 amendment 2; `-N` before, unrecognised now):
@@ -271,8 +275,7 @@ reading, one task per MS/MS spectrum on the thread pool, per-thread msalign
 files merged at the end and buffered SQLite records, but the spectrum is
 deconvoluted with the FLASHDeconv algorithm (OpenMS `SpectralDeconvolution`,
 `PeakGroup`, `PeakGroupScoring`, `FLASHHelperClasses`) instead of
-`DeconvSingleSp`. `--ms2-deconv flashdeconv` (topdia: `--deconv-ms2`)
-selects it in topfd and topdia (`TopfdPara::isUseFlashDeconv`, `topfd_process.cpp`, `topdia_process.cpp`;
+`DeconvSingleSp`. `--ms2-deconv flashdeconv` selects it in topfd and topdia (`TopfdPara::isUseFlashDeconv`, `topfd_process.cpp`, `topdia_process.cpp`;
 previous section). Facts to keep straight:
 
 - **Everything lives in the cpp**, in the namespace `flashdeconv_ms2_process`:

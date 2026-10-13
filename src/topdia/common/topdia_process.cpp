@@ -67,7 +67,7 @@ void processOneFileWithFaims(const TopfdParaPtr& topfd_para_ptr,
   std::cout << "MS/MS deconvolution started." << std::endl;
   topfd_para_ptr->setMissingLevelOne(true);
   if (topfd_para_ptr->isUseFlashDeconv()) {
-    // --deconv-ms2 flashdeconv: the FLASHDeconv algorithm
+    // --ms2-deconv flashdeconv: the FLASHDeconv algorithm
     FlashDeconvMs2ProcessPtr ms2_proc_ptr =
         std::make_shared<FlashDeconvMs2Process>(topfd_para_ptr,
                                                 "ms2_raw.msalign");

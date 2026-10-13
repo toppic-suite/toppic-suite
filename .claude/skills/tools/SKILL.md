@@ -79,8 +79,7 @@ Key options (defaults): `-c` max charge 30, `-m` max mass 50000,
 <greedy|msdeconv|flashdeconv>` the deconvolution methods (default greedy
 for both; `msdeconv` is the MS-Deconv dynamic programming of earlier
 versions, `flashdeconv` FLASHDeconv, experimental, not with `-T`). TopDIA
-takes the same two options (`-p`, `-q`; long names `--deconv-ms1`,
-`--deconv-ms2`) with `msdeconv` as the default.
+takes the same two options (`-p`, `-q`) with `msdeconv` as the default.
 `-f`/`-g` the MS1 and MS/MS EnvCNN cutoffs (0.2, 0; greedy and msdeconv
 only), `-n`/`--env-rank <envcnn|msdeconv>` the envelope ranking, `-j` the
 fragment-number filter (topdia has the same `-f`, `-g`, `-n` and `-j`).

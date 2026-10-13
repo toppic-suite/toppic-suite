@@ -89,8 +89,8 @@ class TopfdPara {
   bool isOutputAvgMass() const { return output_avg_mass_; }
   bool isOutputCsvFeatureFile() const { return output_csv_feature_file_; }
   bool isOutputDpEnvs() const { return output_dp_envs_; }
-  // the deconvolution methods, named as topfd's --ms1-deconv and
-  // --ms2-deconv options (topdia's --deconv-ms1 and --deconv-ms2) name them
+  // the deconvolution methods, named as the --ms1-deconv and --ms2-deconv
+  // options of topfd and topdia name them
   static const std::vector<std::string>& getMs1DeconvMethods();
   static const std::vector<std::string>& getMs2DeconvMethods();
   const std::string& getMs1DeconvMethod() const { return ms1_deconv_method_; }
