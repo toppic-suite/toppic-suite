@@ -1031,3 +1031,77 @@ byte for byte (toppic_test experiment 112, in 2.5 s against `emass.py`'s
   S (`averagineFormulaWithSulphur`): the composition is scaled to the entry
   mass minus k 32S masses (at least 0, so the lightest entries are S_k
   alone) and k S are added.
+
+## The MS1 peaks of the database and the 3D levels (`sql/ms_sql_writer`, `--sql-3d`)
+
+Since toppic_test experiment 165 (branch `merged_ms1_peak`, merged into
+main on 2026-10-13) the MS1 peaks and the levels of the 3D view
+(`topfd -D`) are one table:
+
+    ms1_peak(LEVEL, spec_id, peak_id, mz, intensity) WITHOUT ROWID,
+      PRIMARY KEY(LEVEL, spec_id, peak_id)
+
+- **Before**, `ms1_peak` was a rowid table without `LEVEL`, and `-D` added
+  `PEAKS0..n` (`MZ`, `INTENSITY`, `RETENTIONTIME` in ms, `COLOR`), each
+  with an index on `(RETENTIONTIME, MZ)`. `PEAKS0` repeated every MS1 peak
+  of intensity > 0, and each further table kept the most intense peak of
+  each grid block of the one below, so the levels are nested. On
+  480_F3_02 the tables were 1,641 of the file's 2,516 MB.
+- **`LEVEL`** is the highest level that keeps the peak; level k is the
+  rows with `LEVEL >= k`. Without `-D` every peak has `LEVEL` 0. A peak of
+  intensity <= 0 is not in the map and has -1 (a guard: the mzML reader
+  drops such peaks, `PwMsReader::parsePeaks`, so TopFD writes no -1 today).
+  `CONFIG` is unchanged (row k + 1: the ranges and the `COUNT` of level k).
+- **Not stored**: a peak's retention time is its spectrum's
+  (`static_cast<int>(rt * 1000)` ms, as before), and readers compute the
+  colour as `setColors` did, from `CONFIG`'s first `INTMIN` / `INTMAX`
+  (0 when `INTMIN <= 0` or `INTMAX <= INTMIN`, else
+  `clamp(int(7 (ln I - ln INTMIN) / (ln INTMAX - ln INTMIN)), 0, 6)`).
+- **Queries**: a spectrum's peaks are `LEVEL IN (-1, 0, ..., n) AND spec_id
+  = ? ORDER BY peak_id`, one key range per `LEVEL` (no index on
+  `spec_id`). A 3D window of level k is `LEVEL IN (k, ..., n)` over the
+  window's spectra: MS1 spectrum ids follow the retention time, so a
+  retention-time range is a `spec_id` range. TopMSV tells the layouts
+  apart by the `LEVEL` column (topmsv_private branch `merged_ms1_peak`).
+- **Who writes it**: without `-D`, `MzmlMsSqlWriter` as before, with
+  `LEVEL` 0 or -1. With `-D`, `deconv_ms1_process` keeps every MS1 peak with
+  its spectrum's id and its index (the key `MzmlMsSqlWriter` would write),
+  `MzmlMsSqlWriter` writes no `ms1_peak` rows, and `MsSqlWriter::write`
+  builds the levels, writes `CONFIG` and inserts `ms1_peak` in key order,
+  in one transaction after the deconvolution.
+- **The levels are those of before only if their input order is.**
+  `downsample` and `addRow` use `std::sort`, which is not stable, so the
+  input order decides between peaks of equal retention time or m/z; a
+  block keeps the first of two equally intense peaks. `write` therefore
+  builds the levels from the peaks of intensity > 0 in the order
+  `deconv_ms1_process` collected them, sorts each level by
+  `(rt, mz)` (`sortByRtMz`, the order the `PEAKS<k>` tables were written
+  in) before the next is down-sampled, and records each peak's level
+  through `MsSqlPeak::pos`, its input position (the levels are copies).
+  Level 0 is kept to the end and put back in input order in place
+  (`restoreInputOrder`), so the rows of a level go in key order.
+- **toppic `--mass-calib`** corrects `ms1_peak.mz` in place (`mz` is not a
+  key column) and sets each `CONFIG` row's `MZMIN` / `MZMAX` from
+  `ms1_peak` (`sqlite_mass_calib`; see `.claude/tools/toppic_output.md`).
+- **Checks (toppic_test experiment 165, report 0165)** against main
+  01d2db5a on st_1 and 480_F3_02, with and without `-D`: msalign and
+  feature files equal (but the time line), every other table the same
+  rows, `ms1_peak` row for row the conversion of main's file (levels from
+  `PEAKS<k>`, matched by retention time and m/z), `PEAKS0..n` rebuilt from
+  it with `COLOR` equal to main's, toppic's results equal.
+- **Size and time on 480_F3_02 `-D`**: 894 MB instead of 2,516 (`ms1_peak`
+  420 MB instead of 401 + 1,641); the 3D step 11 s instead of 16; peak
+  memory unchanged (feature detection, 5.2 GiB; the 3D step 3.8 instead of
+  3.6 GiB: level 0 is kept, and a peak carries its key). Without `-D` the
+  file is 881 MB instead of 875.
+- **Page fill**: SQLite balances the pages of a `WITHOUT ROWID` table (an
+  index B-tree) on every split, also on appends in key order, so
+  `ms1_peak` is written about 88% full; only a rowid table's appends fill
+  their pages (writing the MS1 records in spectrum order does not help).
+  A `VACUUM` packs it: 843 MB with `-D` and 839 without, in 3-4 s on
+  480_F3_02. So TopFD and TopDIA end each database with
+  `TopfdPara::closeSqlDb()`: `VACUUM` (its copy in a temporary file,
+  `temp_store = FILE`, not in memory as `MzmlMsSqlWriter`'s setting would
+  put it; a failure is a warning and leaves the file as written), then
+  close. topfd `-T` does not (one spectrum); its database is closed by
+  `createSqlDb` or the destructor as before.

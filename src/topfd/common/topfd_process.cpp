@@ -104,6 +104,7 @@ void processFraction(const TopfdParaPtr& para_ptr) {
     ms3_proc_ptr->process();
     std::cout << "MS3 deconvolution finished." << std::endl;
   }
+  para_ptr->closeSqlDb();
 }
 
 void processOneFile(const TopfdParaPtr& para_ptr,

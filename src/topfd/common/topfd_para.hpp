@@ -48,6 +48,13 @@ class TopfdPara {
 
   void createSqlDb(const std::string& db_name);
 
+  // Compacts (VACUUM) and closes the SQLite database once it is complete;
+  // nothing when none is open. TopFD and TopDIA call it at the end of each
+  // file or FAIMS fraction (not topfd -T, whose database holds one
+  // spectrum: createSqlDb and the destructor close a database still open
+  // without compacting it).
+  void closeSqlDb();
+
   const std::string& getExeDir() const { return exe_dir_; }
   const std::string& getResourceDir() const { return resource_dir_; }
   bool isMissingLevelOne() const { return missing_level_one_; }

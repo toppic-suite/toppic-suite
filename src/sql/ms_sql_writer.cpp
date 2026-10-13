@@ -18,8 +18,8 @@
 #include <sqlite3.h>
 
 #include <algorithm>
-#include <cmath>
 #include <cstddef>
+#include <cstdint>
 #include <cstdlib>
 #include <iostream>
 #include <limits>
@@ -64,24 +64,6 @@ MsSqlRange computeRange(const std::vector<MsSqlPeak>& peaks) {
     extendRange(range, peak);
   }
   return range;
-}
-
-// Map the intensities to COLOR_NUM buckets on a log scale between the map's
-// minimum and maximum intensity.
-void setColors(std::vector<MsSqlPeak>& peaks, const MsSqlRange& range) {
-  if (range.int_min <= 0.0 || range.int_max <= range.int_min) {
-    for (MsSqlPeak& peak : peaks) {
-      peak.color = 0;
-    }
-    return;
-  }
-  double log_min = std::log(range.int_min);
-  double log_span = std::log(range.int_max) - log_min;
-  for (MsSqlPeak& peak : peaks) {
-    int idx = static_cast<int>(MsSqlWriter::COLOR_NUM *
-                               (std::log(peak.inte) - log_min) / log_span);
-    peak.color = std::clamp(idx, 0, MsSqlWriter::COLOR_NUM - 1);
-  }
 }
 
 // Keep, for one retention-time row of the grid, the most intense peak of each
@@ -140,8 +122,11 @@ std::vector<MsSqlPeak> downsample(std::vector<MsSqlPeak>& peaks,
   return layer;
 }
 
-// Order the peaks the way the (RETENTIONTIME, MZ) index is ordered, so that
-// inserting them after the index exists only appends to it.
+// Order the peaks by retention time and m/z: the order the levels were
+// written in as the tables PEAKS<k> with an index on (RETENTIONTIME, MZ)
+// before toppic_test experiment 165. The down-sampling of the next level
+// starts from it, and its sorts are not stable, so this order decides
+// between peaks they find equal: kept, the levels are those of before.
 void sortByRtMz(std::vector<MsSqlPeak>& peaks) {
   std::sort(peaks.begin(), peaks.end(),
             [](const MsSqlPeak& a, const MsSqlPeak& b) {
@@ -149,12 +134,40 @@ void sortByRtMz(std::vector<MsSqlPeak>& peaks) {
             });
 }
 
+// Put the peaks back in their input order (pos) in place: every swap moves
+// one peak to its place.
+void restoreInputOrder(std::vector<MsSqlPeak>& peaks) {
+  for (std::size_t i = 0; i < peaks.size(); i++) {
+    while (peaks[i].pos != static_cast<int>(i)) {
+      std::size_t j = static_cast<std::size_t>(peaks[i].pos);
+      std::swap(peaks[i], peaks[j]);
+    }
+  }
+}
+
 }  // namespace
 
 void MsSqlWriter::write(std::vector<MsSqlPeak> peaks, int ms1_scan_num,
                         double mz_size, double rt_divider) {
+  // The peaks of intensity <= 0 are not in the map (LEVEL -1). The others
+  // keep their order, the order the levels have always been built from.
+  std::vector<MsSqlPeak> unmapped;
+  std::size_t peak_num = 0;
+  for (const MsSqlPeak& peak : peaks) {
+    if (peak.inte > 0.0) {
+      peaks[peak_num++] = peak;
+    } else {
+      unmapped.push_back(peak);
+    }
+  }
+  peaks.resize(peak_num);
+  for (std::size_t i = 0; i < peak_num; i++) {
+    peaks[i].pos = static_cast<int>(i);
+  }
+  // the highest level that keeps a peak, by its position in the input
+  std::vector<std::int8_t> levels(peak_num, 0);
+
   MsSqlRange range = computeRange(peaks);
-  setColors(peaks, range);
   mz_size = std::min(mz_size, range.mz_max - range.mz_min);
   double rt_size = 0.0;
   if (ms1_scan_num > 0 && rt_divider > 0.0) {
@@ -164,34 +177,69 @@ void MsSqlWriter::write(std::vector<MsSqlPeak> peaks, int ms1_scan_num,
 
   sql_util::execSql(db_, "BEGIN;");
   createConfigTable();
-  int layer = 0;
+  int level = 0;
   sortByRtMz(peaks);
-  createLayerTable(layer);
-  insertLayerPeaks(peaks, layer);
   insertConfig(range);
-  std::cout << peaks.size() << " peaks written to PEAKS0." << std::endl;
+  std::cout << peaks.size() << " MS1 peaks in 3D level 0." << std::endl;
 
-  while (static_cast<int>(peaks.size()) >= MIN_LAYER_PEAKS && mz_size > 0.0 &&
+  // each level is down-sampled from the one below (last); level 0 is kept
+  // for ms1_peak
+  std::vector<MsSqlPeak> last_level;
+  std::vector<MsSqlPeak>* last = &peaks;
+  while (static_cast<int>(last->size()) >= MIN_LAYER_PEAKS && mz_size > 0.0 &&
          rt_size > 0.0) {
     MsSqlRange layer_range;
     std::vector<MsSqlPeak> layer_peaks =
-        downsample(peaks, range, mz_size, rt_size, layer_range);
+        downsample(*last, range, mz_size, rt_size, layer_range);
     mz_size *= MZ_SCALE;
     rt_size *= RT_SCALE;
-    if (layer_peaks.size() == peaks.size()) {
-      // no block held two peaks, so the layer would repeat the previous one
+    if (layer_peaks.size() == last->size()) {
+      // no block held two peaks, so the level would repeat the previous one
       continue;
     }
-    layer++;
+    level++;
     sortByRtMz(layer_peaks);
-    createLayerTable(layer);
-    insertLayerPeaks(layer_peaks, layer);
+    for (const MsSqlPeak& peak : layer_peaks) {
+      levels[peak.pos] = static_cast<std::int8_t>(level);
+    }
     insertConfig(layer_range);
-    std::cout << layer_peaks.size() << " peaks written to PEAKS" << layer << "."
-              << std::endl;
-    peaks = std::move(layer_peaks);
+    std::cout << layer_peaks.size() << " MS1 peaks in 3D level " << level
+              << "." << std::endl;
+    last_level = std::move(layer_peaks);
+    last = &last_level;
   }
+  std::vector<MsSqlPeak>().swap(last_level);
+
+  // ms1_peak in key order (LEVEL, spec_id, peak_id): the input order within
+  // a level
+  restoreInputOrder(peaks);
+  sqlite3_stmt* stmt = sql_util::prepareSql(
+      db_,
+      "INSERT INTO ms1_peak(LEVEL, spec_id, peak_id, mz, intensity) "
+      "VALUES (?, ?, ?, ?, ?);");
+  auto insert = [&](int peak_level, const MsSqlPeak& peak) {
+    sqlite3_bind_int(stmt, 1, peak_level);
+    sqlite3_bind_int(stmt, 2, peak.spec_id);
+    sqlite3_bind_int(stmt, 3, peak.peak_id);
+    sqlite3_bind_double(stmt, 4, peak.mz);
+    sqlite3_bind_double(stmt, 5, peak.inte);
+    sql_util::stepAndReset(db_, stmt);
+  };
+  for (const MsSqlPeak& peak : unmapped) {
+    insert(-1, peak);
+  }
+  for (int k = 0; k <= level; k++) {
+    for (std::size_t i = 0; i < peak_num; i++) {
+      if (levels[i] == k) {
+        insert(k, peaks[i]);
+      }
+    }
+  }
+  sqlite3_finalize(stmt);
   sql_util::execSql(db_, "COMMIT;");
+  std::cout << unmapped.size() + peak_num
+            << " MS1 peaks written to ms1_peak with their 3D levels."
+            << std::endl;
 }
 
 void MsSqlWriter::createConfigTable() {
@@ -219,35 +267,6 @@ void MsSqlWriter::insertConfig(const MsSqlRange& range) {
   sqlite3_bind_double(stmt, 6, range.int_max);
   sqlite3_bind_int(stmt, 7, range.count);
   sql_util::stepAndReset(db_, stmt);
-  sqlite3_finalize(stmt);
-}
-
-void MsSqlWriter::createLayerTable(int layer) {
-  std::string num = std::to_string(layer);
-  sql_util::execSql(db_, "CREATE TABLE PEAKS" + num +
-                             "(MZ REAL NOT NULL,"
-                             "INTENSITY REAL NOT NULL,"
-                             "RETENTIONTIME INT NOT NULL,"
-                             "COLOR TINYINT NOT NULL);");
-  // The index is created before the rows: they arrive in index order (see
-  // sortByRtMz), so building it incrementally is cheaper than sorting the
-  // whole table afterwards.
-  sql_util::execSql(db_, "CREATE INDEX rtmz_index" + num + " ON PEAKS" + num +
-                             " (RETENTIONTIME, MZ);");
-}
-
-void MsSqlWriter::insertLayerPeaks(const std::vector<MsSqlPeak>& peaks,
-                                   int layer) {
-  sqlite3_stmt* stmt = sql_util::prepareSql(
-      db_, "INSERT INTO PEAKS" + std::to_string(layer) +
-               "(MZ, INTENSITY, RETENTIONTIME, COLOR) VALUES (?, ?, ?, ?);");
-  for (const MsSqlPeak& peak : peaks) {
-    sqlite3_bind_double(stmt, 1, peak.mz);
-    sqlite3_bind_double(stmt, 2, peak.inte);
-    sqlite3_bind_int(stmt, 3, peak.rt);
-    sqlite3_bind_int(stmt, 4, peak.color);
-    sql_util::stepAndReset(db_, stmt);
-  }
   sqlite3_finalize(stmt);
 }
 
