@@ -67,8 +67,8 @@ std::string geneTopfdCommand(const TopfdParaPtr& para_ptr,
   if (!para_ptr->isGeneSql()) {
     command = command + "-z ";
   }
-  command = command + "--deconv-ms1 " + para_ptr->getMs1DeconvMethod() +
-            " --deconv-ms2 " + para_ptr->getMs2DeconvMethod() + " ";
+  command = command + "--ms1-deconv " + para_ptr->getMs1DeconvMethod() +
+            " --ms2-deconv " + para_ptr->getMs2DeconvMethod() + " ";
   if (para_ptr->isTextPeakList()) {
     command = command + "-T ";
   }

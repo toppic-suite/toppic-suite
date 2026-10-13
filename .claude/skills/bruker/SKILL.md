@@ -91,7 +91,7 @@ TopPIC):
   ECD spectra show the precursor's charge directly: the charge-reduced species
   (M+zH)^(z-1)+. , (z-2)+. ... dominate the spectrum; the largest deconvoluted mass
   is the precursor (23,466.61 Da at 8+, 7+, 9+ in experiment 148).
-- **Use a high MS/MS S/N ratio, `-s` 50-100.** `-s` (`--ms-two-sn-ratio`, default 1)
+- **Use a high MS/MS S/N ratio, `-s` 50-100.** `-s` (`--ms2-sn-ratio`, default 1)
   is the factor over the spectrum's noise level (the most crowded intensity bin) that a
   peak needs to seed an isotopic envelope; the other peaks of an envelope only need the
   noise level. On the summed timsOmni spectrum (all frames, `-c 10`) raising it removed
@@ -103,7 +103,7 @@ TopPIC):
   first. Measured on the sum of all frames; on spectra of 100 summed frames `-s 5`
   already lost TopPIC identifications to the KRAS4A isoform, so check a lower `-s` for
   shorter sums.
-- **`-g` (`--envcnn-cutoff-ms2`, the MS/MS EnvCNN cutoff, default 0; `-v` before
+- **`-g` (`--ms2-envcnn-cutoff`, the MS/MS EnvCNN cutoff, default 0; `-v` before
   2026-10-12) at about 0.4** keeps only the masses that TopPIC's own filter keeps
   (`toppic -F`, default 0.4): with `-c 10 -s 100`, `-g 0.4` leaves 313
   of 4,616 masses, 0.2% random matches, and the same TopPIC E-values as `-g 0` (TopPIC

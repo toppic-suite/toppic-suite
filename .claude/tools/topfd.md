@@ -120,18 +120,18 @@ rows. `assignIntensity` (called before `mzRefine` and again after sorting)
 only splits an experimental peak among envelopes that share it; it never
 changes theoretical intensities. The greedy MS1 and MS/MS searches (TopFD's
 defaults) do not run this refinement. When touching any of this, validate
-with `topfd -T -j --deconv-ms2 msdeconv` on the myoglobin peak list (without
+with `topfd -T -j --ms2-deconv msdeconv` on the myoglobin peak list (without
 the option `-T` runs the greedy search): compare the deconvoluted masses
 against the sequence's b/y ions (46 exact / 14 off-by-one-isotope is the
 reference), and count envelopes whose theoretical apex exceeds the observed
 apex by > 20% (77 of 611 before the core fit, 1 after).
 
-## Deconvolution methods (`--deconv-ms1`, `--deconv-ms2`)
+## Deconvolution methods (`--ms1-deconv`, `--ms2-deconv`)
 
 topfd and topdia choose the deconvolution of each spectrum level with two
-visible options: `--deconv-ms1 <greedy|msdeconv>` and `--deconv-ms2
-<greedy|msdeconv|flashdeconv>` (`greedy`: the greedy searches of the next
-sections; `msdeconv`: MS-Deconv's dynamic programming, `DeconvSingleSp`;
+visible options: `--ms1-deconv <greedy|msdeconv>` and `--ms2-deconv
+<greedy|msdeconv|flashdeconv>` (topdia: `--deconv-ms1`, `--deconv-ms2`)
+(`greedy`: the greedy searches of the next sections; `msdeconv`: MS-Deconv's dynamic programming, `DeconvSingleSp`;
 `flashdeconv`: the FLASHDeconv port below). Both tools also take the
 short names `-p` and `-q` (2026-10-08; in topfd briefly `-x` and `-y`); in
 topdia `--ms1-intensity-correlation-cutoff` moved from `-p` to `-y` for
@@ -163,6 +163,15 @@ command emits `-y` and `-Y`). Facts to keep straight:
   hidden `--ms1-greedy-deconv` / `--ms2-greedy-deconv`, and the short-lived
   `--deconv-ms1-msdeconv` / `--deconv-ms2-msdeconv` of commit b3d71867.
   The letter `-F` is free in topfd.
+- **Long names renamed** (2026-10-13, the user's request; short letters
+  unchanged): `--ms1-sn-ratio` (`-r`, was `--ms-one-sn-ratio`),
+  `--ms2-sn-ratio` (`-s`, was `--ms-two-sn-ratio`), `--missing-ms1` (`-o`,
+  was `--missing-level-one`), `--ms1-deconv` (`-p`, was `--deconv-ms1`),
+  `--ms2-deconv` (`-q`, was `--deconv-ms2`), `--ms1-envcnn-cutoff` (`-f`,
+  was `--envcnn-cutoff-ms1`) and `--ms2-envcnn-cutoff` (`-g`, was
+  `--envcnn-cutoff-ms2`); the old names are unrecognised. topfd_gui emits
+  `--ms1-deconv`/`--ms2-deconv` (`gui/util/command.cpp`). topdia keeps the
+  old names (its parser, manual, topdia_gui command and tooltips).
 - **`--no-sql` is `-z`** (2026-10-13, branch `no_sql_short_option`,
   merged into main with `topdia_no_sql` as daa9098e; toppic_test
   experiment 164 amendment 2; `-N` before, unrecognised now):
@@ -193,17 +202,17 @@ command emits `-y` and `-Y`). Facts to keep straight:
   and `gui/util/command.cpp` always emits `--env-rank <score>`. The ranking
   only decides which envelopes `--frag-num-filtering` (`-j` in topfd and
   topdia; MS/MS envelopes only: `DeconvSingleSp`, which also deconvolutes
-  the MS1 spectra with `--deconv-ms1 msdeconv`, applied it to MS1 envelopes
+  the MS1 spectra with `--ms1-deconv msdeconv`, applied it to MS1 envelopes
   too until 2026-10-12) keeps; the EnvCNN cutoffs and the msalign
   score column use the EnvCNN score with either value.
-- **The EnvCNN cutoffs** (2026-10-12): `-f`/`--envcnn-cutoff-ms1`
+- **The EnvCNN cutoffs** (2026-10-12): `-f`/`--ms1-envcnn-cutoff`
   (`TopfdPara::ms1_env_cnn_score_cutoff_`, default 0.2) and
-  `-g`/`--envcnn-cutoff-ms2` (`ms2_env_cnn_score_cutoff_`, default 0; topfd's
+  `-g`/`--ms2-envcnn-cutoff` (`ms2_env_cnn_score_cutoff_`, default 0; topfd's
   `-v`/`--env-cnn-cutoff` before; topdia had none) of topfd and topdia, with the greedy and MS-Deconv deconvolutions
   only. MS1: the greedy search drops its envelopes below the larger of the
   cutoff and `GreedyPara::min_envcnn` (now 0; its default 0.2 became the
   option's), `DeconvSingleSp::postprocess` those of `deconvMsOne`'s
-  whole-spectrum search (`ms_level` 1; `--deconv-ms1 msdeconv` had no
+  whole-spectrum search (`ms_level` 1; `--ms1-deconv msdeconv` had no
   EnvCNN filter before, so its default output lost the envelopes below
   0.2); the precursor-window envelopes (`addPrecWinEnvs`, `deconvMsOne`'s
   precursor-window step) are not filtered. MS/MS as before
@@ -225,7 +234,7 @@ command emits `-y` and `-Y`). Facts to keep straight:
   default `TopfdPara` (TopFD: a default-constructed one; TopDIA:
   `Argument::getTopfdParaPtrForTopdia`) and read back with
   `setMs1DeconvMethod(currentText())`; `gui/util/command.cpp` always emits
-  `--deconv-ms1 <m> --deconv-ms2 <m>`. In topfd_gui they are the middle
+  `--ms1-deconv <m> --ms2-deconv <m>`. In topfd_gui they are the middle
   column's rows 3 and 4, "MS1 deconvolution" and "MS2 deconvolution" (was
   "MS/MS deconvolution"; they came in as the third column's rows 4 and 5,
   the window grew by 40 pixels, and the former "Use FLASHDeconv for MS/MS"
@@ -262,8 +271,8 @@ reading, one task per MS/MS spectrum on the thread pool, per-thread msalign
 files merged at the end and buffered SQLite records, but the spectrum is
 deconvoluted with the FLASHDeconv algorithm (OpenMS `SpectralDeconvolution`,
 `PeakGroup`, `PeakGroupScoring`, `FLASHHelperClasses`) instead of
-`DeconvSingleSp`. `--deconv-ms2 flashdeconv` selects it in topfd and topdia
-(`TopfdPara::isUseFlashDeconv`, `topfd_process.cpp`, `topdia_process.cpp`;
+`DeconvSingleSp`. `--ms2-deconv flashdeconv` (topdia: `--deconv-ms2`)
+selects it in topfd and topdia (`TopfdPara::isUseFlashDeconv`, `topfd_process.cpp`, `topdia_process.cpp`;
 previous section). Facts to keep straight:
 
 - **Everything lives in the cpp**, in the namespace `flashdeconv_ms2_process`:
@@ -317,7 +326,7 @@ THRASH-like subtractive search in which a peak's charge is decided with all
 the charge states of its mass; the output (msalign lines per charge state,
 EnvCNN scores, SQLite rows) is written by the same `writeMsOne` as
 `deconvMsOne`'s. `deconvMsOne`, TopFD's default up to main 89df2a8c, runs
-with `--deconv-ms1 msdeconv`, TopDIA's default (see "Deconvolution
+with `--ms1-deconv msdeconv`, TopDIA's default (see "Deconvolution
 methods" above for the option, the defaults and the GUIs). Facts to keep
 straight:
 
@@ -350,7 +359,7 @@ straight:
   isotopes off the grid of every 2nd/3rd isotope are much weaker than those
   on it is rejected as a harmonic (`harm_ratio` 0.4); a mass found at one
   charge only needs an isotope cosine of 0.8 (`single_min_cos`); envelopes
-  with an EnvCNN score below 0.2 are not written (`-f`/`--envcnn-cutoff-ms1`,
+  with an EnvCNN score below 0.2 are not written (`-f`/`--ms1-envcnn-cutoff`,
   until 2026-10-12 the switch `min_envcnn`; a third of the envelopes, which
   only seeded extra MS1 features).
 - **Shared peaks** (toppic_test experiments 157 and 158, reports 0157 and
@@ -439,7 +448,7 @@ straight:
   The search gives fewer MS/MS spectra a precursor on some data: 612 of
   1,381 against MS-Deconv's 855 on st_1.mzML (MS/MS-matched features 894
   against 1,158), 4,289 against 4,303 on 480_F3_02.
-- **`--deconv-ms1 msdeconv` writes the earlier default's output** (with
+- **`--ms1-deconv msdeconv` writes the earlier default's output** (with
   `-f 0` since 2026-10-12, when the MS1 EnvCNN cutoff 0.2 began to apply to
   it): on st_1
   all 1,418 MS1 scans' masses and charges, both feature files and the
@@ -459,7 +468,7 @@ straight:
 deconvMsTwo` and `topfd -T` call it; the parameter block then prints
 "MS/MS deconvolution: Greedy" instead of the DP's ranking window and
 harmonic check lines). `DeconvSingleSp`, TopFD's default up to main
-89df2a8c, runs with `--deconv-ms2 msdeconv`, TopDIA's default (see
+89df2a8c, runs with `--ms2-deconv msdeconv`, TopDIA's default (see
 "Deconvolution methods" above). `-g`, `-v` and `-n` apply to both methods
 (`greedy_ms2_deconv::deconv` ends with the same filters). It started as a
 copy of the greedy MS1 search (previous section) and keeps its structure;
@@ -534,12 +543,12 @@ rows) is written as `DeconvSingleSp`'s. Facts to keep straight:
   (mostly 1,000-5,000 Da: right charges and isotopes, and envelopes the DP
   did not report). The MS/MS stage takes about 100 s against main's 135 s
   at 16 threads.
-- **`--deconv-ms2 msdeconv` writes the earlier default's output**: on
-  st_1, with `--deconv-ms1 msdeconv` too, the MS/MS spectra equal main
+- **`--ms2-deconv msdeconv` writes the earlier default's output**: on
+  st_1, with `--ms1-deconv msdeconv` too, the MS/MS spectra equal main
   89df2a8c's default output up to the EnvCNN jitter, and `topfd -T` on the
   myoglobin peak list writes main's msalign byte for byte (681 masses; the
   greedy search 2,476). With the MS1 deconvolution fixed, the greedy MS/MS
-  search is repeatable up to that jitter. `--deconv-ms2 flashdeconv` writes
+  search is repeatable up to that jitter. `--ms2-deconv flashdeconv` writes
   main 89df2a8c's `-F` MS/MS spectra unchanged (st_1, all 1,381).
 
 ## Precursor isotope correction from fragment pairs (`topfd/deconv/prec_pair_refine`, `--skip-ms2-prec-pair-refine`)
@@ -681,7 +690,7 @@ species at lower charges. Facts to keep straight:
   spectrum's window (`feature_ppm` 10 ppm, also one isotope apart) gets its
   id and mass (the TSV columns `Feature ID`, `Feature mass`), and the
   precursor species' feature gives the precursor its id and intensity.
-  Not in `FlashDeconvMs2Process` (`--deconv-ms2 flashdeconv`) or `-T`.
+  Not in `FlashDeconvMs2Process` (`--ms2-deconv flashdeconv`) or `-T`.
 - **The search** is the greedy MS1 search through
   `greedy_ms1_deconv::deconvSeries`, a second entry point of
   `greedy_ms1_deconv` (no precursor-window step) that takes a seed S/N
@@ -713,7 +722,7 @@ species at lower charges. Facts to keep straight:
   (80.7 M; experiment 139).
 - **Fragment PTCR spectra** (`isFragPtcr`: a dissociation, then proton
   transfer charge reduction of the fragments) are deconvoluted as other
-  MS/MS spectra of their activation (`deconvMsTwo`, `--deconv-ms2`) and
+  MS/MS spectra of their activation (`deconvMsTwo`, `--ms2-deconv`) and
   written to `_ms2.msalign` and the SQLite database, so TopPIC searches
   them with the dissociation's ion types. The selected ion bounds the
   fragments (`ptcr_ms2_deconv::getSelectedIonPrec`: its charge, and its
@@ -909,7 +918,7 @@ FAIMS data). Facts to keep straight:
   separate the cases (experiment 146, amendment 1). TopPIC's zero-shift
   search tolerates the +-1 Da precursor error anyway.
 - **The deconvolution** is the MS/MS one (`greedy_ms2_deconv::deconv`,
-  or `DeconvSingleSp` at level 2 with `--deconv-ms2 msdeconv`) bounded by
+  or `DeconvSingleSp` at level 2 with `--ms2-deconv msdeconv`) bounded by
   the precursor's mass (+1 Da) and charge (the MS2 precursor's in the
   fallback case), single-threaded (8,000 MS3 scans of 75 peaks take
   about 80 s).

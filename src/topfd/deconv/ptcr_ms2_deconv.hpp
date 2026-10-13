@@ -66,7 +66,7 @@ namespace toppic {
 // at which it lay in the isolation window of the proton transfer stage, and
 // no fragment has more charges or mass than its precursor. They are
 // deconvoluted as other MS/MS spectra (deconv_ms2_process::deconvMsTwo,
-// --deconv-ms2) and written to the MS/MS msalign file with the
+// --ms2-deconv) and written to the MS/MS msalign file with the
 // dissociation's activation. The selected ion bounds the fragments
 // (getSelectedIonPrec; with MS1 features, the larger of its bounds and the
 // features'), and without MS1 features of the precursor window it is their

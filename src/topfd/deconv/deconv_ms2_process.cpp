@@ -288,7 +288,7 @@ void deconvMsTwo(const MzmlMsPtr& ms_ptr, SpecFeaturePtrVec sp_feat_ptr_vec,
   PeakPtrVec peak_list = ms_ptr->getPeakPtrVec();
   MatchEnvPtrVec deconv_envs;
   if (peak_list.size() > 0 && topfd_para_ptr->isMs2GreedyDeconv()) {
-    // --deconv-ms2 greedy, TopFD's default (DeconvSingleSp with msdeconv,
+    // --ms2-deconv greedy, TopFD's default (DeconvSingleSp with msdeconv,
     // TopDIA's default); research aid: the decisions of one scan
     // (TOPFD_GREEDY_MS2_DEBUG_SCAN)
     std::string debug_name;

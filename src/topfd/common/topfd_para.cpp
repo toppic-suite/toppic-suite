@@ -315,7 +315,7 @@ std::string TopfdPara::getTopfdParaStr(const std::string& prefix,
     kv("MS1 envelope EnvCNN score cutoff:")
         << ms1_env_cnn_score_cutoff_ << std::endl;
     // printed only for the greedy search (TopFD's default), so that the
-    // output files of --deconv-ms1 msdeconv (TopDIA's default) keep the
+    // output files of --ms1-deconv msdeconv (TopDIA's default) keep the
     // parameter block of earlier versions
     if (isMs1GreedyDeconv()) {
       kv("MS1 deconvolution:") << "Greedy" << std::endl;
@@ -360,11 +360,11 @@ std::string TopfdPara::getTopfdParaStr(const std::string& prefix,
   kv("Fragment envelope EnvCNN score cutoff:")
       << ms2_env_cnn_score_cutoff_ << std::endl;
   // the ranking window and the harmonic check belong to MS-Deconv's MS/MS
-  // deconvolution (--deconv-ms2 msdeconv, TopDIA's default): the greedy
+  // deconvolution (--ms2-deconv msdeconv, TopDIA's default): the greedy
   // search (TopFD's default) and FLASHDeconv do not run them, and the ranking
   // window has no meaning when the filtering-by-mz step is disabled. The
   // method's line is printed only for the other two, so that the output
-  // files of --deconv-ms2 msdeconv keep the block of earlier versions.
+  // files of --ms2-deconv msdeconv keep the block of earlier versions.
   if (isMs2GreedyDeconv()) {
     kv("MS/MS deconvolution:") << "Greedy" << std::endl;
     // the hidden shared-peak limit only when set, as for MS1

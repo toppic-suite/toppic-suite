@@ -121,7 +121,7 @@ struct GreedyPara {
   // near-duplicate mass
   double merge_window = 0;
   // envelopes with an EnvCNN score below the larger of min_envcnn and
-  // --envcnn-cutoff-ms1 (TopfdPara, default 0.2; it was this switch's
+  // --ms1-envcnn-cutoff (TopfdPara, default 0.2; it was this switch's
   // default, experiment 104, run g6) are not reported
   double min_envcnn = 0;
   // research aid for timing: 0 skips the EnvCNN scores

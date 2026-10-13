@@ -189,7 +189,7 @@ void writeMsOne(const MzmlMsPtr& ms_ptr, MatchEnvPtrVec& result_envs,
   }
 }
 
-// --deconv-ms1 greedy, TopFD's default (deconvMsOne runs instead with
+// --ms1-deconv greedy, TopFD's default (deconvMsOne runs instead with
 // msdeconv, TopDIA's default): the spectrum is deconvoluted by
 // greedy_ms1_deconv (the most intense peak's charge decided with all the
 // charge states of its mass, its envelopes subtracted, repeated) instead of

@@ -388,7 +388,7 @@
         </size>
        </property>
        <property name="toolTip">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Signal-to-noise ratio for MS1 spectra, a non-negative number with at most two decimal places. In MS1 deconvolution it sets the intensity threshold for the reference peak of an isotopic envelope; in feature detection, peaks below the ratio times the noise level are left out of the LC-MS map. Default: 3. (topfd -r, --ms-one-sn-ratio)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Signal-to-noise ratio for MS1 spectra, a non-negative number with at most two decimal places. In MS1 deconvolution it sets the intensity threshold for the reference peak of an isotopic envelope; in feature detection, peaks below the ratio times the noise level are left out of the LC-MS map. Default: 3. (topfd -r, --ms1-sn-ratio)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="text">
         <string>MS1 S/N ratio: </string>
@@ -410,7 +410,7 @@
         </size>
        </property>
        <property name="toolTip">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Signal-to-noise ratio for MS1 spectra, a non-negative number with at most two decimal places. In MS1 deconvolution it sets the intensity threshold for the reference peak of an isotopic envelope; in feature detection, peaks below the ratio times the noise level are left out of the LC-MS map. Default: 3. (topfd -r, --ms-one-sn-ratio)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Signal-to-noise ratio for MS1 spectra, a non-negative number with at most two decimal places. In MS1 deconvolution it sets the intensity threshold for the reference peak of an isotopic envelope; in feature detection, peaks below the ratio times the noise level are left out of the LC-MS map. Default: 3. (topfd -r, --ms1-sn-ratio)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="text">
         <string>3.0</string>
@@ -570,7 +570,7 @@ p, li { white-space: pre-wrap; }
      <item>
       <widget class="QLabel" name="label_7">
        <property name="toolTip">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Signal-to-noise ratio for MS/MS spectra, a non-negative number with at most two decimal places. Only peaks with an intensity of at least the ratio times the noise level can be the reference peak of an isotopic envelope; the other peaks of an envelope must be above the noise level (a ratio below 1 lowers both thresholds). Default: 1. (topfd -s, --ms-two-sn-ratio)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Signal-to-noise ratio for MS/MS spectra, a non-negative number with at most two decimal places. Only peaks with an intensity of at least the ratio times the noise level can be the reference peak of an isotopic envelope; the other peaks of an envelope must be above the noise level (a ratio below 1 lowers both thresholds). Default: 1. (topfd -s, --ms2-sn-ratio)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="text">
         <string>MS2 S/N ratio:</string>
@@ -586,7 +586,7 @@ p, li { white-space: pre-wrap; }
         </size>
        </property>
        <property name="toolTip">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Signal-to-noise ratio for MS/MS spectra, a non-negative number with at most two decimal places. Only peaks with an intensity of at least the ratio times the noise level can be the reference peak of an isotopic envelope; the other peaks of an envelope must be above the noise level (a ratio below 1 lowers both thresholds). Default: 1. (topfd -s, --ms-two-sn-ratio)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Signal-to-noise ratio for MS/MS spectra, a non-negative number with at most two decimal places. Only peaks with an intensity of at least the ratio times the noise level can be the reference peak of an isotopic envelope; the other peaks of an envelope must be above the noise level (a ratio below 1 lowers both thresholds). Default: 1. (topfd -s, --ms2-sn-ratio)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="text">
         <string>1.0</string>
@@ -723,7 +723,7 @@ p, li { white-space: pre-wrap; }
          <bool>false</bool>
         </property>
         <property name="toolTip">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Check when the input files have no MS1 spectra: MS1 deconvolution and feature detection are skipped, and each MS/MS spectrum is deconvoluted up to the maximum mass and charge, which are reported as its precursor mass and charge. Default: unchecked. (topfd -o, --missing-level-one)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Check when the input files have no MS1 spectra: MS1 deconvolution and feature detection are skipped, and each MS/MS spectrum is deconvoluted up to the maximum mass and charge, which are reported as its precursor mass and charge. Default: unchecked. (topfd -o, --missing-ms1)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
         <property name="text">
          <string>Missing MS1 spectra</string>
@@ -919,7 +919,7 @@ p, li { white-space: pre-wrap; }
         </size>
        </property>
        <property name="toolTip">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;EnvCNN score cutoff for isotopic envelopes in MS1 spectra, a number from 0 to 1: envelopes with a lower EnvCNN score are not reported, except those added for precursor isolation windows; 0 reports every envelope. Used with both MS1 deconvolution methods. Default: 0.2. (topfd -f, --envcnn-cutoff-ms1)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;EnvCNN score cutoff for isotopic envelopes in MS1 spectra, a number from 0 to 1: envelopes with a lower EnvCNN score are not reported, except those added for precursor isolation windows; 0 reports every envelope. Used with both MS1 deconvolution methods. Default: 0.2. (topfd -f, --ms1-envcnn-cutoff)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="text">
         <string>MS1 EnvCNN cutoff:</string>
@@ -941,7 +941,7 @@ p, li { white-space: pre-wrap; }
         </size>
        </property>
        <property name="toolTip">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;EnvCNN score cutoff for isotopic envelopes in MS1 spectra, a number from 0 to 1: envelopes with a lower EnvCNN score are not reported, except those added for precursor isolation windows; 0 reports every envelope. Used with both MS1 deconvolution methods. Default: 0.2. (topfd -f, --envcnn-cutoff-ms1)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;EnvCNN score cutoff for isotopic envelopes in MS1 spectra, a number from 0 to 1: envelopes with a lower EnvCNN score are not reported, except those added for precursor isolation windows; 0 reports every envelope. Used with both MS1 deconvolution methods. Default: 0.2. (topfd -f, --ms1-envcnn-cutoff)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="text">
         <string>0.2</string>
@@ -969,7 +969,7 @@ p, li { white-space: pre-wrap; }
         </size>
        </property>
        <property name="toolTip">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;EnvCNN score cutoff for isotopic envelopes in MS/MS spectra, a number from 0 to 1: envelopes with a lower EnvCNN score are not reported. Used with the greedy and msdeconv MS2 deconvolution methods, not with flashdeconv. Default: 0 (all envelopes reported). (topfd -g, --envcnn-cutoff-ms2)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;EnvCNN score cutoff for isotopic envelopes in MS/MS spectra, a number from 0 to 1: envelopes with a lower EnvCNN score are not reported. Used with the greedy and msdeconv MS2 deconvolution methods, not with flashdeconv. Default: 0 (all envelopes reported). (topfd -g, --ms2-envcnn-cutoff)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="text">
         <string>MS2 EnvCNN cutoff:</string>
@@ -991,7 +991,7 @@ p, li { white-space: pre-wrap; }
         </size>
        </property>
        <property name="toolTip">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;EnvCNN score cutoff for isotopic envelopes in MS/MS spectra, a number from 0 to 1: envelopes with a lower EnvCNN score are not reported. Used with the greedy and msdeconv MS2 deconvolution methods, not with flashdeconv. Default: 0 (all envelopes reported). (topfd -g, --envcnn-cutoff-ms2)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;EnvCNN score cutoff for isotopic envelopes in MS/MS spectra, a number from 0 to 1: envelopes with a lower EnvCNN score are not reported. Used with the greedy and msdeconv MS2 deconvolution methods, not with flashdeconv. Default: 0 (all envelopes reported). (topfd -g, --ms2-envcnn-cutoff)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="text">
         <string>0</string>
@@ -1169,7 +1169,7 @@ p, li { white-space: pre-wrap; }
      <item>
       <widget class="QLabel" name="ms1DeconvLabel">
        <property name="toolTip">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Deconvolution method of MS1 spectra: greedy, a greedy search that decides the charge state of the most intense peak with all the charge states of its mass and subtracts the mass's envelopes, or msdeconv, the MS-Deconv dynamic programming of earlier versions. Default: greedy. (topfd -p, --deconv-ms1)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Deconvolution method of MS1 spectra: greedy, a greedy search that decides the charge state of the most intense peak with all the charge states of its mass and subtracts the mass's envelopes, or msdeconv, the MS-Deconv dynamic programming of earlier versions. Default: greedy. (topfd -p, --ms1-deconv)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="text">
         <string>MS1 deconvolution:</string>
@@ -1185,7 +1185,7 @@ p, li { white-space: pre-wrap; }
         </size>
        </property>
        <property name="toolTip">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Deconvolution method of MS1 spectra: greedy, a greedy search that decides the charge state of the most intense peak with all the charge states of its mass and subtracts the mass's envelopes, or msdeconv, the MS-Deconv dynamic programming of earlier versions. Default: greedy. (topfd -p, --deconv-ms1)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Deconvolution method of MS1 spectra: greedy, a greedy search that decides the charge state of the most intense peak with all the charge states of its mass and subtracts the mass's envelopes, or msdeconv, the MS-Deconv dynamic programming of earlier versions. Default: greedy. (topfd -p, --ms1-deconv)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <item>
         <property name="text">
@@ -1220,7 +1220,7 @@ p, li { white-space: pre-wrap; }
      <item>
       <widget class="QLabel" name="ms2DeconvLabel">
        <property name="toolTip">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Deconvolution method of MS/MS spectra: greedy, the greedy search of MS1 spectra adapted to fragment ions; msdeconv, the MS-Deconv dynamic programming of earlier versions; or flashdeconv, the FLASHDeconv algorithm (experimental; not with &quot;Text peak list input&quot;). Default: greedy. (topfd -q, --deconv-ms2)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Deconvolution method of MS/MS spectra: greedy, the greedy search of MS1 spectra adapted to fragment ions; msdeconv, the MS-Deconv dynamic programming of earlier versions; or flashdeconv, the FLASHDeconv algorithm (experimental; not with &quot;Text peak list input&quot;). Default: greedy. (topfd -q, --ms2-deconv)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="text">
         <string>MS2 deconvolution:</string>
@@ -1236,7 +1236,7 @@ p, li { white-space: pre-wrap; }
         </size>
        </property>
        <property name="toolTip">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Deconvolution method of MS/MS spectra: greedy, the greedy search of MS1 spectra adapted to fragment ions; msdeconv, the MS-Deconv dynamic programming of earlier versions; or flashdeconv, the FLASHDeconv algorithm (experimental; not with &quot;Text peak list input&quot;). Default: greedy. (topfd -q, --deconv-ms2)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Deconvolution method of MS/MS spectra: greedy, the greedy search of MS1 spectra adapted to fragment ions; msdeconv, the MS-Deconv dynamic programming of earlier versions; or flashdeconv, the FLASHDeconv algorithm (experimental; not with &quot;Text peak list input&quot;). Default: greedy. (topfd -q, --ms2-deconv)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <item>
         <property name="text">

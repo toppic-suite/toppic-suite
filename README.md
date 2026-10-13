@@ -89,7 +89,8 @@ proteomics. *Journal of Proteome Research*, 24:55-64, 2025.
 
 **FLASHDeconv**\
 TopFD and TopDIA deconvolute MS/MS spectra with the FLASHDeconv algorithm
-when `--deconv-ms2 flashdeconv` is given. If you use that option, please also
+when `--ms2-deconv flashdeconv` (TopFD) or `--deconv-ms2 flashdeconv`
+(TopDIA) is given. If you use that option, please also
 cite:\
 Kyowon Jeong, Jihyung Kim, Manasi Gaikwad, Siti Nurul Hidayah, Laura Heikaus,
 Hartmut Schlüter, and Oliver Kohlbacher. FLASHDeconv: ultrafast, high-quality

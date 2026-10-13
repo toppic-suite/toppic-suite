@@ -89,8 +89,8 @@ class TopfdPara {
   bool isOutputAvgMass() const { return output_avg_mass_; }
   bool isOutputCsvFeatureFile() const { return output_csv_feature_file_; }
   bool isOutputDpEnvs() const { return output_dp_envs_; }
-  // the deconvolution methods, named as the --deconv-ms1 and --deconv-ms2
-  // options of topfd and topdia name them
+  // the deconvolution methods, named as topfd's --ms1-deconv and
+  // --ms2-deconv options (topdia's --deconv-ms1 and --deconv-ms2) name them
   static const std::vector<std::string>& getMs1DeconvMethods();
   static const std::vector<std::string>& getMs2DeconvMethods();
   const std::string& getMs1DeconvMethod() const { return ms1_deconv_method_; }
@@ -284,7 +284,7 @@ class TopfdPara {
   // (the MS-Deconv score)
   std::string deconv_score_ = "envcnn";
   // the EnvCNN score cutoffs of the MS1 and MS/MS envelopes (topfd's
-  // --envcnn-cutoff-ms1 and --envcnn-cutoff-ms2) of the greedy and MS-Deconv
+  // --ms1-envcnn-cutoff and --ms2-envcnn-cutoff) of the greedy and MS-Deconv
   // deconvolutions; not the envelopes added for precursor windows, not
   // FLASHDeconv. MS1 0.2: the greedy MS1 search's own minimum until then
   // (its envelopes below 0.2 are a third of them, seed the features that the
@@ -328,12 +328,12 @@ class TopfdPara {
   // envelopes of every deconvoluted spectrum to win_envs.txt / dp_envs.txt
   // (debugging aid).
   bool output_dp_envs_ = false;
-  // the MS1 deconvolution method (option --deconv-ms1): "greedy"
+  // the MS1 deconvolution method (option --ms1-deconv): "greedy"
   // (greedy_ms1_deconv, deconv_ms1_process::deconvMsOneGreedy; TopFD's
   // default) or "msdeconv" (MS-Deconv's precursor-window step +
   // DeconvSingleSp; TopDIA's default, which its argument parser sets)
   std::string ms1_deconv_method_ = "greedy";
-  // the MS/MS deconvolution method (option --deconv-ms2): "greedy"
+  // the MS/MS deconvolution method (option --ms2-deconv): "greedy"
   // (greedy_ms2_deconv, in deconv_ms2_process::deconvMsTwo and
   // topfd_single_process; TopFD's default), "msdeconv" (MS-Deconv's
   // DeconvSingleSp; TopDIA's default) or "flashdeconv" (FlashDeconvMs2Process

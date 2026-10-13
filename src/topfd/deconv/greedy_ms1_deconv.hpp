@@ -26,7 +26,7 @@
 
 namespace toppic {
 
-// The greedy MS1 deconvolution, --deconv-ms1 greedy, TopFD's default
+// The greedy MS1 deconvolution, --ms1-deconv greedy, TopFD's default
 // (msdeconv, TopDIA's default, uses the precursor-window step and the
 // candidate envelopes + dynamic programming of DeconvSingleSp for MS1
 // spectra instead). It is a THRASH-like subtractive search (Horn et al.,

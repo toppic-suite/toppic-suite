@@ -69,10 +69,10 @@ For each file TopFD prints the parameters it uses, then runs three steps:
 1. **MS1 deconvolution**: every MS1 spectrum is deconvoluted with a greedy
    search: the charge state of the most intense peak is decided with all the
    charge states of its mass, the mass's envelopes are subtracted, and the
-   search repeats on the rest of the spectrum. With `--deconv-ms1 msdeconv`
+   search repeats on the rest of the spectrum. With `--ms1-deconv msdeconv`
    the MS-Deconv dynamic programming, the default method of earlier
    versions, is used instead. With either method, envelopes whose EnvCNN
-   score is below `--envcnn-cutoff-ms1` (`-f`, default 0.2) are not
+   score is below `--ms1-envcnn-cutoff` (`-f`, default 0.2) are not
    reported.
 2. **MS1 feature detection**: the deconvoluted MS1 envelopes are linked
    across scans into proteoform features (LC-MS features), each scored with
@@ -81,14 +81,14 @@ For each file TopFD prints the parameters it uses, then runs three steps:
    monoisotopic mass, charge and intensity.
 3. **MS/MS deconvolution**: every MS/MS spectrum is deconvoluted, using its
    precursor information from step 2, with the greedy search of step 1
-   adapted to fragment ions. With `--deconv-ms2 msdeconv` the MS-Deconv
+   adapted to fragment ions. With `--ms2-deconv msdeconv` the MS-Deconv
    dynamic programming, the default method of earlier versions, is used
-   instead, and with `--deconv-ms2 flashdeconv` the FLASHDeconv algorithm
+   instead, and with `--ms2-deconv flashdeconv` the FLASHDeconv algorithm
    (experimental). With `greedy` and `msdeconv`, envelopes whose EnvCNN
-   score is below `--envcnn-cutoff-ms2` (`-g`, default 0: all reported) are
+   score is below `--ms2-envcnn-cutoff` (`-g`, default 0: all reported) are
    not reported.
 
-If the file has no MS1 spectra, pass `--missing-level-one` (`-o`): steps 1 and
+If the file has no MS1 spectra, pass `--missing-ms1` (`-o`): steps 1 and
 2 are skipped and no precursor is determined. Every MS/MS spectrum is then
 deconvoluted up to the maximum mass and charge given by `-m` and `-c`, and
 its `PRECURSOR_MASS` and `PRECURSOR_CHARGE` are written as those limits, with
@@ -134,7 +134,7 @@ strongest feature's intensity are all kept and the `PRECURSOR_*` values are
 separated by `:`. The parameters used are recorded as `#` comment lines at
 the top of the file, starting with the input file (`File name`) and the
 msalign file's own name (`Msalign file name`, e.g. `sample_-40_ms1.msalign`
-for a FAIMS voltage level). With `--missing-level-one` no `_ms1.msalign`
+for a FAIMS voltage level). With `--missing-ms1` no `_ms1.msalign`
 and no feature files are produced.
 
 With more than one thread, per-thread partial `msalign` files
@@ -235,7 +235,7 @@ Parameters that apply to both MS1 and MS/MS deconvolution:
 | `-e`, `--mz-error <number>` | 0.02 | Error tolerance of peak m/z values (m/z units). |
 | `-u`, `--thread-number <int>` | 1 | Number of threads. Must not exceed the number of hardware threads; TopFD warns (but still runs) when the available memory looks too small for the requested number. |
 | `-z`, `--no-sql` | off | Do not write the `.sqlite` database; an earlier `sample.sqlite` in the output folder (from another run) is deleted with its `-wal` and `-shm` files, so that no database of another run is left next to the new results. **Do not use it if TopPIC will search the spectra**: TopPIC's post mass matching, which is on by default, reads the centroided MS/MS peaks from this database and stops with an error when it is missing (see the [TopPIC manual](toppic_manual.md); `toppic --disable-post-match` is the alternative). |
-| `-o`, `--missing-level-one` | off | The file has no MS1 spectra: skip MS1 deconvolution and feature detection. |
+| `-o`, `--missing-ms1` | off | The file has no MS1 spectra: skip MS1 deconvolution and feature detection. |
 | `-A`, `--average-mass` | off | Report average masses instead of monoisotopic masses for the precursor and fragment ions in `sample_ms2.msalign` (section 1.3). The MS1 msalign file, the feature files and the SQLite database keep monoisotopic masses. Search such a file with `toppic --average-mass`. Also applies to `sample_ptcr.msalign`, `sample_ms3.msalign` and `-T`. |
 | `-T`, `--text-peak-list` | off | The input is a text peak list (one MS/MS spectrum), not an mzML file; lines that do not start with a number are skipped, so an MGF file of one spectrum can be used; see section 2. In `topfd_gui`, the checkbox "Text peak list input" under "Additional settings" turns this on; the Add button then lists `.txt` and `.mgf` files (or all files), and Start refuses to run while an mzML or mzXML file is in the list. |
 
@@ -243,9 +243,9 @@ MS1 deconvolution and proteoform feature detection:
 
 | Option | Default | Meaning |
 |---|---|---|
-| `-r`, `--ms-one-sn-ratio <number>` | 3 | Signal-to-noise ratio for MS1 spectra. In MS1 deconvolution it sets the reference-peak threshold (as `-s` does for MS/MS); in feature detection peaks below `ratio × noise level` are excluded from the LC-MS map. |
-| `-p`, `--deconv-ms1 <greedy\|msdeconv>` | greedy | MS1 deconvolution method (section 1.2): `greedy`, the greedy search, or `msdeconv`, the MS-Deconv dynamic programming, the default method of earlier versions. In `topfd_gui`: "MS1 deconvolution". |
-| `-f`, `--envcnn-cutoff-ms1 <0..1>` | 0.2 | MS1 envelopes whose EnvCNN score is below the cutoff are not reported, so they do not enter the MS1 msalign file, the SQLite database or the feature detection. Used with both MS1 deconvolution methods (`-p greedy` and `msdeconv`). Not filtered: the envelopes added for the precursor isolation windows of the MS/MS spectra (the greedy search adds one to a window in which no reported envelope has its apex; MS-Deconv deconvolutes the windows before the whole spectrum). The cutoff compares the EnvCNN score whatever `-n` ranks by. `-f 0` reports every envelope. In `topfd_gui`: "MS1 EnvCNN cutoff". |
+| `-r`, `--ms1-sn-ratio <number>` | 3 | Signal-to-noise ratio for MS1 spectra. In MS1 deconvolution it sets the reference-peak threshold (as `-s` does for MS/MS); in feature detection peaks below `ratio × noise level` are excluded from the LC-MS map. |
+| `-p`, `--ms1-deconv <greedy\|msdeconv>` | greedy | MS1 deconvolution method (section 1.2): `greedy`, the greedy search, or `msdeconv`, the MS-Deconv dynamic programming, the default method of earlier versions. In `topfd_gui`: "MS1 deconvolution". |
+| `-f`, `--ms1-envcnn-cutoff <0..1>` | 0.2 | MS1 envelopes whose EnvCNN score is below the cutoff are not reported, so they do not enter the MS1 msalign file, the SQLite database or the feature detection. Used with both MS1 deconvolution methods (`-p greedy` and `msdeconv`). Not filtered: the envelopes added for the precursor isolation windows of the MS/MS spectra (the greedy search adds one to a window in which no reported envelope has its apex; MS-Deconv deconvolutes the windows before the whole spectrum). The cutoff compares the EnvCNN score whatever `-n` ranks by. `-f 0` reports every envelope. In `topfd_gui`: "MS1 EnvCNN cutoff". |
 | `-t`, `--ecscore-cutoff <0..1>` | 0.1 | Features with an ECScore below the cutoff are removed. |
 | `-b`, `--min-scan-number <1\|2\|3>` | 1 | Minimum number of MS1 scans a feature must be detected in. |
 | `-l`, `--split-intensity-ratio <number>` | 2.5 | Intensity ratio required to split one feature into two. |
@@ -257,10 +257,10 @@ MS/MS deconvolution:
 | Option | Default | Meaning |
 |---|---|---|
 | `-a`, `--activation <CID\|ETD\|ETCID\|ETHCD\|HCD\|MPD\|UVPD\|FILE>` | FILE | Fragmentation method. `FILE` takes it from the activation terms of each spectrum in the input file, whatever their order: ETD with beam-type or supplemental beam-type CID (or the EThcD term) is ETHCD, ETD with CID or supplemental CID (or the ETciD term) is ETCID, otherwise ETD, HCD, CID or MPD. ETCID (ETciD) and ETHCD (EThcD) have the ion types of ETD (c, z-dot). Give a method explicitly when the file does not record it or records it wrongly. |
-| `-s`, `--ms-two-sn-ratio <number>` | 1 | Signal-to-noise ratio for MS/MS spectra. Only peaks with intensity at least `ratio × noise level` can be the reference peak of an isotopic envelope; the other peaks of an envelope must be above the noise level. Values below 1, down to 0, lower both thresholds to `ratio × noise level`; the noise level itself still bounds how far isotopic envelopes extend. |
+| `-s`, `--ms2-sn-ratio <number>` | 1 | Signal-to-noise ratio for MS/MS spectra. Only peaks with intensity at least `ratio × noise level` can be the reference peak of an isotopic envelope; the other peaks of an envelope must be above the noise level. Values below 1, down to 0, lower both thresholds to `ratio × noise level`; the noise level itself still bounds how far isotopic envelopes extend. |
 | `-w`, `--precursor-window <number>` | 3.0 | Default precursor isolation window width (m/z). Ignored when the file contains isolation window information. |
-| `-q`, `--deconv-ms2 <greedy\|msdeconv\|flashdeconv>` | greedy | MS/MS deconvolution method (section 1.2): `greedy`, the greedy search adapted to fragment ions; `msdeconv`, the MS-Deconv dynamic programming, the default method of earlier versions; or `flashdeconv`, the FLASHDeconv algorithm (experimental; the output files are the same; not with `-T`). In `topfd_gui`: "MS2 deconvolution" (it replaces the former option `--ms2-flashdeconv`). |
-| `-g`, `--envcnn-cutoff-ms2 <0..1>` | 0 | MS/MS envelopes whose EnvCNN score is below the cutoff are not reported. Used with `-q greedy` and `msdeconv`, not with `flashdeconv`; also for MS3 spectra and `-T`. In `topfd_gui`: "MS2 EnvCNN cutoff". |
+| `-q`, `--ms2-deconv <greedy\|msdeconv\|flashdeconv>` | greedy | MS/MS deconvolution method (section 1.2): `greedy`, the greedy search adapted to fragment ions; `msdeconv`, the MS-Deconv dynamic programming, the default method of earlier versions; or `flashdeconv`, the FLASHDeconv algorithm (experimental; the output files are the same; not with `-T`). In `topfd_gui`: "MS2 deconvolution" (it replaces the former option `--ms2-flashdeconv`). |
+| `-g`, `--ms2-envcnn-cutoff <0..1>` | 0 | MS/MS envelopes whose EnvCNN score is below the cutoff are not reported. Used with `-q greedy` and `msdeconv`, not with `flashdeconv`; also for MS3 spectra and `-T`. In `topfd_gui`: "MS2 EnvCNN cutoff". |
 | `-n`, `--env-rank <envcnn\|msdeconv>` | envcnn | The score that ranks isotopic envelopes: `envcnn`, the EnvCNN neural-network score, or `msdeconv`, the MS-Deconv score. The ranking decides which envelopes `-j` keeps; the EnvCNN cutoffs `-f` and `-g` compare the EnvCNN score with either value, and the score column of the msalign files is the EnvCNN score. In `topfd_gui`: "Sort using MS-Deconv score" (`msdeconv` when checked). |
 | `-j`, `--frag-num-filtering` | off | Limit the number of fragment envelopes in an MS/MS spectrum based on the estimated number of fragment ions: the envelopes ranked highest by the score of `-n` are kept. Used with `-q greedy` and `msdeconv`, not with `flashdeconv`. In `topfd_gui`: "Enable frag num-based filtering". |
 
@@ -335,8 +335,8 @@ topfd -T [options] peaks.txt
 
 Only the parameters of MS/MS deconvolution apply. The useful ones are
 `-c`/`--max-charge`, `-m`/`--max-mass`, `-e`/`--mz-error`,
-`-s`/`--ms-two-sn-ratio`, `-n`/`--env-rank`, `-g`/`--envcnn-cutoff-ms2`,
-`-j`/`--frag-num-filtering` and `-q`/`--deconv-ms2` (`greedy` or `msdeconv`;
+`-s`/`--ms2-sn-ratio`, `-n`/`--env-rank`, `-g`/`--ms2-envcnn-cutoff`,
+`-j`/`--frag-num-filtering` and `-q`/`--ms2-deconv` (`greedy` or `msdeconv`;
 `flashdeconv` is refused with `-T`). The MS1 and feature detection options
 (`-r`, `-p`, `-f`, `-t`, `-b`, `-l`, `-i`, `-d`), `-o` and `-w` have
 no effect; `-u` only sets the number of threads ONNX Runtime uses for EnvCNN
