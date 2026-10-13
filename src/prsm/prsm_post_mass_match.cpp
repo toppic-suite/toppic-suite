@@ -540,6 +540,11 @@ std::string toppicSqlFileName(const std::string& sp_file_name) {
   return dbBaseName(sp_file_name, &resid) + "_toppic.sqlite";
 }
 
+std::string topmgSqlFileName(const std::string& sp_file_name) {
+  bool resid = false;
+  return dbBaseName(sp_file_name, &resid) + "_topmg.sqlite";
+}
+
 std::string postBaseName(const std::string& sp_file_name) {
   // the spectrum file's base name, with the _resid suffix of the second
   // precursor search kept: <base>_post_ms2 for <base>_ms2.msalign,

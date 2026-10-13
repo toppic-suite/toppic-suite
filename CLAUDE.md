@@ -450,8 +450,9 @@ above it, never the reverse:
   `stepAndReset`, `hasTable`, all abort on error — use them rather than
   re-implementing the prepare/step boilerplate; `immutableUri` opens a
   database read only as immutable), `sql_db_copy` (toppic's database,
-  `<base>_toppic.sqlite`: TopFD's tables `ms2_env` and `ms2_env_peak`
-  (`copyTables`, toppic_test experiment 168), or with `--mass-calib` the
+  `<base>_toppic.sqlite`, and topmg's `<base>_topmg.sqlite`: TopFD's
+  tables `ms2_env` and `ms2_env_peak` (`writeEnvelopeDb` / `copyTables`,
+  toppic_test experiments 168 and 170), or with toppic `--mass-calib` the
   corrected copy of every table (`openCopy` / `closeCopy`: backup API,
   toppic's tables dropped); written with no journal under a temporary
   name, closed in WAL mode (TopFD's journal mode: in rollback mode a reader
@@ -555,8 +556,9 @@ above it, never the reverse:
   `.claude/tools/toppic_output.md`).
   `prsm_sql_output::write` is the one entry point that writes those tables
   plus `seq/fasta_sql_writer`'s `fasta_seq` table into the database it is
-  given when it exists (toppic: its `<base>_toppic.sqlite`; topmg: the
-  topfd `.sqlite` of the spectrum file; neither with `--no-sql`, see
+  given when it exists (toppic: its `<base>_toppic.sqlite`; topmg: its
+  `<base>_topmg.sqlite`, toppic_test experiment 170; neither with
+  `--no-sql`, see
   `.claude/tools/toppic_output.md`); toppic and topmg both call it after
   their protein table, passing their own cutoff file extensions — do not duplicate
   the open/write/close sequence in a driver. Keep the TSV and SQL columns in

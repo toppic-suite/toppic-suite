@@ -25,12 +25,12 @@ namespace toppic {
 
 namespace sql_db_copy {
 
-// toppic's database of a spectrum file, <base>_toppic.sqlite, built from
-// TopFD's (toppic_test experiments 154, 156 and 168): the tables ms2_env and
-// ms2_env_peak (copyTables), to which the post mass matching appends its
-// envelopes, or with --mass-calib the corrected copy of every table
-// (openCopy and closeCopy, sqlite_mass_calib). TopFD's database is only
-// read.
+// toppic's and topmg's database of a spectrum file, <base>_toppic.sqlite and
+// <base>_topmg.sqlite, built from TopFD's (toppic_test experiments 154, 156,
+// 168 and 170): the tables ms2_env and ms2_env_peak (writeEnvelopeDb), to
+// which toppic's post mass matching appends its envelopes, or with toppic
+// --mass-calib the corrected copy of every table (openCopy and closeCopy,
+// sqlite_mass_calib). TopFD's database is only read.
 
 // Opens a copy of src_name, written under the temporary name
 // dest_name + ".tmp" (an earlier temporary file is removed), for changes
@@ -59,6 +59,13 @@ void closeCopy(sqlite3* db, const std::string& dest_name);
 // when a database cannot be read or written or src_name lacks a table.
 void copyTables(const std::string& src_name, const std::string& dest_name,
                 const std::vector<std::string>& tables);
+
+// Writes dest_name with the tables ms2_env and ms2_env_peak of TopFD's
+// database topfd_db_name (copyTables) and prints "Copied the tables ...
+// (n s)."; when TopFD's database does not exist (topfd -z), prints a note
+// and writes nothing. Returns whether dest_name was written.
+bool writeEnvelopeDb(const std::string& topfd_db_name,
+                     const std::string& dest_name);
 
 // Deletes the database name with its -journal, -wal and -shm files, if they
 // exist. Returns whether name existed.

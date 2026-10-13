@@ -16,7 +16,6 @@
 #include "console/toppic_process.hpp"
 
 #include <algorithm>
-#include <chrono>
 #include <cstdlib>
 #include <ctime>
 #include <filesystem>
@@ -374,33 +373,6 @@ std::string toleranceStr(double value) {
   std::ostringstream out;
   out << value;
   return out.str();
-}
-
-// Writes toppic's database of a spectrum file, toppic_db_name
-// (<base>_toppic.sqlite), with the tables ms2_env and ms2_env_peak of TopFD's
-// topfd_db_name (sql_db_copy::copyTables; toppic_test experiment 168: every
-// table before it), to which the post mass matching appends its envelopes;
-// a reader takes the other tables from TopFD's database. Prints a note when
-// TopFD's database does not exist (TopFD -z, possible with -D): the run then
-// writes no database.
-void writeToppicDb(const std::string& topfd_db_name,
-                   const std::string& toppic_db_name) {
-  if (!std::filesystem::exists(topfd_db_name)) {
-    std::cout << "The TopFD database " << topfd_db_name
-              << " was not found: no " << toppic_db_name << " is written."
-              << std::endl;
-    return;
-  }
-  auto copy_start = std::chrono::steady_clock::now();
-  sql_db_copy::copyTables(topfd_db_name, toppic_db_name,
-                          {"ms2_env", "ms2_env_peak"});
-  double seconds = std::chrono::duration<double>(
-                       std::chrono::steady_clock::now() - copy_start)
-                       .count();
-  std::cout << "Copied the tables ms2_env and ms2_env_peak of " << topfd_db_name
-            << " to " << toppic_db_name << " (" << std::fixed
-            << std::setprecision(1) << seconds << " s)." << std::defaultfloat
-            << std::endl;
 }
 
 // By default the generating function of the variable PTM PrSMs takes the
@@ -1964,7 +1936,7 @@ std::string TopPIC_mass_calib(std::map<std::string, std::string>& arguments) {
       std::cout << "WARNING: too few calibrants for the mass calibration; "
                 << sp_file_name << " is searched without it." << std::endl;
       if (!no_sql) {
-        writeToppicDb(topfd_db_name, toppic_db_name);
+        sql_db_copy::writeEnvelopeDb(topfd_db_name, toppic_db_name);
       }
       return sp_file_name;
     }
@@ -2117,7 +2089,9 @@ int TopPICProgress_multi_file(std::map<std::string, std::string>& arguments,
     // --no-sql: no database is written (an earlier one is still deleted, so
     // that none of another run sits next to the new results)
     if (arguments["massCalib"] != "true" && arguments["noSql"] != "true") {
-      writeToppicDb(topfd_db_lst[k], toppic_db_lst[k]);
+      // TopFD's tables ms2_env and ms2_env_peak (toppic_test experiment 168);
+      // a reader takes the other tables from TopFD's database
+      sql_db_copy::writeEnvelopeDb(topfd_db_lst[k], toppic_db_lst[k]);
     }
   }
   // --mass-calib: the calibration model of each file, which the post mass
