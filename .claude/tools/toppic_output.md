@@ -136,7 +136,8 @@ instead of the input. Facts to keep straight:
   13.1 s against 16.4 s, and the 5.4 s table write and the 0.9 s copy
   gone.
 - **toppic's database holds TopFD's MS/MS envelope tables only**
-  (branch `toppic_db_ms2_env` from main 04b96954, toppic_test experiment
+  (branch `toppic_db_ms2_env` from main 04b96954, merged into main on
+  2026-10-13 as e9eb0cf6 after `sql_3d_default`; toppic_test experiment
   168, the user's request: "copy only ms2 envelope and ms2 envelope peaks
   ... in default setting. Copy all peaks only if recalibration is turned
   on. For average mass, copy only ms2 envelope ..."). `writeToppicDb`
