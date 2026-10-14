@@ -960,9 +960,10 @@ amendments 2 and 3; from main 2863fa08, merged into main on 2026-10-09 as
 main writes main 6949cad7's files without the option and the branch's model,
 spectra and PrSM files with `--mass-calib`). `topcalib` is the C++
 form of the experiment's `calib.py` and `recal_msalign.py`
-(`tests/202610/scripts/two_pass_recal/` of toppic_test; the manual is
-`docs/manual/topcalib_manual.md`), and toppic's hidden `--mass-calib` runs
-the method inside a search. Facts to keep straight:
+(`tests/202610/scripts/two_pass_recal/` of toppic_test; it has no manual,
+`topcalib fit -h` and `topcalib apply -h` print its options), and toppic's
+hidden `--mass-calib` runs the method inside a search. Facts to keep
+straight:
 
 - **The method.** A zero-shift search (`toppic -s 0`, `-D` is enough) gives
   the calibrants: PrSMs with E-value <= 1e-5, no unexpected shift, no
