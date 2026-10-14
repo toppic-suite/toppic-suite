@@ -18,6 +18,13 @@ TopPIC Suite consists of six software tools for the analysis of top-down mass sp
 
 * **TopDiff** (Top-down mass spectrometry-based identification of Differentially expressed proteoforms) compares the abundances of proteoforms and finds differentially expressed proteoforms by using identifications of top-down mass spectrometry data of several protein samples.
 
+The suite also includes four command-line utilities: **toplib_build** and
+**toplib_search** build a spectral library of identified MS/MS spectra and
+identify spectra by searching it, **topcalib** recalibrates the m/z values
+of TopFD's MS/MS spectra with the identifications of a first TopPIC search,
+and **topzstd** compresses and decompresses the SQLite databases of the
+suite.
+
 ## Manuals
 
 The command-line tools are documented in `docs/manual/`:
@@ -35,8 +42,10 @@ The command-line tools are documented in `docs/manual/`:
 - [Proteoform annotation](docs/manual/proteoform.md) — how to read the annotated proteoform strings in TopPIC and TopMG results
 
 The GUI tools (`topfd_gui`, `topdia_gui`, `topindex_gui`, `toppic_gui`,
-`topmg_gui`, `topdiff_gui`) offer the same options as the command-line tools
-and run them.
+`topmg_gui`, `topdiff_gui`) set the main options of the command-line tools
+and run them. The tooltip of each parameter explains it and names the
+command-line option it sets, and the parameter values are checked before a
+run starts.
 
 Claude Code loads the skills in `.claude/skills/` automatically when it is
 started in this repository: `tools` for running the command-line tools and
@@ -44,11 +53,18 @@ reading their outputs, `compile` for building and installing the suite, and
 `repo` for publishing the private repository to the public one.
 
 **TopMSV** (Top-down Mass Spectrometry Visualization) is the web-based
-viewer for TopPIC Suite results. It reads the SQLite database written by
-TopFD and TopPIC and shows the MS1 and MS/MS spectra with their
-deconvoluted envelopes, the LC-MS map with the detected proteoform
+viewer for TopPIC Suite results. It shows the MS1 and MS/MS spectra with
+their deconvoluted envelopes, the LC-MS map with the detected proteoform
 features, and the identified proteoform-spectrum matches with their
-annotated fragment ions. It is distributed separately; see the
+annotated fragment ions. It reads the SQLite databases of the suite: the
+database of TopFD or TopDIA (`<name>.sqlite`), with the spectra, their
+peaks and envelopes, and the MS1 peaks of the 3D view of the LC-MS map,
+together with the database of TopPIC (`<name>_toppic.sqlite`) or TopMG
+(`<name>_topmg.sqlite`), with the identifications. The tools compress their
+databases when they write them; TopMSV reads compressed databases with the
+sqlite-zstd extension, and `topzstd -d` decompresses a database for
+programs without it (see the [topzstd manual](docs/manual/topzstd_manual.md)).
+TopMSV is distributed separately; see the
 [TopMSV manual](https://toppic.org/software/topmsv/manual.html).
 
 ## Building TopPIC Suite

@@ -26,8 +26,10 @@ make -j$(nproc)          # macOS: make -j$(sysctl -n hw.ncpu)
 ```
 
 - Build one tool: `make -j$(nproc) topfd` (targets: `topfd`, `topdia`,
-  `topindex`, `toppic`, `topmg`, `topdiff`, and `topfd_gui`, `topdia_gui`,
-  `topindex_gui`, `toppic_gui`, `topmg_gui`, `topdiff_gui`).
+  `topindex`, `toppic`, `topmg`, `topdiff`, `toplib_build`,
+  `toplib_search`, `topcalib`, `topzstd`, and `topfd_gui`, `topdia_gui`,
+  `topindex_gui`, `toppic_gui`, `topmg_gui`, `topdiff_gui`; the developer
+  tool `theo_patt_gen` is outside the default target).
 - Generator-independent form: `cmake --build build --target toppic -j8`.
 - Verify: `bin/toppic -h` (or the tool you built) prints the option list.
 - A `build/` directory usually already exists in this checkout; reuse it
@@ -121,10 +123,11 @@ ninja
 - Install: `cmake --install .` or `ninja install`; `res/` is installed next
   to the executables. `ninja uninstall` reverses it.
 - Release zip: `scripts\win_release.bat [version]` (run from cmd or
-  PowerShell after building) bundles `bin\*.exe`, the UCRT64 DLLs they
-  import, the Qt plugins and `res/` into `toppic-windows-<version>.zip` in the
-  repository root (default version `2.1.0`); the extracted folder runs
-  without MSYS2 on `PATH`.
+  PowerShell after building) bundles the twelve executables of the six
+  main tools and their GUIs (not toplib_build, toplib_search, topcalib or
+  topzstd), the UCRT64 DLLs they import, the Qt plugins and `res/` into
+  `toppic-windows-<version>.zip` in the repository root (default version
+  `2.1.0`); the extracted folder runs without MSYS2 on `PATH`.
 
 ### macOS (Xcode CLT + Homebrew)
 
@@ -163,8 +166,9 @@ sudo make install
 sudo make uninstall      # same build directory; reads install_manifest.txt
 ```
 
-`make install` puts the twelve executables in `<prefix>/bin`, the vendored
-ONNX Runtime library in `<prefix>/lib/toppic` (the executables carry an
+`make install` puts the sixteen executables (ten command-line tools and
+six GUIs) in `<prefix>/bin`, the vendored ONNX Runtime library in
+`<prefix>/lib/toppic` (the executables carry an
 `$ORIGIN/../lib/toppic` rpath, so the tree is relocatable), and `res/` in
 `<prefix>/share/toppic`. `make uninstall` deletes every file in the
 manifest and then any directory left empty; without the manifest (build

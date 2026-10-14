@@ -70,10 +70,12 @@ cmake ..
 make -j$(nproc)
 ```
 
-The build type defaults to `Release`. The executables (`topfd`, `topdia`,
-`topindex`, `toppic`, `topmg`, `topdiff` and their `*_gui` counterparts) are
-placed in the repository's `bin/` directory. To build just one tool, e.g.
-TopFD:
+The build type defaults to `Release`. The executables are placed in the
+repository's `bin/` directory: the ten command-line tools (`topfd`, `topdia`,
+`topindex`, `toppic`, `topmg`, `topdiff`, `toplib_build`, `toplib_search`,
+`topcalib` and `topzstd`) and the six GUI tools (`topfd_gui`, `topdia_gui`,
+`topindex_gui`, `toppic_gui`, `topmg_gui` and `topdiff_gui`). To build just
+one tool, e.g. TopFD:
 
 ```sh
 make -j$(nproc) topfd

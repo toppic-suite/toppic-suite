@@ -83,9 +83,11 @@ libraries, are built with GCC, and linking clang-compiled objects against them
 fails with "duplicate section ... has different size" warnings followed by
 "multiple definition" errors. To use clang, use the MSYS2 CLANG64 shell with
 the matching `mingw-w64-clang-x86_64-*` packages instead. The executables
+are placed in the repository's `bin/` directory: the ten command-line tools
 (`topfd.exe`, `topdia.exe`, `topindex.exe`, `toppic.exe`, `topmg.exe`,
-`topdiff.exe` and their `*_gui.exe` counterparts) are placed in the
-repository's `bin/` directory.
+`topdiff.exe`, `toplib_build.exe`, `toplib_search.exe`, `topcalib.exe` and
+`topzstd.exe`) and the six GUI tools (`topfd_gui.exe`, `topdia_gui.exe`,
+`topindex_gui.exe`, `toppic_gui.exe`, `topmg_gui.exe` and `topdiff_gui.exe`).
 
 ## 5. Run the tools
 
@@ -117,10 +119,12 @@ command prompt or PowerShell in the repository root after building:
 
 ```bat
 scripts\win_release.bat
-scripts\win_release.bat 1.9.1.0
+scripts\win_release.bat 2.1.1
 ```
 
-It copies the twelve executables from `bin\`, walks their import tables
+It copies the twelve executables of the six main tools and their GUIs
+from `bin\` (not `toplib_build.exe`, `toplib_search.exe`, `topcalib.exe` or
+`topzstd.exe`), walks their import tables
 with `objdump` and copies every UCRT64 DLL they need (Boost is linked
 statically; the runtime DLLs are the GCC runtime, pugixml, SQLite, zlib, zstd,
 ONNX Runtime and, for the GUIs, Qt6 and its dependencies), the Qt
