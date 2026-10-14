@@ -59,7 +59,8 @@ std::map<std::string, std::string> TopIndexArgument::initArguments() {
 void TopIndexArgument::outputArguments(
     std::ostream& output, const std::string& sep,
     std::map<std::string, std::string> arguments) {
-  int gap = 36;
+  // the longest label: "Error tolerance for precursor masses:"
+  int gap = 37;
   output << "********************** Parameters **********************"
          << std::endl;
   output << std::setw(gap) << std::left << "Protein database file:" << sep
