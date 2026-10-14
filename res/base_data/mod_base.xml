@@ -32,7 +32,7 @@
 	      <name>Cysteine</name>
       </amino_acid>
       <ptm>
-        <abbreviation>Carbamidomethylation</abbreviation>
+        <abbreviation>Carbamidomethyl</abbreviation>
       </ptm>
     </mod_residue>
     <mod_type>SIDE_CHAIN</mod_type>
@@ -477,7 +477,7 @@
   <mod>
     <ori_residue>
       <amino_acid>
-      	<name>Ornithine</name>
+      	<name>Pyrrolysine</name>
       </amino_acid>
       <ptm>
         <abbreviation>No PTM</abbreviation>
@@ -485,7 +485,7 @@
     </ori_residue>
     <mod_residue>
       <amino_acid>
-      	<name>Ornithine</name>
+      	<name>Pyrrolysine</name>
       </amino_acid>
       <ptm>
         <abbreviation>Acetyl</abbreviation>

@@ -20,6 +20,7 @@
 #include <mutex>
 
 #include "common/util/file_util.hpp"
+#include "common/util/stage_profile.hpp"
 #include "common/util/logger.hpp"
 #include "filter/massmatch/mass_match_factory.hpp"
 #include "filter/massmatch/index_load_gate.hpp"
@@ -85,6 +86,7 @@ ZeroPtmFilter::ZeroPtmFilter(const ProteoformPtrVec& proteo_ptrs,
           lock.unlock();
         }
       }
+      stage_profile::Timer load_timer("zero.load");
       IndexLoadGate::Slot load_slot(index_load_gate);
       term_index_ptr_->deserializeMassMatch(
           mng_ptr->zero_ptm_file_vec_[0] + suffix, index_dir);
@@ -131,6 +133,13 @@ ZeroPtmFilter::ZeroPtmFilter(const ProteoformPtrVec& proteo_ptrs,
         proteo_ptrs, n_term_acet_2d, mng_ptr->max_proteoform_mass_,
         mng_ptr->filter_scale_);
   }
+  std::vector<int> proteo_lens;
+  for (size_t i = 0; i < proteo_ptrs.size(); i++) {
+    proteo_lens.push_back(proteo_ptrs[i]->getResSeqPtr()->getLen());
+  }
+  row_ranges_.init(proteo_lens, term_index_ptr_, diag_index_ptr_,
+                   rev_term_index_ptr_, rev_diag_index_ptr_,
+                   prsm_para_ptr->getProtModPtrVec());
 }
 
 FilterSpecPtr ZeroPtmFilter::geneFilterSpec(
@@ -145,9 +154,11 @@ FilterSpecPtr ZeroPtmFilter::geneFilterSpec(
   std::vector<std::pair<int, int> > suff_mass_errors =
       extend_ms_util::getExtendIntMassErrorList(ms_ptr_vec, pref,
                                                 mng_ptr->filter_scale_);
+  MsHeaderPtr header_ptr = ms_ptr_vec[0]->getMsHeaderPtr();
   std::pair<int, int> prec_minus_water_mass_error =
-      ms_ptr_vec[0]->getMsHeaderPtr()->getFirstPrecMonoMassMinusWaterError(
-          tole_ptr->getPpo(), mng_ptr->filter_scale_);
+      header_ptr->getFirstPrecMonoMassMinusWaterError(
+          tole_ptr->compPrecErrorTole(header_ptr->getFirstPrecMonoMass()),
+          mng_ptr->filter_scale_);
   return std::make_shared<FilterSpec>(
       ms_ptr_vec[0]->getMsHeaderPtr(), static_cast<int>(ms_ptr_vec.size()),
       std::move(pref_mass_errors), std::move(suff_mass_errors),
@@ -163,46 +174,78 @@ void ZeroPtmFilter::computeBestMatch(const FilterSpecPtr& spec_ptr) {
       spec_ptr->getPrefMassErrors();
   const std::vector<std::pair<int, int> >& suff_mass_errors =
       spec_ptr->getSuffMassErrors();
-  const std::pair<int, int>& prec_minus_water_mass_error =
-      spec_ptr->getPrecMinusWaterMassError();
+  // one precursor mass; the rows that receive its bonus are noted
+  const std::vector<std::pair<int, int> > prec_minus_water_mass_errors(
+      1, spec_ptr->getPrecMinusWaterMassError());
 
-  int term_row_num = term_index_ptr_->getRowNum();
-  std::vector<short> term_scores(term_row_num, 0);
-  term_index_ptr_->compMatchScores(pref_mass_errors,
-                                   prec_minus_water_mass_error, term_scores);
+  std::unique_ptr<stage_profile::Timer> score_timer =
+      std::make_unique<stage_profile::Timer>("zero.score");
+  if (!has_base_scores_ || pref_mass_errors != base_pref_mass_errors_) {
+    base_pref_mass_errors_ = pref_mass_errors;
+    term_base_scores_.assign(term_index_ptr_->getRowNum(), 0);
+    term_index_ptr_->compScores(pref_mass_errors, term_base_scores_);
+    diag_base_scores_.assign(diag_index_ptr_->getRowNum(), 0);
+    diag_index_ptr_->compScores(pref_mass_errors, diag_base_scores_);
+    has_base_scores_ = true;
+  }
+  std::vector<short> term_scores = term_base_scores_;
+  term_prec_rows_.clear();
+  term_index_ptr_->compPrecScores(prec_minus_water_mass_errors, term_scores,
+                                  term_prec_rows_);
 
-  int diag_row_num = diag_index_ptr_->getRowNum();
-  std::vector<short> diag_scores(diag_row_num, 0);
-  diag_index_ptr_->compMatchScores(pref_mass_errors,
-                                   prec_minus_water_mass_error, diag_scores);
+  std::vector<short> diag_scores = diag_base_scores_;
+  diag_prec_rows_.clear();
+  diag_index_ptr_->compPrecScores(prec_minus_water_mass_errors, diag_scores,
+                                  diag_prec_rows_);
 
   int rev_term_row_num = rev_term_index_ptr_->getRowNum();
   std::vector<short> rev_term_scores(rev_term_row_num, 0);
-  rev_term_index_ptr_->compMatchScores(
-      suff_mass_errors, prec_minus_water_mass_error, rev_term_scores);
+  rev_term_prec_rows_.clear();
+  rev_term_index_ptr_->compMatchScores(suff_mass_errors,
+                                       prec_minus_water_mass_errors,
+                                       rev_term_scores, rev_term_prec_rows_);
 
   int rev_diag_row_num = rev_diag_index_ptr_->getRowNum();
   std::vector<short> rev_diag_scores(rev_diag_row_num, 0);
-  rev_diag_index_ptr_->compMatchScores(
-      suff_mass_errors, prec_minus_water_mass_error, rev_diag_scores);
+  rev_diag_prec_rows_.clear();
+  rev_diag_index_ptr_->compMatchScores(suff_mass_errors,
+                                       prec_minus_water_mass_errors,
+                                       rev_diag_scores, rev_diag_prec_rows_);
 
+  score_timer = nullptr;
+  stage_profile::Timer find_timer("zero.find");
   int threshold = MassMatch::getPrecursorMatchScore() * 2 + 4;
   int group_spec_num = spec_ptr->getGroupSpecNum();
-  // the best row score of each proteoform in each index, computed once and
-  // shared by the four proteoform types below
-  std::vector<int> term_max, diag_max, rev_term_max, rev_diag_max;
-  mass_match_util::compProteoMaxScores(term_scores, term_index_ptr_, term_max);
-  mass_match_util::compProteoMaxScores(diag_scores, diag_index_ptr_, diag_max);
-  mass_match_util::compProteoMaxScores(rev_term_scores, rev_term_index_ptr_,
-                                       rev_term_max);
-  mass_match_util::compProteoMaxScores(rev_diag_scores, rev_diag_index_ptr_,
-                                       rev_diag_max);
+  // The candidates are sequence ranges (issue #348): the pairs of rows that
+  // both received the precursor bonus and whose range mass matches the
+  // precursor mass, with the ranges the zero-shift search of the type takes
+  // (PREFIX not to the last residue, SUFFIX not from the first, INTERNAL
+  // neither). The bonus rows of each proteoform are collected once and
+  // shared by the four proteoform types below.
+  mass_match_util::compPrecMatchRows(term_index_ptr_, term_prec_rows_,
+                                     term_rows_2d_);
+  mass_match_util::compPrecMatchRows(diag_index_ptr_, diag_prec_rows_,
+                                     diag_rows_2d_);
+  mass_match_util::compPrecMatchRows(rev_term_index_ptr_, rev_term_prec_rows_,
+                                     rev_term_rows_2d_);
+  mass_match_util::compPrecMatchRows(rev_diag_index_ptr_, rev_diag_prec_rows_,
+                                     rev_diag_rows_2d_);
+  PeakTolerancePtr tole_ptr =
+      mng_ptr_->prsm_para_ptr_->getSpParaPtr()->getPrecTolerancePtr();
+  double prec_minus_water_mass =
+      spec_ptr->getHeaderPtr()->getFirstPrecMonoMassMinusWater();
+  double prec_error_tole = tole_ptr->compPrecErrorTole(
+      spec_ptr->getHeaderPtr()->getFirstPrecMonoMass());
+  bool one_per_protein = !mng_ptr_->range_candidates_;
   LOG_DEBUG("allow complete prot"
             << mng_ptr_->prsm_para_ptr_->allowCompleteProt());
   if (mng_ptr_->prsm_para_ptr_->allowCompleteProt()) {
-    ProtCandidatePtrVec comp_prots =
-        mass_match_util::simpleFindZeroShiftTopProteins(
-            term_max, rev_term_max, threshold, mng_ptr_->comp_num_);
+    ProtCandidatePtrVec comp_prots = mass_match_util::findZeroShiftTopRanges(
+        term_scores, rev_term_scores, term_rows_2d_, rev_term_rows_2d_,
+        term_index_ptr_, rev_term_index_ptr_,
+        row_ranges_.getRangeRows(true, true, false, false),
+        prec_minus_water_mass, prec_error_tole, threshold, mng_ptr_->comp_num_,
+        one_per_protein);
     comp_match_ptrs_.clear();
     for (size_t i = 0; i < comp_prots.size(); i++) {
       int id = comp_prots[i]->getProteinId();
@@ -212,9 +255,12 @@ void ZeroPtmFilter::computeBestMatch(const FilterSpecPtr& spec_ptr) {
     }
   }
   if (mng_ptr_->prsm_para_ptr_->allowPrefixProt()) {
-    ProtCandidatePtrVec pref_prots =
-        mass_match_util::simpleFindZeroShiftTopProteins(
-            term_max, rev_diag_max, threshold, mng_ptr_->pref_suff_num_);
+    ProtCandidatePtrVec pref_prots = mass_match_util::findZeroShiftTopRanges(
+        term_scores, rev_diag_scores, term_rows_2d_, rev_diag_rows_2d_,
+        term_index_ptr_, rev_diag_index_ptr_,
+        row_ranges_.getRangeRows(true, false, false, true),
+        prec_minus_water_mass, prec_error_tole, threshold,
+        mng_ptr_->pref_suff_num_, one_per_protein);
     pref_match_ptrs_.clear();
     for (size_t i = 0; i < pref_prots.size(); i++) {
       int id = pref_prots[i]->getProteinId();
@@ -225,9 +271,12 @@ void ZeroPtmFilter::computeBestMatch(const FilterSpecPtr& spec_ptr) {
   }
 
   if (mng_ptr_->prsm_para_ptr_->allowSuffixProt()) {
-    ProtCandidatePtrVec suff_prots =
-        mass_match_util::simpleFindZeroShiftTopProteins(
-            diag_max, rev_term_max, threshold, mng_ptr_->pref_suff_num_);
+    ProtCandidatePtrVec suff_prots = mass_match_util::findZeroShiftTopRanges(
+        diag_scores, rev_term_scores, diag_rows_2d_, rev_term_rows_2d_,
+        diag_index_ptr_, rev_term_index_ptr_,
+        row_ranges_.getRangeRows(false, true, true, false),
+        prec_minus_water_mass, prec_error_tole, threshold,
+        mng_ptr_->pref_suff_num_, one_per_protein);
     suff_match_ptrs_.clear();
     for (size_t i = 0; i < suff_prots.size(); i++) {
       int id = suff_prots[i]->getProteinId();
@@ -239,8 +288,12 @@ void ZeroPtmFilter::computeBestMatch(const FilterSpecPtr& spec_ptr) {
 
   if (mng_ptr_->prsm_para_ptr_->allowInternalProt()) {
     ProtCandidatePtrVec internal_prots =
-        mass_match_util::simpleFindZeroShiftTopProteins(
-            diag_max, rev_diag_max, threshold, mng_ptr_->inte_num_);
+        mass_match_util::findZeroShiftTopRanges(
+            diag_scores, rev_diag_scores, diag_rows_2d_, rev_diag_rows_2d_,
+            diag_index_ptr_, rev_diag_index_ptr_,
+            row_ranges_.getRangeRows(false, false, true, true),
+            prec_minus_water_mass, prec_error_tole, threshold,
+            mng_ptr_->inte_num_, one_per_protein);
     internal_match_ptrs_.clear();
     for (size_t i = 0; i < internal_prots.size(); i++) {
       int id = internal_prots[i]->getProteinId();

@@ -28,15 +28,15 @@ VarPtmSlowMatch::VarPtmSlowMatch(const ProteoformPtr& proteo_ptr,
   proteo_ptr_ = proteo_ptr;
   deconv_ms_ptr_vec_ = spectrum_set_ptr->getDeconvMsPtrVec();
   ms_six_ptr_vec_ = spectrum_set_ptr->getMsSixPtrVec();
-  prec_mono_mass_ = spectrum_set_ptr->getPrecMonoMass();
+  // the label-free precursor mass (toppic -N), the mass of the PRM spectra
+  prec_mono_mass_ = spectrum_set_ptr->getLabelFreePrecMonoMass();
   // LOG_ERROR("prec mass " << prec_mono_mass_ << " protein mass " <<
   // proteo_ptr->getMonoNeutralMass());
   mng_ptr_ = mng_ptr;
   PeakTolerancePtr tole_ptr =
       mng_ptr_->prsm_para_ptr_->getSpParaPtr()->getPrecTolerancePtr();
-  prec_error_tole_ =
-      deconv_ms_ptr_vec_[0]->getMsHeaderPtr()->getFirstPrecErrorTolerance(
-          tole_ptr->getPpo());
+  prec_error_tole_ = tole_ptr->compPrecErrorTole(
+      deconv_ms_ptr_vec_[0]->getMsHeaderPtr()->getFirstPrecMonoMass());
   // LOG_ERROR("error tolerance " << prec_error_tole_);
   init();
 }
@@ -116,8 +116,12 @@ void VarPtmSlowMatch::init() {
     return;
   }
   LOG_DEBUG("Seq mass " << sub_res_seq_ptr->getSeqMass());
-  var_ptm_align_ptr_ = std::make_shared<VarPtmAlign>(
-      ms_masses, seq_masses, sub_res_seq_ptr, diagonal_ptrs, mng_ptr_);
+  // a truncation N-terminal modification is one of the variable PTMs
+  int max_ptm_num =
+      mng_ptr_->var_ptm_num_ - (proteo_ptr_->hasTruncNTermMod() ? 1 : 0);
+  var_ptm_align_ptr_ =
+      std::make_shared<VarPtmAlign>(ms_masses, seq_masses, sub_res_seq_ptr,
+                                    diagonal_ptrs, mng_ptr_, max_ptm_num);
   success_init_ = true;
 }
 

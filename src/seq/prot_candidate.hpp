@@ -38,12 +38,20 @@ class ProtCandidate {
   int getScore() const { return score_; }
   const std::vector<double>& getNTermShifts() const { return n_term_shifts_; }
   const std::vector<double>& getCTermShifts() const { return c_term_shifts_; }
+  // the sequence range of the candidate: its first and last residue,
+  // 0-based positions in the protein, -1 when not known
+  int getStartPos() const { return start_pos_; }
+  int getEndPos() const { return end_pos_; }
 
   void setNTermShifts(std::vector<double> shifts) {
     n_term_shifts_ = std::move(shifts);
   }
   void setCTermShifts(std::vector<double> shifts) {
     c_term_shifts_ = std::move(shifts);
+  }
+  void setRange(int start_pos, int end_pos) {
+    start_pos_ = start_pos;
+    end_pos_ = end_pos;
   }
 
   static ProtCandidatePtrVec geneResults(
@@ -56,6 +64,8 @@ class ProtCandidate {
  private:
   int protein_id_;
   int score_;
+  int start_pos_ = -1;
+  int end_pos_ = -1;
   std::vector<double> n_term_shifts_;
   std::vector<double> c_term_shifts_;
 };

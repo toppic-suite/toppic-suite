@@ -17,6 +17,7 @@
 #define TOPPIC_MS_SPEC_MSALIGN_UTIL_HPP_
 
 #include <string>
+#include <vector>
 
 namespace toppic {
 
@@ -29,6 +30,13 @@ void geneSpIndex(const std::string& spectrum_file_name);
 
 // Get spectrum number information from the index file
 int getSpNum(const std::string& spectrum_file_name);
+
+// The spectrum ids (SPECTRUM_ID) of an msalign file in file order. They need
+// not start at 0 or be consecutive: a subset keeps the ids of its spectra, and
+// msalign_frac_merge adds SpPara::getMaxSpecNumPerFile() per fraction. Code
+// that keeps one entry per spectrum indexes it by the position of the
+// spectrum in this list, not by its id (issue #598).
+std::vector<int> readSpIds(const std::string& spectrum_file_name);
 
 // The parameter block (the comment lines before the first spectrum) of an
 // msalign file, without a trailing newline.

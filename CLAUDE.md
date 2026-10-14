@@ -1,7 +1,69 @@
 # Project conventions and migration notes
 
-Guidance for working on this codebase (the `common/` and `seq/` layers of
-TopPIC). Read this before adding or changing code in `src/common` or `src/seq`.
+Guidance for working on this codebase: the code-wide conventions, the
+dependencies, the build and install rules, the manuals and the source
+layout. The notes on each tool are in `.claude/tools/` (next section).
+
+## Tool notes (`.claude/tools/`)
+
+The notes on each tool's algorithms, options and results are in one file
+per tool under `.claude/tools/`. They are not loaded automatically: read
+the file of the tool you work on before changing its code, and update it
+in the same commit as the code (as this file was before 2026-10-12).
+
+- `.claude/tools/topfd.md` — TopFD and TopDIA:
+  - Quantized ONNX models
+  - Envelope refinement and the core-peak intensity fit
+  - Deconvolution methods
+  - FLASHDeconv MS/MS deconvolution
+  - Greedy MS1 deconvolution
+  - Greedy MS/MS deconvolution
+  - Precursor isotope correction from fragment pairs
+  - PTCR spectra
+  - MS3 spectral deconvolution
+  - Activation of MS/MS spectra
+  - Isotope distributions
+  - The MS1 peaks of the database and the 3D levels
+  - The compressed database (also `topzstd`)
+- `.claude/tools/toppic_search.md` — TopPIC tolerances, filters and searches (also the index files topindex writes):
+  - Precursor and fragment mass tolerances
+  - Precursor error tolerance in Dalton
+  - Precursor +-1 Da error per identification stage
+  - Precursor refinement of the variable PTM search
+  - Precursor refinement of the shift searches
+  - The filters' mass list
+  - Tag filter
+  - Second alignment of the shift searches
+  - Large-shift penalty of the shift alignments
+  - Range of a variable PTM shift
+  - Truncation N-terminal modifications
+  - Index files version 2, the combined filter pass and the E-value stage (toppic_test experiment 150)
+- `.claude/tools/toppic_evalue.md` — TopPIC E-values and FDRs:
+  - E-values of PrSMs found at a +-1 isotope offset
+  - E-values of the variable PTM PrSMs with modified residues
+  - Tolerance of the complementary PRM peaks in the E-values
+  - Deamidation or the -1 isotope offset
+  - Rescoring of the PrSMs
+- `.claude/tools/toppic_output.md` — TopPIC after the search (also topcalib, and the PrSM tables topmg writes too):
+  - Post mass matching
+  - ProForma strings
+  - Average masses in msalign files
+  - Proteoform classification
+  - PTM localization by a variable PTM search
+  - The second precursor search
+  - Two-pass m/z recalibration
+  - Compressed databases
+- `.claude/tools/topmg.md` — TopMG:
+  - Graph alignment tolerance
+  - Protein N-terminal forms in TopMG
+  - PTMs written in FASTA sequences in TopMG
+  - Precursor refinement of TopMG's graph alignment
+  - Compressed databases
+- `.claude/tools/topdiff.md` — TopDiff:
+  - TopDiff
+- `.claude/tools/toplib.md` — toplib_build and toplib_search:
+  - toplib_build
+  - toplib_search
 
 ## Removed functions in `str_util.hpp` (use the standard library)
 
@@ -172,7 +234,11 @@ path and linked into `toppic_common`:
   it destruct to flush the final transaction), **not** the old
   `mzml_ms_sql_writer::writeMs1/writeMs2(sqlite3*, ...)` free functions — the
   batching needs state a per-call free function can't hold. The caller still owns
-  the connection (opens it, creates the schema, closes it). When migrating the
+  the connection (opens it, creates the schema, closes it). `ms1_peak` is a
+  `WITHOUT ROWID` table keyed on `(LEVEL, spec_id, peak_id)` (toppic_test
+  experiment 165), and this writer writes no `ms1_peak` rows: `MsSqlWriter`
+  writes them with the 3D levels after the MS1 deconvolution (toppic_test
+  experiment 169 removed the `LEVEL` 0 path and topfd `--sql-3d`). When migrating the
   upstream topfd driver that wrote spectra, adopt the object; do not reintroduce
   per-call free-function wrappers (they would restore the per-scan
   transaction/prepare cost this rewrite removed).
@@ -207,19 +273,21 @@ path and linked into `toppic_common`:
   desktop executables (see the source-layout note). Only the GUI targets use it,
   via per-target `AUTOMOC`/`AUTOUIC`/`AUTORCC`; the `toppic_common` library has
   no Qt dependency.
-- **ProteoWizard (pwiz)** — a trimmed copy is vendored under `ext/pwiz` (only the
-  `utility/minimxml`, `utility/misc`, `data/common`, `data/msdata` source dirs
-  are compiled; the rest is headers), built as a static `pwiz` library against
-  Boost + zlib with `WITHOUT_MZ5` (so no HDF5). `ms/mzml/pw_ms_reader` uses it to
-  read mzML/mzMLb. pwiz uses its own `minimxml` parser, **not** Xerces. It needs
-  a few Boost pieces the system package lacks (`boost/nowide`, the `boost::enums`
-  library, `foreach_field.hpp`); those are vendored under `ext/boost`, which
-  `ext/` (the include root) resolves ahead of the system Boost while everything
-  else still comes from the system. The vendored nowide's `iostream.cpp` (the
-  Windows UTF-8 console streams `boost::nowide::cerr` etc. that pwiz's
-  `Stream.hpp` uses) is appended to the `pwiz` sources; it is an empty TU off
-  Windows, and it must be that copy, not the system `boost_nowide` library,
-  because the vendored headers predate Boost.Nowide. Treat `ext/pwiz` and
+- **ProteoWizard (pwiz)** — version 3.0.26278, vendored under `ext/pwiz` with
+  only the files `ms/mzml/pw_ms_reader` needs (the sources the linker takes and
+  the headers they reach; `ext/README.md` lists the rule, the local changes and
+  how to update). Every `.cpp` under `ext/pwiz` is compiled into a static
+  `pwiz` library against Boost, zlib and zstd (pwiz's binary data encoder
+  decodes zstd-compressed arrays) with `WITHOUT_MZ5` and `WITHOUT_MZMLB` (so no
+  HDF5; mz5 and mzMLb are not supported). `ms/mzml/pw_ms_reader` uses it to
+  read mzML/mzXML. pwiz uses its own `minimxml` parser, **not** Xerces. It needs
+  a few headers of pwiz's `boost_aux` that Boost itself does not have (the
+  `boost::enums` library, the singleton utility, `boost/nowide/system.hpp`);
+  those are vendored under `ext/boost`, and everything else, Boost.Nowide
+  included, comes from the system Boost. The nowide parts pwiz uses are
+  header-only off Windows; on Windows `pwiz` links `Boost::nowide` (the UTF-8
+  console streams `boost::nowide::cerr` etc. of pwiz's `Stream.hpp`, and the
+  file buffer), which `find_package(Boost)` requests only there. Treat `ext/pwiz` and
   `ext/boost` as third-party: do not reformat them or hold them to the
   IWYU/include-order rules.
   Their `.cpp` files are built with `-w`; the `ext/` directory is added to every
@@ -258,10 +326,13 @@ copied or symlinked to run from `bin/`), then the compiled-in shared dir
 `CMAKE_INSTALL_PREFIX` (default `/usr/local`), so `DESTDIR` staging and a
 custom prefix both work:
 
-- `install(TARGETS ${TOPPIC_EXECUTABLES} ...)` puts the six CLI tools and their
-  six `*_gui` counterparts in `<prefix>/bin`. **When you add a new executable
+- `install(TARGETS ${TOPPIC_EXECUTABLES} ...)` puts the ten CLI tools and
+  the six `*_gui` counterparts (toplib_build, toplib_search, topcalib and
+  topzstd have none) in `<prefix>/bin`. **When you add a new executable
   target, append it to the `TOPPIC_EXECUTABLES` list** (end of the file) so it
-  is installed and gets the rpath below — nothing else is needed.
+  is installed and gets the rpath below — nothing else is needed. The one
+  exception is a developer tool outside the default target, such as
+  `theo_patt_gen` (`EXCLUDE_FROM_ALL`), which stays out of the list.
 - On Linux the vendored `ext/onnx/libonnxruntime.so.1.23.2` and its SONAME symlink (which every
   executable loads at run time, via `toppic_common`) is installed to
   `<prefix>/${CMAKE_INSTALL_LIBDIR}` (= `lib/toppic`), and the executables get
@@ -316,7 +387,9 @@ docs are hand-written and nothing checks them against the build.
 
 One manual per command-line tool, linked from README.md's "Manuals" section:
 `topfd_manual.md`, `topdia_manual.md`, `topindex_manual.md`,
-`toppic_manual.md`, `topmg_manual.md`, `topdiff_manual.md`. Each follows the
+`toppic_manual.md`, `topmg_manual.md`, `topdiff_manual.md`,
+`toplib_build_manual.md`, `toplib_search_manual.md`,
+`topcalib_manual.md`, `topzstd_manual.md`. Each follows the
 same layout: overview and usage line, input (including the companion files a
 tool needs, e.g. TopPIC's `_ms2.feature` and `.sqlite`), the pipeline steps
 as the console prints them, the output files with their columns, option
@@ -339,11 +412,15 @@ writers, and nothing checks them against the code, so:
 - `topfd_manual.md` specifics: its examples use no `-a` (activation
   defaults to `FILE`), and `-T`-mode claims must be checked against
   `topfd_single_process.cpp` (that mode ignores the MS1/feature options).
-- TopDIA's `-p`/`-P` options set `TopfdPara::seed_env_inte_corr_tole_cutoff_`
+- TopDIA's `-y`/`-Y` options (`-p`/`-P` until 2026-10-08) set
+  `TopfdPara::seed_env_inte_corr_tole_cutoff_`
   (copied into `EcscorePara` by `env_coll_detect::processMs1/processMs2`)
   before each feature-detection stage; both default to 0.5, the value the
-  detector had hard-coded, so default runs are unchanged. TopPIC's hidden
-  `-N`/`--n-terminal-label` works (its handler used to test the wrong key). (TopDiff resolves result
+  detector had hard-coded, so default runs are unchanged. TopPIC's
+  `-N`/`--n-terminal-label` works (its handler used to test the wrong key); it
+  is a visible option and a toppic_gui field ("N-terminal label mass (Da)",
+  Advanced Parameters tab, `nTermLabelEdit`; `gui/util/command.cpp` emits
+  `-N` only for a non-zero value). (TopDiff resolves result
   files itself: `<base>_post_ms2_<tool>_proteoform.xml` first, then
   `<base>_ms2_...`, for either `_ms2.msalign` or `_post_ms2.msalign` input —
   `merge/feature_sample_merge.cpp`; keep the manual's section 1 in step.)
@@ -360,387 +437,6 @@ abbreviation matches. Update it when that code or the table columns change.
 each `base_data` file, the two ONNX models, the Git LFS-tracked files);
 update it when a resource file is added, removed or repurposed.
 
-## Envelope refinement and the core-peak intensity fit (`ms/env/match_env_refine`)
-
-After the DP stage, `DeconvSingleSp::postprocess` calls
-`match_env_refine::mzRefine`, which regenerates each envelope's theoretical
-distribution from its reference peak and rescales it to the experimental
-peaks. It is two-stage, and the split is deliberate (issue 532):
-
-1. **Monoisotopic choice** (current / previous / next isotope) uses the
-   whole-envelope distance, unchanged from the original code. A core-only
-   choice was tried and matched no more theoretical b/y fragments of horse
-   myoglobin on a test MS/MS spectrum, so do not "simplify" stage 2's core
-   into stage 1.
-2. **Intensity ratio** of the chosen distribution is refit on the **core
-   peaks only**: theoretical intensity >= `EnvPara::refine_core_ratio_`
-   (0.5) x the reference peak, and present in the experimental envelope;
-   fewer than 3 such peaks -> whole envelope (small envelopes unchanged).
-   `compDistWithNorm`/`compDist` take an index list (empty = all peaks).
-   Fitting every peak let tails inflated by overlapping neighbouring
-   envelopes drag the ratio up, leaving theoretical apexes far above the
-   observed ones (1.58x on the 16896 Da envelope near m/z 891 of
-   `~/code/mms/data/myoglobin_peaks.txt`).
-
-The theoretical intensities set here are what reach the outputs: the
-`msalign` intensity per mass is the theoretical envelope's intensity sum,
-the `.env` file's `THEO_INTE` column, and the SQLite `ms1_env`/`ms2_env`
-rows. `assignIntensity` (called before `mzRefine` and again after sorting)
-only splits an experimental peak among envelopes that share it; it never
-changes theoretical intensities. When touching any of this, validate with
-`topfd -T -g` on the myoglobin peak list: compare the deconvoluted masses
-against the sequence's b/y ions (46 exact / 14 off-by-one-isotope is the
-reference), and count envelopes whose theoretical apex exceeds the observed
-apex by > 20% (77 of 611 before the core fit, 1 after).
-
-## FLASHDeconv MS/MS deconvolution (`topfd/deconv/flashdeconv_ms2_process`)
-
-`FlashDeconvMs2Process` is a second `DeconvMs2Process`: the same mzML group
-reading, one task per MS/MS spectrum on the thread pool, per-thread msalign
-files merged at the end and buffered SQLite records, but the spectrum is
-deconvoluted with the FLASHDeconv algorithm (OpenMS `SpectralDeconvolution`,
-`PeakGroup`, `PeakGroupScoring`, `FLASHHelperClasses`) instead of
-`DeconvSingleSp`. The option `topfd --ms2-flashdeconv` selects it
-(`TopfdPara::isUseFlashDeconv`, `topfd_process.cpp`). Facts to keep straight:
-
-- **Everything lives in the cpp**, in the namespace `flashdeconv_ms2_process`:
-  `Averagine` (the theoretical distributions), `LogMzPeak`, `PeakGroup` (one
-  deconvoluted mass with its scores) and `FlashDeconvSingleSp` (one spectrum).
-  Each function's comment names the OpenMS function it ports; keep that when
-  editing so the two can be compared.
-- **FLASHDeconv's constants, not TopFD's.** The tolerance is 10 ppm
-  (`kMs2TolerancePpm`), the isotope spacing 1.002371 Da (`kIsoDaDistance`, not
-  1.00335), the log m/z bin is tolerance / 2.5, the thresholds are cosine 0.85,
-  charge SNR 0.25, QScore 0.2, charge score 0.7, and the QScore weights are
-  the fixed ones of `PeakGroupScoring`. TopFD's `-e` (m/z error) is used only
-  to match the theoretical envelopes to the peaks for the output.
-- **The averagine table is EnvBase's** (`res/base_data/theo_patt.txt`, one
-  entry per 25 Da from 50 Da to `-m`), prepared as `PrecalculatedAveragine`
-  prepares CoarseIsotopePatternGenerator's: the weak end isotopes are trimmed
-  until 0.01% of the power is gone, the intensities are L2-normalised (so
-  `getCosine` needs no norm of the theoretical side), and the left / right
-  isotope counts from the apex are a running maximum over the masses. It is
-  built once per run in `process()` and shared read-only by the threads.
-- **Output.** Every surviving peak group becomes a `MatchEnv` of its
-  representative (highest per-charge SNR) charge: the EnvBase envelope of the
-  monoisotopic mass, scaled so its intensity sum is the group's intensity over
-  all charges, **trimmed to the noise floor exactly as `env_detect::compFullEnv`
-  trims the standard pipeline's own envelope** (`getSubEnv(1.0, bound_inte,
-  INT_MAX, INT_MAX)`; `bound_inte`/`min_inte` are `deconvMsTwo`'s own estimate
-  of `DeconvData::initMinInte`, via `baseline_util::getBaseLine` on the
-  spectrum, gated by `-estimate-min-inte`/`isEstimateMinInte()`) before
-  matching to the peaks by `ExpEnv`. Without this trim every envelope carried
-  the averagine table's full isotope tail (EnvBase's entries run to 100+
-  peaks for large masses) into the SQLite output, 3–4x more than
-  `DeconvMs2Process` writes for the same data (toppic_test experiment,
-  2026-09). The QScore is stored as the EnvCNN score (what
-  `match_env_util::getDeconvMsPtr` reports and sorts by) and the isotope
-  cosine as the MsDeconv score; no EnvCNN model runs. Note FLASHDeconv's own
-  msalign writer reports the maximum charge of the range, this path the
-  representative charge.
-- **Not ported:** the MS1 side and the precursor peak group search (the MS/MS
-  max mass and charge come from TopFD's precursor features, as in
-  `DeconvMs2Process`), decoy / FDR runs, target masses, and the tolerance
-  auto-estimation.
-
-## Post mass matching (`prsm/prsm_post_mass_match`, toppic only)
-
-After the search, the clustering, the cluster protein correction and the
-match recount, `console/toppic_process` runs
-`prsm_post_mass_match::process`, which matches the theoretical fragment
-masses of each PrSM that no deconvoluted mass matched against the
-**centroided MS/MS peaks stored in TopFD's SQLite database** (MSPathFinderT's
-envelope test), scores the added masses with EnvCNN, and writes
-`<base>_post_ms2.msalign` plus PrSM/feature files under that name, which every
-downstream step (PTM characterization, FDR, tables, SQL output) then reads
-instead of the input. Facts to keep straight:
-
-- **It is on by default.** `initArguments()` sets `postMassMatch = "true"`;
-  `-D` / `--disable-post-match` sets it to false (there is no enabling flag
-  any more), and `-I` / `--post-min-peak-num` (default 1) is the minimum
-  number of observed isotopic peaks per accepted fragment.
-- **A missing database is an error, not a skip.** The database name comes
-  from `prsm_post_mass_match::sqlFileName(sp_file)` (`<base>.sqlite` for
-  `<base>_ms2.msalign`; use it, do not re-derive the name). It is checked in
-  three places with the same message ("run TopFD without disabling its SQLite
-  database output (without -N) ..., or run TopPIC with --disable-post-match"):
-  `ToppicArgument::validateArguments` (so a run fails before the search),
-  `process()` itself (abort), and `toppic_gui`'s `checkError()` (a warning
-  dialog before toppic is launched). Keep all three in step.
-- **It runs on the best PrSM of every spectrum, after the clustering, the
-  cluster protein correction and the recount.** `TopPIC_postprocess`
-  clusters and corrects the PrSMs (`toppic_raw_prsm` → `toppic_cluster_prot`),
-  recounts them against the full spectra (`toppic_recount`), then
-  post-matches `toppic_recount` (targets and decoys alike) into
-  `<base>_post_ms2.toppic_recount`,
-  and the PTM characterization (`-l`), FDR, cutoffs, tables and SQL output
-  read the spectra with the added masses under the new name. Post matching
-  changes neither E-values nor cluster ids, so the FDRs and the
-  identifications equal those of a `-D` run; only the matched masses and
-  fragments differ. (It used to run before the clustering, which let the
-  cluster protein correction recompute E-values on the post-matched
-  spectra: 42 E-values and 6 PrSMs at the 1% cutoff differed from `-D` on
-  480_F3_02, toppic_test report 0062.) The PrSM XML carries the cluster
-  ids (`proteo_cluster_id`, `prot_id`, `prot_cluster_id` in the proteoform
-  element), so the read-modify-write in `process()` keeps them.
-- **It reads each PrSM's peaks with one query on `ms2_peak` by `spec_id`**
-  (`RawPeakReader`), and TopFD writes that table without an index, so the
-  reader first runs `CREATE INDEX IF NOT EXISTS ms2_peak_spec_id_index`.
-  Without the index every query scans the whole table: on 480_F3_02
-  (4.5 M peaks, ~4,000 PrSMs) the step took 11 of the 18 minutes of a
-  default run. Keep any new per-spectrum query on the SQLite file indexed.
-- **Cluster protein correction runs right after the clustering, before
-  the match recount** (`stat/tdgf/cluster_prot_corrector`; it lives in
-  `stat` because it needs `EValueProcessor`): in every proteoform cluster
-  the PrSMs whose protein differs from the protein of the cluster's
-  lowest-E-value PrSM (the same proteoform mass matched to another
-  protein) get that PrSM's proteoform (shared pointer; its mass becomes
-  their adjusted precursor mass), and their matched fragment numbers and
-  E-values (`EValueProcessor::compEvalues`) are recomputed on the spectra
-  read as the search read them: `MsAlignReader` with the EnvCNN cutoff and
-  `SpPara::getFragDedupPpo()` (the combined masses of `--frag-mass-dedup`);
-  the recount that follows replaces the matched numbers with full-spectrum
-  counts (a `TdgfMng` built from the same values as the search's, with
-  `varPtmTypeNum` from the argument map, 0 if absent). Nothing is removed;
-  a corrected PrSM that matches at most
-  `comp_evalue_min_match_theo_frag_num_` fragments gets the maximum
-  E-value and fails the cutoffs. The output is `toppic_cluster_prot`
-  (deleted without `-k`); the recount reads it and writes `toppic_recount`
-  with the matched numbers of every PrSM, corrected ones included, counted
-  on the full spectra, which the post mass matching, the PTM
-  characterization (`-l`) and the FDR use.
-  Combined runs (`TopPIC_multi_postprocess`) do not run it. The earlier
-  `prsm_cluster_prot_filter`, which dropped those PrSMs, is gone.
-- **`<base>.toppic_record_prsm` is where `TopPIC_postprocess` ends and
-  `TopPIC_report` starts.** It is a copy, made inline at the end of
-  `TopPIC_postprocess`, of the PrSM file after the FDR computation
-  (`toppic_cluster_fdr` with `-d`; `toppic_recount`, or
-  `toppic_cluster_local` with `-l`, without): the best PrSM of every
-  spectrum with the added masses, the cluster ids and the FDRs, before the
-  cutoffs, **decoys included** (`prsm_fdr::process` and
-  `prsm_fdr_groups::process` always write the decoys; their former
-  keep-decoy parameter is gone). `cleanToppicDir` never deletes it. `TopPIC_report`
-  (the decoy removal, the cutoffs, the tables and the SQL output) reads
-  only the argument map and re-derives the file names from it, so the two
-  stages can be run separately, and a combined run (`-c`) merges the
-  fractions' record files and runs the report alone. Without `-K`,
-  `prsm_decoy_filter::process` writes the PrSMs whose sequence name does
-  not start with `DECOY_` to `toppic_prsm_target`, which the spectrum-level
-  cutoff reads (with `-K` it reads `toppic_record_prsm` itself); the
-  proteoform and protein cutoffs and their best-PrSM selections chain from
-  `toppic_prsm_cutoff`, and `cleanToppicDir` deletes `toppic_prsm_target`
-  and the cutoff files with the other intermediates.
-- **The PrSM-only output steps take the spectrum base name, not the
-  spectrum file.** `prsm_decoy_filter`, `prsm_cutoff_selector`,
-  `prsm_form_filter`, `prsm_prot_filter` and `prsm_sql_output::write` only
-  ever name `<base>.<ext>` files (the SQL writer strips `_ms2`/`_post_ms2`
-  from it for the `.sqlite` name), so their first name argument is
-  `base_name`, the spectrum file name without its extension
-  (`file_util::basename(sp_file)`); `TopPIC_report` and `TopMG_post`
-  compute it once. Do not pass the spectrum file name to them. The steps
-  that need the spectra themselves — `PrsmMatchTableWriter` through
-  `prsm_reader_util::readPrsmsWithSpectra`, and `PrsmCoverage` — open the
-  msalign named in `PrsmPara`, so the report still needs `<base>.msalign`
-  on disk for the tables (the PrSM XML stores no peaks).
-- **Result file names carry `_post_ms2`** whenever post matching ran; the
-  cleanup in `toppic_process` (`cleanToppicDir`) takes that name to find the
-  intermediate files. With `-D` the names are the plain `<base>_ms2` ones.
-- **Combined runs (`-c`) merge the spectra and record files, re-cluster,
-  compute one FDR and report.** `TopPICProgress_multi_file` merges each
-  fraction's post-matched spectra (`<frac>_post_ms2.msalign`, or
-  `<frac>_ms2.msalign` with `-D`) into `<name>_ms2.msalign` with
-  `msalign_frac_merge::mergeFractions`, and each fraction's
-  `toppic_record_prsm` (`<frac>_post_ms2.toppic_record_prsm`, or
-  `<frac>_ms2.…` with `-D`) into `<name>_ms2.toppic_raw_prsm`; `<frac>` is
-  the mzML base without the `_mono` suffix of a `-g` run (the same rule as
-  `prsm_post_mass_match::sqlFileName`). The spectra are merged from the
-  post-matched files because the report attaches them to the PrSMs, whose
-  matches were counted on those spectra. `TopPIC_multi_postprocess` then
-  clusters the merged PrSMs into proteoforms and proteins across the
-  fractions with `prsm_simple_cluster` (by protein and precursor mass, not
-  by feature; the feature files are not merged) and computes one FDR
-  (decoys kept), writing
-  `<name>_ms2.toppic_record_prsm`, and `TopPIC_report` runs on it. The
-  re-clustering is required: `prsm_util::mergePrsmFiles` offsets the
-  spectrum and feature ids per fraction but not the proteoform/protein
-  cluster ids, so without it the fractions' clusters collide and the
-  best-PrSM filters collapse them (79 combined proteoforms instead of 142
-  on st_1 + st_2). There is no recount, post mass matching or PTM
-  characterization on the merged set. The record file is always kept, so
-  `-C` (combine-result-only) does not need `-k`. Combined results are
-  always `<name>_ms2_toppic_*`.
-- **The multiple-shift stage runs after the first-pass top selection
-  (`TopPIC_identify` → `TopPIC_multi_ptm_search` → `TopPIC_postprocess` →
-  `TopPIC_report`, no `TopPIC_post` any more; a combined run's merged set
-  goes `TopPIC_multi_postprocess` → `TopPIC_report`).** `TopPIC_multi_ptm_search`
-  reads `toppic_pre_raw_prsm` (the first-pass top selection), skips the
-  spectra whose best PrSM has an E-value strictly below the skip E-value
-  (with `-d` the smallest E-value of a decoy PrSM of the first pass, so
-  that every spectrum a decoy could compete with is searched again; 0.01
-  without a decoy database; the hidden `--multi-skip-evalue <x>` overrides
-  both), searches the rest (`DiagFilterMng::skip_spec_ids_`), merges all
-  first-pass PrSMs (`toppic_pre_raw_prsm`, skipped spectra included) with
-  the multiple-shift ones and keeps the best PrSM per spectrum
-  (`toppic_raw_prsm`; without `-s 2` `TopPIC_postprocess` copies
-  `toppic_pre_raw_prsm` to that name). `TopPIC_postprocess` runs the
-  clustering, cluster protein correction, recount, post mass matching,
-  characterization and FDR once on `toppic_raw_prsm` and writes
-  `toppic_record_prsm`;
-  `TopPIC_report` runs the decoy removal, the cutoffs and the outputs.
-  The PrSM file chain is therefore `toppic_pre_raw_prsm` → `toppic_raw_prsm`
-  → `toppic_proteoform_cluster` → `toppic_cluster` → `toppic_cluster_prot`
-  → `toppic_recount` [→ the same under the `_post_ms2` name]
-  [→ `toppic_cluster_local`] [→ `toppic_cluster_fdr`]
-  → `toppic_record_prsm`
-  [→ `toppic_prsm_target`] → `toppic_prsm_cutoff` → `toppic_form_cutoff`
-  → `toppic_form_cutoff_form` / `toppic_prot_cutoff` → `toppic_prot_cutoff_prot`.
-  Do not reintroduce a separate FDR for the multiple-shift PrSMs: with the
-  skipped targets missing from its denominator it under-reports (toppic_test
-  reports 0023/0024).
-- **GUI wiring.** `toppicwindow.ui` has `postMassMatchCheckBox` (checked by
-  default from the parser's argument map, enables `postMinPeakNumEdit`) on the
-  bottom row of the Advanced Parameters tab; `gui/util/command.cpp` emits
-  `-D` when the box is **cleared** and `-I <n>` only while it is checked.
-- **Short options in `toppic_argument.cpp` are nearly exhausted.** Before
-  adding one, list the letters in use with
-  `grep -oE '"[a-z-]+,[A-Za-z]"' src/console/toppic_argument.cpp`; a clash is
-  only reported at run time as "option '-X' is ambiguous" (that is how `-P`
-  collided with `--proteoform-ppm-error`). Every option is declared twice
-  (the visible `display_desc` and the full parse `desc`); change both.
-
-## TopDiff (`merge/feature_sample_merge`, `console/topdiff_process`)
-
-TopDiff reads one `<base>_post_ms2_<tool>_proteoform.xml` (or `_ms2_`)
-per sample into `FeaturePrsm`s (protein, residue range, adjusted precursor
-mass, proteoform cluster id and abundance, feature min/max/apex retention
-times), normalizes each sample's times by its latest feature end, aligns
-samples 2..n onto sample 1 (`sampleAlignTime`: a dynamic programme over
-the 1,000 most abundant proteoforms of each, sorted by apex time; a cell
-matches when a feature of the other sample within 0.1 normalized time has
-a precursor mass within `--error-tolerance`, scored by log10 abundance;
-the backtracked matches are the piecewise-linear warp `setAlignTime`
-applies), then builds the table (`getFeatureTable`): all proteoforms of
-all samples by decreasing abundance, each not yet in the table starts a
-row and takes, in every other sample, the most abundant unused proteoform
-of the same protein within `--error-tolerance` and 0.3 aligned apex time
-(`findMatchFeature`). Facts to keep straight:
-
-- **The matching is by protein accession, precursor mass and aligned
-  time only**; the residue range and the proteoform string are not
-  compared. On 480_F3_02 result sets of the same TopFD features
-  (toppic_test experiment 65) that matches every proteoform of a sample
-  with itself and the same spectrum (1,765 of 1,765), and across search
-  settings 1,780 of 1,799 matched rows join the same MS/MS scan; 4 rows
-  join different features of one protein within 1.2 Da.
-- **The hot spots were exact rewrites** (experiment 65, byte-identical
-  tables): the alignment's per-cell `findMatch` scan became per-row sorted
-  match-position lists with a binary search (`matchPositions` /
-  `findMatch`; three quarters of the run before), the matrix is a flat
-  `std::vector<Cell>` with the cell matches kept for the backtracking,
-  `featureUsed` is a set of (sample, cluster id), and `findMatchFeature`
-  looks only at the protein's features through a per-sample index in the
-  intensity order of the scan it replaced (the dead `prot == ""` branch is
-  kept, with the strict tolerances, so the result is the same). 32 copies
-  of one result set: 14.8 s -> 2.4 s; two samples: 0.56 s -> 0.17 s, most
-  of it now the XML reading. `initCells` used to leave cell (0, b_size)
-  uninitialized (fixed; no output change on that data).
-- **Result files of other versions are refused**, not parsed: every
-  `<prsm>` starts with a `<version>` element (`Prsm::toXmlElement`,
-  `Version::getVersion()`), and `PrsmReader::readOnePrsmStr` exits with
-  "was written by version X of TopPIC Suite and cannot be read by this
-  version" when it differs from the running version, or "by an earlier
-  version" when it is absent (1.9 and earlier wrote `match_peak_num` /
-  `match_fragment_num` and no `rt`; `PrsmStr` threw `std::invalid_argument`
-  on them). Every tool that reads PrSM files gets this check; a result
-  file needs the search rerun after a version change.
-- The console prints `Aligning retention times of sample <k>` and
-  `Matching proteoforms across samples` as started/finished steps (the
-  manual lists them); the table is written next to the **first** input
-  file, so give inputs from one directory or expect the output there.
-- Not done: matching an identified proteoform to an unidentified TopFD
-  feature of another sample (the commented-out "Match without MS/MS ID"
-  path) - the `_ms1.feature` files are not read.
-
-## Average masses in msalign files (`ms/env/avg_mass_util`)
-
-`topfd --average-mass` (`-A`, `TopfdPara::output_avg_mass_`) writes the
-MS/MS msalign file with average masses: `deconv_ms2_process::deconvMsTwo`
-and `topfd_single_process` pass the `DeconvMs` through
-`avg_mass_util::getAvgMassMs` just before `MsAlignWriter::writeMs`, which
-copies the header (precursor m/z and mass) and the peaks with every
-monoisotopic mass replaced by `EnvBase::convertMonoMassToAvgMass` (the
-intensity-weighted average of the `theo_patt.txt` distribution, cached in
-`Env::avg_mz_`). The SQLite record, the feature files and the MS1 file keep
-monoisotopic masses. `toppic --average-mass` (`-g`, argument key
-`averageMass`) converts each input file in `TopPICProgress_multi_file`,
-before any search, with `avg_mass_util::convertToMonoMass` to
-`<base>_mono_ms2.msalign` (`EnvBase::convertAvgMassToMonoMass` inverts the
-table by fixed-point iteration; the feature file is copied to the new
-name) and replaces the spectrum file list with the converted names, so the
-per-file runs, the cleanup and the `-c` merge all see monoisotopic files.
-`prsm_post_mass_match::sqlFileName` strips the `_mono` suffix so the post
-mass matching finds `<base>.sqlite` and still writes `<base>_post_ms2.*`.
-Do not convert masses inside `MsAlignReader` instead: the converted file
-is what every later step (and the user) sees. GUI: `toppicwindow.ui` has
-`averageMassCheckBox` (Advanced Parameters tab, above the localization
-box; the keep-decoy row moved up to make room), read into
-`arguments_["averageMass"]`, and `gui/util/command.cpp` emits `-g` when it
-is checked.
-
-## Precursor and fragment mass tolerances (`para/sp_para`)
-
-`SpPara` holds two `PeakTolerance` objects, `prec_tolerance_ptr_` and
-`frag_tolerance_ptr_`, set by `-E`/`--prec-error-tolerance` and
-`-e`/`--frag-error-tolerance` (argument keys `precErrorTolerance` and
-`fragErrorTolerance`, both default 10 ppm) in toppic, topindex and topmg and
-their GUIs. The index file name (`filter/mng/index_file_name`) carries only
-the fragment value: the indexes depend on neither tolerance, and the manuals
-say an index is reused when `-f`, `-n`, `-e` and `-d` match. topmg's hidden
-`--proteoform-ppm-error` moved from `-E` to `-Q` to free the letter. The
-rule for choosing between the two tolerances: the
-precursor tolerance covers anything sized on the precursor mass — the
-`getFirstPrecErrorTolerance(ppo)` checks in the filters/searches/E-value
-code, `refinePrecursorAndHeaderShift`, the localization shift checks
-(`LocalMng::prec_tole_ptr_`), **and** the tolerance handed to
-`prm_ms_util::getIntMassErrorList` / `getPrmPeakPtrs` and
-`comp_prob_value`, which use it only to build the synthetic zero and
-precursor PRM peaks (`prm_peak_factory`, sized on the precursor mass; the
-real fragment peaks already carry their own tolerances). The fragment
-tolerance covers per-peak tolerances set on fragment masses: the PRM /
-extend spectrum factories, post mass matching's m/z test, and the
-localization M tables (`LocalMng::frag_tole_ptr_`). Neither `SpPara` nor
-`PeakTolerance` has XML (de)serialization any more: their `appendXml` and
-`XmlDOMElement` constructors were never called and were removed; `SpPara`
-is built only from the toppic/topmg arguments in `PrsmPara`.
-
-## Precursor +-1 Da error per identification stage (`para/sp_para`)
-
-`SpPara` holds one precursor-offset list per stage; each filter/search
-expands a spectrum into one spectrum set per offset with
-`spectrum_set_factory::geneSpectrumSetPtrVecWithPrecError`. Defaults: zero
-shift and one shift `{0, -1 Da, +1 Da}`, variable PTM `{0}`, multi shift
-`{0}` (the diagonal filter and PTM search absorb a 1 Da error into the
-unknown shift, so they have no switch). `PrsmPara` applies the toppic hidden
-options `--disable-zero-shift-prec-error`, `--enable-one-shift-prec-error`
-and `--enable-var-ptm-prec-error` (argument keys `zeroShiftPrecOneDaError`,
-`oneShiftPrecOneDaError`, `varPtmPrecOneDaError`) through the
-`SpPara::set*PrecOneDaError` setters. **toppic's defaults differ from
-`SpPara`'s for one stage**: `ToppicArgument::initArguments` sets
-`oneShiftPrecOneDaError = "false"` (one-shift stage searched with `{0}`;
-`--enable-one-shift-prec-error` restores `{0, -1, +1}`) and
-`varPtmPrecOneDaError = "false"` (variable-PTM stage searched with `{0}`,
-matching the `SpPara` default; `--enable-var-ptm-prec-error` switches it to
-`{0, -1, +1}`, the pre-2026-09 toppic default). Absent keys
-keep the `SpPara` defaults, so topmg is unaffected. The fragment-mass
-`frag_ext_offsets_` expansion (`{0, -1 Da, +1 Da}` applied by
-`extend_ms_factory` to every fragment above `frag_extend_min_mass_`) is separate:
-`SpPara::setFragMassExtension(false)` reduces it to `{0}`, reached through
-toppic's hidden `--disable-frag-mass-extension` (key `fragMassExtension`,
-default `"true"`), and `setFragExtendMinMass` sets the threshold, reached
-through the hidden `--frag-extend-min-mass <Da>` (key `fragExtendMinMass`,
-default `"5000"`, the `SpPara` default; validated as a non-negative
-number).
-
 ## Source layout
 
 `src` is the include root, so headers are included by their path from `src`
@@ -751,22 +447,61 @@ are linked directly into each executable, so **no `libtoppic_common.so`/`.a` is
 built**; the executables are self-contained. Each layer depends only on the ones
 above it, never the reverse:
 
-- `src/common` — foundation: `base`, `util`, `xml`, `thread`.
+- `src/common` — foundation: `base`, `util`, `xml`, `thread`, `emass`
+  (isotope distributions; see `.claude/tools/topfd.md`).
 - `src/sql` — thin SQLite helper (`sql_util`: `execSql`, `prepareSql`,
-  `stepAndReset`, all abort on error — use them rather than re-implementing
-  the prepare/step boilerplate) plus `ms_sql_writer`, the
-  MS1-peak tables for 3D visualization: `MsSqlWriter` writes a peak list as `PEAKS0`
-  (all peaks) plus down-sampled `PEAKS1..n` layer tables, one `CONFIG` row
-  per layer, and a colour bucket per peak, on a caller-owned connection like
-  the topfd writer below. topfd `--sql-3d` (in `deconv_ms1_process`) writes
-  them into the topfd `.sqlite` after MS1 deconvolution.
+  `stepAndReset`, `hasTable`, all abort on error — use them rather than
+  re-implementing the prepare/step boilerplate; `immutableUri` opens a
+  database read only as immutable), `sql_db_copy` (toppic's database,
+  `<base>_toppic.sqlite`, and topmg's `<base>_topmg.sqlite`: TopFD's
+  tables `ms2_env` and `ms2_env_peak` (`writeEnvelopeDb` / `copyTables`,
+  toppic_test experiments 168 and 170), or with toppic `--mass-calib` the
+  corrected copy of every table (`openCopy` / `closeCopy`: backup API,
+  toppic's tables dropped); written with no journal under a temporary
+  name, closed in WAL mode (TopFD's journal mode: in rollback mode a reader
+  of the copy, such as a viewer, made toppic's next write stop with
+  "database is locked", toppic_test experiment 156) and renamed when
+  complete; `removeDb` deletes a database with its -journal, -wal and -shm
+  files; a compressed TopFD database is read decoded: `copyTables` writes
+  its tables as rows, `openCopy` copies it decompressed), `zstd_db`
+  (compressed databases, toppic_test experiment 172: the format of TopMSV's
+  converter, which the sqlite-zstd extension reads -- the per-spectrum
+  tables as one row per spectrum of arrays in `_<table>_blob_zstd`,
+  `zstd_blob_columns` / `zstd_blob_tables`, a zstd dictionary per column,
+  "compact" magicless frames -- written and read with libzstd alone, since
+  the system SQLite (3.46) cannot load the extension (it needs >= 3.49.1):
+  `compressDb`, `decompressDb`, `compressInPlace`, and `BlobTableReader`
+  for readers of compressed tables; topfd, topdia, toppic and topmg
+  compress their database when complete unless the hidden
+  `--disable-zstd`, and every reader of TopFD's database in the suite
+  (`sql_db_copy`, the post mass matching) handles a compressed one -- a new
+  reader must too) plus
+  `ms_sql_writer`, the
+  MS1-peak levels for 3D visualization: `MsSqlWriter` builds level 0 (every
+  MS1 peak of intensity > 0) and the down-sampled levels 1..n, and writes
+  them as the `LEVEL` column of `ms1_peak` (the highest level that keeps the
+  peak; the levels are nested) plus one `CONFIG` row per level, on a
+  caller-owned connection like the topfd writer below; readers compute the
+  colour bucket (before toppic_test experiment 165 the levels were the
+  tables `PEAKS0..n` with a `COLOR` column; see `.claude/tools/topfd.md`).
+  topfd and topdia (in `deconv_ms1_process`) write them into the `.sqlite`
+  after MS1 deconvolution whenever the database is written (no option since
+  toppic_test experiment 169; topfd `-D` / `--sql-3d` before).
 - `src/para` — analysis parameters (`sp_para`, `peak_tolerance`, `prsm_para`).
 - `src/seq` — sequence/proteoform layer.
 - `src/ms` — mass-spectrum layer: `spec` (peaks/spectra/msalign), `msmap`,
-  `factory`, `env` (envelope detection), `feature`, `mzml`.
+  `factory`, `env` (envelope detection), `feature`, `mzml`, `calib` (the
+  two-pass m/z recalibration of topcalib and toppic `--mass-calib`, with
+  the corrected database of `sqlite_mass_calib`, see
+  `.claude/tools/toppic_output.md`).
   `MsAlignReader` has a four-argument constructor taking an EnvCNN score
   cutoff (`SpPara::getEnvCnnCutoff()`, whose own default is 0.2, but both
-  toppic and topmg set the key from their `-F`, which defaults to 0.4 in
+  toppic and topmg set the key from their `-F` (`--filter-by-score`; the
+  fourth msalign column is TopFD's EnvCNN score or TopDIA's pseudo score;
+  `--filter-by-envcnn` until 2026-10-12; the parameter block, topmg_gui and
+  toppic_gui (Advanced Parameters tab, `envCnnCutoffEdit`, since 2026-10-12)
+  say "Confidence score cutoff", "EnvCNN score cutoff" before),
+  which defaults to 0.4 in
   each): masses whose fourth
   msalign column is below it are skipped, keeping the file's peak ids. The
   filter, search and E-value/p-value stages (`filter/*`, `search/*`,
@@ -784,6 +519,16 @@ above it, never the reverse:
   default, 0, keeps every mass; both drivers use the default); the number
   of masses in the tables is not stored in the PrSM but computed from the
   attached full spectra at output.
+  Spectrum ids (`SPECTRUM_ID`) need not start at 0 or be consecutive: a
+  subset of a file keeps the ids of its spectra, and `msalign_frac_merge`
+  adds `SpPara::getMaxSpecNumPerFile()` (10,000,000) per fraction. Code that
+  keeps one entry per spectrum indexes it by the spectrum's position in the
+  file (`msalign_util::readSpIds`, the ids in file order), never by its id
+  up to `getSpNum`: the filters' candidate lists (`SimplePrsmMemMerge`,
+  `DiagFilterProcessor`) once allocated one list per id below the spectrum
+  number and dropped the candidates of every larger id without a word, so
+  TopPIC found nothing in a file whose ids start above 0 (issue #598,
+  toppic_test experiment 100).
 - `src/topfd` — the TopFD deconvolution/feature-detection layer, built on `ms`:
   `common` (`topfd_para` config + the `topfd_process`/`topfd_single_process`
   orchestrators), `dp` (dynamic-programming envelope assignment), `envcnn` and
@@ -798,12 +543,21 @@ above it, never the reverse:
   mzML/mzXML files (MS1 deconvolution → feature detection → MS/MS
   deconvolution, one fraction per FAIMS voltage), and `topfd_single_process`
   deconvolutes one MS/MS spectrum from a text peak list (`m/z intensity` per
-  line, space-separated) with `DeconvSingleSp`, writing `<input>_ms2.msalign`,
+  line, separated by spaces or a tab; `readPeakFile` skips the lines that
+  do not start with a digit, so an MGF file of one spectrum is read as
+  one, and the peaks of all spectra of a longer MGF file are merged, with
+  a warning when it has more than one `BEGIN IONS` line)
+  with `DeconvSingleSp`, writing `<input>_ms2.msalign`,
   `<input>_ms2.env` and `<input>.sqlite`. **Both** name their outputs through
   `TopfdPara::setMzmlFileNameAndFaims` (base name = input path minus
   extension, `_<voltage>` appended for FAIMS; it also creates the SQLite
   database when enabled) — do not hand-roll output names or a second
-  `createSqlDb` call in a driver.
+  `createSqlDb` call in a driver. In topfd_gui the checkbox "Text peak list
+  input" (`textPeakListCheckBox`, Additional settings, third column, row 3)
+  sets `setTextPeakList` and `gui/util/command.cpp` emits `-T`; the Add
+  button then offers `*.txt` and `*.mgf` or all files, and Start refuses a
+  list holding an mzML/mzXML file (none of its lines starts with a digit,
+  so `readPeakFile` would return an empty spectrum).
 - `src/topdia` — the TopDIA pseudo-spectrum layer built on `topfd`/`ms`:
   `common` (`topdia_para` + `topdia_process`) and `pseudo_spec`
   (`mzrt_feature`, `pseudo_peak`, `pseudo_spectrum`, `generate_pseudo_spectrum`).
@@ -813,10 +567,16 @@ above it, never the reverse:
   msalign file; both `prsm_match_table_writer` (the TSV tables) and
   `prsm_sql_writer` (the same columns as `prsm`/`proteoform`/`protein` tables, plus
   `prsm_mass_shift` and `prsm_protein_match`) are built on it.
+  `prsm_second_prec` is the second precursor search and `prsm_mass_calib`
+  reads the calibrants of `--mass-calib` (see
+  `.claude/tools/toppic_output.md`).
   `prsm_sql_output::write` is the one entry point that writes those tables
-  plus `seq/fasta_sql_writer`'s `fasta_seq` table into the topfd `.sqlite` of
-  the spectrum file when it exists; toppic and topmg both call it after their
-  protein table, passing their own cutoff file extensions — do not duplicate
+  plus `seq/fasta_sql_writer`'s `fasta_seq` table into the database it is
+  given when it exists (toppic: its `<base>_toppic.sqlite`; topmg: its
+  `<base>_topmg.sqlite`, toppic_test experiment 170; neither with
+  `--no-sql`, see
+  `.claude/tools/toppic_output.md`); toppic and topmg both call it after
+  their protein table, passing their own cutoff file extensions — do not duplicate
   the open/write/close sequence in a driver. Keep the TSV and SQL columns in
   step when changing either. `prsm`/`simple_prsm`/`expected_value`/
   `peak_ion_pair` carry the pugixml XML (de)serialization (`toXmlElement`/`toXml`/
@@ -896,18 +656,30 @@ above it, never the reverse:
   per thread and merge them with `PrsmStrMerge`. Use the runner for a new
   stage whose output order matters; `ZeroPtmSearchMng` and `PtmSearchMng`
   carry the thread number from the toppic `-u` option.
-- `src/stat` — E-value/p-value estimation (`count`/`local`/`mcmc`/`tdgf`);
-  `tdgf/cluster_prot_corrector` (see the post mass matching section) is
-  here rather than in `prsm` because it recomputes E-values.
+- `src/stat` — E-value/p-value estimation (`count`/`local`/`mcmc`/`tdgf`),
+  the PTM localization (`local`, and its alternative `local_align`) and
+  the rescoring of the PrSMs before the FDR (`rescore`, `--rescore`);
+  `tdgf/cluster_prot_corrector` is here rather than in `prsm` because it
+  recomputes E-values (see `.claude/tools/toppic_output.md` for the
+  localization and the correction, `.claude/tools/toppic_evalue.md` for
+  the E-values and the rescoring).
 - `src/merge` — the topdiff feature-merge backend (`feature_prsm`,
   `feature_sample_merge`), used by `console/topdiff_process`.
+- `src/toplib` — toplib_build's spectral library building and
+  toplib_search's library search (see `.claude/tools/toplib.md`); it
+  depends only on
+  `common` and `sql`.
 
 These are all library layers. The **executable** layers are separate (they are
 NOT in `COMMON_SRCS`; each is its own `add_executable` that links
 `toppic_common`):
 
 - `src/console` — the command-line tools. Each is a `main()` (`topfd.cpp`,
-  `topdia.cpp`, `topindex.cpp`, `toppic.cpp`, `topmg.cpp`, `topdiff.cpp`) plus
+  `topdia.cpp`, `topindex.cpp`, `toppic.cpp`, `topmg.cpp`, `topdiff.cpp`,
+  `toplib_build.cpp`, `toplib_search.cpp`; plus `topcalib.cpp` and
+  `topzstd.cpp`, single files with their options in them, and the developer
+  tool
+  `theo_patt_gen.cpp`, a single file outside the default target) plus
   its `<tool>_argument.cpp` parser (`boost::program_options`) plus, for the four
   multi-step tools, its `<tool>_process.cpp` orchestrator. topfd/topdia have no
   `*_process` here — they drive the `topfd_process`/`topdia_process`
@@ -923,6 +695,22 @@ NOT in `COMMON_SRCS`; each is its own `add_executable` that links
   the matching CLI tool via QProcess, reading its default values from that
   tool's console argument parser. `src/gui/topmerge` is migrated but has no
   target (no `topmerge` CLI tool drives the `merge` backend yet).
+  Every parameter control of the six forms has a tooltip (2026-10-12):
+  rich text, `<html><head/><body><p>...</p></body></html>` (Qt wraps rich
+  text; a plain-text tooltip is one long line), with `<`, `>` and `&` of
+  the message HTML-escaped (`&lt;name&gt;`), the same text on a row's
+  label and input, ending with the option it sets, e.g. `(topfd -c,
+  --max-charge)`. Give a new control one, and change it with its option's
+  help. The `-x` checkbox of toppic_gui and topmg_gui is "No TopFD feature
+  file" ("Missing MS1 feature file" until 2026-10-12; it is the
+  `<base>_ms2.feature` file, not an MS1 file). Start runs the form's `checkError()` first (every GUI since
+  2026-10-12; before, only topmerge called it, so an empty field crashed
+  topfd_gui and topdia_gui): the files (at least one, two for topdiff; no
+  path with a space, `gui_check::pathWithSpace`, because the command line is
+  split at spaces), and every line edit through `gui_check::invalidEdit`
+  (empty, or not accepted by its validator), so a field's validator must
+  accept exactly the values its option takes (the cutoff values take
+  0.001 and 1e-5; thread numbers and ppm tolerances start at 1).
 
 The `<tool>_argument.cpp` parsers are compiled into both the CLI tool and its
 GUI (each target compiles its own object — no shared lib for them). When

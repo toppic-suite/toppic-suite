@@ -117,8 +117,11 @@ PeakIonPairPtrVec genePeakIonPairs(const ProteoformPtr& proteoform_ptr,
   ActivationPtr activation_ptr =
       ms_three_ptr->getMsHeaderPtr()->getActivationPtr();
 
+  // an extended spectrum of a labeled run (toppic -N) has N-terminal
+  // fragment masses with the label, so the theoretical ones get it as well
   TheoPeakPtrVec theo_peaks = theo_peak_util::geneProteoformTheoPeak(
-      proteoform_ptr, activation_ptr, min_mass);
+      proteoform_ptr, activation_ptr, min_mass,
+      ms_three_ptr->getMsHeaderPtr()->getNTermLabelMass());
 
   return findPairs(ms_three_ptr, theo_peaks, 0, proteoform_ptr->getLen(), 0);
 }

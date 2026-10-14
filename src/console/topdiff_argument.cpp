@@ -15,6 +15,7 @@
 
 #include "console/topdiff_argument.hpp"
 
+#include <exception>
 #include <filesystem>
 #include <iomanip>
 
@@ -70,12 +71,14 @@ bool TopDiffArgument::parse(int argc, char* argv[]) {
     po::options_description display_desc("Options");
     display_desc.add_options()("help,h", "Print the help message.")(
         "error-tolerance,e", po::value<std::string>(&error_tole),
-        "Error tolerance of precursor masses for mapping identified "
-        "proteoforms. Default: 1.2 Dalton.")(
+        "Error tolerance of precursor masses for aligning retention times "
+        "and mapping identified proteoforms across samples. Default: 1.2 "
+        "Dalton.")(
         "tool-name,t", po::value<std::string>(&tool_name),
         "<toppic|topmg>. Database search tool name: toppic or topmg. Default: "
         "toppic.")("output,o", po::value<std::string>(&merged_output_name),
-                   "Output file name. Default: sample_diff.tsv.");
+                   "Output file name, written in the directory of the first "
+                   "spectrum file. Default: sample_diff.tsv.");
     po::options_description desc("Options");
 
     desc.add_options()("help,h", "")("error-tolerance,e",
@@ -170,6 +173,18 @@ bool TopDiffArgument::validateArguments() {
     LOG_ERROR(
         "Only 1 spectrum file added. Please add at least 2 spectrum files to "
         "make a comparison.");
+    return false;
+  }
+
+  std::string error_tole = arguments_["errorTolerance"];
+  try {
+    if (std::stod(error_tole) <= 0) {
+      LOG_ERROR("Error tolerance " << error_tole
+                                   << " error! The value should be positive.");
+      return false;
+    }
+  } catch (const std::exception& ex) {
+    LOG_ERROR("Error tolerance " << error_tole << " should be a number.");
     return false;
   }
 

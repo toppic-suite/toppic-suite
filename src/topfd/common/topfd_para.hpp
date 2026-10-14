@@ -21,6 +21,7 @@
 #include <memory>
 #include <string>
 #include <utility>
+#include <vector>
 
 namespace toppic {
 
@@ -47,12 +48,22 @@ class TopfdPara {
 
   void createSqlDb(const std::string& db_name);
 
+  // Compacts (VACUUM) and closes the SQLite database once it is complete,
+  // then compresses it in place (zstd_db::compressInPlace, toppic_test
+  // experiment 172) unless isZstd() is false (the hidden --disable-zstd);
+  // nothing when none is open. TopFD and TopDIA call it at the end of each
+  // file or FAIMS fraction (not topfd -T, whose database holds one
+  // spectrum: createSqlDb and the destructor close a database still open
+  // without compacting or compressing it).
+  void closeSqlDb();
+
   const std::string& getExeDir() const { return exe_dir_; }
   const std::string& getResourceDir() const { return resource_dir_; }
   bool isMissingLevelOne() const { return missing_level_one_; }
   int getMaxCharge() const { return max_charge_; }
 
   double getMassGroupBoundary() const { return mass_group_boundary_; }
+  double getMaxPeakSharingRatio() const { return max_peak_sharing_ratio_; }
   double getMaxMass() const { return max_mass_; }
   double getMzError() const { return mz_error_; }
   int getMaxMissPeakNum() const { return max_miss_peak_num_; }
@@ -66,17 +77,43 @@ class TopfdPara {
   double getMsTwoSnRatio() const { return ms_two_sn_ratio_; }
   double getSplitIntensityRatio() const { return split_intensity_ratio_; }
   double getPrecWindowWidth() const { return prec_window_; }
-  bool isSortUseMsDeconv() const { return sort_use_msdeconv_; }
+  // the score that ranks the envelopes (--env-rank of topfd and topdia):
+  // "envcnn" or "msdeconv"
+  static const std::vector<std::string>& getDeconvScores();
+  const std::string& getDeconvScore() const { return deconv_score_; }
+  bool isSortUseMsDeconv() const { return deconv_score_ == "msdeconv"; }
   bool isAANumBasedFilter() const { return aa_num_based_filter_; }
+  double getMs1EnvCnnScoreCutoff() const { return ms1_env_cnn_score_cutoff_; }
   double getMs2EnvCnnScoreCutoff() const { return ms2_env_cnn_score_cutoff_; }
   const std::string& getActivation() const { return activation_; }
   bool isGeneSql() const { return gene_sql_; }
-  bool isSql3d() const { return sql_3d_; }
+  bool isZstd() const { return zstd_; }
   bool isKeepUnusedPeaks() const { return keep_unused_peaks_; }
   bool isOutputAvgMass() const { return output_avg_mass_; }
   bool isOutputCsvFeatureFile() const { return output_csv_feature_file_; }
   bool isOutputDpEnvs() const { return output_dp_envs_; }
-  bool isUseFlashDeconv() const { return use_flashdeconv_; }
+  // the deconvolution methods, named as the --ms1-deconv and --ms2-deconv
+  // options of topfd and topdia name them
+  static const std::vector<std::string>& getMs1DeconvMethods();
+  static const std::vector<std::string>& getMs2DeconvMethods();
+  const std::string& getMs1DeconvMethod() const { return ms1_deconv_method_; }
+  const std::string& getMs2DeconvMethod() const { return ms2_deconv_method_; }
+  bool isMs1GreedyDeconv() const { return ms1_deconv_method_ == "greedy"; }
+  bool isMs2GreedyDeconv() const { return ms2_deconv_method_ == "greedy"; }
+  // the greedy searches' limit of the peaks a new envelope may share with
+  // each envelope of its charge already reported (-1: no limit)
+  int getMs1MaxSharedPeakNum() const { return ms1_max_shared_peak_num_; }
+  int getMs2MaxSharedPeakNum() const { return ms2_max_shared_peak_num_; }
+  bool isUseFlashDeconv() const { return ms2_deconv_method_ == "flashdeconv"; }
+  bool isMs2PrecPairRefine() const { return ms2_prec_pair_refine_; }
+
+  // topfd --ptcr: every MS/MS spectrum is a PTCR spectrum (the activation
+  // is then PTCR; see ptcr_ms2_deconv)
+  bool isPtcrForced() const { return ptcr_forced_; }
+  // the MS3 spectral deconvolution (DeconvMs3Process), on by default;
+  // hidden --disable-ms3 turns it off
+  bool isMs3Deconv() const { return ms3_deconv_; }
+  int getMs3ScanNum() const { return ms_3_scan_num_; }
   int getThreadNum() const { return thread_num_; }
   double getMs1EcscoreCutoff() const { return ms1_ecscore_cutoff_; }
   double getMs2EcscoreCutoff() const { return ms2_ecscore_cutoff_; }
@@ -113,14 +150,23 @@ class TopfdPara {
   void setMassGroupBoundary(double mass) {
     mass_group_boundary_ = mass;
   }
+  void setMaxPeakSharingRatio(double ratio) {
+    max_peak_sharing_ratio_ = ratio;
+  }
+  void setMs1MaxSharedPeakNum(int num) { ms1_max_shared_peak_num_ = num; }
+  void setMs2MaxSharedPeakNum(int num) { ms2_max_shared_peak_num_ = num; }
   void setMaxMass(double mass) { max_mass_ = mass; }
   void setMzError(double error) { mz_error_ = error; }
   void setMsOneSnRatio(double ratio) { ms_one_sn_ratio_ = ratio; }
   void setMsTwoSnRatio(double ratio) { ms_two_sn_ratio_ = ratio; }
   void setSplitIntensityRatio(double ratio) { split_intensity_ratio_ = ratio; }
   void setPrecWindowWidth(double window) { prec_window_ = window; }
-  void setSortUseMsDeconv(bool use) { sort_use_msdeconv_ = use; }
+  // false, and the score unchanged, for a name not in getDeconvScores()
+  bool setDeconvScore(const std::string& score);
   void setAANumBasedFilter(bool filter) { aa_num_based_filter_ = filter; }
+  void setMs1EnvCnnScoreCutoff(double cutoff) {
+    ms1_env_cnn_score_cutoff_ = cutoff;
+  }
   void setMs2EnvCnnScoreCutoff(double cutoff) {
     ms2_env_cnn_score_cutoff_ = cutoff;
   }
@@ -133,9 +179,17 @@ class TopfdPara {
     output_csv_feature_file_ = output;
   }
   void setGeneSql(bool gene_sql) { gene_sql_ = gene_sql; }
-  void setSql3d(bool sql_3d) { sql_3d_ = sql_3d; }
+  void setZstd(bool zstd) { zstd_ = zstd; }
   void setOutputDpEnvs(bool output) { output_dp_envs_ = output; }
-  void setUseFlashDeconv(bool use) { use_flashdeconv_ = use; }
+  // false, and the method unchanged, for a name not in getMs1DeconvMethods()
+  // (getMs2DeconvMethods())
+  bool setMs1DeconvMethod(const std::string& method);
+  bool setMs2DeconvMethod(const std::string& method);
+  void setMs2PrecPairRefine(bool refine) { ms2_prec_pair_refine_ = refine; }
+
+  void setPtcrForced(bool ptcr_forced) { ptcr_forced_ = ptcr_forced; }
+  void setMs3Deconv(bool ms3_deconv) { ms3_deconv_ = ms3_deconv; }
+  void setMs3ScanNumber(int ms3_scan_num) { ms_3_scan_num_ = ms3_scan_num; }
   void setMaxMissPeakNum(int num) { max_miss_peak_num_ = num; }
   void setMsOneRankPeakDistance(double d) { ms1_rank_peak_distance_ = d; }
   void setMsTwoRankPeakDistance(double d) { ms2_rank_peak_distance_ = d; }
@@ -197,6 +251,9 @@ class TopfdPara {
   // keep in step with EnvPara::DEFAULT_MASS_GROUP_BOUNDARY; this header
   // deliberately has no project includes, so the value is repeated
   double mass_group_boundary_ = 4250;
+  // hidden option --max-peak-sharing-ratio: DpPara::max_peak_sharing_ratio_,
+  // above which two envelopes sharing peaks do not coexist in the DP
+  double max_peak_sharing_ratio_ = 1.0;
   double max_mass_ = 50000;
   // precursor window is used only when the mzML file does not
   // contain the precursor window information
@@ -226,14 +283,27 @@ class TopfdPara {
   std::string activation_ = "FILE";
   // keep unused peaks in dynamic programming
   bool keep_unused_peaks_ = false;
-  // sorting using msdeconv, the default method is env_cnn score
-  bool sort_use_msdeconv_ = false;
+  // the score that ranks the envelopes (--env-rank of topfd and topdia):
+  // "envcnn" (the EnvCNN score, the default) or "msdeconv"
+  // (the MS-Deconv score)
+  std::string deconv_score_ = "envcnn";
+  // the EnvCNN score cutoffs of the MS1 and MS/MS envelopes (topfd's
+  // --ms1-envcnn-cutoff and --ms2-envcnn-cutoff) of the greedy and MS-Deconv
+  // deconvolutions; not the envelopes added for precursor windows, not
+  // FLASHDeconv. MS1 0.2: the greedy MS1 search's own minimum until then
+  // (its envelopes below 0.2 are a third of them, seed the features that the
+  // feature detection would otherwise spend 50% more time on, and gave no
+  // identification; toppic_test experiment 104, run g6)
+  double ms1_env_cnn_score_cutoff_ = 0.2;
   double ms2_env_cnn_score_cutoff_ = 0.0;
   bool aa_num_based_filter_ = false;
   bool output_csv_feature_file_ = false;
+  // the database holds the MS1 peaks with their 3D levels (toppic_test
+  // experiment 169)
   bool gene_sql_ = true;
-  // also write the MS1 peak tables for 3D visualization (--sql-3d)
-  bool sql_3d_ = false;
+  // the database is compressed when complete (sqlite-zstd's format,
+  // sql/zstd_db; toppic_test experiment 172); false with --disable-zstd
+  bool zstd_ = true;
   // set per input file from MzmlProfile::hasPrecWindow()
   bool file_prec_window_ = false;
 
@@ -246,7 +316,7 @@ class TopfdPara {
   int ms1_min_scan_num_ = 1;
   // Minimum correlation between a seed envelope's intensities and the
   // theoretical ones in feature detection (EcscorePara). TopDIA sets it per
-  // stage from its -p (MS1) / -P (MS2) options; TopFD uses the default.
+  // stage from its -y (MS1) / -Y (MS2) options; TopFD uses the default.
   double seed_env_inte_corr_tole_cutoff_ = 0.5;
   int ms2_min_scan_num_ = 1;
 
@@ -265,9 +335,39 @@ class TopfdPara {
   // envelopes of every deconvoluted spectrum to win_envs.txt / dp_envs.txt
   // (debugging aid).
   bool output_dp_envs_ = false;
-  // option --ms2-flashdeconv: deconvolute the MS/MS spectra with the
-  // FLASHDeconv algorithm (FlashDeconvMs2Process) instead of DeconvMs2Process
-  bool use_flashdeconv_ = false;
+  // the MS1 deconvolution method (option --ms1-deconv): "greedy"
+  // (greedy_ms1_deconv, deconv_ms1_process::deconvMsOneGreedy; TopFD's
+  // default) or "msdeconv" (MS-Deconv's precursor-window step +
+  // DeconvSingleSp; TopDIA's default, which its argument parser sets)
+  std::string ms1_deconv_method_ = "greedy";
+  // the MS/MS deconvolution method (option --ms2-deconv): "greedy"
+  // (greedy_ms2_deconv, in deconv_ms2_process::deconvMsTwo and
+  // topfd_single_process; TopFD's default), "msdeconv" (MS-Deconv's
+  // DeconvSingleSp; TopDIA's default) or "flashdeconv" (FlashDeconvMs2Process
+  // instead of DeconvMs2Process)
+  std::string ms2_deconv_method_ = "greedy";
+  // hidden options --ms1-max-shared-peak-num and --ms2-max-shared-peak-num:
+  // the greedy MS1 and MS/MS searches do not report an envelope that shares
+  // more than this number of peaks with an envelope of the same charge
+  // already reported in the spectrum (toppic_test experiment 157;
+  // experiment 158 limited the test to the same charge). The default -1 is
+  // no limit (the test is off, the searches before experiment 157): no k
+  // raised the identifications on 480_F3_02 (reports 0157 and 0158).
+  int ms1_max_shared_peak_num_ = -1;
+  int ms2_max_shared_peak_num_ = -1;
+  // the precursor masses of an MS/MS spectrum corrected by whole isotopes
+  // with the complementary pairs of its fragment masses and the MS1 spectrum
+  // (prec_pair_refine::correctIsotopes; toppic_test experiment 116): on by
+  // default, off with --skip-ms2-prec-pair-refine and in TopDIA. It runs in
+  // DeconvMs2Process (not FLASHDeconv) and only for MS/MS spectra with an
+  // MS1 spectrum.
+  bool ms2_prec_pair_refine_ = true;
+  // topfd --ptcr (isPtcrForced)
+  bool ptcr_forced_ = false;
+  // the MS3 spectral deconvolution (isMs3Deconv) and the MS3 scans of the
+  // file without a proton transfer stage
+  bool ms3_deconv_ = true;
+  int ms_3_scan_num_ = 0;
 
   //** information for each run **
   int frac_id_ = -1;

@@ -180,6 +180,31 @@ ProteoformPtrVec2D gene2DProtModProteoform(const ProteoformPtrVec& ori_forms,
   return new_forms;
 }
 
+ProteoformPtr geneTruncNTermModProteoform(const ProteoformPtr& form_ptr,
+                                          const ModPtr& mod_ptr) {
+  ProteoformPtr new_form_ptr = std::make_shared<Proteoform>(
+      form_ptr->getFastaSeqPtr(), form_ptr->getProtModPtr(),
+      form_ptr->getStartPos(), form_ptr->getEndPos(), form_ptr->getResSeqPtr(),
+      form_ptr->getMassShiftPtrVec());
+  if (form_ptr->hasTruncNTermMod() ||
+      !new_form_ptr->setTruncNTermModPtr(mod_ptr)) {
+    return ProteoformPtr(nullptr);
+  }
+  return new_form_ptr;
+}
+
+ProteoformPtrVec geneTruncNTermModProteoform(const ProteoformPtr& form_ptr,
+                                             const ModPtrVec& mod_ptrs) {
+  ProteoformPtrVec new_forms;
+  for (size_t i = 0; i < mod_ptrs.size(); i++) {
+    ProteoformPtr ptr = geneTruncNTermModProteoform(form_ptr, mod_ptrs[i]);
+    if (ptr != nullptr) {
+      new_forms.push_back(ptr);
+    }
+  }
+  return new_forms;
+}
+
 ProteoformPtr geneSubProteoform(const ProteoformPtr& proteoform_ptr,
                                 const FastaSeqPtr& fasta_seq_ptr,
                                 int residue_start, int residue_end) {
@@ -212,10 +237,15 @@ ProteoformPtr geneSubProteoform(const ProteoformPtr& proteoform_ptr,
     prot_mod_ptr = ProtModBase::getProtModPtr_NONE();
   }
 
-  return std::make_shared<Proteoform>(
+  ProteoformPtr sub_form_ptr = std::make_shared<Proteoform>(
       fasta_seq_ptr, prot_mod_ptr,
       residue_start + proteoform_ptr->getStartPos(),
       residue_end + proteoform_ptr->getStartPos(), seq_ptr, shift_list);
+  if (residue_start == 0 && proteoform_ptr->hasTruncNTermMod()) {
+    // the residue sequence has its mass already; the proteoform records it
+    sub_form_ptr->setTruncNTermModPtr(proteoform_ptr->getTruncNTermModPtr());
+  }
+  return sub_form_ptr;
 }
 
 ProteoformPtrVec readFastaToProteoformPtrVec(const std::string& file_name,

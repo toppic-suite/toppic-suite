@@ -25,7 +25,12 @@ namespace toppic {
 
 PrsmStr::PrsmStr(const std::vector<std::string>& str_vec) {
   str_vec_ = str_vec;
-  std::string line = prsm_util::getXmlLine(str_vec_, "<file_name>");
+  std::string line = prsm_util::getXmlLine(str_vec_, "<tool>");
+  // PrSM files written before the tool element have none
+  if (line != "") {
+    tool_ = prsm_util::getValueStr(line);
+  }
+  line = prsm_util::getXmlLine(str_vec_, "<file_name>");
   file_name_ = prsm_util::getValueStr(line);
   line = prsm_util::getXmlLine(str_vec_, "<spectrum_id>");
   spectrum_id_ = std::stoi(prsm_util::getValueStr(line));
@@ -72,6 +77,11 @@ PrsmStr::PrsmStr(const std::vector<std::string>& str_vec) {
   proteoform_fdr_ = std::stod(prsm_util::getValueStr(line));
   line = prsm_util::getXmlLine(str_vec_, "<protein_fdr>");
   protein_fdr_ = std::stod(prsm_util::getValueStr(line));
+  // written only by the rescoring step (--rescore)
+  line = prsm_util::getXmlLine(str_vec_, "<rescore>");
+  if (line != "") {
+    rescore_ = std::stod(prsm_util::getValueStr(line));
+  }
   line = prsm_util::getXmlLine(str_vec_, "<start_pos>");
   proteoform_start_pos_ = std::stoi(prsm_util::getValueStr(line));
   line = prsm_util::getXmlLine(str_vec_, "<end_pos>");
@@ -291,6 +301,16 @@ bool PrsmStr::cmpEValueIncProtInc(const PrsmStrPtr& a, const PrsmStrPtr& b) {
   }
 }
 
+bool PrsmStr::cmpRescoreDecProtInc(const PrsmStrPtr& a, const PrsmStrPtr& b) {
+  if (a->getRescore() > b->getRescore()) {
+    return true;
+  } else if (a->getRescore() < b->getRescore()) {
+    return false;
+  } else {
+    return a->getSeqName() < b->getSeqName();
+  }
+}
+
 bool PrsmStr::cmpMatchTheoFragDecMatchExpFragDecProtInc(const PrsmStrPtr& a,
                                                         const PrsmStrPtr& b) {
   if (a->getMatchTheoFragNum() > b->getMatchTheoFragNum()) {
@@ -306,14 +326,39 @@ bool PrsmStr::cmpMatchTheoFragDecMatchExpFragDecProtInc(const PrsmStrPtr& a,
   }
 }
 
-bool PrsmStr::cmpNormMatchTheoFragDecProtInc(const PrsmStrPtr& a,
-                                             const PrsmStrPtr& b) {
+// Equal scores are ordered by fewer unexpected shifts, then fewer variable
+// PTMs (as GraphAlign::geneResult keeps the fewest variable modifications at
+// an equal score), more matched theoretical and then experimental fragments,
+// the protein, the start and end positions, the precursor and last the whole
+// record, so that the order does not depend on the order of the input: the
+// graph alignment's merge keeps the first PrSM of each protein, and its input
+// comes file by file from as many files as threads.
+bool PrsmStr::cmpNormMatchTheoFragDecPtmNumInc(const PrsmStrPtr& a,
+                                               const PrsmStrPtr& b) {
   if (a->getNormMatchTheoFragNum() > b->getNormMatchTheoFragNum()) {
     return true;
   } else if (a->getNormMatchTheoFragNum() < b->getNormMatchTheoFragNum()) {
     return false;
+  } else if (a->unexpected_ptm_num_ != b->unexpected_ptm_num_) {
+    return a->unexpected_ptm_num_ < b->unexpected_ptm_num_;
+  } else if (a->variable_ptm_num_ != b->variable_ptm_num_) {
+    return a->variable_ptm_num_ < b->variable_ptm_num_;
+  } else if (a->match_theo_frag_num_ != b->match_theo_frag_num_) {
+    return a->match_theo_frag_num_ > b->match_theo_frag_num_;
+  } else if (a->match_exp_frag_num_ != b->match_exp_frag_num_) {
+    return a->match_exp_frag_num_ > b->match_exp_frag_num_;
+  } else if (a->seq_name_ != b->seq_name_) {
+    return a->seq_name_ < b->seq_name_;
+  } else if (a->proteoform_start_pos_ != b->proteoform_start_pos_) {
+    return a->proteoform_start_pos_ < b->proteoform_start_pos_;
+  } else if (a->proteoform_end_pos_ != b->proteoform_end_pos_) {
+    return a->proteoform_end_pos_ < b->proteoform_end_pos_;
+  } else if (a->precursor_id_ != b->precursor_id_) {
+    return a->precursor_id_ < b->precursor_id_;
+  } else if (a->adjusted_prec_mass_ != b->adjusted_prec_mass_) {
+    return a->adjusted_prec_mass_ < b->adjusted_prec_mass_;
   } else {
-    return a->getSeqName() < b->getSeqName();
+    return a->str_vec_ < b->str_vec_;
   }
 }
 

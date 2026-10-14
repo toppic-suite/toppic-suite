@@ -21,6 +21,7 @@
 #include "common/thread/simple_thread_pool.hpp"
 #include "common/util/file_util.hpp"
 #include "common/util/logger.hpp"
+#include "common/util/stage_profile.hpp"
 #include "filter/massmatch/filter_spec.hpp"
 #include "filter/varptm/var_ptm_filter.hpp"
 #include "ms/factory/prm_ms_factory.hpp"
@@ -37,8 +38,71 @@ namespace toppic {
 
 namespace var_ptm_filter_processor {
 
+// The filter's form of a spectrum set, and, with proteoform N-terminal PTMs,
+// one more for each N-terminal mass m: the spectrum set with m added to its
+// N-terminal label, which prm_ms_factory takes off the N-terminal masses and
+// the precursor mass (as for toppic's -N), while the C-terminal masses stay.
+inline FilterSpecPtr geneFilterSpec(const DeconvMsPtrVec& deconv_ms_ptr_vec,
+                                    const SpParaPtr& sp_para_ptr,
+                                    double prec_mono_mass,
+                                    double n_term_label_mass,
+                                    const std::vector<double>& mod_mass,
+                                    const VarPtmFilterMngPtr& mng_ptr) {
+  auto geneSpec = [&](double label_mass) {
+    PrmMsPtrVec prm_ms_ptr_vec = prm_ms_factory::geneMsTwoPtrVec(
+        deconv_ms_ptr_vec, sp_para_ptr, prec_mono_mass, label_mass, mod_mass);
+    PrmMsPtrVec srm_ms_ptr_vec = prm_ms_factory::geneSuffixMsTwoPtrVec(
+        deconv_ms_ptr_vec, sp_para_ptr, prec_mono_mass, label_mass, mod_mass);
+    return VarPtmFilter::geneFilterSpec(prm_ms_ptr_vec, srm_ms_ptr_vec,
+                                        mng_ptr);
+  };
+  FilterSpecPtr spec_ptr = geneSpec(n_term_label_mass);
+  if (!mng_ptr->n_term_shift_list_.empty()) {
+    FilterSpecPtrVec n_term_specs;
+    for (size_t i = 0; i < mng_ptr->n_term_shift_list_.size(); i++) {
+      n_term_specs.push_back(
+          geneSpec(n_term_label_mass + mng_ptr->n_term_shift_list_[i]));
+    }
+    spec_ptr->setNTermModSpecs(std::move(n_term_specs));
+  }
+  return spec_ptr;
+}
+
 // Reads the spectra per block and scores every variable-modification variant
 // of each set (topmg, use_approx_spec_).
+// The candidates of the last spectrum set of the filter, by proteoform
+// type: the first round's in group 0, those of the N-terminal round k in
+// group k + 1.
+void addCands(const VarPtmFilterPtr& filter_ptr,
+              const PrsmParaPtr& prsm_para_ptr, int block_idx, int add_idx,
+              SimplePrsmMemMerge* combiner) {
+  if (prsm_para_ptr->allowCompleteProt()) {
+    combiner->add(0, block_idx, add_idx, filter_ptr->getCompMatchPtrs());
+  }
+  if (prsm_para_ptr->allowPrefixProt()) {
+    combiner->add(1, block_idx, add_idx, filter_ptr->getPrefMatchPtrs());
+  }
+  if (prsm_para_ptr->allowSuffixProt()) {
+    combiner->add(2, block_idx, add_idx, filter_ptr->getSuffMatchPtrs());
+  }
+  if (prsm_para_ptr->allowInternalProt()) {
+    combiner->add(3, block_idx, add_idx, filter_ptr->getInternalMatchPtrs());
+  }
+  std::vector<bool> allowed = {
+      prsm_para_ptr->allowCompleteProt(), prsm_para_ptr->allowPrefixProt(),
+      prsm_para_ptr->allowSuffixProt(), prsm_para_ptr->allowInternalProt()};
+  size_t round_num = filter_ptr->getNTermRoundNum();
+  for (size_t k = 0; k < round_num; k++) {
+    for (int t = 0; t < 4; t++) {
+      if (allowed[t]) {
+        combiner->add(t, block_idx, add_idx,
+                      filter_ptr->getNTermMatchPtrs(k, t),
+                      static_cast<int>(k) + 1);
+      }
+    }
+  }
+}
+
 inline void filterBlockVariants(const ProteoformPtrVec& raw_forms,
                                 int block_idx,
                                 const VarPtmFilterMngPtr& mng_ptr,
@@ -82,51 +146,19 @@ inline void filterBlockVariants(const ProteoformPtrVec& raw_forms,
               for (size_t p = 0; p < mod_mass.size(); p++) {
                 std::fill(mod_mass.begin(), mod_mass.end(), 0.0);
                 mod_mass[p] += mod_mass_list[m];
-                PrmMsPtrVec prm_ms_ptr_vec = prm_ms_factory::geneMsTwoPtrVec(
+                filter_ptr->computeBestMatch(geneFilterSpec(
                     deconv_ms_ptr_vec, sp_para_ptr, prec_mono_mass,
-                    n_term_label_mass, mod_mass);
-                PrmMsPtrVec srm_ms_ptr_vec =
-                    prm_ms_factory::geneSuffixMsTwoPtrVec(
-                        deconv_ms_ptr_vec, sp_para_ptr, prec_mono_mass,
-                        n_term_label_mass, mod_mass);
-                filter_ptr->computeBestMatch(prm_ms_ptr_vec, srm_ms_ptr_vec);
-                if (prsm_para_ptr->allowCompleteProt()) {
-                  combiner->add(0, block_idx, add_idx, filter_ptr->getCompMatchPtrs());
-                }
-                if (prsm_para_ptr->allowPrefixProt()) {
-                  combiner->add(1, block_idx, add_idx, filter_ptr->getPrefMatchPtrs());
-                }
-                if (prsm_para_ptr->allowSuffixProt()) {
-                  combiner->add(2, block_idx, add_idx, filter_ptr->getSuffMatchPtrs());
-                }
-                if (prsm_para_ptr->allowInternalProt()) {
-                  combiner->add(3, block_idx, add_idx,
-                                filter_ptr->getInternalMatchPtrs());
-                }
+                    n_term_label_mass, mod_mass, mng_ptr));
+                addCands(filter_ptr, prsm_para_ptr, block_idx, add_idx,
+                         combiner);
                 add_idx++;
               }
             }
           } else {
-            PrmMsPtrVec prm_ms_ptr_vec = prm_ms_factory::geneMsTwoPtrVec(
+            filter_ptr->computeBestMatch(geneFilterSpec(
                 deconv_ms_ptr_vec, sp_para_ptr, prec_mono_mass,
-                n_term_label_mass, mod_mass);
-            PrmMsPtrVec srm_ms_ptr_vec = prm_ms_factory::geneSuffixMsTwoPtrVec(
-                deconv_ms_ptr_vec, sp_para_ptr, prec_mono_mass,
-                n_term_label_mass, mod_mass);
-            filter_ptr->computeBestMatch(prm_ms_ptr_vec, srm_ms_ptr_vec);
-            if (prsm_para_ptr->allowCompleteProt()) {
-              combiner->add(0, block_idx, add_idx, filter_ptr->getCompMatchPtrs());
-            }
-            if (prsm_para_ptr->allowPrefixProt()) {
-              combiner->add(1, block_idx, add_idx, filter_ptr->getPrefMatchPtrs());
-            }
-            if (prsm_para_ptr->allowSuffixProt()) {
-              combiner->add(2, block_idx, add_idx, filter_ptr->getSuffMatchPtrs());
-            }
-            if (prsm_para_ptr->allowInternalProt()) {
-              combiner->add(3, block_idx, add_idx,
-                            filter_ptr->getInternalMatchPtrs());
-            }
+                n_term_label_mass, mod_mass, mng_ptr));
+            addCands(filter_ptr, prsm_para_ptr, block_idx, add_idx, combiner);
             add_idx++;
           }
         }
@@ -151,7 +183,7 @@ inline void filterBlockVariants(const ProteoformPtrVec& raw_forms,
 // Reads the msalign file once and converts every spectrum set into the block
 // independent form the filter scores, so that the blocks share the conversion
 // instead of repeating it.
-inline FilterSpecPtrVec readSpectra(const VarPtmFilterMngPtr& mng_ptr) {
+FilterSpecPtrVec readSpectra(const VarPtmFilterMngPtr& mng_ptr) {
   PrsmParaPtr prsm_para_ptr = mng_ptr->prsm_para_ptr_;
   SpParaPtr sp_para_ptr = prsm_para_ptr->getSpParaPtr();
   int group_spec_num = prsm_para_ptr->getGroupSpecNum();
@@ -176,14 +208,9 @@ inline FilterSpecPtrVec readSpectra(const VarPtmFilterMngPtr& mng_ptr) {
           DeconvMsPtrVec set_ms_ptr_vec = spec_set_ptr->getDeconvMsPtrVec();
           double prec_mono_mass = spec_set_ptr->getPrecMonoMass();
           double n_term_label_mass = spec_set_ptr->getNTermLabelMass();
-          PrmMsPtrVec prm_ms_ptr_vec = prm_ms_factory::geneMsTwoPtrVec(
-              set_ms_ptr_vec, sp_para_ptr, prec_mono_mass, n_term_label_mass,
-              mod_mass);
-          PrmMsPtrVec srm_ms_ptr_vec = prm_ms_factory::geneSuffixMsTwoPtrVec(
-              set_ms_ptr_vec, sp_para_ptr, prec_mono_mass, n_term_label_mass,
-              mod_mass);
-          spectra.push_back(VarPtmFilter::geneFilterSpec(
-              prm_ms_ptr_vec, srm_ms_ptr_vec, mng_ptr));
+          spectra.push_back(geneFilterSpec(set_ms_ptr_vec, sp_para_ptr,
+                                           prec_mono_mass, n_term_label_mass,
+                                           mod_mass, mng_ptr));
         }
       }
     }
@@ -192,53 +219,41 @@ inline FilterSpecPtrVec readSpectra(const VarPtmFilterMngPtr& mng_ptr) {
   return spectra;
 }
 
-inline void filterBlockCached(const ProteoformPtrVec& raw_forms, int block_idx,
-                              const VarPtmFilterMngPtr& mng_ptr,
-                              const FilterSpecPtrVec& spectra,
-                              SimplePrsmMemMerge* combiner) {
-  std::string block_str = std::to_string(block_idx);
-  VarPtmFilterPtr filter_ptr =
-      std::make_shared<VarPtmFilter>(raw_forms, mng_ptr, block_str);
-
-  PrsmParaPtr prsm_para_ptr = mng_ptr->prsm_para_ptr_;
-  int group_spec_num = prsm_para_ptr->getGroupSpecNum();
+void reportProgress(const VarPtmFilterMngPtr& mng_ptr, int block_idx,
+                    size_t i, size_t spectra_num) {
+  const size_t report_step = 100;
+  if ((i + 1) % report_step != 0 && i + 1 != spectra_num) {
+    return;
+  }
+  int group_spec_num = mng_ptr->prsm_para_ptr_->getGroupSpecNum();
   int block_num = static_cast<int>(mng_ptr->cnts_.size());
   int spec_num = mng_ptr->n_spec_block_ / block_num;
-  size_t report_step = 100;
+  // the count covers the spectra without precursor as well
+  mng_ptr->cnts_[block_idx] =
+      i + 1 == spectra_num ? spec_num
+                           : static_cast<int>((i + 1) * group_spec_num);
+  int cnt_sum = 0;
+  for (size_t k = 0; k < mng_ptr->cnts_.size(); k++) {
+    cnt_sum = cnt_sum + mng_ptr->cnts_[k];
+  }
+  double perc = cnt_sum * 100.0 / mng_ptr->n_spec_block_;
+  std::stringstream msg;
+  msg << std::flush << "Variable PTM filtering - processing "
+      << std::setprecision(3) << perc << "%.    \r";
+  mng_ptr->mutex_.lock();
+  std::cout << msg.str();
+  mng_ptr->mutex_.unlock();
+}
+
+void scoreBlock(const VarPtmFilterPtr& filter_ptr, int block_idx,
+                const VarPtmFilterMngPtr& mng_ptr,
+                const FilterSpecPtrVec& spectra, SimplePrsmMemMerge* combiner) {
+  PrsmParaPtr prsm_para_ptr = mng_ptr->prsm_para_ptr_;
   for (size_t i = 0; i < spectra.size(); i++) {
     filter_ptr->computeBestMatch(spectra[i]);
-    int add_idx = static_cast<int>(i);
-    if (prsm_para_ptr->allowCompleteProt()) {
-      combiner->add(0, block_idx, add_idx, filter_ptr->getCompMatchPtrs());
-    }
-    if (prsm_para_ptr->allowPrefixProt()) {
-      combiner->add(1, block_idx, add_idx, filter_ptr->getPrefMatchPtrs());
-    }
-    if (prsm_para_ptr->allowSuffixProt()) {
-      combiner->add(2, block_idx, add_idx, filter_ptr->getSuffMatchPtrs());
-    }
-    if (prsm_para_ptr->allowInternalProt()) {
-      combiner->add(3, block_idx, add_idx, filter_ptr->getInternalMatchPtrs());
-    }
-
-    if ((i + 1) % report_step == 0 || i + 1 == spectra.size()) {
-      // the count covers the spectra without precursor as well
-      mng_ptr->cnts_[block_idx] = i + 1 == spectra.size()
-                                      ? spec_num
-                                      : static_cast<int>((i + 1) *
-                                                         group_spec_num);
-      int cnt_sum = 0;
-      for (size_t k = 0; k < mng_ptr->cnts_.size(); k++) {
-        cnt_sum = cnt_sum + mng_ptr->cnts_[k];
-      }
-      double perc = cnt_sum * 100.0 / mng_ptr->n_spec_block_;
-      std::stringstream msg;
-      msg << std::flush << "Variable PTM filtering - processing "
-          << std::setprecision(3) << perc << "%.    \r";
-      mng_ptr->mutex_.lock();
-      std::cout << msg.str();
-      mng_ptr->mutex_.unlock();
-    }
+    addCands(filter_ptr, prsm_para_ptr, block_idx, static_cast<int>(i),
+             combiner);
+    reportProgress(mng_ptr, block_idx, i, spectra.size());
   }
 }
 
@@ -259,7 +274,9 @@ std::function<void()> geneTask(int block_idx,
     if (mng_ptr->use_approx_spec_) {
       filterBlockVariants(raw_forms, block_idx, mng_ptr, combiner);
     } else {
-      filterBlockCached(raw_forms, block_idx, mng_ptr, *spectra, combiner);
+      VarPtmFilterPtr filter_ptr = std::make_shared<VarPtmFilter>(
+          raw_forms, mng_ptr, std::to_string(block_idx));
+      scoreBlock(filter_ptr, block_idx, mng_ptr, *spectra, combiner);
     }
   };
 }
@@ -278,9 +295,12 @@ void process(const VarPtmFilterMngPtr& mng_ptr) {
                                static_cast<int>(mng_ptr->pref_suff_num_),
                                static_cast<int>(mng_ptr->pref_suff_num_),
                                static_cast<int>(mng_ptr->internal_num_)};
-  SimplePrsmMemMerge combiner(prsm_para_ptr->getSpectrumFileName(),
-                              mng_ptr->output_file_ext_, top_nums,
-                              spec_num);
+  // one candidate group for the first round and one for each proteoform
+  // N-terminal PTM mass
+  SimplePrsmMemMerge combiner(
+      prsm_para_ptr->getSpectrumFileName(), mng_ptr->output_file_ext_,
+      top_nums, msalign_util::readSpIds(prsm_para_ptr->getSpectrumFileName()),
+      1 + static_cast<int>(mng_ptr->n_term_shift_list_.size()));
   int block_num = db_block_ptr_vec.size();
   mng_ptr->cnts_.resize(block_num, 0);
   // the spectra are read and converted once and scored against every block
@@ -300,6 +320,7 @@ void process(const VarPtmFilterMngPtr& mng_ptr) {
                                &spectra, &combiner));
   }
   pool_ptr->shutDown();
+  stage_profile::report("var_filter");
   std::cout << std::endl;
   std::cout << "Variable PTM filtering - combining blocks started."
             << std::endl;

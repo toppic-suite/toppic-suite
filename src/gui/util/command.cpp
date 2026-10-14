@@ -17,6 +17,7 @@
 
 #include <iostream>
 #include <sstream>
+#include <string>
 
 #include "common/util/logger.hpp"
 
@@ -42,33 +43,34 @@ std::string geneTopfdCommand(const TopfdParaPtr& para_ptr,
   oss << "-e " << para_ptr->getMzError() << " ";
   oss << "-r " << para_ptr->getMsOneSnRatio() << " ";
   oss << "-s " << para_ptr->getMsTwoSnRatio() << " ";
+  oss << "-f " << para_ptr->getMs1EnvCnnScoreCutoff() << " ";
+  oss << "-g " << para_ptr->getMs2EnvCnnScoreCutoff() << " ";
   oss << "-w " << para_ptr->getPrecWindowWidth() << " ";
   oss << "-t " << para_ptr->getMs1EcscoreCutoff() << " ";
   oss << "-b " << para_ptr->getMs1MinScanNum() << " ";
+  oss << "-l " << para_ptr->getSplitIntensityRatio() << " ";
   command = command + oss.str();
-  if (para_ptr->isSortUseMsDeconv()) {
-    command = command + "-n ";
-  }
+  command = command + "--env-rank " + para_ptr->getDeconvScore() + " ";
   if (para_ptr->isMissingLevelOne()) {
     command = command + "-o ";
   }
   command = command + "-u " + std::to_string(para_ptr->getThreadNum()) + " ";
   if (para_ptr->isAANumBasedFilter()) {
-    command = command + "-g ";
+    command = command + "-j ";
   }
   if (para_ptr->isSearchPrecWindow()) {
-    command = command + "-f ";
+    command = command + "-d ";
   }
   if (para_ptr->isUseSingleScanNoiseLevel()) {
     command = command + "-i ";
   }
   if (!para_ptr->isGeneSql()) {
-    command = command + "-N ";
-  } else if (para_ptr->isSql3d()) {
-    command = command + "-D ";
+    command = command + "-z ";
   }
-  if (para_ptr->isUseFlashDeconv()) {
-    command = command + "-F ";
+  command = command + "--ms1-deconv " + para_ptr->getMs1DeconvMethod() +
+            " --ms2-deconv " + para_ptr->getMs2DeconvMethod() + " ";
+  if (para_ptr->isTextPeakList()) {
+    command = command + "-T ";
   }
   for (size_t i = 0; i < spec_file_lst.size(); i++) {
     command = command + spec_file_lst[i] + " ";
@@ -102,23 +104,23 @@ std::string geneTopdiaCommand(const TopfdParaPtr& topfd_para_ptr,
   oss << "-B " << topfd_para_ptr->getMs2MinScanNum() << " ";
   oss << "-v " << topdia_para_ptr->getPseudoScoreCutoff() << " ";
   oss << "-V " << topdia_para_ptr->getPseudoMinPeaks() << " ";
-  oss << "-p " << topdia_para_ptr->getMs1SeedEnvInteCorrToleCutoff() << " ";
-  oss << "-P " << topdia_para_ptr->getMs2SeedEnvInteCorrToleCutoff() << " ";
+  oss << "-y " << topdia_para_ptr->getMs1SeedEnvInteCorrToleCutoff() << " ";
+  oss << "-Y " << topdia_para_ptr->getMs2SeedEnvInteCorrToleCutoff() << " ";
   command = command + oss.str();
-  if (topfd_para_ptr->isSortUseMsDeconv()) {
-    command = command + "-n ";
-  }
+  command = command + "--env-rank " + topfd_para_ptr->getDeconvScore() + " ";
   if (topfd_para_ptr->isMissingLevelOne()) {
     command = command + "-o ";
   }
   command =
       command + "-u " + std::to_string(topfd_para_ptr->getThreadNum()) + " ";
   if (topfd_para_ptr->isAANumBasedFilter()) {
-    command = command + "-d ";
+    command = command + "-j ";
   }
   if (topfd_para_ptr->isUseSingleScanNoiseLevel()) {
     command = command + "-i ";
   }
+  command = command + "--ms1-deconv " + topfd_para_ptr->getMs1DeconvMethod() +
+            " --ms2-deconv " + topfd_para_ptr->getMs2DeconvMethod() + " ";
   for (size_t i = 0; i < spec_file_lst.size(); i++) {
     command = command + spec_file_lst[i] + " ";
   }
@@ -167,6 +169,8 @@ std::map<std::string, std::string> toppic_para{
     {"activation", "-a "},
     {"fixedMod", "-f "},
     {"allowProtMod", "-n "},
+    {"nTermLabelMass", "-N "},
+    {"envCnnCutoff", "-F "},
     {"allowProtType", "-R "},
     {"searchType", "-d "},
     {"threadNumber", "-u "},
@@ -175,7 +179,7 @@ std::map<std::string, std::string> toppic_para{
     {"minShiftMass", "-m "},
     {"variablePtmNum", "-S "},
     {"variablePtmFileName", "-b "},
-    {"useApproxSpectra", "-A "},
+    {"useApproxSpectra", "-X "},
     {"cutoffSpectralType", "-t "},
     {"cutoffSpectralValue", "-v "},
     {"cutoffProteoformType", "-T "},
@@ -193,7 +197,9 @@ std::map<std::string, std::string> toppic_para{
     {"localPtmFileName", "-B "},
     {"localThreshold", "-H "},
     {"postMassMatch", "-D "},
-    {"averageMass", "-g "}};
+    {"noSql", "-z "},
+    {"averageMass", "-A "},
+    {"rescore", "--rescore "}};
 
 std::string geneToppicCommand(std::map<std::string, std::string> arguments_,
                               std::vector<std::string> spec_file_lst_) {
@@ -216,6 +222,9 @@ std::string geneToppicCommand(std::map<std::string, std::string> arguments_,
         continue;
       } else if (it->first == "combinedOutputName" && it->second == "") {
         continue;
+      } else if (it->first == "nTermLabelMass" &&
+                 (it->second == "" || std::stod(it->second) == 0.0)) {
+        continue;  // no N-terminal label: leave out -N
       } else if (it->first == "useFeatureFile") {
         if (it->second == "false") {
           command = command + toppic_para[it->first];
@@ -238,8 +247,18 @@ std::string geneToppicCommand(std::map<std::string, std::string> arguments_,
         if (it->second == "false") {
           command = command + toppic_para[it->first];
         }
+      } else if (it->first == "noSql") {
+        // -z (--no-sql): no SQLite database is written
+        if (it->second == "true") {
+          command = command + toppic_para[it->first];
+        }
       } else if (it->first == "averageMass") {
-        // -g (--average-mass): the spectrum files hold average masses
+        // -A (--average-mass): the spectrum files hold average masses
+        if (it->second == "true") {
+          command = command + toppic_para[it->first];
+        }
+      } else if (it->first == "rescore") {
+        // --rescore: off by default, needs -d
         if (it->second == "true") {
           command = command + toppic_para[it->first];
         }
@@ -278,10 +297,11 @@ std::map<std::string, std::string> topmg_para{
     {"cutoffProteoformValue", "-V "},
     {"cutoffProteinType", "-y "},
     {"cutoffProteinValue", "-Y "},
-    {"shiftNumber", "-s "},
+    {"topmgShiftNumber", "-s "},
     {"useFeatureFile", "-x "},
     {"keepTempFiles", "-k "},
     {"keepDecoyResults", "-K "},
+    {"noSql", "-z "},
     {"combinedOutputName", "-c "},
     {"fragErrorTolerance", "-e "},
     {"precErrorTolerance", "-E "},
@@ -289,7 +309,7 @@ std::map<std::string, std::string> topmg_para{
     {"useAsfDiag", "-D "},
     {"varModFileName", "-i "},
     {"varPtmNumber", "-P "},
-    {"wholeProteinOnly", "-w "},
+    {"allowProtType", "-w "},
     {"proteoGraphGap", "-j "},
     {"varPtmNumInGap", "-G "}};
 
@@ -326,10 +346,22 @@ std::string geneTopmgCommand(std::map<std::string, std::string> arguments_,
         if (it->second == "true") {
           command = command + topmg_para[it->first];
         }
+      } else if (it->first == "noSql") {
+        // -z (--no-sql): no SQLite database is written
+        if (it->second == "true") {
+          command = command + topmg_para[it->first];
+        }
       }
       // some parameters require extra processing
-      else if (it->first == "useAsfDiag" || it->first == "wholeProteinOnly") {
+      else if (it->first == "useAsfDiag") {
         if (it->second == "true") {
+          command = command + topmg_para[it->first];
+        }
+      }
+      // whole proteins only, which topmg spells -w, is the proteoform type
+      // COMPLETE alone
+      else if (it->first == "allowProtType") {
+        if (it->second == "COMPLETE") {
           command = command + topmg_para[it->first];
         }
       } else {

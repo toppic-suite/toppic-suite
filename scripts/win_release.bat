@@ -15,7 +15,7 @@ rem Needs:   a finished build (docs\compile\windows_build.md) and MSYS2 with
 rem          the UCRT64 packages from that document, installed at
 rem          %MSYS2_ROOT% (default C:\msys64).
 
-set "VERSION=2.0.0.0"
+set "VERSION=2.1.0"
 if not "%~1"=="" set "VERSION=%~1"
 
 if "%MSYS2_ROOT%"=="" set "MSYS2_ROOT=C:\msys64"

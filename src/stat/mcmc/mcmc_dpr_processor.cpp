@@ -25,7 +25,6 @@
 
 #include "common/base/mod_util.hpp"
 #include "common/base/neutral_loss.hpp"
-#include "common/base/ptm_util.hpp"
 #include "common/base/residue_util.hpp"
 #include "common/thread/simple_thread_pool.hpp"
 #include "common/util/file_util.hpp"
@@ -56,9 +55,28 @@ namespace toppic {
 void DprProcessor::init() {
   std::string var_mod_file_name = mng_ptr_->residue_mod_file_;
 
-  ptm_vec_ = ptm_util::readPtmTxt(var_mod_file_name);
+  ModPtrVec2D mod_ptr_vec2d = mod_util::readModTxt(var_mod_file_name);
+  ModPtrVec var_mod_ptr_vec = mod_ptr_vec2d[2];
 
-  ModPtrVec var_mod_ptr_vec = mod_util::readModTxt(var_mod_file_name)[2];
+  // the side-chain variable PTMs (Position any), whose combinations explain
+  // a PrSM's variable PTMs, as GraphPostProcessor names them; a proteoform
+  // N-terminal PTM (Position N-term) is no side-chain PTM
+  ptm_vec_.clear();
+  for (size_t i = 0; i < var_mod_ptr_vec.size(); i++) {
+    PtmPtr ptm_ptr = var_mod_ptr_vec[i]->getModResiduePtr()->getPtmPtr();
+    if (std::find(ptm_vec_.begin(), ptm_vec_.end(), ptm_ptr) == ptm_vec_.end()) {
+      ptm_vec_.push_back(ptm_ptr);
+    }
+  }
+  // the masses of the proteoform N-terminal PTMs, each once
+  n_term_mass_vec_.clear();
+  for (size_t i = 0; i < mod_ptr_vec2d[3].size(); i++) {
+    double shift = mod_ptr_vec2d[3][i]->getShift();
+    if (std::find(n_term_mass_vec_.begin(), n_term_mass_vec_.end(), shift) ==
+        n_term_mass_vec_.end()) {
+      n_term_mass_vec_.push_back(shift);
+    }
+  }
 
   for (size_t i = 0; i < var_mod_ptr_vec.size(); i++) {
     ptm_residue_map_[var_mod_ptr_vec[i]->getModResiduePtr()->getPtmPtr()]
@@ -185,8 +203,9 @@ void DprProcessor::process() {
     MsHeaderPtr header_ptr = deconv_ms_ptr_vec[0]->getMsHeaderPtr();
     if (header_ptr->containsPrec()) {
       deconv_ms_util::keepTopPeaks(deconv_ms_ptr_vec, peak_num_limit);
-      double prec_mono_mass = header_ptr->getFirstPrecMonoMass() -
-                              sp_para_ptr_->getNTermLabelMass();
+      // the observed precursor mass: the spectrum set subtracts the N-terminal
+      // label (toppic -N) itself, for its PRM and extended spectra
+      double prec_mono_mass = header_ptr->getFirstPrecMonoMass();
       SpectrumSetPtr spec_set_ptr = spectrum_set_factory::geneSpectrumSetPtr(
           deconv_ms_ptr_vec, sp_para_ptr_, prec_mono_mass);
 
@@ -242,10 +261,12 @@ std::function<void()> geneTask(
     const std::map<int, std::vector<std::string> >& mass_table,
     const CountTestNumPtr& test_num_ptr,
     const std::vector<std::vector<double> >& ptm_mass_vec2d,
+    const std::vector<double>& n_term_mass_vec,
     const SimpleThreadPoolPtr& pool_ptr,
     const PrsmXmlWriterPtrVec& writer_ptr_vec) {
   return [spec_set_ptr, prsm_ptr, mng_ptr, ptm_residue_map, mass_table,
-          test_num_ptr, ptm_mass_vec2d, pool_ptr, writer_ptr_vec]() {
+          test_num_ptr, ptm_mass_vec2d, n_term_mass_vec, pool_ptr,
+          writer_ptr_vec]() {
     CompPValueMCMCPtr comp_mcmc_ptr = std::make_shared<toppic::CompPValueMCMC>(
         mng_ptr, ptm_residue_map, mass_table);
     DeconvMsPtrVec deconv_ms_ptr_vec = spec_set_ptr->getDeconvMsPtrVec();
@@ -253,12 +274,11 @@ std::function<void()> geneTask(
         deconv_ms_ptr_vec, mng_ptr->prsm_para_ptr_->getSpParaPtr(),
         prsm_ptr->getAdjustedPrecMass());
 
-    double ppo = mng_ptr->prsm_para_ptr_->getSpParaPtr()
-                     ->getPrecTolerancePtr()
-                     ->getPpo();
+    PeakTolerancePtr prec_tole_ptr =
+        mng_ptr->prsm_para_ptr_->getSpParaPtr()->getPrecTolerancePtr();
 
-    double tolerance =
-        refine_ms_ptr_vec[0]->getMsHeaderPtr()->getFirstPrecErrorTolerance(ppo);
+    double tolerance = prec_tole_ptr->compPrecErrorTole(
+        refine_ms_ptr_vec[0]->getMsHeaderPtr()->getFirstPrecMonoMass());
 
     std::vector<double> ms_masses =
         extend_ms_util::getExtendMassVec(refine_ms_ptr_vec[0]);
@@ -289,22 +309,29 @@ std::function<void()> geneTask(
     int unexpect_shift_num =
         prsm_ptr->getProteoformPtr()->getAlterNum(AlterType::UNEXPECTED);
 
-    if (prsm_ptr->getProteoformPtr()->getAlterNum(AlterType::VARIABLE) == 0) {
-      cand_num = test_num_ptr->compCandNum(
-          type_ptr, unexpect_shift_num,
-          prsm_ptr->getAdjustedPrecMass() - mass_constant::getWaterMass(),
-          tolerance);
-    } else {
-      std::vector<double> mass_ptm_vec =
-          ptm_mass_vec2d[prsm_ptr->getProteoformPtr()->getAlterNum(
-              AlterType::VARIABLE)];
+    // a truncation N-terminal modification counts as a variable PTM does:
+    // the candidate numbers of every proteoform N-terminal PTM mass add up
+    std::vector<double> n_term_masses(1, 0.0);
+    if (prsm_ptr->getProteoformPtr()->hasTruncNTermMod()) {
+      n_term_masses = n_term_mass_vec;
+    }
+    for (size_t t = 0; t < n_term_masses.size(); t++) {
+      double search_mass = prsm_ptr->getAdjustedPrecMass() -
+                           mass_constant::getWaterMass() - n_term_masses[t];
+      if (prsm_ptr->getProteoformPtr()->getAlterNum(AlterType::VARIABLE) ==
+          0) {
+        cand_num += test_num_ptr->compCandNum(type_ptr, unexpect_shift_num,
+                                              search_mass, tolerance);
+      } else {
+        const std::vector<double>& mass_ptm_vec =
+            ptm_mass_vec2d[prsm_ptr->getProteoformPtr()->getAlterNum(
+                AlterType::VARIABLE)];
 
-      for (size_t k = 0; k < mass_ptm_vec.size(); k++) {
-        cand_num += test_num_ptr->compCandNum(
-            type_ptr, unexpect_shift_num,
-            prsm_ptr->getAdjustedPrecMass() - mass_constant::getWaterMass() -
-                mass_ptm_vec[k],
-            tolerance);
+        for (size_t k = 0; k < mass_ptm_vec.size(); k++) {
+          cand_num += test_num_ptr->compCandNum(
+              type_ptr, unexpect_shift_num, search_mass - mass_ptm_vec[k],
+              tolerance);
+        }
       }
     }
 
@@ -338,7 +365,8 @@ void DprProcessor::processOnePrsm(const PrsmPtr& prsm_ptr,
   }
   pool_ptr_->enqueue(geneTask(spec_set_ptr, prsm_ptr, mng_ptr_,
                               ptm_residue_map_, mass_table_, test_num_ptr_,
-                              ptm_mass_vec2d_, pool_ptr_, writer_ptr_vec_));
+                              ptm_mass_vec2d_, n_term_mass_vec_, pool_ptr_,
+                              writer_ptr_vec_));
 }
 
 }  // namespace toppic

@@ -30,8 +30,11 @@ std::string IndexFileName::geneFileName(
   fixed_mod = file_util::basenameFromEntirePath(fixed_mod);
 
   // the indexes do not depend on either tolerance; the fragment tolerance
-  // (-e) is kept in the name so topindex and the searches agree on it
-  std::string error_tol = arguments["fragErrorTolerance"];
+  // (-e) is kept in the name so topindex and the searches agree on it, as
+  // the integer ppm the searches use (std::stoi in PrsmPara: "7.5" and "07"
+  // give 7; the parsers have checked that it is a number)
+  std::string error_tol =
+      std::to_string(std::stoi(arguments["fragErrorTolerance"]));
 
   std::string search_type = arguments["searchType"];
   std::string decoy = search_type_map_.find(search_type)->second;

@@ -17,6 +17,7 @@
 #define TOPPIC_FILTER_MNG_ONE_PTM_FILTER_MNG_HPP_
 
 #include <mutex>
+#include <set>
 
 #include "filter/mng/ptm_diag_index.hpp"
 #include "para/prsm_para.hpp"
@@ -76,6 +77,25 @@ class OnePtmFilterMng {
   std::string residueModFileName_ = "";
 
   int var_num_ = 0;
+
+  // true: a candidate is a protein and a sequence range, so a protein can
+  // take several of the candidate numbers above with different ranges (issue
+  // #348); false (the default): each protein keeps its best range and the
+  // shifts of its best pairs. Here the pairs of the shift window give a
+  // protein many ranges that share one strong side, which took 29% to 55% of
+  // the slots on the 480 data set and made the one-shift search worse on
+  // five times as many spectra as it made it better (toppic_test experiment
+  // 86).
+  bool range_candidates_ = false;
+
+  // The spectra the variable-PTM variants are filtered for (var_num_ > 0),
+  // by spectrum id. A topmg run filters every spectrum and leaves
+  // search_all_ true; toppic's --topmg filters only the spectra its graph
+  // alignment searches: with pipeline the ones its earlier stages have not
+  // identified, with topmg-only all of them.
+  bool search_all_ = true;
+
+  std::set<int> search_spec_ids_;
 
   int n_spec_block_ = 0;
 

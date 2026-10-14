@@ -37,7 +37,8 @@ SpPara::SpPara(const std::string& activation_name, double n_term_label_mass,
   setFragMassExtension(true);
 
   setZeroShiftPrecOneDaError(true);
-  setOneShiftPrecOneDaError(true);
+  // the one-shift stages absorb a 1 Da error into their unknown mass shift
+  setOneShiftPrecOneDaError(false);
   setVarPtmPrecOneDaError(false);
   // multi-shift stages absorb a 1 Da error into an unknown mass shift
   multi_shift_search_prec_error_vec_ = {0};
@@ -69,6 +70,33 @@ void SpPara::setVarPtmPrecOneDaError(bool allow) {
 
 void SpPara::setFragMassExtension(bool extend) {
   frag_ext_offsets_ = precErrorVec(extend);
+}
+
+const std::vector<std::string>& SpPara::getFilterMassListModeNames() {
+  static const std::vector<std::string> names = {"merge", "fragment",
+                                                 "single"};
+  return names;
+}
+
+bool SpPara::isFilterMassListModeName(const std::string& name) {
+  const std::vector<std::string>& names = getFilterMassListModeNames();
+  for (size_t i = 0; i < names.size(); i++) {
+    if (names[i] == name) {
+      return true;
+    }
+  }
+  return false;
+}
+
+bool SpPara::setFilterMassListMode(const std::string& name) {
+  const std::vector<std::string>& names = getFilterMassListModeNames();
+  for (size_t i = 0; i < names.size(); i++) {
+    if (names[i] == name) {
+      filter_mass_list_mode_ = static_cast<FilterMassListMode>(i);
+      return true;
+    }
+  }
+  return false;
 }
 
 }  // namespace toppic

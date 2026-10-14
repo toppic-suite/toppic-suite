@@ -85,6 +85,13 @@ PrsmPara::PrsmPara(const std::map<std::string, std::string>& arguments) {
   }
   sp_para_ptr_ = std::make_shared<SpPara>(activation_name, n_term_label_mass,
                                           prec_ppm, frag_ppm);
+  // a precursor error tolerance in Dalton in place of the ppm of
+  // precErrorTolerance (toppic hidden --prec-dalton-error); an absent or
+  // empty key keeps the ppm tolerance
+  if (getArg(arguments, "precDaltonError") != "") {
+    sp_para_ptr_->getPrecTolerancePtr()->setDaltonTolerance(
+        std::stod(getArg(arguments, "precDaltonError")));
+  }
   if (getArg(arguments, "envCnnCutoff") != "") {
     sp_para_ptr_->setEnvCnnCutoff(std::stod(getArg(arguments, "envCnnCutoff")));
   }
@@ -129,8 +136,30 @@ PrsmPara::PrsmPara(const std::map<std::string, std::string>& arguments) {
     sp_para_ptr_->setFragExtendMinMass(
         std::stod(getArg(arguments, "fragExtendMinMass")));
   }
+  // the filters' mass list (toppic and topmg hidden --filter-mass-list,
+  // checked by their parsers); an absent key keeps the SpPara default,
+  // fragment
+  std::string filter_mass_list = getArg(arguments, "filterMassList");
+  if (filter_mass_list != "") {
+    sp_para_ptr_->setFilterMassListMode(filter_mass_list);
+  }
   // toppic hidden --disable-multi-type-align; default true
   use_multi_type_align_ = (getArg(arguments, "multiTypeAlign") != "false");
+  // toppic hidden --disable-second-align; default true (an absent key, as
+  // in topmg, keeps it on, but only toppic's shift searches use it)
+  use_second_align_ = (getArg(arguments, "secondAlign") != "false");
+  // toppic hidden --evalue-complement-tolerance <relax|strict|separate>;
+  // default relax (an absent key, as in topmg, keeps it)
+  use_evalue_strict_complement_ =
+      (getArg(arguments, "evalueComplementTolerance") == "strict");
+  use_evalue_separate_ =
+      (getArg(arguments, "evalueComplementTolerance") == "separate");
+
+  // the unexpected shifts of the proteoform-graph alignment: TopMG's own
+  // number, not the shiftNumber of toppic's stages; an absent key keeps 1
+  if (getArg(arguments, "topmgShiftNumber") != "") {
+    topmg_shift_num_ = std::stoi(getArg(arguments, "topmgShiftNumber"));
+  }
 }
 
 bool PrsmPara::allowProtType(const ProteoformTypePtr& type_ptr) const {

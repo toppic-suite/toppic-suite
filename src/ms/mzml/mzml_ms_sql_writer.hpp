@@ -39,6 +39,10 @@ namespace toppic {
 // before constructing the writer and closes the database after destroying it.
 // The writer only manages the bulk-load PRAGMAs, prepared statements and the
 // chunked transactions on that connection.
+//
+// It writes no ms1_peak rows: DeconvMs1Process writes the MS1 peaks with
+// their 3D levels (MsSqlWriter) after the deconvolution (toppic_test
+// experiment 169).
 class MzmlMsSqlWriter {
  public:
   explicit MzmlMsSqlWriter(sqlite3* sql_db);
@@ -64,7 +68,6 @@ class MzmlMsSqlWriter {
   std::mutex mutex_;  // serializes writers sharing this object
 
   sqlite3_stmt* ms1_spec_stmt_ = nullptr;
-  sqlite3_stmt* ms1_peak_stmt_ = nullptr;
   sqlite3_stmt* ms1_env_stmt_ = nullptr;
   sqlite3_stmt* ms1_env_peak_stmt_ = nullptr;
   sqlite3_stmt* ms2_spec_stmt_ = nullptr;

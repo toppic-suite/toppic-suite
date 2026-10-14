@@ -47,6 +47,7 @@ std::map<std::string, std::string> TopIndexArgument::initArguments() {
   arguments["executiveDir"] = ".";
   arguments["resourceDir"] = "";
   arguments["threadNumber"] = "1";
+  arguments["indexFormat"] = "2";
   arguments["version"] = "";
 
   // the following two arguments are used for the initializatio of prsm para
@@ -58,7 +59,8 @@ std::map<std::string, std::string> TopIndexArgument::initArguments() {
 void TopIndexArgument::outputArguments(
     std::ostream& output, const std::string& sep,
     std::map<std::string, std::string> arguments) {
-  int gap = 36;
+  // the longest label: "Error tolerance for precursor masses:"
+  int gap = 37;
   output << "********************** Parameters **********************"
          << std::endl;
   output << std::setw(gap) << std::left << "Protein database file:" << sep
@@ -112,6 +114,7 @@ bool TopIndexArgument::parse(int argc, char* argv[]) {
   std::string frag_error_tole = "";
   std::string prec_error_tole = "";
   std::string thread_number = "";
+  std::string index_format = "";
 
   /** Define and parse the program options*/
   try {
@@ -136,14 +139,17 @@ bool TopIndexArgument::parse(int argc, char* argv[]) {
         "forms are allowed, they are separated by commas. Default value: "
         "NONE,NME,NME_ACETYLATION,M_ACETYLATION.")(
         "decoy,d",
-        "Use a shuffled decoy protein database to estimate false discovery "
-        "rates.")("frag-error-tolerance,e",
-                  po::value<std::string>(&frag_error_tole),
-                  "<a positive integer>. Error tolerance for fragment masses "
-                  "in PPM. Default value: 10.")(
+        "Index a database of the target proteins and shuffled decoy "
+        "proteins, for TopPIC and TopMG searches with -d (--decoy).")(
+        "frag-error-tolerance,e", po::value<std::string>(&frag_error_tole),
+        "<a positive integer>. Error tolerance for fragment masses in PPM. "
+        "The index files do not depend on it, but their names include it: "
+        "give the -e value of the TopPIC or TopMG searches that will use "
+        "them. Default value: 10.")(
         "prec-error-tolerance,E", po::value<std::string>(&prec_error_tole),
         "<a positive integer>. Error tolerance for precursor masses in PPM. "
-        "Default value: 10.")(
+        "Neither the index files nor their names depend on it. Default "
+        "value: 10.")(
         "thread-number,u", po::value<std::string>(&thread_number),
         "<a positive integer>. Number of threads used in the computation. "
         "Default value: 1.");
@@ -157,6 +163,7 @@ bool TopIndexArgument::parse(int argc, char* argv[]) {
                        po::value<std::string>(&frag_error_tole), "")(
         "prec-error-tolerance,E", po::value<std::string>(&prec_error_tole), "")(
         "thread-number,u", po::value<std::string>(&thread_number), "")(
+        "index-format", po::value<std::string>(&index_format), "")(
         "database-file-name",
         po::value<std::string>(&database_file_name)->required(),
         "Database file name with its path.");
@@ -229,6 +236,16 @@ bool TopIndexArgument::parse(int argc, char* argv[]) {
     if (vm.count("thread-number")) {
       arguments_["threadNumber"] = thread_number;
     }
+    // hidden: the index file format, 2 (zstd frames, the column bounds once;
+    // the default) or 1 (the Boost binary archive of the earlier versions);
+    // toppic and topmg read both (toppic_test experiment 150)
+    if (vm.count("index-format")) {
+      if (index_format != "1" && index_format != "2") {
+        LOG_ERROR("The index format must be 1 or 2: " << index_format);
+        return false;
+      }
+      arguments_["indexFormat"] = index_format;
+    }
   } catch (std::exception& e) {
     std::cerr << "Unhandled Exception in parsing command line" << e.what()
               << ", application will now exit" << std::endl;
@@ -249,7 +266,7 @@ bool TopIndexArgument::validateArguments() {
 
   if (!std::filesystem::exists(arguments_["oriDatabaseFileName"])) {
     LOG_ERROR("Database file "
-              << arguments_["databaseFileName"] << " does not exist!\n"
+              << arguments_["oriDatabaseFileName"] << " does not exist!\n"
               << " Please check if file directory or name contains special "
                  "characters such as spaces or quotation marks.");
     return false;

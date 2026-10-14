@@ -29,18 +29,23 @@ class EValueProcessor {
 
   void init();
 
+  // Builds the CountTestNum of mng_ptr's parameters into the cache that
+  // init() reads (a database scan of about 9 s on one thread), so that the
+  // scan can run in a background thread during the filter stages instead
+  // of at the start of the E-value stage (toppic_test experiment 150).
+  static void prepareCountTestNum(const TdgfMngPtr& mng_ptr);
+
   void process(bool is_separate);
 
   void compEvalues(const SpectrumSetPtr& spectrum_set_ptr,
-                   PrsmPtrVec& sele_prsm_ptrs, double ppo, bool is_separate);
+                   PrsmPtrVec& sele_prsm_ptrs, bool is_separate);
 
   // compEvalues through a per-worker-thread CompPValueArray (the same
   // pattern the process() thread pool uses), for callers that run one
   // spectrum's E-values per pool task. Safe to call concurrently for
   // disjoint PrSM sets.
   void compEvaluesThreadLocal(const SpectrumSetPtr& spectrum_set_ptr,
-                              PrsmPtrVec& sele_prsm_ptrs, double ppo,
-                              bool is_separate);
+                              PrsmPtrVec& sele_prsm_ptrs, bool is_separate);
 
  private:
   TdgfMngPtr mng_ptr_;

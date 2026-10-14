@@ -30,12 +30,13 @@
 
 namespace toppic {
 
-std::vector<int> getMinMaxProtDist(DistVec2D dist_vec) {
+std::vector<int> getMinMaxProtDist(const DistList2D& dist_lists) {
   std::vector<int> min_dist, max_dist;
-  for (size_t i = 0; i < dist_vec.size(); i++) {
-    if (dist_vec[i].size() == 0) continue;
-    min_dist.push_back(dist_vec[i][0].dist_);
-    max_dist.push_back(dist_vec[i][dist_vec[i].size() - 1].dist_);
+  // the range of all the distances, including those a cover left out
+  for (size_t i = 0; i < dist_lists.size(); i++) {
+    if (dist_lists[i].all_num_ == 0) continue;
+    min_dist.push_back(dist_lists[i].all_min_);
+    max_dist.push_back(dist_lists[i].all_max_);
   }
   std::sort(min_dist.begin(), min_dist.end());
   std::sort(max_dist.begin(), max_dist.end());
@@ -43,6 +44,17 @@ std::vector<int> getMinMaxProtDist(DistVec2D dist_vec) {
   res.push_back(min_dist[0]);
   res.push_back(max_dist[max_dist.size() - 1]);
   return res;
+}
+
+// A score read into an int. The scores are integers, or -DBL_MAX for an entry
+// the DP has not reached; the conversion of -DBL_MAX to int is undefined, and
+// x86 gives INT_MIN, which is what the DP compares here. Every score below -1
+// compares the same with the -1 the searches start from.
+inline int toIntScore(double score) {
+  if (score < static_cast<double>(std::numeric_limits<int>::min())) {
+    return std::numeric_limits<int>::min();
+  }
+  return static_cast<int>(score);
 }
 
 GraphAlign::GraphAlign(const GraphAlignMngPtr& mng_ptr,
@@ -55,30 +67,47 @@ GraphAlign::GraphAlign(const GraphAlignMngPtr& mng_ptr,
   spec_graph_ptr_ = spec_graph_ptr;
   fasta_seq_ptr_ = fasta_seq_ptr;
 
-  dist_vec_ = proteo_graph_ptr_->getDistVec2D();
-  spec_dist_ = spec_graph_ptr_->getDistVec();
-
-  std::vector<int> cutoff = getMinMaxProtDist(dist_vec_);
+  // The distance lists of both graphs are in increasing order of distance,
+  // one entry per distance (dist.hpp), so they are read in place: neither is
+  // copied or sorted again.
+  std::vector<int> cutoff =
+      getMinMaxProtDist(proteo_graph_ptr_->getDistList2D());
   cutoff[0] -= mng_ptr_->getIntTolerance();
   cutoff[1] += mng_ptr_->getIntTolerance();
 
-  spec_dist_.erase(std::remove_if(spec_dist_.begin(), spec_dist_.end(),
-                                  [cutoff](Dist d) {
-                                    return d.dist_ < cutoff[0] ||
-                                           d.dist_ > cutoff[1];
-                                  }),
-                   spec_dist_.end());
-
-  std::sort(spec_dist_.begin(), spec_dist_.end(), distVecUp);
-
-  for (int i = 0; i < mng_ptr->max_known_mods_ + 1; i++) {
-    std::sort(dist_vec_[i].begin(), dist_vec_[i].end(), distVecUp);
+  const DistList& spec_dist = spec_graph_ptr_->getDistList();
+  for (size_t i = 0; i < spec_dist.size(); i++) {
+    if (spec_dist.dists_[i] >= cutoff[0] && spec_dist.dists_[i] <= cutoff[1]) {
+      spec_dist_idxes_.push_back(static_cast<int>(i));
+    }
   }
 
   pg_ = proteo_graph_ptr_->getMassGraphPtr();
   sg_ = spec_graph_ptr_->getMassGraphPtr();
   proteo_ver_num_ = num_vertices(*pg_.get());
   spec_ver_num_ = num_vertices(*sg_.get());
+  shift_layer_num_ = mng_ptr_->n_unknown_shift_ + 1;
+  mod_layer_num_ = mng_ptr_->max_known_mods_ + 1;
+
+  // As toppic's Proteoform::setTruncNTermModPtr allows a truncation
+  // N-terminal modification: on a proteoform starting at protein residue 3
+  // or later (0-based 2; the first two are the protein N-terminal forms')
+  // whose first amino acid is one the modification allows.
+  ProteoformPtr db_form_ptr = proteo_graph_ptr_->getProteoformPtr();
+  int seq_start = db_form_ptr->getStartPos();
+  ResSeqPtr res_seq_ptr = db_form_ptr->getResSeqPtr();
+  n_term_starts_.assign(mng_ptr_->n_term_int_masses_.size(),
+                        std::vector<char>(proteo_ver_num_, 0));
+  for (size_t t = 0; t < n_term_starts_.size(); t++) {
+    const std::vector<AminoAcidPtr>& acid_ptrs = mng_ptr_->n_term_acid_ptrs_[t];
+    for (int i = std::max(0, 2 - seq_start); i < res_seq_ptr->getLen(); i++) {
+      AminoAcidPtr acid_ptr = res_seq_ptr->getResiduePtr(i)->getAminoAcidPtr();
+      if (std::find(acid_ptrs.begin(), acid_ptrs.end(), acid_ptr) !=
+          acid_ptrs.end()) {
+        n_term_starts_[t][i] = 1;
+      }
+    }
+  }
   LOG_DEBUG("Graph constructor end");
 }
 
@@ -86,220 +115,289 @@ void GraphAlign::getConsistentPairs() {
   LOG_DEBUG("consistent pair start");
   int tole = mng_ptr_->getIntTolerance();
   LOG_DEBUG("Integer error tolerance " << tole);
-  std::vector<std::pair<int, int>> empty_list;
-  std::vector<std::vector<std::pair<int, int>>> empty_vec(
-      mng_ptr_->max_known_mods_ + 1, empty_list);
-  for (int i = 0; i < proteo_ver_num_; i++) {
-    std::vector<std::vector<std::vector<std::pair<int, int>>>> empty_vec_2d;
-    for (int j = 0; j < spec_ver_num_; j++) {
-      empty_vec_2d.push_back(empty_vec);
-    }
-    cons_pairs_.push_back(empty_vec_2d);
-  }
-
+  const DistList2D& prot_lists = proteo_graph_ptr_->getDistList2D();
+  const DistList& spec_list = spec_graph_ptr_->getDistList();
   int min_dist = mng_ptr_->getIntMinConsistentDist();
-  for (size_t m = 0; m < dist_vec_.size(); m++) {
-    if (dist_vec_[m].size() == 0) continue;
 
-    size_t prot_idx_min = 0, prot_idx_max = 0;
-    for (size_t spec_idx = 0; spec_idx < spec_dist_.size(); spec_idx++) {
-      Dist distance = spec_dist_[spec_idx];
-      int sp_dist = distance.dist_;
-      if (sp_dist < min_dist) continue;
+  // Every pair of a proteoform distance and a spectrum distance within the
+  // tolerance makes the pairs of their vertex pairs consistent. The search
+  // runs twice, first counting the pairs of each cell and modification
+  // number, then storing them, so that they are stored in the order they
+  // are found.
+  size_t key_num = static_cast<size_t>(proteo_ver_num_) * spec_ver_num_ *
+                   mod_layer_num_;
+  std::vector<int> cursors(key_num + 1, 0);
+  for (int pass = 0; pass < 2; pass++) {
+    for (size_t m = 0; m < prot_lists.size(); m++) {
+      const DistList& prot_list = prot_lists[m];
+      if (prot_list.size() == 0) continue;
 
-      bool flag = true;
-      while (prot_idx_min < dist_vec_[m].size() && flag) {
-        if (dist_vec_[m][prot_idx_min].dist_ >= sp_dist - tole) {
-          flag = false;
-        } else {
+      size_t prot_idx_min = 0, prot_idx_max = 0;
+      for (size_t spec_idx = 0; spec_idx < spec_dist_idxes_.size();
+           spec_idx++) {
+        int sd = spec_dist_idxes_[spec_idx];
+        int sp_dist = spec_list.dists_[sd];
+        if (sp_dist < min_dist) continue;
+
+        while (prot_idx_min < prot_list.size() &&
+               prot_list.dists_[prot_idx_min] < sp_dist - tole) {
           prot_idx_min++;
         }
-      }
 
-      if (prot_idx_min >= dist_vec_[m].size()) continue;
+        if (prot_idx_min >= prot_list.size()) continue;
 
-      prot_idx_max = std::max(prot_idx_min, prot_idx_max);
+        prot_idx_max = std::max(prot_idx_min, prot_idx_max);
 
-      flag = true;
-
-      while (prot_idx_max < dist_vec_[m].size() && flag) {
-        if (dist_vec_[m][prot_idx_max].dist_ > sp_dist + tole) {
-          flag = false;
-        } else {
+        while (prot_idx_max < prot_list.size() &&
+               prot_list.dists_[prot_idx_max] <= sp_dist + tole) {
           prot_idx_max++;
         }
-      }
 
-      for (size_t t = prot_idx_min; t < prot_idx_max; t++) {
-        Dist new_distance = dist_vec_[m][t];
-        if (std::abs(sp_dist - new_distance.dist_) <= tole)
-          addToConsistentPairs(m, distance.pair_ij_, new_distance.pair_ij_);
+        for (size_t t = prot_idx_min; t < prot_idx_max; t++) {
+          if (std::abs(sp_dist - prot_list.dists_[t]) > tole) continue;
+          for (int k = prot_list.begins_[t]; k < prot_list.begins_[t + 1];
+               k++) {
+            const std::pair<int, int>& pg_pair = prot_list.pairs_[k];
+            for (int sp = spec_list.begins_[sd]; sp < spec_list.begins_[sd + 1];
+                 sp++) {
+              const std::pair<int, int>& sp_pair = spec_list.pairs_[sp];
+              size_t key =
+                  getCellIdx(pg_pair.second, sp_pair.second) * mod_layer_num_ +
+                  m;
+              if (pass == 0) {
+                cursors[key + 1]++;
+              } else {
+                cons_prev_cells_[cursors[key]++] = static_cast<int>(
+                    getCellIdx(pg_pair.first, sp_pair.first));
+              }
+            }
+          }
+        }
       }
     }
-    dist_vec_[m].clear();
+    // Proteoform N-terminal variable PTMs: a distance of the spectrum's zero
+    // vertex (the N-terminus) also matches a proteoform distance m shorter
+    // from a vertex where the modification of mass m is allowed. The
+    // alignment then starts at that vertex with the modification, which
+    // takes one variable PTM layer more, as the protein N-terminal forms'
+    // edges do; GraphPostProcessor reads it back from the variable shift
+    // that begins at the first residue. The pair stores its cell c as -1 - c,
+    // so that the DP knows the path has the modification.
+    for (size_t t = 0; t < n_term_starts_.size(); t++) {
+      int n_term_mass = mng_ptr_->n_term_int_masses_[t];
+      const std::vector<char>& starts = n_term_starts_[t];
+      for (size_t m = 0; m + 1 < prot_lists.size(); m++) {
+        const DistList& prot_list = prot_lists[m];
+        if (prot_list.size() == 0) continue;
+        for (int sp = 1; sp < spec_ver_num_; sp++) {
+          int dist = spec_graph_ptr_->getPeakDist(0, sp) - n_term_mass;
+          if (dist < min_dist) continue;
+          size_t t_idx = std::lower_bound(prot_list.dists_.begin(),
+                                          prot_list.dists_.end(), dist - tole) -
+                         prot_list.dists_.begin();
+          for (; t_idx < prot_list.size() &&
+                 prot_list.dists_[t_idx] <= dist + tole;
+               t_idx++) {
+            for (int k = prot_list.begins_[t_idx];
+                 k < prot_list.begins_[t_idx + 1]; k++) {
+              const std::pair<int, int>& pg_pair = prot_list.pairs_[k];
+              if (!starts[pg_pair.first]) continue;
+              size_t key =
+                  getCellIdx(pg_pair.second, sp) * mod_layer_num_ + m + 1;
+              if (pass == 0) {
+                cursors[key + 1]++;
+              } else {
+                cons_prev_cells_[cursors[key]++] =
+                    -1 - static_cast<int>(getCellIdx(pg_pair.first, 0));
+              }
+            }
+          }
+        }
+      }
+    }
+    if (pass == 0) {
+      for (size_t key = 0; key < key_num; key++) {
+        cursors[key + 1] += cursors[key];
+      }
+      cons_begins_ = cursors;
+      cons_prev_cells_.resize(cursors[key_num]);
+    }
   }
-  dist_vec_.clear();
   LOG_DEBUG("consistent pair end");
-}
-
-void GraphAlign::addToConsistentPairs(
-    int m, const std::vector<std::pair<int, int>>& sp_pair_ij,
-    const std::vector<std::pair<int, int>>& pg_pair_ij) {
-  for (size_t k = 0; k < pg_pair_ij.size(); k++) {
-    for (size_t sp = 0; sp < sp_pair_ij.size(); sp++) {
-      int pr_v1 = pg_pair_ij[k].first;
-      int pr_v2 = pg_pair_ij[k].second;
-      int sp_v1 = sp_pair_ij[sp].first;
-      int sp_v2 = sp_pair_ij[sp].second;
-      std::pair<int, int> pre_pair(pr_v1, sp_v1);
-      cons_pairs_[pr_v2][sp_v2][m].push_back(pre_pair);
-    }
-  }
 }
 
 void GraphAlign::initTable() {
   LOG_DEBUG("init table start");
   double node_score = 1.0;
-  for (int i = 0; i < proteo_ver_num_; i++) {
-    GraphDpNodePtrVec node_vec;
-    for (int j = 0; j < spec_ver_num_; j++) {
-      GraphDpNodePtr node_ptr = std::make_shared<GraphDpNode>(
-          i, j, node_score, mng_ptr_->n_unknown_shift_,
-          mng_ptr_->max_known_mods_);
-      node_vec.push_back(node_ptr);
-    }
-    table_.push_back(node_vec);
-  }
+  size_t entry_num = static_cast<size_t>(proteo_ver_num_) * spec_ver_num_ *
+                     shift_layer_num_ * mod_layer_num_;
+  prev_edge_types_.assign(entry_num, GRAPH_ALIGN_TYPE_NULL);
+  prev_edge_mod_nums_.assign(entry_num, 0);
+  prev_nodes_.assign(entry_num, -1);
+  best_scores_.assign(entry_num, -std::numeric_limits<double>::max());
+  best_shift_nodes_.assign(entry_num, -1);
+  best_shift_scores_.assign(entry_num, -std::numeric_limits<double>::max());
+  trunc_paths_.assign(entry_num, 0);
   LOG_DEBUG("init table step 1");
+  int init_aa_num = proteo_ver_num_;
   if (mng_ptr_->whole_protein_only_) {
-    int init_aa_num = 2;
-    if (init_aa_num > proteo_ver_num_) {
-      init_aa_num = proteo_ver_num_;
-    }
-    for (int i = 0; i < init_aa_num; i++) {
-      table_[i][0]->updateTable(0, 0, GRAPH_ALIGN_TYPE_NULL, 0, nullptr,
-                                node_score);
-      table_[i][0]->updateBestShiftNode(0, 0, 0, table_[i][0]);
-      // LOG_DEBUG("type " << table_[i][0]->getType(0) << " first index " <<
-      // table_[i][0]->getFirstIdx() << " second index " <<
-      // table_[i][0]->getSecondIdx());
-    }
-  } else {
-    for (int i = 0; i < proteo_ver_num_; i++) {
-      table_[i][0]->updateTable(0, 0, GRAPH_ALIGN_TYPE_NULL, 0, nullptr,
-                                node_score);
-      table_[i][0]->updateBestShiftNode(0, 0, 0, table_[i][0]);
-      // LOG_DEBUG("type " << table_[i][0]->getType(0) << " first index " <<
-      // table_[i][0]->getFirstIdx() << " second index " <<
-      // table_[i][0]->getSecondIdx());
-    }
+    // the protein N-terminus, or its second residue when NME is allowed for
+    // the protein (the acetylated forms start at the N-terminus)
+    init_aa_num = std::min(proteo_graph_ptr_->isNme() ? 2 : 1, proteo_ver_num_);
+  }
+  for (int i = 0; i < init_aa_num; i++) {
+    size_t cell = getCellIdx(i, 0);
+    size_t entry = getEntryIdx(cell, 0, 0);
+    // the start of an alignment: its score is the node score as an int
+    prev_edge_types_[entry] = GRAPH_ALIGN_TYPE_NULL;
+    prev_edge_mod_nums_[entry] = 0;
+    prev_nodes_[entry] = -1;
+    best_scores_[entry] = static_cast<int>(node_score);
+    best_shift_scores_[entry] = 0;
+    best_shift_nodes_[entry] = static_cast<int>(cell);
   }
   LOG_DEBUG("init table end");
 }
 
-GraphDpNodePtr GraphAlign::compBestVariableNode(int i, int j, int s, int m,
-                                                int& best_edge_mod_num) {
+// On equal scores, the DP keeps the path without a truncation N-terminal
+// modification, so that a protein N-terminal form wins a tie against it; the
+// paths are otherwise chosen as without the modifications.
+int GraphAlign::compBestVariableNode(size_t cell, int s, int m,
+                                     int& best_edge_mod_num,
+                                     bool& best_trunc) {
   int best_prev_score = -1;
   best_edge_mod_num = -1;
-  GraphDpNodePtr best_prev_node = nullptr;
+  best_trunc = false;
+  int best_prev_node = -1;
   for (int p = 0; p <= m; p++) {
-    for (size_t q = 0; q < cons_pairs_[i][j][p].size(); q++) {
-      std::pair<int, int> pair = cons_pairs_[i][j][p][q];
-      int pi = pair.first;
-      int pj = pair.second;
-      // LOG_DEBUG("pi " << pi << " pj " << pj);
-      int score = table_[pi][pj]->getBestScore(s, m - p);
-      if (score > best_prev_score) {
+    size_t key = cell * mod_layer_num_ + p;
+    for (int q = cons_begins_[key]; q < cons_begins_[key + 1]; q++) {
+      int prev_cell = cons_prev_cells_[q];
+      bool trunc = prev_cell < 0;
+      if (trunc) {
+        prev_cell = -1 - prev_cell;
+      }
+      size_t prev_entry = getEntryIdx(prev_cell, s, m - p);
+      int score = toIntScore(best_scores_[prev_entry]);
+      trunc = trunc || trunc_paths_[prev_entry];
+      if (score > best_prev_score ||
+          (score == best_prev_score && best_trunc && !trunc)) {
         best_prev_score = score;
-        best_prev_node = table_[pi][pj];
+        best_prev_node = prev_cell;
         best_edge_mod_num = p;
+        best_trunc = trunc;
       }
     }
   }
   return best_prev_node;
 }
 
-GraphDpNodePtr GraphAlign::compBestShiftNode(int i, int j, int s, int m) {
+int GraphAlign::compBestShiftNode(int i, int j, int s, int m) {
   if (s == 0) {
-    return nullptr;
+    return -1;
   }
   int best_prev_score = -1;
-  GraphDpNodePtr best_prev_node = nullptr;
-  GraphDpNodePtr up_node = table_[i - 1][j];
-  int score = up_node->getBestShiftScore(s - 1, m);
+  int best_prev_node = -1;
+  size_t up_entry = getEntryIdx(getCellIdx(i - 1, j), s - 1, m);
+  int score = toIntScore(best_shift_scores_[up_entry]);
   if (score > best_prev_score) {
     best_prev_score = score;
-    best_prev_node = up_node->getBestShiftNodePtr(s - 1, m);
+    best_prev_node = best_shift_nodes_[up_entry];
   }
 
-  GraphDpNodePtr left_node = table_[i][j - 1];
-  score = left_node->getBestShiftScore(s - 1, m);
-  if (score > best_prev_score) {
+  size_t left_entry = getEntryIdx(getCellIdx(i, j - 1), s - 1, m);
+  score = toIntScore(best_shift_scores_[left_entry]);
+  int left_node = best_shift_nodes_[left_entry];
+  if (score > best_prev_score ||
+      (score == best_prev_score && isTruncPath(best_prev_node, s - 1, m) &&
+       !isTruncPath(left_node, s - 1, m))) {
     best_prev_score = score;
-    best_prev_node = left_node->getBestShiftNodePtr(s - 1, m);
+    best_prev_node = left_node;
   }
   return best_prev_node;
 }
 
 void GraphAlign::updateBestShiftNode(int i, int j, int s, int m) {
+  size_t cell = getCellIdx(i, j);
+  size_t entry = getEntryIdx(cell, s, m);
+  size_t up_entry = getEntryIdx(getCellIdx(i - 1, j), s, m);
+  size_t left_entry = getEntryIdx(getCellIdx(i, j - 1), s, m);
   // update best node
-  if (table_[i - 1][j]->getBestShiftScore(s, m) >
-      table_[i][j - 1]->getBestShiftScore(s, m)) {
-    table_[i][j]->updateBestShiftNode(
-        s, m, table_[i - 1][j]->getBestShiftScore(s, m),
-        table_[i - 1][j]->getBestShiftNodePtr(s, m));
+  double up_score = best_shift_scores_[up_entry];
+  double left_score = best_shift_scores_[left_entry];
+  if (up_score > left_score ||
+      (up_score == left_score &&
+       isTruncPath(best_shift_nodes_[left_entry], s, m) &&
+       !isTruncPath(best_shift_nodes_[up_entry], s, m))) {
+    best_shift_scores_[entry] = up_score;
+    best_shift_nodes_[entry] = best_shift_nodes_[up_entry];
   } else {
-    table_[i][j]->updateBestShiftNode(
-        s, m, table_[i][j - 1]->getBestShiftScore(s, m),
-        table_[i][j - 1]->getBestShiftNodePtr(s, m));
+    best_shift_scores_[entry] = left_score;
+    best_shift_nodes_[entry] = best_shift_nodes_[left_entry];
   }
 
-  if (table_[i][j]->getBestScore(s, m) >
-      table_[i][j]->getBestShiftScore(s, m)) {
-    table_[i][j]->updateBestShiftNode(s, m, table_[i][j]->getBestScore(s, m),
-                                      table_[i][j]);
+  if (best_scores_[entry] > best_shift_scores_[entry] ||
+      (best_scores_[entry] == best_shift_scores_[entry] &&
+       isTruncPath(best_shift_nodes_[entry], s, m) && !trunc_paths_[entry])) {
+    best_shift_scores_[entry] = best_scores_[entry];
+    best_shift_nodes_[entry] = static_cast<int>(cell);
   }
 }
 
 void GraphAlign::dp() {
   LOG_DEBUG("dp start");
+  double new_score = 1.0;
   for (int i = 1; i < proteo_ver_num_; i++) {
     for (int j = 1; j < spec_ver_num_; j++) {
+      size_t cell = getCellIdx(i, j);
       // compute for zero shift
       for (int s = 0; s <= mng_ptr_->n_unknown_shift_; s++) {
         for (int m = 0; m <= mng_ptr_->max_known_mods_; m++) {
           int edge_mod_num;
-          GraphDpNodePtr best_var_node =
-              compBestVariableNode(i, j, s, m, edge_mod_num);
+          bool var_trunc;
+          int best_var_node =
+              compBestVariableNode(cell, s, m, edge_mod_num, var_trunc);
           double var_score;
-          if (best_var_node == nullptr) {
+          if (best_var_node < 0) {
             var_score = -std::numeric_limits<double>::max();
           } else {
-            var_score = best_var_node->getBestScore(s, m - edge_mod_num);
+            var_score =
+                best_scores_[getEntryIdx(best_var_node, s, m - edge_mod_num)];
           }
 
-          GraphDpNodePtr best_shift_node = compBestShiftNode(i, j, s, m);
+          int best_shift_node = compBestShiftNode(i, j, s, m);
           double shift_score;
-          if (best_shift_node != nullptr) {
-            shift_score = best_shift_node->getBestScore(s - 1, m);
+          bool shift_trunc = isTruncPath(best_shift_node, s - 1, m);
+          if (best_shift_node >= 0) {
+            shift_score = best_scores_[getEntryIdx(best_shift_node, s - 1, m)];
           } else {
             shift_score = -std::numeric_limits<double>::max();
           }
-          double new_score = table_[i][j]->getNodeScore();
-          // LOG_DEBUG("new score " << new_score);
 
-          if (var_score >= shift_score) {
+          // a new score is stored as an int, as the node table did; on equal
+          // scores the variable path is kept unless it alone has a
+          // truncation N-terminal modification
+          size_t entry = getEntryIdx(cell, s, m);
+          if (var_score > shift_score ||
+              (var_score == shift_score && !(var_trunc && !shift_trunc))) {
             if (var_score == -std::numeric_limits<double>::max()) {
-              table_[i][j]->updateTable(s, m, GRAPH_ALIGN_TYPE_NULL, 0, nullptr,
-                                        -std::numeric_limits<int>::max());
+              prev_edge_types_[entry] = GRAPH_ALIGN_TYPE_NULL;
+              prev_edge_mod_nums_[entry] = 0;
+              prev_nodes_[entry] = -1;
+              best_scores_[entry] = -std::numeric_limits<int>::max();
             } else {
-              table_[i][j]->updateTable(s, m, GRAPH_ALIGN_TYPE_VARIABLE,
-                                        edge_mod_num, best_var_node,
-                                        var_score + new_score);
+              prev_edge_types_[entry] = GRAPH_ALIGN_TYPE_VARIABLE;
+              prev_edge_mod_nums_[entry] = edge_mod_num;
+              prev_nodes_[entry] = best_var_node;
+              best_scores_[entry] = toIntScore(var_score + new_score);
+              trunc_paths_[entry] = var_trunc;
             }
           } else {
-            table_[i][j]->updateTable(s, m, GRAPH_ALIGN_TYPE_UNEXPECTED, 0,
-                                      best_shift_node, shift_score + new_score);
+            prev_edge_types_[entry] = GRAPH_ALIGN_TYPE_UNEXPECTED;
+            prev_edge_mod_nums_[entry] = 0;
+            prev_nodes_[entry] = best_shift_node;
+            best_scores_[entry] = toIntScore(shift_score + new_score);
+            trunc_paths_[entry] = shift_trunc;
           }
           updateBestShiftNode(i, j, s, m);
         }
@@ -309,45 +407,47 @@ void GraphAlign::dp() {
   LOG_DEBUG("dp end");
 }
 
-GraphResultNodePtrVec GraphAlign::backtrace(int s, int m) {
-  // find the best score;
+GraphResultNodePtrVec GraphAlign::backtrace(int s, int m, bool& trunc) {
+  // find the best score; on equal scores, the path without a truncation
+  // N-terminal modification
   int best_score = -1;
-  GraphDpNodePtr best_node_ptr = nullptr;
+  int best_node = -1;
 
   // if whole sequence only
   if (mng_ptr_->whole_protein_only_) {
-    int score =
-        table_[proteo_ver_num_ - 1][spec_ver_num_ - 1]->getBestScore(s, m);
+    size_t cell = getCellIdx(proteo_ver_num_ - 1, spec_ver_num_ - 1);
+    int score = toIntScore(best_scores_[getEntryIdx(cell, s, m)]);
     if (score > best_score) {
       best_score = score;
-      best_node_ptr = table_[proteo_ver_num_ - 1][spec_ver_num_ - 1];
+      best_node = static_cast<int>(cell);
     }
   } else {
     for (int i = 0; i < proteo_ver_num_; i++) {
-      int score = table_[i][spec_ver_num_ - 1]->getBestScore(s, m);
-      if (score > best_score) {
+      size_t cell = getCellIdx(i, spec_ver_num_ - 1);
+      int score = toIntScore(best_scores_[getEntryIdx(cell, s, m)]);
+      if (score > best_score ||
+          (score == best_score && isTruncPath(best_node, s, m) &&
+           !isTruncPath(static_cast<int>(cell), s, m))) {
         best_score = score;
-        best_node_ptr = table_[i][spec_ver_num_ - 1];
+        best_node = static_cast<int>(cell);
       }
     }
   }
+  trunc = best_score > 0 && isTruncPath(best_node, s, m);
   int shift = s;
   int mod = m;
   LOG_DEBUG("best score " << best_score);
   GraphResultNodePtrVec results;
   if (best_score > 0) {
-    GraphDpNodePtr cur_node_ptr = best_node_ptr;
-    while (cur_node_ptr != nullptr) {
-      LOG_DEBUG("cur node " << cur_node_ptr);
-      results.push_back(
-          std::make_shared<GraphResultNode>(cur_node_ptr, shift, mod));
-      int type = cur_node_ptr->getPrevEdgeType(shift, mod);
-      LOG_DEBUG("type " << type << " shift " << shift << " first index "
-                        << cur_node_ptr->getFirstIdx() << " second index "
-                        << cur_node_ptr->getSecondIdx());
-      int prev_edge_mod_num = cur_node_ptr->getPrevEdgeModNum(shift, mod);
-      cur_node_ptr = cur_node_ptr->getPrevNodePtr(shift, mod);
-      LOG_DEBUG("get prev node ");
+    int cur_node = best_node;
+    while (cur_node >= 0) {
+      size_t entry = getEntryIdx(cur_node, shift, mod);
+      int type = prev_edge_types_[entry];
+      results.push_back(std::make_shared<GraphResultNode>(
+          cur_node / spec_ver_num_, cur_node % spec_ver_num_, shift, mod,
+          type));
+      int prev_edge_mod_num = prev_edge_mod_nums_[entry];
+      cur_node = prev_nodes_[entry];
       if (type == GRAPH_ALIGN_TYPE_UNEXPECTED) {
         shift--;
       }
@@ -362,13 +462,18 @@ GraphResultNodePtrVec GraphAlign::backtrace(int s, int m) {
 void GraphAlign::backtrace() {
   LOG_DEBUG("start back trace");
   result_nodes_.clear();
+  result_truncs_.clear();
   for (int s = 0; s <= mng_ptr_->n_unknown_shift_; s++) {
     LOG_DEBUG("shift num " << s);
     GraphResultNodePtrVec2D nodes_2d;
+    std::vector<char> truncs;
     for (int m = 0; m <= mng_ptr_->max_known_mods_; m++) {
-      nodes_2d.push_back(backtrace(s, m));
+      bool trunc;
+      nodes_2d.push_back(backtrace(s, m, trunc));
+      truncs.push_back(trunc);
     }
     result_nodes_.push_back(nodes_2d);
+    result_truncs_.push_back(truncs);
   }
   LOG_DEBUG("end back trace");
 }
@@ -525,7 +630,7 @@ void GraphAlign::geneHeaders() {
   for (size_t i = 0; i < diag_headers_.size(); i++) {
     double n_shift = diag_headers_[i]->getProtNTermShift();
     double prec_mono_mass =
-        spec_graph_ptr_->getSpectrumSetPtr()->getPrecMonoMass();
+        spec_graph_ptr_->getSpectrumSetPtr()->getLabelFreePrecMonoMass();
     double c_shift =
         prec_mono_mass -
         proteo_graph_ptr_->getProteoformPtr()->getResSeqPtr()->getSeqMass() -
@@ -575,11 +680,10 @@ PrsmPtr GraphAlign::geneResult(int s, int m) {
   ExtendMsPtrVec ms_three_ptr_vec =
       spec_graph_ptr_->getSpectrumSetPtr()->getMsThreePtrVec();
   double min_mass = sp_para_ptr->getMinMass();
-  double ppo = sp_para_ptr->getPrecTolerancePtr()->getPpo();
   LOG_DEBUG("begin refine");
-  double refine_prec_mass = diagonal_util::refinePrecursorAndHeaderShift(
-      proteo_ptr, ms_three_ptr_vec, diag_headers_, ppo, min_mass,
-      mng_ptr_->refine_prec_step_width_);
+  double refine_prec_mass = diagonal_util::refinePrecursorByMatchedIons(
+      proteo_ptr, ms_three_ptr_vec, diag_headers_,
+      sp_para_ptr->getPrecTolerancePtr(), min_mass);
   LOG_DEBUG("get reine prec mass" << refine_prec_mass);
 
   DeconvMsPtrVec deconv_ms_ptr_vec =
@@ -619,13 +723,20 @@ PrsmPtr GraphAlign::geneResult(int s, int m) {
   sub_proteo_ptr->addMassShiftPtrVec(shifts);
   // sub_proteo_ptr->setVariablePtmNum(m);
 
-  return std::make_shared<Prsm>(sub_proteo_ptr, deconv_ms_ptr_vec,
-                                refine_prec_mass,
-                                mng_ptr_->prsm_para_ptr_->getSpParaPtr());
+  PrsmPtr prsm_ptr = std::make_shared<Prsm>(
+      sub_proteo_ptr, deconv_ms_ptr_vec, refine_prec_mass,
+      mng_ptr_->prsm_para_ptr_->getSpParaPtr());
+  // the graph alignment is TopMG's search, wherever it runs from
+  prsm_ptr->setTool("topmg");
+  return prsm_ptr;
 }
 
+// The PrSM with the most matched fragments over the variable PTM numbers: on
+// equal numbers the one with fewer PTMs, unless it alone has a truncation
+// N-terminal modification.
 PrsmPtr GraphAlign::geneResult(int s) {
   PrsmPtr best_prsm_ptr(nullptr);
+  bool best_trunc = false;
   for (int m = 0; m <= mng_ptr_->max_known_mods_; m++) {
     PrsmPtr cur_prsm_ptr = geneResult(s, m);
     if (cur_prsm_ptr != nullptr) {
@@ -640,10 +751,15 @@ PrsmPtr GraphAlign::geneResult(int s) {
         }
       }
 
+      bool cur_trunc = result_truncs_[s][m];
       if (valid && (best_prsm_ptr == nullptr ||
                     best_prsm_ptr->getNormMatchTheoFragNum() <
-                        cur_prsm_ptr->getNormMatchTheoFragNum())) {
+                        cur_prsm_ptr->getNormMatchTheoFragNum() ||
+                    (best_prsm_ptr->getNormMatchTheoFragNum() ==
+                         cur_prsm_ptr->getNormMatchTheoFragNum() &&
+                     best_trunc && !cur_trunc))) {
         best_prsm_ptr = cur_prsm_ptr;
+        best_trunc = cur_trunc;
       }
     }
   }

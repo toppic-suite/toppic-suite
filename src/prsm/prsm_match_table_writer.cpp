@@ -23,6 +23,7 @@
 #include "common/util/file_util.hpp"
 #include "common/util/logger.hpp"
 #include "prsm/prsm_reader_util.hpp"
+#include "seq/proteoform_util.hpp"
 
 namespace toppic {
 
@@ -40,25 +41,29 @@ void PrsmMatchTableWriter::writeHeader(std::ofstream& file) {
   // write title
   std::string delim = "\t";
   file << "Data file name" << delim << "Prsm ID" << delim << "Spectrum ID"
-       << delim << "Fragmentation" << delim << "Scan(s)" << delim
+       << delim << "Precursor ID" << delim << "Fragmentation" << delim
+       << "Scan(s)" << delim
        << "Retention time" << delim << "# Masses" << delim << "Charge" << delim
        << "Precursor mass" << delim << "Adjusted precursor mass" << delim
-       << "Proteoform ID" << delim << "Proteoform intensity" << delim
+       << "N-terminal label mass" << delim << "Proteoform ID" << delim
+       << "Proteoform intensity" << delim
        << "Feature ID" << delim << "Feature intensity" << delim
        << "Feature score" << delim << "Feature apex time" << delim
        << "# Protein hits" << delim << "Protein accession" << delim
        << "Protein description" << delim << "First residue" << delim
        << "Last residue" << delim << "Special amino acids" << delim
        << "Database protein sequence" << delim << "Previous amino acid" << delim
-       << "Proteoform" << delim << "Next amino acid" << delim
-       << "Proteoform mass" << delim << "Protein N-terminal form" << delim
+       << "Proteoform" << delim << "Next amino acid" << delim << "ProForma"
+       << delim << "Proteoform mass" << delim << "Protein N-terminal form" << delim
        << "Fixed PTMs" << delim << "# Unexpected modifications" << delim
        << "Unexpected modifications" << delim << "# Variable PTMs" << delim
        << "Variable PTMs" << delim << "MIScore" << delim
+       << "Alternative PTM explanation" << delim
        << "# Matched exp fragments" << delim << "# Matched theo fragments"
        << delim << "E-value" << delim
        << "Spectrum-level Q-value" << delim << "Proteoform-level Q-value"
-       << delim << "Protein-level Q-value" << std::endl;
+       << delim << "Protein-level Q-value" << delim
+       << "Proteoform classification" << std::endl;
 }
 
 void PrsmMatchTableWriter::write(const std::string& output_file_ext,
@@ -158,12 +163,19 @@ void PrsmMatchTableWriter::writePrsmStandardFormat(
   std::stringstream line_str;
   line_str << std::setprecision(10);
   LOG_DEBUG("start output prsm ");
+  // the PrSM's precursor: the scan's first, or with --second-precursor the
+  // one of its precursor id in the scan's list
+  int prec_charge = deconv_ms_ptr_vec[0]
+                        ->getMsHeaderPtr()
+                        ->getPrecPtrById(prsm_ptr->getPrecursorId())
+                        ->getCharge();
   line_str << prsm_ptr->getFileName() << delim << prsm_ptr->getPrsmId() << delim
-           << spec_ids << delim << spec_activations << delim << spec_scans
-           << delim << retention_time << delim << mass_num << delim
-           << deconv_ms_ptr_vec[0]->getMsHeaderPtr()->getFirstPrecCharge()
+           << spec_ids << delim << prsm_ptr->getPrecursorId() << delim
+           << spec_activations << delim << spec_scans << delim
+           << retention_time << delim << mass_num << delim << prec_charge
            << delim << prsm_ptr->getOriPrecMass() << delim
            << prsm_ptr->getAdjustedPrecMass() << delim
+           << prsm_ptr->getNTermLabelMass() << delim
            << prsm_ptr->getProteoformPtr()->getProteoClusterId() << delim
            << prsm_ptr->getProteoformPtr()->getProteoInte() << delim;
 
@@ -198,14 +210,18 @@ void PrsmMatchTableWriter::writePrsmStandardFormat(
            << delim << form_ptr->getFastaSeqPtr()->getSubSeq(start_pos, end_pos)
            << delim << form_ptr->getPrevAminoAcid() << delim
            << form_ptr->getProteoformMatchSeq() << delim
-           << form_ptr->getNextAminoAcid() << delim << form_ptr->getMass()
+           << form_ptr->getNextAminoAcid() << delim
+           << proteoform_util::getProFormaStr(form_ptr) << delim
+           << form_ptr->getMass()
            << delim << form_ptr->getProtModPtr()->getType() << delim
            << form_ptr->getAlterStr(AlterType::FIXED) << delim
            << form_ptr->getAlterNum(AlterType::UNEXPECTED) << delim
            << form_ptr->getAlterStr(AlterType::UNEXPECTED) << delim
-           << form_ptr->getAlterNum(AlterType::VARIABLE) << delim
-           << form_ptr->getAlterStr(AlterType::VARIABLE) << delim
-           << form_ptr->getMIScore() << delim << prsm_ptr->getMatchExpFragNum()
+           << form_ptr->getVarPtmNum() << delim
+           << form_ptr->getVarPtmStr() << delim
+           << form_ptr->getMIScore() << delim
+           << form_ptr->getAlternativePtmStr() << delim
+           << prsm_ptr->getMatchExpFragNum()
            << delim << prsm_ptr->getMatchTheoFragNum() << delim
            << prsm_ptr->getEValue() << delim;
 
@@ -225,10 +241,16 @@ void PrsmMatchTableWriter::writePrsmStandardFormat(
 
   double protein_fdr = prsm_ptr->getProteinFdr();
   if (protein_fdr >= 0) {
-    line_str << protein_fdr << std::endl;
+    line_str << protein_fdr << delim;
   } else {
-    line_str << empty_str << std::endl;
+    line_str << empty_str << delim;
   }
+
+  // set by the cutoff selection (prsm_cutoff_selector), whose files the
+  // tables read
+  const std::string& classification = form_ptr->getClassification();
+  line_str << (classification == "" ? empty_str : classification)
+           << std::endl;
 
   if (write_multiple_matches) {
     // print out other matches
@@ -239,9 +261,10 @@ void PrsmMatchTableWriter::writePrsmStandardFormat(
         continue;
       }
 
+      // the fields from the spectrum id to the proteoform intensity empty
       line_str << prsm_ptr->getFileName() << delim << prsm_ptr->getPrsmId()
                << delim << delim << delim << delim << delim << delim << delim
-               << delim << delim << delim << delim;
+               << delim << delim << delim << delim << delim << delim;
 
       // feature
       line_str << delim << delim << delim << delim << delim;
@@ -253,6 +276,8 @@ void PrsmMatchTableWriter::writePrsmStandardFormat(
                                              form_ptr->getEndPos())
                << delim << delim << delim << delim << delim << delim << delim
                << delim << delim << delim << delim << delim;
+      // ProForma
+      line_str << delim;
 
       // fdr
       line_str << delim << delim << std::endl;

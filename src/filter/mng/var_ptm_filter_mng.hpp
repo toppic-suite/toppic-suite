@@ -17,7 +17,10 @@
 #define TOPPIC_FILTER_MNG_VAR_PTM_FILTER_MNG_HPP_
 
 #include <mutex>
+#include <string>
+#include <vector>
 
+#include "common/base/residue.hpp"
 #include "filter/massmatch/mass_match.hpp"
 #include "para/prsm_para.hpp"
 
@@ -40,6 +43,10 @@ class VarPtmFilterMng {
 
   int getSingleShiftNum() { return single_shift_list_.size(); }
 
+  // the number of proteoform N-terminal variable PTM masses, which the
+  // E-value computation counts apart from the PTMs anywhere
+  int getNTermShiftNum() { return n_term_shift_list_.size(); }
+
   PrsmParaPtr prsm_para_ptr_;
 
   std::string index_file_para_;
@@ -51,6 +58,10 @@ class VarPtmFilterMng {
   unsigned int comp_num_ = 5;
   unsigned int pref_suff_num_ = 20;
   unsigned int internal_num_ = 30;
+  // A candidate is a protein and a sequence range, so a protein can take
+  // several of the candidate numbers above with different ranges (issue
+  // #348); false keeps the best range of each protein only.
+  bool range_candidates_ = true;
   int filter_scale_ = 100;
 
   int comp_threshold_ = MassMatch::getPrecursorMatchScore() * 2;
@@ -86,6 +97,18 @@ class VarPtmFilterMng {
   std::vector<int> round_shift_list_;
   std::vector<double> shift_list_;
   std::vector<int> int_shift_list_;
+
+  // Variable PTMs of the proteoform N-terminus (Position N-term): their
+  // distinct masses and, for each mass, the residues that can carry it. The
+  // filter scores a spectrum once more for each of these masses, with the
+  // mass taken off its N-terminal masses and its precursor mass.
+  std::vector<double> n_term_shift_list_;
+  ResiduePtrVec2D n_term_res_ptr_vec_2d_;
+  // the shifts of the other variable PTMs on a proteoform with an
+  // N-terminal PTM: combinations of up to var_ptm_num - 1 of them, 0
+  // included
+  std::vector<double> n_term_other_shift_list_;
+  std::vector<int> n_term_other_int_shift_list_;
 };
 
 using VarPtmFilterMngPtr = std::shared_ptr<VarPtmFilterMng>;

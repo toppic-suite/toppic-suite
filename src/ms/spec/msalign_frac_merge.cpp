@@ -78,12 +78,15 @@ void mergeMsalignFiles(const std::vector<std::string>& msalign_file_names,
 void mergeFractions(const std::vector<std::string>& spec_file_names,
                     const std::string& output_file_name,
                     const std::string& para_str,
-                    const std::string& ms2_suffix) {
+                    const std::string& ms2_suffix,
+                    const std::vector<std::string>& ms1_base_names) {
   std::vector<std::string> ms1_file_names;
   std::vector<std::string> ms2_file_names;
   for (size_t i = 0; i < spec_file_names.size(); i++) {
     std::string base_name = spec_file_names[i];
-    std::string ms1_name = base_name + "_ms1.msalign";
+    std::string ms1_base =
+        ms1_base_names.empty() ? base_name : ms1_base_names[i];
+    std::string ms1_name = ms1_base + "_ms1.msalign";
     ms1_file_names.push_back(ms1_name);
     std::string ms2_name = base_name + ms2_suffix;
     ms2_file_names.push_back(ms2_name);

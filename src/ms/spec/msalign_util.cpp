@@ -17,8 +17,11 @@
 
 #include <fstream>
 #include <string>
+#include <vector>
 
 #include "common/util/logger.hpp"
+#include "ms/spec/deconv_ms.hpp"
+#include "ms/spec/ms_header.hpp"
 #include "ms/spec/msalign_reader.hpp"
 
 namespace toppic {
@@ -50,6 +53,16 @@ int getSpNum(const std::string& spectrum_file_name) {
   int sp_num = std::stoi(line);
   LOG_DEBUG("Get sp number " << sp_num);
   return sp_num;
+}
+
+std::vector<int> readSpIds(const std::string& spectrum_file_name) {
+  MsAlignReader reader(spectrum_file_name);
+  std::vector<int> spec_ids;
+  DeconvMsPtr deconv_ms_ptr;
+  while ((deconv_ms_ptr = reader.getNextMsPtr()) != nullptr) {
+    spec_ids.push_back(deconv_ms_ptr->getMsHeaderPtr()->getSpecId());
+  }
+  return spec_ids;
 }
 
 std::string readParaStr(const std::string& spectrum_file_name) {

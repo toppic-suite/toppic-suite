@@ -65,12 +65,78 @@ class MsHeader {
 
   ActivationPtr getActivationPtr() const { return activation_ptr_; }
 
+  // The selected ion of the precursor as the input file gives it (m/z and
+  // charge; -1 and 0 when the file has none). TopFD reads them for PTCR
+  // spectra (ptcr_ms2_deconv); the precursors of other spectra come from the
+  // MS1 features.
+  double getSelectedMz() const { return selected_mz_; }
+
+  int getSelectedCharge() const { return selected_charge_; }
+
+  // A PTCR spectrum: proton transfer charge reduction of the isolated ions
+  // without dissociation (activation PTCR, TopFD only; ptcr_ms2_deconv)
+  bool isPtcr() const { return ptcr_; }
+
+  // A fragment PTCR spectrum: the fragments of a dissociation (the header's
+  // activation), charge-reduced by proton transfer, e.g. the MS3 scan
+  // "X@cid60 Y@ptr10" (ptcr_ms2_deconv::deconvFragments)
+  bool isFragPtcr() const { return frag_ptcr_; }
+
+  // The isolation window of the proton transfer stage: the window of the
+  // precursor whose activation is the proton transfer (the second one of an
+  // MS3 scan), the precursor window when that is the only one. -1 when
+  // unknown.
+  double getPtcrWinBegin() const { return ptcr_win_begin_; }
+
+  double getPtcrWinEnd() const { return ptcr_win_end_; }
+
+  // The dissociation of a charge-reduced precursor: an MSn scan whose
+  // dissociation stage comes after its proton transfer stage, e.g. the MS3
+  // scan "X@ptr5 Y@hcd80" (proton transfer charge reduction of the ions
+  // isolated at X, then the isolation of one charge-reduced ion at Y and its
+  // dissociation). Its activation is the dissociation's and its precursor
+  // window the first stage's (the MS1 window, as for other MS/MS spectra);
+  // its precursor is the species of the PTCR products at Y (see
+  // deconv_ms2_process::deconvMsTwo). Not a fragment PTCR spectrum.
+  bool isReducedPrec() const { return reduced_prec_; }
+
+  // The isolation of the dissociation stage of such a spectrum: its target
+  // m/z (the charge-reduced ion) and window. -1 when unknown.
+  double getReducedPrecTargetMz() const { return reduced_prec_target_mz_; }
+
+  double getReducedPrecWinBegin() const { return reduced_prec_win_begin_; }
+
+  double getReducedPrecWinEnd() const { return reduced_prec_win_end_; }
+
+  // The scan an MSn scan (n > 2) references as its precursor scan (the
+  // spectrumRef of its last precursor: the MS(n-1) scan), -1 without one
+  int getParentScan() const { return parent_scan_; }
+  // the parent MS2 spectrum of an MS3 spectrum (DeconvMs3Process): its id
+  // in the MS/MS msalign file and its first precursor
+  int getMsTwoId() const { return ms_two_id_; }
+  double getMsTwoPrecMz() const { return ms_two_prec_mz_; }
+  int getMsTwoPrecCharge() const { return ms_two_prec_charge_; }
+  double getMsTwoPrecMass() const { return ms_two_prec_mass_; }
+
+  // The N-terminal label mass (toppic -N) of an extended spectrum: the
+  // precursor mass of its header is then the label-free one, and its
+  // N-terminal fragment masses still carry the label, which the matching of
+  // theoretical N-terminal ions adds back (see extend_ms_factory). 0 for the
+  // other spectra.
+  double getNTermLabelMass() const { return n_term_label_mass_; }
+
   // get functions for precursor
   int getPrecNum() const { return prec_ptr_vec_.size(); }
 
   bool containsPrec() const { return prec_ptr_vec_.size() > 0; }
 
   PrecursorPtr getFirstPrecPtr() const;
+
+  // The precursor with the id prec_id (a PrSM's precursor_id: the position
+  // of the precursor in the scan's list as TopFD writes it; an msalign
+  // spectrum whose list is reordered carries the ids in PRECURSOR_ID), or
+  // the first precursor when none has it.
+  PrecursorPtr getPrecPtrById(int prec_id) const;
 
   const PrecursorPtrVec& getPrecPtrVec() const { return prec_ptr_vec_; }
 
@@ -88,10 +154,10 @@ class MsHeader {
 
   double getFirstPrecMonoMassMinusWater() const;
 
-  double getFirstPrecErrorTolerance(double ppo) const;
-
-  std::pair<int, int> getFirstPrecMonoMassMinusWaterError(double ppo,
-                                                          double scale) const;
+  // error_tolerance: the precursor tolerance in Da
+  // (PeakTolerance::compPrecErrorTole)
+  std::pair<int, int> getFirstPrecMonoMassMinusWaterError(
+      double error_tolerance, double scale) const;
 
   // set functions for all spectra
   void setFileName(const std::string& file_name) { file_name_ = file_name; }
@@ -131,6 +197,41 @@ class MsHeader {
 
   void setActivationPtr(ActivationPtr acti_ptr) {
     activation_ptr_ = std::move(acti_ptr);
+  }
+
+  void setSelectedMz(double selected_mz) { selected_mz_ = selected_mz; }
+
+  void setSelectedCharge(int selected_charge) {
+    selected_charge_ = selected_charge;
+  }
+
+  void setPtcr(bool ptcr) { ptcr_ = ptcr; }
+
+  void setFragPtcr(bool frag_ptcr) { frag_ptcr_ = frag_ptcr; }
+
+  void setReducedPrec(bool reduced_prec) { reduced_prec_ = reduced_prec; }
+
+  void setReducedPrecWin(double target_mz, double begin, double end) {
+    reduced_prec_target_mz_ = target_mz;
+    reduced_prec_win_begin_ = begin;
+    reduced_prec_win_end_ = end;
+  }
+
+  void setParentScan(int parent_scan) { parent_scan_ = parent_scan; }
+  void setMsTwoId(int id) { ms_two_id_ = id; }
+  void setMsTwoPrec(double mz, int charge, double mass) {
+    ms_two_prec_mz_ = mz;
+    ms_two_prec_charge_ = charge;
+    ms_two_prec_mass_ = mass;
+  }
+
+  void setPtcrWin(double begin, double end) {
+    ptcr_win_begin_ = begin;
+    ptcr_win_end_ = end;
+  }
+
+  void setNTermLabelMass(double n_term_label_mass) {
+    n_term_label_mass_ = n_term_label_mass;
   }
 
   // set function for precursor
@@ -186,6 +287,30 @@ class MsHeader {
   double prec_target_mz_ = -1;
   // activation type
   ActivationPtr activation_ptr_;
+  // the selected ion of the input file (getSelectedMz, getSelectedCharge)
+  double selected_mz_ = -1;
+  int selected_charge_ = 0;
+  // a PTCR spectrum (isPtcr), a fragment PTCR spectrum (isFragPtcr)
+  bool ptcr_ = false;
+  bool frag_ptcr_ = false;
+  // the isolation window of the proton transfer stage (getPtcrWinBegin)
+  double ptcr_win_begin_ = -1;
+  double ptcr_win_end_ = -1;
+  // the dissociation of a charge-reduced precursor (isReducedPrec), the
+  // isolation of its dissociation stage (getReducedPrecTargetMz)
+  bool reduced_prec_ = false;
+  double reduced_prec_target_mz_ = -1;
+  double reduced_prec_win_begin_ = -1;
+  double reduced_prec_win_end_ = -1;
+  // the precursor scan an MSn scan references (getParentScan)
+  int parent_scan_ = -1;
+  // the parent MS2 spectrum of an MS3 spectrum (getMsTwoId)
+  int ms_two_id_ = -1;
+  double ms_two_prec_mz_ = -1;
+  int ms_two_prec_charge_ = 0;
+  double ms_two_prec_mass_ = -1;
+  // N-terminal label mass of an extended spectrum (getNTermLabelMass)
+  double n_term_label_mass_ = 0;
 
   // Precursor information
   PrecursorPtrVec prec_ptr_vec_;

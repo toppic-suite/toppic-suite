@@ -10,8 +10,8 @@ TopPIC Suite on Windows with [MSYS2](https://www.msys2.org).
   MSYS2 libraries are built with GCC, and mixing compilers fails at link time
 * CMake >= 3.16 and Ninja
 * Boost >= 1.74 (filesystem, iostreams, thread, chrono, serialization,
-  program_options)
-* pugixml, SQLite3 and zlib development libraries
+  program_options, and nowide, which the ProteoWizard code needs on Windows)
+* pugixml, SQLite3, zlib and zstd development libraries
 * ONNX Runtime from MSYS2 (the vendored library under `ext/onnx/` is for
   Linux only)
 * Qt6 (Core, Gui, Widgets) for the GUI tools
@@ -44,6 +44,7 @@ pacman -S mingw-w64-ucrt-x86_64-gcc mingw-w64-ucrt-x86_64-cmake mingw-w64-ucrt-x
 # libraries
 pacman -S mingw-w64-ucrt-x86_64-boost mingw-w64-ucrt-x86_64-pugixml \
           mingw-w64-ucrt-x86_64-sqlite3 mingw-w64-ucrt-x86_64-zlib \
+          mingw-w64-ucrt-x86_64-zstd \
           mingw-w64-ucrt-x86_64-onnxruntime
 
 # Qt6 for the GUI tools
@@ -82,9 +83,11 @@ libraries, are built with GCC, and linking clang-compiled objects against them
 fails with "duplicate section ... has different size" warnings followed by
 "multiple definition" errors. To use clang, use the MSYS2 CLANG64 shell with
 the matching `mingw-w64-clang-x86_64-*` packages instead. The executables
+are placed in the repository's `bin/` directory: the ten command-line tools
 (`topfd.exe`, `topdia.exe`, `topindex.exe`, `toppic.exe`, `topmg.exe`,
-`topdiff.exe` and their `*_gui.exe` counterparts) are placed in the
-repository's `bin/` directory.
+`topdiff.exe`, `toplib_build.exe`, `toplib_search.exe`, `topcalib.exe` and
+`topzstd.exe`) and the six GUI tools (`topfd_gui.exe`, `topdia_gui.exe`,
+`topindex_gui.exe`, `toppic_gui.exe`, `topmg_gui.exe` and `topdiff_gui.exe`).
 
 ## 5. Run the tools
 
@@ -111,17 +114,19 @@ installed files again.
 
 `scripts\win_release.bat` bundles a finished build into a self-contained
 `toppic-windows-<version>.zip` in the repository root (default version
-`2.0.0.0`; pass another as the first argument). Run it from a Windows
+`2.1.0`; pass another as the first argument). Run it from a Windows
 command prompt or PowerShell in the repository root after building:
 
 ```bat
 scripts\win_release.bat
-scripts\win_release.bat 1.9.1.0
+scripts\win_release.bat 2.1.1
 ```
 
-It copies the twelve executables from `bin\`, walks their import tables
+It copies the twelve executables of the six main tools and their GUIs
+from `bin\` (not `toplib_build.exe`, `toplib_search.exe`, `topcalib.exe` or
+`topzstd.exe`), walks their import tables
 with `objdump` and copies every UCRT64 DLL they need (Boost is linked
-statically; the runtime DLLs are the GCC runtime, pugixml, SQLite, zlib,
+statically; the runtime DLLs are the GCC runtime, pugixml, SQLite, zlib, zstd,
 ONNX Runtime and, for the GUIs, Qt6 and its dependencies), the Qt
 `platforms`, `styles` and `imageformats` plugins, the `res` directory and
 the `LICENSE` into `toppic-windows-<version>\`, zips that folder with the

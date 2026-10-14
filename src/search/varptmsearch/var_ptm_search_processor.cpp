@@ -56,6 +56,22 @@ ProtModPtr findMatchedProtModPtr(const ProteoformPtr& db_proteo_ptr,
   exit(EXIT_FAILURE);
 }
 
+// Prsm::cmpMatchTheoFragDecMatchExpFragDecProtInc, then a PrSM with a
+// truncation N-terminal modification first: a candidate is searched as it is
+// and with each truncation N-terminal modification, and when a first
+// residue's modification can be placed on the N-terminus or on the side chain
+// with the same scores (an acetylation of K1), the N-terminal one is reported
+bool cmpScoreDecProtIncTruncNTermFirst(const PrsmPtr& a, const PrsmPtr& b) {
+  if (Prsm::cmpMatchTheoFragDecMatchExpFragDecProtInc(a, b)) {
+    return true;
+  }
+  if (Prsm::cmpMatchTheoFragDecMatchExpFragDecProtInc(b, a)) {
+    return false;
+  }
+  return a->getProteoformPtr()->hasTruncNTermMod() &&
+         !b->getProteoformPtr()->hasTruncNTermMod();
+}
+
 int findMatchedPos(const ProteoformPtr& proteo_ptr, double n_term_trunc) {
   std::vector<double> prms = proteo_ptr->getBpSpecPtr()->getPrmMasses();
   for (size_t i = 0; i < prms.size(); i++) {
@@ -88,7 +104,8 @@ std::function<void()> geneTask(const SpectrumSetPtr& spec_set_ptr,
         mng_ptr->prsm_para_ptr_->getProtModPtrVec();
     ProteoformPtrVec proteoform_ptr_vec;
     for (size_t i = 0; i < simple_prsm_ptr_vec.size(); i++) {
-      if (std::abs(spec_set_ptr->getPrecMonoMass() -
+      // the filtering result holds the label-free precursor mass (-N)
+      if (std::abs(spec_set_ptr->getLabelFreePrecMonoMass() -
                    simple_prsm_ptr_vec[i]->getPrecMass()) > std::pow(10, -4)) {
         // When precursor error is allowed, if the adjusted precursor of the
         // spectrum set does not match the adjusted precursor mass in the
@@ -129,13 +146,18 @@ std::function<void()> geneTask(const SpectrumSetPtr& spec_set_ptr,
           start_pos = proteo_with_prot_mod_ptr->getStartPos();
           LOG_DEBUG("Start pos with N terminal mod: " << start_pos);
         }
-      } else {
+      } else if (!simple_prsm_ptr->hasSeqRange()) {
         double n_term_trunc = -n_term_shift;
         start_pos = findMatchedPos(db_proteo_ptr, n_term_trunc);
       }
       int end_pos = db_proteo_ptr->getEndPos();
-      if (type_ptr == ProteoformType::PREFIX ||
-          type_ptr == ProteoformType::INTERNAL) {
+      if (simple_prsm_ptr->hasSeqRange()) {
+        // the range of the filtering result (issue #348), which the shifts
+        // give as well
+        start_pos = simple_prsm_ptr->getSeqStartPos();
+        end_pos = simple_prsm_ptr->getSeqEndPos();
+      } else if (type_ptr == ProteoformType::PREFIX ||
+                 type_ptr == ProteoformType::INTERNAL) {
         double proteo_minus_water_mass = db_proteo_ptr->getMinusWaterMass();
         double n_term_trunc = proteo_minus_water_mass + c_term_shift;
         // the reported position is the position of matched breakpoint
@@ -157,7 +179,32 @@ std::function<void()> geneTask(const SpectrumSetPtr& spec_set_ptr,
                                 << "proteoform mass diff "
                                 << (simple_prsm_ptr->getPrecMass() -
                                     sub_proteo_ptr->getMass()));
-      proteoform_ptr_vec.push_back(sub_proteo_ptr);
+      // the candidate as it is (shift 0) and with each truncation N-terminal
+      // modification of a shift the filter found it with
+      const std::vector<double>& trunc_shifts =
+          simple_prsm_ptr->getTruncNTermModShifts();
+      for (size_t j = 0; j < trunc_shifts.size(); j++) {
+        if (trunc_shifts[j] == 0) {
+          proteoform_ptr_vec.push_back(sub_proteo_ptr);
+          continue;
+        }
+        const ModPtrVec& n_term_mod_ptrs = mng_ptr->n_term_mod_ptr_vec_;
+        for (size_t k = 0; k < n_term_mod_ptrs.size(); k++) {
+          // the shift went through a text file
+          if (std::abs(n_term_mod_ptrs[k]->getShift() - trunc_shifts[j]) >
+              std::pow(10, -4)) {
+            continue;
+          }
+          ProteoformPtr mod_proteo_ptr =
+              proteoform_factory::geneTruncNTermModProteoform(
+                  sub_proteo_ptr, n_term_mod_ptrs[k]);
+          if (mod_proteo_ptr != nullptr) {
+            LOG_DEBUG("trunc N-term mod seq: "
+                      << mod_proteo_ptr->getProteoformMatchSeq());
+            proteoform_ptr_vec.push_back(mod_proteo_ptr);
+          }
+        }
+      }
     }
 
     PrsmPtrVec prsms;
@@ -171,8 +218,7 @@ std::function<void()> geneTask(const SpectrumSetPtr& spec_set_ptr,
         }
       }
     }
-    std::sort(prsms.begin(), prsms.end(),
-              Prsm::cmpMatchTheoFragDecMatchExpFragDecProtInc);
+    std::sort(prsms.begin(), prsms.end(), cmpScoreDecProtIncTruncNTermFirst);
     PrsmPtrVec selected_prsms =
         prsm_util::getTopPrsms(prsms, mng_ptr->n_report_);
 

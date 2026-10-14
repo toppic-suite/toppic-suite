@@ -340,6 +340,8 @@ DeconvSingleSp::DeconvSingleSp(const TopfdParaPtr& topfd_para_ptr,
       (ms_level == 2) ? topfd_para_ptr->getMsTwoRankPeakDistance()
                       : topfd_para_ptr->getMsOneRankPeakDistance();
   dp_para_ptr_ = std::make_shared<DpPara>(topfd_para_ptr->getMzError());
+  dp_para_ptr_->max_peak_sharing_ratio_ =
+      topfd_para_ptr->getMaxPeakSharingRatio();
   ms_level_ = ms_level;
   double sn_ratio;
   if (ms_level == 1) {
@@ -375,13 +377,17 @@ void DeconvSingleSp::postprocess(MatchEnvPtrVec& dp_envs, int ms_level) {
 
   // Obtain EnvCNN Scores for envelopes
   onnx_env_cnn::computeEnvScores(peak_list, result_envs_);
-  // filtering by EnvCNN score
-  if (ms_level == 2) {
+  // filtering by EnvCNN score (MS1: the whole-spectrum envelopes of
+  // deconv_ms1_process::deconvMsOne, not its precursor-window envelopes)
+  if (ms_level == 1) {
+    result_envs_ = match_env_filter::filterByEnvCnnScore(
+        result_envs_, topfd_para_ptr_->getMs1EnvCnnScoreCutoff());
+  } else if (ms_level == 2) {
     result_envs_ = match_env_filter::filterByEnvCnnScore(
         result_envs_, topfd_para_ptr_->getMs2EnvCnnScoreCutoff());
   }
-  // filtering by estimated number of amino acids
-  if (topfd_para_ptr_->isAANumBasedFilter()) {
+  // filtering by estimated number of amino acids (-j): MS/MS envelopes only
+  if (ms_level == 2 && topfd_para_ptr_->isAANumBasedFilter()) {
     result_envs_ = match_env_filter::filterByAANum(
         result_envs_, data_ptr_->getMaxMass(),
         topfd_para_ptr_->isSortUseMsDeconv(), env_para_ptr_);
@@ -431,8 +437,9 @@ MatchEnvPtrVec DeconvSingleSp::deconv() {
   // prepare table for dp
   if (dp_para_ptr_->check_double_increase_) {
     LOG_DEBUG("Generating coexisting table...");
-    dp_para_ptr_->coexist_table_ =
-        CoTable::initCoexistTable(win_envs, dp_para_ptr_->mz_tolerance_);
+    dp_para_ptr_->coexist_table_ = CoTable::initCoexistTable(
+        win_envs, dp_para_ptr_->mz_tolerance_,
+        dp_para_ptr_->max_peak_sharing_ratio_);
   }
   // dp
   LOG_DEBUG("Generating Graph and DP...");

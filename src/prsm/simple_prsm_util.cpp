@@ -23,20 +23,26 @@ namespace toppic {
 
 namespace simple_prsm_util {
 
+// Two candidates of a spectrum are the same simple PrSM when they have the
+// same protein and the same sequence range (issue #348); the one with the
+// best score is kept. Candidates without a range (the multiple-shift
+// filter's) have the range -1 to -1, so for them the protein decides.
 SimplePrsmPtrVec getUniqueMatches(SimplePrsmPtrVec match_ptrs) {
   std::sort(match_ptrs.begin(), match_ptrs.end(),
-            SimplePrsm::cmpSeqIncScoreDec);
+            SimplePrsm::cmpSeqRangeIncScoreDec);
   SimplePrsmPtrVec unique_match_ptrs;
-  std::string prev_name = "";
-  int prev_id = -1;
   for (size_t i = 0; i < match_ptrs.size(); i++) {
-    std::string cur_name = match_ptrs[i]->getSeqName();
-    int cur_id = match_ptrs[i]->getSpectrumId();
-    if (cur_name != prev_name || cur_id != prev_id) {
-      unique_match_ptrs.push_back(match_ptrs[i]);
-      prev_name = cur_name;
-      prev_id = cur_id;
+    if (!unique_match_ptrs.empty()) {
+      const SimplePrsmPtr& prev = unique_match_ptrs.back();
+      const SimplePrsmPtr& cur = match_ptrs[i];
+      if (cur->getSeqName() == prev->getSeqName() &&
+          cur->getSpectrumId() == prev->getSpectrumId() &&
+          cur->getSeqStartPos() == prev->getSeqStartPos() &&
+          cur->getSeqEndPos() == prev->getSeqEndPos()) {
+        continue;
+      }
     }
+    unique_match_ptrs.push_back(match_ptrs[i]);
   }
 
   return unique_match_ptrs;

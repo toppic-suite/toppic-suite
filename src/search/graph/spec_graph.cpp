@@ -46,7 +46,7 @@ int SpecGraph::getPeakDist(int v1, int v2) {
 }
 
 void SpecGraph::compSpecDistances(double convert_ratio) {
-  std::set<Dist> dist_set;
+  std::vector<DistEntry> entries;
   int count = 0;
   peak_dists_ = std::vector<int>(pair_num_, 0);
   for (size_t i = 0; i < peak_vec_.size() - 1; i++) {
@@ -55,14 +55,8 @@ void SpecGraph::compSpecDistances(double convert_ratio) {
 
       int int_dist = std::round(dist * convert_ratio);
 
-      Dist tmp = Dist(graph_ptr_, int_dist, i, j);
-      auto search = dist_set.find(tmp);
-
-      if (search != dist_set.end()) {
-        search->pair_ij_.push_back(std::pair<int, int>(i, j));
-      } else {
-        dist_set.insert(tmp);
-      }
+      entries.push_back(DistEntry{int_dist, static_cast<int>(i),
+                                  static_cast<int>(j)});
 
       int index = getVecIndex(i, j);
       peak_dists_[index] = int_dist;
@@ -70,7 +64,33 @@ void SpecGraph::compSpecDistances(double convert_ratio) {
     }
   }
   LOG_DEBUG("count " << count);
-  std::copy(dist_set.begin(), dist_set.end(), std::back_inserter(dist_));
+  addToDistList(entries, dist_list_);
+}
+
+void SpecGraph::compDistCover(int min_dist, int tole,
+                              const std::vector<int>& n_term_masses) {
+  dist_cover_.clear();
+  if (dist_list_.size() == 0) {
+    return;
+  }
+  dist_cover_.assign(dist_list_.dists_.back() + tole + 1, 0);
+  for (size_t i = 0; i < dist_list_.size(); i++) {
+    int d = dist_list_.dists_[i];
+    if (d < min_dist) continue;
+    int bgn = std::max(0, d - tole);
+    std::fill(dist_cover_.begin() + bgn, dist_cover_.begin() + d + tole + 1, 1);
+  }
+  for (size_t t = 0; t < n_term_masses.size(); t++) {
+    for (int j = 1; j < node_num_; j++) {
+      int d = getPeakDist(0, j) - n_term_masses[t];
+      if (d < min_dist) continue;
+      int bgn = std::max(0, d - tole);
+      int end = std::min(static_cast<int>(dist_cover_.size()), d + tole + 1);
+      if (bgn < end) {
+        std::fill(dist_cover_.begin() + bgn, dist_cover_.begin() + end, 1);
+      }
+    }
+  }
 }
 
 }  // namespace toppic

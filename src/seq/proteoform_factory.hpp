@@ -44,8 +44,25 @@ ProteoformPtrVec geneProtModProteoform(const ProteoformPtrVec& ori_forms,
 ProteoformPtrVec2D gene2DProtModProteoform(const ProteoformPtrVec& db_form_ptrs,
                                            const ProtModPtrVec& prot_mod_ptrs);
 
+// Generate a proteoform with a truncation N-terminal modification: a copy of
+// form_ptr whose N-terminus (the alpha-amine of its first residue) carries
+// mod_ptr, a variable PTM of the proteoform N-terminus (Position N-term in a
+// modification file). This is different from the protein N-terminal forms of
+// geneProtModProteoform: the proteoform must have no protein N-terminal form
+// and start at the third residue of the protein or later, and the first
+// residue's side chain stays free for a variable PTM. Returns null when the
+// modification cannot be added (Proteoform::setTruncNTermModPtr).
+ProteoformPtr geneTruncNTermModProteoform(const ProteoformPtr& form_ptr,
+                                          const ModPtr& mod_ptr);
+
+// The proteoforms of geneTruncNTermModProteoform for the modifications of
+// mod_ptrs that can be added
+ProteoformPtrVec geneTruncNTermModProteoform(const ProteoformPtr& form_ptr,
+                                             const ModPtrVec& mod_ptrs);
+
 // Get subproteoform. local_start and local_end are relatively to
-// the start position in the original proteoform
+// the start position in the original proteoform. A subproteoform that
+// starts at the first residue keeps the truncation N-terminal modification.
 ProteoformPtr geneSubProteoform(const ProteoformPtr& proteoform_ptr,
                                 const FastaSeqPtr& fasta_seq_ptr,
                                 int local_start, int local_end);

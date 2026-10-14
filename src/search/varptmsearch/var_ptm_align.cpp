@@ -18,24 +18,42 @@
 #include <algorithm>
 #include <limits>
 
+#include "common/base/ptm.hpp"
 #include "common/util/logger.hpp"
 #include "ms/factory/extend_ms_factory.hpp"
 #include "search/diag/diag_header_util.hpp"
 #include "search/diag/diagonal_util.hpp"
+#include "seq/alter.hpp"
+#include "seq/mass_shift.hpp"
 #include "seq/proteoform_factory.hpp"
 
 namespace toppic {
+
+namespace {
+
+// whether one of the modifications modifies the residue
+bool isModifiable(const ResiduePtr& res_ptr, const ModPtrVec& mod_ptrs) {
+  for (size_t i = 0; i < mod_ptrs.size(); i++) {
+    if (res_ptr->isSame(mod_ptrs[i]->getOriResiduePtr())) {
+      return true;
+    }
+  }
+  return false;
+}
+
+}  // namespace
 
 VarPtmAlign::VarPtmAlign(const std::vector<double>& ms_masses,
                          const std::vector<double>& seq_masses,
                          const ResSeqPtr& sub_res_seq_ptr,
                          const DiagonalPtrVec& diagonal_ptrs,
-                         const VarPtmSearchMngPtr& mng_ptr)
+                         const VarPtmSearchMngPtr& mng_ptr, int max_ptm_num)
     : ms_masses_(ms_masses),
       seq_masses_(seq_masses),
       sub_res_seq_ptr_(sub_res_seq_ptr),
       diagonal_ptrs_(diagonal_ptrs),
-      mng_ptr_(mng_ptr) {
+      mng_ptr_(mng_ptr),
+      max_ptm_num_(max_ptm_num) {
   initMatchTable();
   initAllowShiftTable();
   initScoreTable();
@@ -143,7 +161,7 @@ void VarPtmAlign::backtrack() {
   best_score_ = -1;
   best_d_ = 0;
   best_ptm_num_ = 0;
-  size_t var_ptm_num = mng_ptr_->var_ptm_num_;
+  int var_ptm_num = std::min(max_ptm_num_, mng_ptr_->var_ptm_num_);
   int pos = seq_masses_.size() - 1;
   for (size_t i = 0; i < diagonal_ptrs_.size(); i++) {
     LOG_DEBUG("diag " << i << " shift "
@@ -152,7 +170,7 @@ void VarPtmAlign::backtrack() {
                       << diagonal_ptrs_[i]->getHeader()->isProtCTermMatch());
     // check if the diagonal is matched to the C-terminus
     if (diagonal_ptrs_[i]->getHeader()->isProtCTermMatch()) {
-      for (size_t j = 0; j <= var_ptm_num; j++) {
+      for (int j = 0; j <= var_ptm_num; j++) {
         int score = scores_3d_[i][pos][j];
         if (score > best_score_) {
           best_score_ = score;
@@ -266,19 +284,19 @@ MassShiftPtrVec VarPtmAlign::geneShiftVec(
     int left_bp_pos = shift_ptrs[idx]->getLeftBpPos();
     int right_bp_pos = shift_ptrs[idx]->getRightBpPos();
     ModPtr mod_ptr = backtrack_mod_ptrs_[i - 1];
-    ResiduePtr mod_res_ptr = mod_ptr->getOriResiduePtr();
-    // find modifiable residues
+    // find modifiable residues: those of every modification of the PTM
+    // (Deamidated on N and on Q), not only of the residue the alignment chose
+    const ModPtrVec& ptm_mod_ptrs = mng_ptr_->getPtmModPtrVec(mod_ptr);
     while (left_bp_pos < right_bp_pos) {
-      ResiduePtr seq_res_ptr = sub_res_seq_ptr_->getResiduePtr(left_bp_pos);
-      if (seq_res_ptr->isSame(mod_res_ptr)) {
+      if (isModifiable(sub_res_seq_ptr_->getResiduePtr(left_bp_pos),
+                       ptm_mod_ptrs)) {
         break;
       }
       left_bp_pos++;
     }
     while (right_bp_pos > left_bp_pos) {
-      ResiduePtr seq_res_ptr =
-          sub_res_seq_ptr_->getResiduePtr(right_bp_pos - 1);
-      if (seq_res_ptr->isSame(mod_res_ptr)) {
+      if (isModifiable(sub_res_seq_ptr_->getResiduePtr(right_bp_pos - 1),
+                       ptm_mod_ptrs)) {
         break;
       }
       right_bp_pos--;
@@ -290,11 +308,97 @@ MassShiftPtrVec VarPtmAlign::geneShiftVec(
 
     if (refined_header_ptrs[i] != nullptr) {
       shift_ptrs[idx]->setAlterPtrVec(alter_ptr_vec);
+      // the shift covers the residues that can carry its PTMs, not the whole
+      // gap between the refined diagonals: the cleavages outside them keep
+      // their ions
+      shift_ptrs[idx]->narrowRangeToAlters();
       alter_ptr_vec.clear();
       idx++;
     }
   }
-  return shift_ptrs;
+  // a shift with as many candidate residues as PTMs becomes one shift per
+  // PTM on its residue
+  MassShiftPtrVec result_ptrs;
+  for (size_t i = 0; i < shift_ptrs.size(); i++) {
+    MassShiftPtrVec cur_ptrs = splitDeterminedShift(shift_ptrs[i]);
+    result_ptrs.insert(result_ptrs.end(), cur_ptrs.begin(), cur_ptrs.end());
+  }
+  return result_ptrs;
+}
+
+MassShiftPtrVec VarPtmAlign::splitDeterminedShift(
+    const MassShiftPtr& shift_ptr) {
+  MassShiftPtrVec result_ptrs{shift_ptr};
+  const AlterPtrVec& alter_ptrs = shift_ptr->getAlterPtrVec();
+  if (alter_ptrs.size() < 2) {
+    return result_ptrs;
+  }
+  // the alterations of each PTM and the candidate residues of the PTM
+  std::vector<AlterPtrVec> ptm_alter_ptrs;
+  std::vector<std::vector<int>> ptm_positions;
+  for (size_t i = 0; i < alter_ptrs.size(); i++) {
+    const PtmPtr& ptm_ptr =
+        alter_ptrs[i]->getModPtr()->getModResiduePtr()->getPtmPtr();
+    size_t g = 0;
+    while (g < ptm_alter_ptrs.size() &&
+           !ptm_alter_ptrs[g][0]->getModPtr()->getModResiduePtr()
+                ->getPtmPtr()->isSame(ptm_ptr)) {
+      g++;
+    }
+    if (g == ptm_alter_ptrs.size()) {
+      const ModPtrVec& ptm_mod_ptrs =
+          mng_ptr_->getPtmModPtrVec(alter_ptrs[i]->getModPtr());
+      std::vector<int> positions;
+      for (int pos = shift_ptr->getLeftBpPos();
+           pos < shift_ptr->getRightBpPos(); pos++) {
+        if (isModifiable(sub_res_seq_ptr_->getResiduePtr(pos), ptm_mod_ptrs)) {
+          positions.push_back(pos);
+        }
+      }
+      ptm_alter_ptrs.push_back(AlterPtrVec());
+      ptm_positions.push_back(positions);
+    }
+    ptm_alter_ptrs[g].push_back(alter_ptrs[i]);
+  }
+  // determined: as many candidate residues as alterations for each PTM, and
+  // no residue a candidate of two PTMs
+  std::vector<int> used_positions;
+  for (size_t g = 0; g < ptm_alter_ptrs.size(); g++) {
+    if (ptm_positions[g].size() != ptm_alter_ptrs[g].size()) {
+      return result_ptrs;
+    }
+    for (size_t j = 0; j < ptm_positions[g].size(); j++) {
+      if (std::find(used_positions.begin(), used_positions.end(),
+                    ptm_positions[g][j]) != used_positions.end()) {
+        return result_ptrs;
+      }
+      used_positions.push_back(ptm_positions[g][j]);
+    }
+  }
+  // one shift per alteration, with the modification of its residue
+  // (Deamidated on N or on Q)
+  result_ptrs.clear();
+  for (size_t g = 0; g < ptm_alter_ptrs.size(); g++) {
+    const ModPtrVec& ptm_mod_ptrs =
+        mng_ptr_->getPtmModPtrVec(ptm_alter_ptrs[g][0]->getModPtr());
+    for (size_t j = 0; j < ptm_alter_ptrs[g].size(); j++) {
+      int pos = ptm_positions[g][j];
+      const ResiduePtr& res_ptr = sub_res_seq_ptr_->getResiduePtr(pos);
+      ModPtr mod_ptr = ptm_alter_ptrs[g][j]->getModPtr();
+      for (size_t k = 0; k < ptm_mod_ptrs.size(); k++) {
+        if (res_ptr->isSame(ptm_mod_ptrs[k]->getOriResiduePtr())) {
+          mod_ptr = ptm_mod_ptrs[k];
+          break;
+        }
+      }
+      AlterPtr alter_ptr = std::make_shared<Alter>(
+          pos, pos + 1, AlterType::VARIABLE, ptm_alter_ptrs[g][j]->getMass(),
+          mod_ptr);
+      result_ptrs.push_back(std::make_shared<MassShift>(alter_ptr));
+    }
+  }
+  std::sort(result_ptrs.begin(), result_ptrs.end(), MassShift::cmpPosInc);
+  return result_ptrs;
 }
 
 PrsmPtr VarPtmAlign::geneResult(const ProteoformPtr& sub_proteo_ptr,
@@ -304,8 +408,12 @@ PrsmPtr VarPtmAlign::geneResult(const ProteoformPtr& sub_proteo_ptr,
     return nullptr;
   }
 
-  double refine_prec_mass =
-      sub_proteo_ptr->getMass() + mng_ptr_->shift_list_[best_d_];
+  // the precursor mass of the proteoform with the variable PTMs of the
+  // C-terminal diagonal; the backtracked headers take their C-terminal
+  // shifts from it before their ranges are refined
+  double refine_prec_mass = diagonal_util::refineVarPtmPrecursorAndHeaderShift(
+      sub_proteo_ptr, backtrack_diag_header_ptrs_,
+      mng_ptr_->shift_list_[best_d_]);
 
   SpParaPtr sp_para_ptr = prsm_para_ptr->getSpParaPtr();
   ExtendMsPtrVec refine_ms_ptr_vec = extend_ms_factory::geneMsThreePtrVec(

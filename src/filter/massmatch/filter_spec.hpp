@@ -58,12 +58,26 @@ class FilterSpec {
     return prec_minus_water_mass_error_;
   }
 
+  // The variable PTM filter's spectra for the proteoform N-terminal PTMs,
+  // one for each N-terminal mass m of VarPtmFilterMng: the same spectrum set
+  // with m taken off its N-terminal masses and its precursor mass, as an
+  // N-terminal label of mass m would be (prm_ms_factory). Empty without
+  // such PTMs.
+  const std::vector<std::shared_ptr<FilterSpec>>& getNTermModSpecs() const {
+    return n_term_mod_specs_;
+  }
+
+  void setNTermModSpecs(std::vector<std::shared_ptr<FilterSpec>> specs) {
+    n_term_mod_specs_ = std::move(specs);
+  }
+
  private:
   MsHeaderPtr header_ptr_;
   int group_spec_num_;
   std::vector<std::pair<int, int>> pref_mass_errors_;
   std::vector<std::pair<int, int>> suff_mass_errors_;
   std::pair<int, int> prec_minus_water_mass_error_;
+  std::vector<std::shared_ptr<FilterSpec>> n_term_mod_specs_;
 };
 
 typedef std::shared_ptr<FilterSpec> FilterSpecPtr;

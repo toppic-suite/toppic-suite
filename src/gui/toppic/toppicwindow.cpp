@@ -26,9 +26,10 @@
 #include <QRegularExpression>
 #include <QRegularExpressionValidator>
 #include <QScrollBar>
-#include <QToolTip>
 
 #include <filesystem>
+#include <utility>
+#include <vector>
 
 #include "common/util/file_util.hpp"
 #include "common/util/mem_check.hpp"
@@ -37,6 +38,7 @@
 #include "gui/toppic/ui_toppicwindow.h"
 #include "prsm/prsm_post_mass_match.hpp"
 #include "gui/util/command.hpp"
+#include "gui/util/gui_check.hpp"
 #include "gui/util/gui_message.hpp"
 
 ToppicWindow::ToppicWindow(QWidget* parent)
@@ -46,28 +48,30 @@ ToppicWindow::ToppicWindow(QWidget* parent)
   QString qstr = QString::fromStdString(title);
   this->setWindowTitle(qstr);
   lastDir_ = ".";
-  QRegularExpression rx1("^\\d{1,8}\\.\\d{0,2}$");
+  ui->maxModEdit->setValidator(new QDoubleValidator(0.01, 100000, 2, this));
+  ui->minModEdit->setValidator(
+      new QDoubleValidator(-100000, 100000, 2, this));
+  // E-values and FDRs: any non-negative number, e.g. 0.001 or 1e-5
+  QRegularExpression rx1("\\d{1,8}(\\.\\d{0,12})?([eE]-?\\d{1,3})?");
   QRegularExpressionValidator* validator1 =
       new QRegularExpressionValidator(rx1, this);
-  ui->maxModEdit->setValidator(validator1);
   ui->cutoffSpectralValueEdit->setValidator(validator1);
   ui->cutoffProteoformValueEdit->setValidator(validator1);
   ui->cutoffProteinValueEdit->setValidator(validator1);
-  ui->numCombinedEdit->setValidator(new QIntValidator(0, 2147483647, this));
-  QRegularExpression rx2("^0\\.\\d{0,2}|1.00$");
-  QRegularExpressionValidator* validator2 =
-      new QRegularExpressionValidator(rx2, this);
-  ui->miscoreThresholdEdit->setValidator(validator2);
-  ui->threadNumberEdit->setValidator(new QIntValidator(0, 2147483647, this));
-  ui->errorToleranceEdit->setValidator(new QIntValidator(0, 2147483647, this));
+  ui->numCombinedEdit->setValidator(new QIntValidator(1, 100, this));
+  ui->miscoreThresholdEdit->setValidator(new QDoubleValidator(0, 1, 4, this));
+  ui->threadNumberEdit->setValidator(new QIntValidator(1, 1000, this));
+  ui->errorToleranceEdit->setValidator(new QIntValidator(1, 1000000, this));
   ui->precErrorToleranceEdit->setValidator(
-      new QIntValidator(0, 2147483647, this));
+      new QIntValidator(1, 1000000, this));
   ui->formErrorToleranceEdit->setValidator(
-      new QDoubleValidator(0, 2147483647, 4, this));
-  QRegularExpression rx3("^-?\\d{1,8}\\.\\d{0,2}$");
-  QRegularExpressionValidator* validator3 =
-      new QRegularExpressionValidator(rx3, this);
-  ui->minModEdit->setValidator(validator3);
+      new QDoubleValidator(0.0001, 1000000, 4, this));
+  ui->varPtmNumEdit->setValidator(new QIntValidator(0, 100, this));
+  ui->envCnnCutoffEdit->setValidator(new QDoubleValidator(0, 1, 4, this));
+  // the N-terminal label mass (-N): a non-negative number with up to six
+  // decimals, e.g. 229.162932 for TMT
+  QRegularExpression rx4("^\\d{1,6}(\\.\\d{0,6})?$");
+  ui->nTermLabelEdit->setValidator(new QRegularExpressionValidator(rx4, this));
 
   QFont font;
   QFont outputFont;
@@ -133,6 +137,10 @@ void ToppicWindow::on_defaultButton_clicked() {
   ui->approxSpectraCheckBox->setChecked(false);
   ui->minModEdit->setText(QString::fromStdString(arguments_["minShiftMass"]));
   ui->maxModEdit->setText(QString::fromStdString(arguments_["maxShiftMass"]));
+  ui->nTermLabelEdit->setText(
+      QString::fromStdString(arguments_["nTermLabelMass"]));
+  ui->envCnnCutoffEdit->setText(
+      QString::fromStdString(arguments_["envCnnCutoff"]));
   ui->cutoffSpectralValueEdit->setText(
       QString::fromStdString(arguments_["cutoffSpectralValue"]));
   ui->cutoffProteoformValueEdit->setText(
@@ -173,7 +181,11 @@ void ToppicWindow::on_defaultButton_clicked() {
   ui->keepTempCheckBox->setChecked(false);
   // post mass matching is on by default (arguments_["postMassMatch"])
   ui->postMassMatchCheckBox->setChecked(arguments_["postMassMatch"] == "true");
+  // the SQLite database is written by default (toppic -z, --no-sql)
+  ui->noSqlCheckBox->setChecked(arguments_["noSql"] == "true");
   ui->averageMassCheckBox->setChecked(arguments_["averageMass"] == "true");
+  // the rescoring (toppic --rescore) is off by default
+  ui->rescoreCheckBox->setChecked(arguments_["rescore"] == "true");
 }
 
 void ToppicWindow::updatedir(QString s) {
@@ -217,6 +229,9 @@ void ToppicWindow::on_varPtmFileButton_clicked() {
 }
 
 void ToppicWindow::on_startButton_clicked() {
+  if (checkError()) {
+    return;
+  }
   lockDialog();
 
   std::map<std::string, std::string> argument = this->getArguments();
@@ -293,8 +308,11 @@ std::map<std::string, std::string> ToppicWindow::getArguments() {
   arguments_["oriDatabaseFileName"] =
       ui->databaseFileEdit->text().toStdString();
 
-  arguments_["combinedOutputName"] =
-      ui->combinedOutputEdit->text().trimmed().toStdString();
+  arguments_["combinedOutputName"] = "";
+  if (ui->listWidget->count() >= 2) {
+    arguments_["combinedOutputName"] =
+        ui->combinedOutputEdit->text().trimmed().toStdString();
+  }
   arguments_["activation"] =
       ui->activationComboBox->currentText().toStdString();
   if (ui->decoyCheckBox->isChecked()) {
@@ -373,6 +391,9 @@ std::map<std::string, std::string> ToppicWindow::getArguments() {
 
   arguments_["minShiftMass"] = ui->minModEdit->text().toStdString();
   arguments_["maxShiftMass"] = ui->maxModEdit->text().toStdString();
+  arguments_["nTermLabelMass"] =
+      ui->nTermLabelEdit->text().trimmed().toStdString();
+  arguments_["envCnnCutoff"] = ui->envCnnCutoffEdit->text().toStdString();
 
   if (ui->approxSpectraCheckBox->isChecked()) {
     arguments_["useApproxSpectra"] = "true";
@@ -398,16 +419,25 @@ std::map<std::string, std::string> ToppicWindow::getArguments() {
   } else {
     arguments_["postMassMatch"] = "false";
   }
+  if (ui->noSqlCheckBox->isChecked()) {
+    arguments_["noSql"] = "true";
+  } else {
+    arguments_["noSql"] = "false";
+  }
   if (ui->averageMassCheckBox->isChecked()) {
     arguments_["averageMass"] = "true";
   } else {
     arguments_["averageMass"] = "false";
   }
+  if (ui->rescoreCheckBox->isChecked()) {
+    arguments_["rescore"] = "true";
+  } else {
+    arguments_["rescore"] = "false";
+  }
   arguments_["localThreshold"] = ui->miscoreThresholdEdit->text().toStdString();
-  // the EnvCNN score cutoff and the minimum isotopic peak number of post mass
-  // matching are not shown by the GUI, so the command line leaves them out and
-  // toppic applies its own defaults
-  arguments_.erase("envCnnCutoff");
+  // the minimum isotopic peak number of post mass matching is not shown by
+  // the GUI, so the command line leaves it out and toppic applies its own
+  // default
   arguments_.erase("postMinPeakNum");
   arguments_["groupSpectrumNumber"] = ui->numCombinedEdit->text().toStdString();
   arguments_["localPtmFileName"] = ui->modFileEdit->text().toStdString();
@@ -491,6 +521,8 @@ void ToppicWindow::lockDialog() {
   ui->formErrorToleranceEdit->setEnabled(false);
   ui->maxModEdit->setEnabled(false);
   ui->minModEdit->setEnabled(false);
+  ui->nTermLabelEdit->setEnabled(false);
+  ui->envCnnCutoffEdit->setEnabled(false);
   ui->cutoffSpectralValueEdit->setEnabled(false);
   ui->cutoffProteoformValueEdit->setEnabled(false);
   ui->cutoffProteinValueEdit->setEnabled(false);
@@ -525,7 +557,9 @@ void ToppicWindow::lockDialog() {
   ui->keepDecoyCheckBox->setEnabled(false);
   ui->keepTempCheckBox->setEnabled(false);
   ui->postMassMatchCheckBox->setEnabled(false);
+  ui->noSqlCheckBox->setEnabled(false);
   ui->averageMassCheckBox->setEnabled(false);
+  ui->rescoreCheckBox->setEnabled(false);
 }
 
 void ToppicWindow::unlockDialog() {
@@ -541,6 +575,8 @@ void ToppicWindow::unlockDialog() {
   ui->formErrorToleranceEdit->setEnabled(true);
   ui->maxModEdit->setEnabled(true);
   ui->minModEdit->setEnabled(true);
+  ui->nTermLabelEdit->setEnabled(true);
+  ui->envCnnCutoffEdit->setEnabled(true);
   ui->cutoffSpectralValueEdit->setEnabled(true);
   ui->cutoffProteoformValueEdit->setEnabled(true);
   ui->cutoffProteinValueEdit->setEnabled(true);
@@ -577,7 +613,9 @@ void ToppicWindow::unlockDialog() {
   ui->keepDecoyCheckBox->setEnabled(true);
   ui->keepTempCheckBox->setEnabled(true);
   ui->postMassMatchCheckBox->setEnabled(true);
+  ui->noSqlCheckBox->setEnabled(true);
   ui->averageMassCheckBox->setEnabled(true);
+  ui->rescoreCheckBox->setEnabled(true);
 }
 
 bool ToppicWindow::checkError() {
@@ -587,98 +625,93 @@ bool ToppicWindow::checkError() {
                          QMessageBox::Yes);
     return true;
   }
-
   if (ui->databaseFileEdit->text().toStdString().length() > 200) {
     QMessageBox::warning(this, tr("Warning"),
                          tr("The protein database file path is too long!"),
                          QMessageBox::Yes);
     return true;
   }
+  if (toppic::gui_check::pathWithSpace(this, ui->databaseFileEdit->text(),
+                                       tr("protein database file"))) {
+    return true;
+  }
 
+  if (ui->listWidget->count() == 0) {
+    QMessageBox::warning(this, tr("Warning"),
+                         tr("Please add at least one spectrum file!"),
+                         QMessageBox::Yes);
+    return true;
+  }
   for (int i = 0; i < ui->listWidget->count(); i++) {
-    if (ui->listWidget->item(i)->text().toStdString().length() > 200) {
+    QString sp_file = ui->listWidget->item(i)->text();
+    if (sp_file.toStdString().length() > 200) {
       QMessageBox::warning(this, tr("Warning"),
-                           tr("The sepctrum file path is too long!"),
+                           tr("The spectrum file path is too long!"),
                            QMessageBox::Yes);
+      return true;
+    }
+    if (toppic::gui_check::pathWithSpace(this, sp_file, tr("spectrum file"))) {
+      return true;
+    }
+  }
+  if (ui->listWidget->count() >= 2) {
+    QString combined = ui->combinedOutputEdit->text().trimmed();
+    if (combined.toStdString().length() > 200) {
+      QMessageBox::warning(this, tr("Warning"),
+                           tr("The combined output filename is too long!"),
+                           QMessageBox::Yes);
+      return true;
+    }
+    if (toppic::gui_check::pathWithSpace(this, combined,
+                                         tr("combined output filename"))) {
       return true;
     }
   }
 
-  if (ui->combinedOutputEdit->text().toStdString().length() > 200) {
-    QMessageBox::warning(this, tr("Warning"),
-                         tr("The combined output filename is too long!"),
-                         QMessageBox::Yes);
+  // the click handlers keep one proteoform type and one N-terminal form
+  // checked; toppic refuses empty lists (-R, -n)
+  if (protTypeError() || nterminalError()) {
     return true;
   }
 
-  if (ui->fixedModFileEdit->text().isEmpty() &&
-      ui->fixedModComboBox->currentIndex() == 3) {
-    QMessageBox::warning(this, tr("Warning"),
-                         tr("Please select a fixed modification file!"),
-                         QMessageBox::Yes);
+  if (ui->fixedModComboBox->currentIndex() == 3) {
+    if (ui->fixedModFileEdit->text().isEmpty()) {
+      QMessageBox::warning(this, tr("Warning"),
+                           tr("Please select a fixed modification file!"),
+                           QMessageBox::Yes);
+      return true;
+    }
+    if (toppic::gui_check::pathWithSpace(this, ui->fixedModFileEdit->text(),
+                                         tr("fixed modification file"))) {
+      return true;
+    }
+  }
+  if (toppic::gui_check::pathWithSpace(this, ui->varPtmFileEdit->text(),
+                                       tr("variable PTM file")) ||
+      toppic::gui_check::pathWithSpace(this, ui->modFileEdit->text(),
+                                       tr("PTM file for localization"))) {
     return true;
   }
-  if (ui->errorToleranceEdit->text().isEmpty()) {
-    QMessageBox::warning(this, tr("Warning"),
-                         tr("Fragment error tolerance is empty!"),
-                         QMessageBox::Yes);
-    return true;
-  }
-  if (ui->precErrorToleranceEdit->text().isEmpty()) {
-    QMessageBox::warning(this, tr("Warning"),
-                         tr("Precursor error tolerance is empty!"),
-                         QMessageBox::Yes);
-    return true;
-  }
-  if (ui->formErrorToleranceEdit->text().isEmpty()) {
-    QMessageBox::warning(this, tr("Warning"),
-                         tr("Proteoform error tolerance is empty!"),
-                         QMessageBox::Yes);
-    return true;
-  }
-  if (ui->maxModEdit->text().isEmpty()) {
-    QMessageBox::warning(this, tr("Warning"),
-                         tr("Maximum mass shift is empty!"), QMessageBox::Yes);
-    return true;
-  }
-  if (ui->minModEdit->text().isEmpty()) {
-    QMessageBox::warning(this, tr("Warning"),
-                         tr("Minimum mass shift is empty!"), QMessageBox::Yes);
-    return true;
-  }
-  if (ui->cutoffSpectralValueEdit->text().isEmpty()) {
-    QMessageBox::warning(this, tr("Warning"),
-                         tr("Spectrum-level cutoff value is empty!"),
-                         QMessageBox::Yes);
-    return true;
-  }
-  if (ui->cutoffProteoformValueEdit->text().isEmpty()) {
-    QMessageBox::warning(this, tr("Warning"),
-                         tr("Proteoform-level cutoff value is empty!"),
-                         QMessageBox::Yes);
-    return true;
-  }
-  if (ui->cutoffProteinValueEdit->text().isEmpty()) {
-    QMessageBox::warning(this, tr("Warning"),
-                         tr("Protein-level cutoff value is empty!"),
-                         QMessageBox::Yes);
-    return true;
-  }
-  if (ui->numCombinedEdit->text().isEmpty()) {
-    QMessageBox::warning(this, tr("Warning"),
-                         tr("Number of combined spectra is empty!"),
-                         QMessageBox::Yes);
-    return true;
-  }
-  if (ui->miscoreThresholdEdit->text().isEmpty()) {
-    QMessageBox::warning(this, tr("Warning"), tr("MIScore threshold is empty!"),
-                         QMessageBox::Yes);
-    return true;
-  }
-  if (ui->threadNumberEdit->text().isEmpty()) {
-    QMessageBox::warning(this, tr("Warning"), tr("Thread number is empty!"),
-                         QMessageBox::Yes);
-    return true;
+
+  const std::vector<std::pair<QLineEdit*, QString>> edits = {
+      {ui->precErrorToleranceEdit, tr("Precursor error tolerance")},
+      {ui->errorToleranceEdit, tr("Fragment error tolerance")},
+      {ui->formErrorToleranceEdit, tr("PrSM cluster error tolerance")},
+      {ui->threadNumberEdit, tr("Thread number")},
+      {ui->varPtmNumEdit, tr("Maximum variable PTM number")},
+      {ui->cutoffSpectralValueEdit, tr("Spectrum-level cutoff value")},
+      {ui->cutoffProteoformValueEdit, tr("Proteoform-level cutoff value")},
+      {ui->cutoffProteinValueEdit, tr("Protein-level cutoff value")},
+      {ui->numCombinedEdit, tr("Number of combined spectra")},
+      {ui->maxModEdit, tr("Maximum mass shift")},
+      {ui->minModEdit, tr("Minimum mass shift")},
+      {ui->miscoreThresholdEdit, tr("MIScore threshold")},
+      {ui->nTermLabelEdit, tr("N-terminal label mass")},
+      {ui->envCnnCutoffEdit, tr("Confidence score cutoff")}};
+  for (const auto& [edit, name] : edits) {
+    if (toppic::gui_check::invalidEdit(this, edit, name)) {
+      return true;
+    }
   }
   // Post mass matching reads the TopFD SQLite database of each spectrum file;
   // report a missing one before starting toppic.
@@ -701,6 +734,14 @@ bool ToppicWindow::checkError() {
         return true;
       }
     }
+  }
+  // the rescoring trains on the decoys: toppic refuses --rescore without -d
+  if (ui->rescoreCheckBox->isChecked() && !ui->decoyCheckBox->isChecked()) {
+    QMessageBox::warning(this, tr("Warning"),
+                         tr("To rescore the PrSMs, the checkbox \"decoy "
+                            "database\" should be checked!"),
+                         QMessageBox::Yes);
+    return true;
   }
   return false;
 }
@@ -744,6 +785,7 @@ void ToppicWindow::showArguments() {
        "\nnumOfTopPrsms:" + arguments_["numOfTopPrsms"] +
        "\nminShiftMass:" + arguments_["minShiftMass"] +
        "\nmaxShiftMass:" + arguments_["maxShiftMass"] +
+       "\nnTermLabelMass:" + arguments_["nTermLabelMass"] +
        "\nkeepTempFiles:" + arguments_["keepTempFiles"] +
        "\nlocalThreshold:" + arguments_["localThreshold"] +
        "\ngroupSpectrumNumber:" + arguments_["groupSpectrumNumber"] +
@@ -751,8 +793,10 @@ void ToppicWindow::showArguments() {
        "\nlocalPtmFileName:" + arguments_["localPtmFileName"] +
        "\nthreadNumber:" + arguments_["threadNumber"] + "\nuseFeatureFile:" +
        arguments_["useFeatureFile"] + "\npostMassMatch:" +
-       arguments_["postMassMatch"] + "\naverageMass:" +
-       arguments_["averageMass"] + "\nskipList:" + arguments_["skipList"])
+       arguments_["postMassMatch"] + "\nnoSql:" + arguments_["noSql"] +
+       "\naverageMass:" +
+       arguments_["averageMass"] + "\nrescore:" + arguments_["rescore"] +
+       "\nskipList:" + arguments_["skipList"])
           .c_str(),
       QMessageBox::Yes);
 }
@@ -904,6 +948,24 @@ void ToppicWindow::on_decoyCheckBox_clicked(bool checked) {
                             "\"decoy database\" cannot be unchecked."),
                          QMessageBox::Yes);
     ui->decoyCheckBox->setChecked(true);
+  } else if (!checked && ui->rescoreCheckBox->isChecked()) {
+    QMessageBox::warning(this, tr("Warning"),
+                         tr("Because \"Rescore PrSMs\" is selected, the "
+                            "checkbox \"decoy database\" cannot be "
+                            "unchecked."),
+                         QMessageBox::Yes);
+    ui->decoyCheckBox->setChecked(true);
+  }
+}
+
+// the rescoring trains on the decoys (toppic refuses --rescore without -d)
+void ToppicWindow::on_rescoreCheckBox_clicked(bool checked) {
+  if (checked && !ui->decoyCheckBox->isChecked()) {
+    QMessageBox::warning(this, tr("Warning"),
+                         tr("To rescore the PrSMs, the checkbox \"decoy "
+                            "database\" should be checked!"),
+                         QMessageBox::Yes);
+    ui->rescoreCheckBox->setChecked(false);
   }
 }
 
@@ -931,20 +993,3 @@ bool ToppicWindow::continueToClose() {
   }
 }
 
-bool ToppicWindow::event(QEvent* event) {
-  if (event->type() == QEvent::ToolTip) {
-    QHelpEvent* helpEvent = static_cast<QHelpEvent*>(event);
-    if (QRect(800, 230, 60, 60).contains(helpEvent->pos()) &&
-        ui->tabWidget->currentIndex() == 1) {
-      QToolTip::showText(helpEvent->globalPos(),
-                         "To use an error tolerance other than \n5, 10, and 15 "
-                         "ppm, the checkbox \n\"Lookup table for E-value "
-                         "computation\" should not be selected!");
-    } else {
-      QToolTip::hideText();
-      event->ignore();
-    }
-    return true;
-  }
-  return QWidget::event(event);
-}

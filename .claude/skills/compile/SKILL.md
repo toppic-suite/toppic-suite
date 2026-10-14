@@ -26,8 +26,10 @@ make -j$(nproc)          # macOS: make -j$(sysctl -n hw.ncpu)
 ```
 
 - Build one tool: `make -j$(nproc) topfd` (targets: `topfd`, `topdia`,
-  `topindex`, `toppic`, `topmg`, `topdiff`, and `topfd_gui`, `topdia_gui`,
-  `topindex_gui`, `toppic_gui`, `topmg_gui`, `topdiff_gui`).
+  `topindex`, `toppic`, `topmg`, `topdiff`, `toplib_build`,
+  `toplib_search`, `topcalib`, `topzstd`, and `topfd_gui`, `topdia_gui`,
+  `topindex_gui`, `toppic_gui`, `topmg_gui`, `topdiff_gui`; the developer
+  tool `theo_patt_gen` is outside the default target).
 - Generator-independent form: `cmake --build build --target toppic -j8`.
 - Verify: `bin/toppic -h` (or the tool you built) prints the option list.
 - A `build/` directory usually already exists in this checkout; reuse it
@@ -41,8 +43,10 @@ make -j$(nproc)          # macOS: make -j$(sysctl -n hw.ncpu)
 - Boost >= 1.74: filesystem, iostreams, thread, chrono, serialization,
   program_options. Not `system`: Boost.System is header-only since 1.69,
   and Boost >= 1.90 (Ubuntu 26.04) ships no `boost_system` library or CMake
-  config, so listing it makes `find_package(Boost)` fail.
-- pugixml, SQLite3, zlib development packages.
+  config, so listing it makes `find_package(Boost)` fail. On Windows also
+  nowide (pwiz's UTF-8 console streams and file buffer); elsewhere pwiz uses
+  Boost.Nowide header-only.
+- pugixml, SQLite3, zlib, zstd development packages.
 - Qt6 (Core, Gui, Widgets) for the `*_gui` targets only.
 - Git LFS: the EnvCNN/ECScore model files and the isotope table under
   `res/` are LFS objects. Run `git lfs install` once per machine before
@@ -60,7 +64,7 @@ make -j$(nproc)          # macOS: make -j$(sysctl -n hw.ncpu)
 ```sh
 sudo apt-get update
 sudo apt-get install build-essential cmake clang git git-lfs \
-    zlib1g-dev libsqlite3-dev libpugixml-dev \
+    zlib1g-dev libzstd-dev libsqlite3-dev libpugixml-dev \
     libboost-filesystem-dev libboost-iostreams-dev libboost-thread-dev \
     libboost-chrono-dev libboost-serialization-dev \
     libboost-program-options-dev \
@@ -79,7 +83,7 @@ sudo subscription-manager repos --enable codeready-builder-for-rhel-10-$(arch)-r
 # Rocky/AlmaLinux instead: sudo dnf config-manager --set-enabled crb
 sudo dnf install https://dl.fedoraproject.org/pub/epel/epel-release-latest-10.noarch.rpm
 sudo dnf install cmake gcc-c++ make clang git git-lfs
-sudo dnf install zlib-ng-compat-devel sqlite-devel pugixml-devel boost-devel
+sudo dnf install zlib-ng-compat-devel libzstd-devel sqlite-devel pugixml-devel boost-devel
 sudo dnf install qt6-qtbase-devel
 ```
 
@@ -96,6 +100,7 @@ pacman -S git mingw-w64-ucrt-x86_64-git-lfs
 pacman -S mingw-w64-ucrt-x86_64-gcc mingw-w64-ucrt-x86_64-cmake mingw-w64-ucrt-x86_64-ninja
 pacman -S mingw-w64-ucrt-x86_64-boost mingw-w64-ucrt-x86_64-pugixml \
           mingw-w64-ucrt-x86_64-sqlite3 mingw-w64-ucrt-x86_64-zlib \
+          mingw-w64-ucrt-x86_64-zstd \
           mingw-w64-ucrt-x86_64-onnxruntime
 pacman -S mingw-w64-ucrt-x86_64-qt6-base
 mkdir -p build && cd build
@@ -118,16 +123,17 @@ ninja
 - Install: `cmake --install .` or `ninja install`; `res/` is installed next
   to the executables. `ninja uninstall` reverses it.
 - Release zip: `scripts\win_release.bat [version]` (run from cmd or
-  PowerShell after building) bundles `bin\*.exe`, the UCRT64 DLLs they
-  import, the Qt plugins and `res/` into `toppic-windows-<version>.zip` in the
-  repository root (default version `2.0.0.0`); the extracted folder runs
-  without MSYS2 on `PATH`.
+  PowerShell after building) bundles the twelve executables of the six
+  main tools and their GUIs (not toplib_build, toplib_search, topcalib or
+  topzstd), the UCRT64 DLLs they import, the Qt plugins and `res/` into
+  `toppic-windows-<version>.zip` in the repository root (default version
+  `2.1.0`); the extracted folder runs without MSYS2 on `PATH`.
 
 ### macOS (Xcode CLT + Homebrew)
 
 ```sh
 xcode-select --install
-brew install cmake git git-lfs boost pugixml sqlite zlib onnxruntime
+brew install cmake git git-lfs boost pugixml sqlite zlib zstd onnxruntime
 brew install qt            # Qt6
 mkdir -p build && cd build
 cmake ..
@@ -160,8 +166,9 @@ sudo make install
 sudo make uninstall      # same build directory; reads install_manifest.txt
 ```
 
-`make install` puts the twelve executables in `<prefix>/bin`, the vendored
-ONNX Runtime library in `<prefix>/lib/toppic` (the executables carry an
+`make install` puts the sixteen executables (ten command-line tools and
+six GUIs) in `<prefix>/bin`, the vendored ONNX Runtime library in
+`<prefix>/lib/toppic` (the executables carry an
 `$ORIGIN/../lib/toppic` rpath, so the tree is relocatable), and `res/` in
 `<prefix>/share/toppic`. `make uninstall` deletes every file in the
 manifest and then any directory left empty; without the manifest (build

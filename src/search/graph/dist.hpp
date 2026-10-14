@@ -16,44 +16,52 @@
 #ifndef TOPPIC_SEARCH_GRAPH_DIST_HPP_
 #define TOPPIC_SEARCH_GRAPH_DIST_HPP_
 
-#include <set>
 #include <utility>
 #include <vector>
 
-#include "search/graph/graph.hpp"
-
 namespace toppic {
 
-class Dist {
- public:
-  Dist(const MassGraphPtr& graph_ptr, int d, int i, int j) {
-    graph_ptr_ = graph_ptr;
-    dist_ = d;
-    pair_ij_.push_back(std::pair<int, int>(i, j));
-  }
+// The distances between the vertex pairs of a graph, one entry per distance
+// in increasing order: the d-th distance is dists_[d], and its vertex pairs
+// (i, j) are pairs_[begins_[d]] ... pairs_[begins_[d + 1] - 1], in the order
+// they were found.
+struct DistList {
+  std::vector<int> dists_;
+  std::vector<int> begins_{0};
+  std::vector<std::pair<int, int>> pairs_;
 
-  bool operator<(const Dist& d) const { return dist_ < d.dist_; }
+  // the number of (i, j) pairs and the smallest and the largest distance the
+  // list was built from, including those a cover left out
+  int all_num_ = 0;
+  int all_min_ = 0;
+  int all_max_ = 0;
 
-  mutable std::vector<std::pair<int, int>> pair_ij_;
-
-  int dist_;
-
-  MassGraphPtr getGraphPtr() { return graph_ptr_; }
-
- private:
-  MassGraphPtr graph_ptr_;
+  size_t size() const { return dists_.size(); }
 };
 
-using DistVec = std::vector<Dist>;
-using DistVec2D = std::vector<DistVec>;
+using DistList2D = std::vector<DistList>;
 
-inline bool distVecUp(const Dist& a, const Dist& b) {
-  return a.dist_ < b.dist_;
-}
+// a distance between the vertices i and j of a graph
+struct DistEntry {
+  int dist_;
+  int i_;
+  int j_;
+};
 
-void addToDistVec(const MassGraphPtr& graph_ptr,
-                  const std::vector<std::vector<std::set<int>>>& dist_vecs,
-                  int node_num, int mod_num, DistVec& dist_vec, int gap);
+// Adds the entries to an empty list: one distance per value, in increasing
+// order, each with its (i, j) pairs in the order of the entries. The entries
+// are reordered.
+void addToDistList(std::vector<DistEntry>& entries, DistList& dist_list);
+
+// The distances of the pairs (i, j) of a proteoform graph with j - i at most
+// gap and mod_num variable modifications: dist_vecs[(gap + 1) * i + j - i]
+// [mod_num] holds the distances of the pair, sorted and unique, and a
+// distance of 0 is left out. With a cover, only the distances d with
+// (*dist_cover)[d] set are listed; all_num_, all_min_ and all_max_ count
+// them all.
+void addToDistList(const std::vector<std::vector<std::vector<int>>>& dist_vecs,
+                   int node_num, int mod_num, DistList& dist_list, int gap,
+                   const std::vector<char>* dist_cover = nullptr);
 
 }  // namespace toppic
 

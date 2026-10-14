@@ -16,6 +16,10 @@
 #include "prsm/prsm.hpp"
 
 #include <algorithm>
+#include <cmath>
+#include <iomanip>
+#include <limits>
+#include <sstream>
 
 #include "common/util/logger.hpp"
 #include "common/util/str_util.hpp"
@@ -40,6 +44,7 @@ Prsm::Prsm(const ProteoformPtr& proteoform_ptr,
   spectrum_num_ = deconv_ms_ptr_vec.size();
   ori_prec_mass_ = header_ptr->getFirstPrecMonoMass();
   frac_feature_id_ = header_ptr->getFirstPrecFeatureId();
+  n_term_label_mass_ = sp_para_ptr->getNTermLabelMass();
   init(sp_para_ptr);
 }
 
@@ -115,6 +120,8 @@ XmlDOMElement Prsm::toXmlElement(XmlDOMDocument* xml_doc,
   // the version of TopPIC Suite that wrote the PrSM; the readers refuse a
   // PrSM of another version (PrsmReader::readOnePrsmStr)
   xml_doc->addElement(element, "version", Version::getVersion().c_str());
+  // the search that found the PrSM, toppic or topmg
+  xml_doc->addElement(element, "tool", tool_.c_str());
   xml_doc->addElement(element, "file_name", file_name_.c_str());
   std::string str = std::to_string(prsm_id_);
   xml_doc->addElement(element, "prsm_id", str.c_str());
@@ -133,6 +140,8 @@ XmlDOMElement Prsm::toXmlElement(XmlDOMDocument* xml_doc,
   xml_doc->addElement(element, "ori_prec_mass", str.c_str());
   str = str_util::toString(adjusted_prec_mass_);
   xml_doc->addElement(element, "adjusted_prec_mass", str.c_str());
+  str = str_util::toString(n_term_label_mass_);
+  xml_doc->addElement(element, "n_term_label_mass", str.c_str());
   str = str_util::toString(match_exp_frag_num_);
   xml_doc->addElement(element, "match_exp_frag_num", str.c_str());
   str = str_util::toString(match_theo_frag_num_);
@@ -145,6 +154,20 @@ XmlDOMElement Prsm::toXmlElement(XmlDOMDocument* xml_doc,
   xml_doc->addElement(element, "proteoform_fdr", str.c_str());
   str = str_util::toString(protein_fdr_);
   xml_doc->addElement(element, "protein_fdr", str.c_str());
+  if (!std::isnan(rescore_)) {
+    // a huge value (the lowest double of prsm_rescore::EValueFloor) in the
+    // shortest form that reads back exactly; toString's fixed notation would
+    // write all its 309 digits
+    if (std::abs(rescore_) >= 1e100) {
+      std::ostringstream os;
+      os << std::setprecision(std::numeric_limits<double>::max_digits10)
+         << rescore_;
+      str = os.str();
+    } else {
+      str = str_util::toString(rescore_);
+    }
+    xml_doc->addElement(element, "rescore", str.c_str());
+  }
   str = str_util::toString(frac_feature_inte_);
   xml_doc->addElement(element, "frac_feature_inte", str.c_str());
   str = str_util::toString(frac_feature_score_);
@@ -167,6 +190,10 @@ void Prsm::appendXml(XmlDOMDocument* xml_doc, XmlDOMElement parent) {
 }
 
 void Prsm::parseXml(XmlDOMElement element) {
+  // PrSM files written before <tool> was added have no such element
+  if (xml_dom_util::getChildCount(element, "tool") > 0) {
+    tool_ = xml_dom_util::getChildValue(element, "tool", 0);
+  }
   file_name_ = xml_dom_util::getChildValue(element, "file_name", 0);
   prsm_id_ = xml_dom_util::getIntChildValue(element, "prsm_id", 0);
   spectrum_id_ = xml_dom_util::getIntChildValue(element, "spectrum_id", 0);
@@ -193,10 +220,19 @@ void Prsm::parseXml(XmlDOMElement element) {
       xml_dom_util::getDoubleChildValue(element, "ori_prec_mass", 0);
   adjusted_prec_mass_ =
       xml_dom_util::getDoubleChildValue(element, "adjusted_prec_mass", 0);
+  // PrSM files written before <n_term_label_mass> was added have no such
+  // element
+  if (xml_dom_util::getChildCount(element, "n_term_label_mass") > 0) {
+    n_term_label_mass_ =
+        xml_dom_util::getDoubleChildValue(element, "n_term_label_mass", 0);
+  }
   fdr_ = xml_dom_util::getDoubleChildValue(element, "fdr", 0);
   proteoform_fdr_ =
       xml_dom_util::getDoubleChildValue(element, "proteoform_fdr", 0);
   protein_fdr_ = xml_dom_util::getDoubleChildValue(element, "protein_fdr", 0);
+  if (xml_dom_util::getChildCount(element, "rescore") > 0) {
+    rescore_ = xml_dom_util::getDoubleChildValue(element, "rescore", 0);
+  }
   match_exp_frag_num_ =
       xml_dom_util::getDoubleChildValue(element, "match_exp_frag_num", 0);
   match_theo_frag_num_ =

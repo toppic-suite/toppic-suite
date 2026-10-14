@@ -53,9 +53,6 @@ MzmlMsSqlWriter::MzmlMsSqlWriter(sqlite3* sql_db) : sql_db_(sql_db) {
   ms1_spec_stmt_ = sql_util::prepareSql(sql_db_,
       "INSERT INTO ms1_spectrum(id, scan, retention_time, peak_num, env_num, "
       "base_inte, min_ref_inte) VALUES (?, ?, ?, ?, ?, ?, ?);");
-  ms1_peak_stmt_ = sql_util::prepareSql(sql_db_,
-                           "INSERT INTO ms1_peak(spec_id, peak_id, mz, "
-                           "intensity) VALUES (?, ?, ?, ?);");
   ms1_env_stmt_ = sql_util::prepareSql(sql_db_,
       "INSERT INTO ms1_env(spec_id, env_id, mono_mass, ref_mass, charge, "
       "intensity, envcnn_score, peak_num) VALUES (?, ?, ?, ?, ?, ?, ?, ?);");
@@ -80,7 +77,6 @@ MzmlMsSqlWriter::MzmlMsSqlWriter(sqlite3* sql_db) : sql_db_(sql_db) {
 MzmlMsSqlWriter::~MzmlMsSqlWriter() {
   flush();
   sqlite3_finalize(ms1_spec_stmt_);
-  sqlite3_finalize(ms1_peak_stmt_);
   sqlite3_finalize(ms1_env_stmt_);
   sqlite3_finalize(ms1_env_peak_stmt_);
   sqlite3_finalize(ms2_spec_stmt_);
@@ -127,14 +123,6 @@ void MzmlMsSqlWriter::writeMs1(const MzmlMsPtr& ms_ptr,
   sqlite3_bind_double(ms1_spec_stmt_, 6, base_inte);
   sqlite3_bind_double(ms1_spec_stmt_, 7, min_ref_inte);
   stepAndReset(ms1_spec_stmt_);
-
-  for (size_t i = 0; i < raw_peaks.size(); i++) {
-    sqlite3_bind_int(ms1_peak_stmt_, 1, spec_id);
-    sqlite3_bind_int(ms1_peak_stmt_, 2, static_cast<int>(i));
-    sqlite3_bind_double(ms1_peak_stmt_, 3, raw_peaks[i]->getPosition());
-    sqlite3_bind_double(ms1_peak_stmt_, 4, raw_peaks[i]->getIntensity());
-    stepAndReset(ms1_peak_stmt_);
-  }
 
   for (size_t i = 0; i < envs.size(); i++) {
     EnvPtr theo_env = envs[i]->getTheoEnvPtr();

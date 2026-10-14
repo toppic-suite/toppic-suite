@@ -16,6 +16,7 @@
 #ifndef TOPPIC_PRSM_PRSM_STR_HPP_
 #define TOPPIC_PRSM_PRSM_STR_HPP_
 
+#include <limits>
 #include <string>
 #include <vector>
 
@@ -33,6 +34,9 @@ class PrsmStr {
   std::vector<std::string> getStrVec() { return str_vec_; }
 
   std::string getFileName() { return file_name_; }
+
+  // the search that found the PrSM, "toppic" or "topmg" (Prsm::getTool)
+  std::string getTool() { return tool_; }
 
   int getSpectrumId() { return spectrum_id_; }
 
@@ -88,6 +92,9 @@ class PrsmStr {
 
   double getProteinFdr() { return protein_fdr_; }
 
+  // the score of the rescoring step (Prsm::getRescore); NaN without one
+  double getRescore() { return rescore_; }
+
   double getOriPrecMass() { return ori_prec_mass_; }
 
   double getAdjustedPrecMass() { return adjusted_prec_mass_; }
@@ -128,11 +135,19 @@ class PrsmStr {
 
   static bool cmpEValueIncProtInc(const PrsmStrPtr& a, const PrsmStrPtr& b);
 
+  // the rescoring step's order (prsm_fdr with --rescore): decreasing score,
+  // then increasing protein name, as cmpEValueIncProtInc
+  static bool cmpRescoreDecProtInc(const PrsmStrPtr& a, const PrsmStrPtr& b);
+
   static bool cmpMatchTheoFragDecMatchExpFragDecProtInc(const PrsmStrPtr& a,
                                                         const PrsmStrPtr& b);
 
-  static bool cmpNormMatchTheoFragDecProtInc(const PrsmStrPtr& a,
-                                             const PrsmStrPtr& b);
+  // equal scores in increasing order of the unexpected and variable PTM
+  // numbers, decreasing matched fragments, then the protein, the start and
+  // end positions, ... and last the whole record: a total order, so the
+  // order does not depend on the input
+  static bool cmpNormMatchTheoFragDecPtmNumInc(const PrsmStrPtr& a,
+                                               const PrsmStrPtr& b);
 
   static bool cmpSpecIncPrecIncEvalueIncProtInc(const PrsmStrPtr& a,
                                                 const PrsmStrPtr& b);
@@ -154,6 +169,8 @@ class PrsmStr {
   std::vector<std::string> str_vec_;
 
   std::string file_name_;
+
+  std::string tool_ = "toppic";
 
   int spectrum_id_;
 
@@ -217,6 +234,8 @@ class PrsmStr {
   double proteoform_fdr_;
 
   double protein_fdr_;
+
+  double rescore_ = std::numeric_limits<double>::quiet_NaN();
 };
 
 using PrsmStrPtrVec = std::vector<PrsmStrPtr>;

@@ -37,6 +37,7 @@
 #include "console/topmg_argument.hpp"
 #include "gui/topmg/ui_topmgwindow.h"
 #include "gui/util/command.hpp"
+#include "gui/util/gui_check.hpp"
 #include "gui/util/gui_message.hpp"
 
 TopmgWindow::TopmgWindow(QWidget* parent)
@@ -46,20 +47,23 @@ TopmgWindow::TopmgWindow(QWidget* parent)
   QString qstr = QString::fromStdString(title);
   this->setWindowTitle(qstr);
   lastDir_ = ".";
-  QRegularExpression rx1("^\\d{1,8}\\.\\d{0,2}$");
+  ui->maxModEdit->setValidator(new QDoubleValidator(0.01, 100000, 2, this));
+  // E-values and FDRs: any non-negative number, e.g. 0.001 or 1e-5
+  QRegularExpression rx1("\\d{1,8}(\\.\\d{0,12})?([eE]-?\\d{1,3})?");
   QRegularExpressionValidator* validator1 =
       new QRegularExpressionValidator(rx1, this);
-  ui->maxModEdit->setValidator(validator1);
   ui->cutoffSpectralValueEdit->setValidator(validator1);
   ui->cutoffProteoformValueEdit->setValidator(validator1);
   ui->cutoffProteinValueEdit->setValidator(validator1);
-  ui->threadNumberEdit->setValidator(new QIntValidator(0, 2147483647, this));
-  ui->errorToleranceEdit->setValidator(new QIntValidator(0, 2147483647, this));
+  ui->threadNumberEdit->setValidator(new QIntValidator(1, 1000, this));
+  ui->errorToleranceEdit->setValidator(new QIntValidator(1, 1000000, this));
   ui->precErrorToleranceEdit->setValidator(
-      new QIntValidator(0, 2147483647, this));
+      new QIntValidator(1, 1000000, this));
   ui->envCnnCutoffEdit->setValidator(new QDoubleValidator(0, 1, 4, this));
   ui->formErrorToleranceEdit->setValidator(
-      new QDoubleValidator(0, 2147483647, 4, this));
+      new QDoubleValidator(0.0001, 1000000, 4, this));
+  ui->maxGapLength->setValidator(new QIntValidator(1, 100000, this));
+  ui->maxVarPTMGap->setValidator(new QIntValidator(1, 1000, this));
 
   QFont font;
   QFont outputFont;
@@ -142,8 +146,8 @@ void TopmgWindow::on_defaultButton_clicked() {
   ui->cutoffProteinTypeComboBox->setCurrentIndex(0);
   // number of variable PTMs: 5
   ui->numModComboBox->setCurrentIndex(4);
-  // number of unknown mass shifts: 0
-  ui->numUnknownShiftComboBox->setCurrentIndex(0);
+  // number of unknown mass shifts: 1, TopMG's own number (topmgShiftNumber)
+  ui->numUnknownShiftComboBox->setCurrentIndex(1);
   ui->NONECheckBox->setChecked(true);
   ui->NMECheckBox->setChecked(true);
   ui->NMEACCheckBox->setChecked(true);
@@ -158,6 +162,8 @@ void TopmgWindow::on_defaultButton_clicked() {
       QString::fromStdString(arguments_["varPtmNumInGap"]));
   ui->keepDecoyCheckBox->setChecked(false);
   ui->keepTempCheckBox->setChecked(false);
+  // the SQLite database is written by default (topmg -z, --no-sql)
+  ui->noSqlCheckBox->setChecked(arguments_["noSql"] == "true");
 }
 
 void TopmgWindow::updatedir(QString s) {
@@ -192,6 +198,9 @@ void TopmgWindow::on_modFileButton_clicked() {
 }
 
 void TopmgWindow::on_startButton_clicked() {
+  if (checkError()) {
+    return;
+  }
   lockDialog();
   std::map<std::string, std::string> argument = this->getArguments();
   std::vector<std::string> spec_file_lst = this->getSpecFileList();
@@ -262,8 +271,11 @@ std::map<std::string, std::string> TopmgWindow::getArguments() {
       toppic::file_util::getResourceDir(arguments_["executiveDir"]);
   arguments_["oriDatabaseFileName"] =
       ui->databaseFileEdit->text().toStdString();
-  arguments_["combinedOutputName"] =
-      ui->combinedOutputEdit->text().trimmed().toStdString();
+  arguments_["combinedOutputName"] = "";
+  if (ui->listWidget->count() >= 2) {
+    arguments_["combinedOutputName"] =
+        ui->combinedOutputEdit->text().trimmed().toStdString();
+  }
   arguments_["activation"] =
       ui->activationComboBox->currentText().toStdString();
   if (ui->decoyCheckBox->isChecked()) {
@@ -287,7 +299,7 @@ std::map<std::string, std::string> TopmgWindow::getArguments() {
     arguments_["fixedMod"] = ui->fixedModFileEdit->text().toStdString();
   }
   arguments_["varPtmNumber"] = ui->numModComboBox->currentText().toStdString();
-  arguments_["shiftNumber"] =
+  arguments_["topmgShiftNumber"] =
       ui->numUnknownShiftComboBox->currentText().toStdString();
   arguments_["fragErrorTolerance"] =
       ui->errorToleranceEdit->text().toStdString();
@@ -328,7 +340,7 @@ std::map<std::string, std::string> TopmgWindow::getArguments() {
   arguments_["maxShiftMass"] = ui->maxModEdit->text().toStdString();
   arguments_["proteoGraphGap"] = ui->maxGapLength->text().toStdString();
   arguments_["varPtmNumber"] = ui->numModComboBox->currentText().toStdString();
-  arguments_["shiftNumber"] =
+  arguments_["topmgShiftNumber"] =
       ui->numUnknownShiftComboBox->currentText().toStdString();
   arguments_["varPtmNumInGap"] = ui->maxVarPTMGap->text().toStdString();
   arguments_["varModFileName"] = ui->modFileEdit->text().toStdString();
@@ -348,15 +360,21 @@ std::map<std::string, std::string> TopmgWindow::getArguments() {
   } else {
     arguments_["keepDecoyResults"] = "false";
   }
+  if (ui->noSqlCheckBox->isChecked()) {
+    arguments_["noSql"] = "true";
+  } else {
+    arguments_["noSql"] = "false";
+  }
   if (ui->asfDiagCheckBox->isChecked()) {
     arguments_["useAsfDiag"] = "true";
   } else {
     arguments_["useAsfDiag"] = "false";
   }
+  // whole proteins only is the proteoform type COMPLETE alone
   if (ui->wholeProteinCheckBox->isChecked()) {
-    arguments_["wholeProteinOnly"] = "true";
+    arguments_["allowProtType"] = "COMPLETE";
   } else {
-    arguments_["wholeProteinOnly"] = "false";
+    arguments_["allowProtType"] = "COMPLETE,PREFIX,SUFFIX,INTERNAL";
   }
   // showArguments();
   return arguments_;
@@ -460,6 +478,7 @@ void TopmgWindow::lockDialog() {
   ui->maxVarPTMGap->setEnabled(false);
   ui->keepDecoyCheckBox->setEnabled(false);
   ui->keepTempCheckBox->setEnabled(false);
+  ui->noSqlCheckBox->setEnabled(false);
   ui->asfDiagCheckBox->setEnabled(false);
 }
 
@@ -507,6 +526,7 @@ void TopmgWindow::unlockDialog() {
   ui->maxVarPTMGap->setEnabled(true);
   ui->keepDecoyCheckBox->setEnabled(true);
   ui->keepTempCheckBox->setEnabled(true);
+  ui->noSqlCheckBox->setEnabled(true);
   ui->asfDiagCheckBox->setEnabled(true);
 }
 
@@ -517,36 +537,47 @@ bool TopmgWindow::checkError() {
                          QMessageBox::Yes);
     return true;
   }
-
   if (ui->databaseFileEdit->text().toStdString().length() > 200) {
     QMessageBox::warning(this, tr("Warning"),
                          tr("The protein database file path is too long!"),
                          QMessageBox::Yes);
     return true;
   }
+  if (toppic::gui_check::pathWithSpace(this, ui->databaseFileEdit->text(),
+                                       tr("protein database file"))) {
+    return true;
+  }
 
+  if (ui->listWidget->count() == 0) {
+    QMessageBox::warning(this, tr("Warning"),
+                         tr("Please add at least one spectrum file!"),
+                         QMessageBox::Yes);
+    return true;
+  }
   for (int i = 0; i < ui->listWidget->count(); i++) {
-    if (ui->listWidget->item(i)->text().toStdString().length() > 200) {
+    QString sp_file = ui->listWidget->item(i)->text();
+    if (sp_file.toStdString().length() > 200) {
       QMessageBox::warning(this, tr("Warning"),
-                           tr("The sepctrum file path is too long!"),
+                           tr("The spectrum file path is too long!"),
                            QMessageBox::Yes);
       return true;
     }
+    if (toppic::gui_check::pathWithSpace(this, sp_file, tr("spectrum file"))) {
+      return true;
+    }
   }
-
-  if (ui->combinedOutputEdit->text().toStdString().length() > 200) {
-    QMessageBox::warning(this, tr("Warning"),
-                         tr("The output folder path is too long!"),
-                         QMessageBox::Yes);
-    return true;
-  }
-
-  if (ui->fixedModFileEdit->text().isEmpty() &&
-      ui->fixedModComboBox->currentIndex() == 3) {
-    QMessageBox::warning(this, tr("Warning"),
-                         tr("Please select a fixed modification file!"),
-                         QMessageBox::Yes);
-    return true;
+  if (ui->listWidget->count() >= 2) {
+    QString combined = ui->combinedOutputEdit->text().trimmed();
+    if (combined.toStdString().length() > 200) {
+      QMessageBox::warning(this, tr("Warning"),
+                           tr("The combined output file name is too long!"),
+                           QMessageBox::Yes);
+      return true;
+    }
+    if (toppic::gui_check::pathWithSpace(this, combined,
+                                         tr("combined output file name"))) {
+      return true;
+    }
   }
 
   if (ui->modFileEdit->text().isEmpty()) {
@@ -555,57 +586,46 @@ bool TopmgWindow::checkError() {
                          QMessageBox::Yes);
     return true;
   }
+  if (toppic::gui_check::pathWithSpace(this, ui->modFileEdit->text(),
+                                       tr("variable modification file"))) {
+    return true;
+  }
+  if (ui->fixedModComboBox->currentIndex() == 3) {
+    if (ui->fixedModFileEdit->text().isEmpty()) {
+      QMessageBox::warning(this, tr("Warning"),
+                           tr("Please select a fixed modification file!"),
+                           QMessageBox::Yes);
+      return true;
+    }
+    if (toppic::gui_check::pathWithSpace(this, ui->fixedModFileEdit->text(),
+                                         tr("fixed modification file"))) {
+      return true;
+    }
+  }
+  if (!ui->NONECheckBox->isChecked() && !ui->NMECheckBox->isChecked() &&
+      !ui->NMEACCheckBox->isChecked() && !ui->MACCheckBox->isChecked()) {
+    QMessageBox::warning(this, tr("Warning"),
+                         tr("Please select at least one N-terminal form!"),
+                         QMessageBox::Yes);
+    return true;
+  }
 
-  if (ui->errorToleranceEdit->text().isEmpty()) {
-    QMessageBox::warning(this, tr("Warning"),
-                         tr("Fragment error tolerance is empty!"),
-                         QMessageBox::Yes);
-    return true;
-  }
-  if (ui->precErrorToleranceEdit->text().isEmpty()) {
-    QMessageBox::warning(this, tr("Warning"),
-                         tr("Precursor error tolerance is empty!"),
-                         QMessageBox::Yes);
-    return true;
-  }
-  if (ui->envCnnCutoffEdit->text().isEmpty()) {
-    QMessageBox::warning(this, tr("Warning"),
-                         tr("EnvCNN score cutoff is empty!"), QMessageBox::Yes);
-    return true;
-  }
-  if (ui->formErrorToleranceEdit->text().isEmpty()) {
-    QMessageBox::warning(this, tr("Warning"),
-                         tr("Prsm cluster error tolerance is empty!"),
-                         QMessageBox::Yes);
-    return true;
-  }
-  if (ui->maxModEdit->text().isEmpty()) {
-    QMessageBox::warning(this, tr("Warning"),
-                         tr("Maximum mass shift is empty!"), QMessageBox::Yes);
-    return true;
-  }
-  if (ui->cutoffSpectralValueEdit->text().isEmpty()) {
-    QMessageBox::warning(this, tr("Warning"),
-                         tr("Spectrum-level cutoff value is empty!"),
-                         QMessageBox::Yes);
-    return true;
-  }
-  if (ui->cutoffProteoformValueEdit->text().isEmpty()) {
-    QMessageBox::warning(this, tr("Warning"),
-                         tr("Proteoform-level cutoff value is empty!"),
-                         QMessageBox::Yes);
-    return true;
-  }
-  if (ui->cutoffProteinValueEdit->text().isEmpty()) {
-    QMessageBox::warning(this, tr("Warning"),
-                         tr("Protein-level cutoff value is empty!"),
-                         QMessageBox::Yes);
-    return true;
-  }
-  if (ui->threadNumberEdit->text().isEmpty()) {
-    QMessageBox::warning(this, tr("Warning"), tr("Thread number is empty!"),
-                         QMessageBox::Yes);
-    return true;
+  const std::vector<std::pair<QLineEdit*, QString>> edits = {
+      {ui->precErrorToleranceEdit, tr("Precursor error tolerance")},
+      {ui->errorToleranceEdit, tr("Fragment error tolerance")},
+      {ui->formErrorToleranceEdit, tr("PrSM cluster error tolerance")},
+      {ui->envCnnCutoffEdit, tr("Confidence score cutoff")},
+      {ui->maxModEdit, tr("Maximum mass shift")},
+      {ui->cutoffSpectralValueEdit, tr("Spectrum-level cutoff value")},
+      {ui->cutoffProteoformValueEdit, tr("Proteoform-level cutoff value")},
+      {ui->cutoffProteinValueEdit, tr("Protein-level cutoff value")},
+      {ui->threadNumberEdit, tr("Thread number")},
+      {ui->maxGapLength, tr("Maximum gap length in the graph")},
+      {ui->maxVarPTMGap, tr("Maximum number of variable PTMs in a gap")}};
+  for (const auto& [edit, name] : edits) {
+    if (toppic::gui_check::invalidEdit(this, edit, name)) {
+      return true;
+    }
   }
   // topmg lowers the thread number of a protein sequence filtering step by
   // itself when the memory is tight, one budget per step, so this is not the
@@ -638,17 +658,6 @@ bool TopmgWindow::checkError() {
       return true;
     }
   }
-  if (ui->maxGapLength->text().isEmpty()) {
-    QMessageBox::warning(this, tr("Warning"),
-                         tr("Maximum gap length is empty!"), QMessageBox::Yes);
-    return true;
-  }
-  if (ui->maxVarPTMGap->text().isEmpty()) {
-    QMessageBox::warning(this, tr("Warning"),
-                         tr("Maximum variable PTM in a gap is empty!"),
-                         QMessageBox::Yes);
-    return true;
-  }
   return false;
 }
 
@@ -678,7 +687,7 @@ void TopmgWindow::showArguments() {
        "\ncombinedOutputName:" + arguments_["combinedOutputName"] +
        "\nactivation:" + arguments_["activation"] + "\nsearchType:" +
        arguments_["searchType"] + "\nfixedMod:" + arguments_["fixedMod"] +
-       "\nshiftNumber:" + arguments_["shiftNumber"] +
+       "\ntopmgShiftNumber:" + arguments_["topmgShiftNumber"] +
        "\nprecErrorTolerance:" + arguments_["precErrorTolerance"] +
        "\nfragErrorTolerance:" + arguments_["fragErrorTolerance"] +
        "\nformErrorTolerance:" + arguments_["proteoformErrorTolerance"] +
@@ -692,8 +701,9 @@ void TopmgWindow::showArguments() {
        "\nnumOfTopPrsms:" + arguments_["numOfTopPrsms"] +
        "\nmaxShiftMass:" + arguments_["maxShiftMass"] +
        "\nkeepTempFiles:" + arguments_["keepTempFiles"] +
+       "\nnoSql:" + arguments_["noSql"] +
        "\ngroupSpectrumNumber:" + arguments_["groupSpectrumNumber"] +
-       "\nfilteringResultNumber:" + arguments_["filteringResultNumber"] +
+       "\nasfFilteringResultNumber:" + arguments_["asfFilteringResultNumber"] +
        "\nvarModFileName:" + arguments_["varModFileName"] +
        "\nthreadNumber:" + arguments_["threadNumber"] + "\nuseFeatureFile:" +
        arguments_["useFeatureFile"] + "\nskipList:" + arguments_["skipList"] +

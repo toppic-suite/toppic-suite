@@ -17,7 +17,9 @@
 
 #include <algorithm>
 #include <cstddef>
+#include <iostream>
 #include <map>
+#include <memory>
 #include <string>
 
 #include "common/util/file_util.hpp"
@@ -101,13 +103,14 @@ double fdrRatio(int n_decoy, int n_target) {
 
 }  // namespace
 
-void computePrsmFdr(PrsmStrPtrVec& target_prsms, PrsmStrPtrVec& decoy_prsms) {
+void computePrsmFdr(PrsmStrPtrVec& target_prsms, PrsmStrPtrVec& decoy_prsms,
+                    FdrKey key) {
   int n_decoy = 0;
   for (size_t i = 0; i < target_prsms.size(); i++) {
     int n_target = i + 1;
-    double target_evalue = target_prsms[i]->getEValue();
+    double target_evalue = key(target_prsms[i]);
     for (size_t j = n_decoy; j < decoy_prsms.size(); j++) {
-      if (decoy_prsms[j]->getEValue() <= target_evalue) {
+      if (key(decoy_prsms[j]) <= target_evalue) {
         n_decoy++;
         double fdr = fdrRatio(n_decoy, n_target);
         decoy_prsms[j]->setFdr(fdr);
@@ -121,13 +124,13 @@ void computePrsmFdr(PrsmStrPtrVec& target_prsms, PrsmStrPtrVec& decoy_prsms) {
 }
 
 void computeProteoformFdr(PrsmStrPtrVec2D& target_proteoforms,
-                          PrsmStrPtrVec2D& decoy_proteoforms) {
+                          PrsmStrPtrVec2D& decoy_proteoforms, FdrKey key) {
   int n_decoy = 0;
   for (size_t i = 0; i < target_proteoforms.size(); i++) {
     int n_target = i + 1;
-    double target_evalue = target_proteoforms[i][0]->getEValue();
+    double target_evalue = key(target_proteoforms[i][0]);
     for (size_t j = n_decoy; j < decoy_proteoforms.size(); j++) {
-      if (decoy_proteoforms[j][0]->getEValue() <= target_evalue) {
+      if (key(decoy_proteoforms[j][0]) <= target_evalue) {
         n_decoy++;
         double fdr = fdrRatio(n_decoy, n_target);
         for (size_t k = 0; k < decoy_proteoforms[j].size(); k++) {
@@ -163,13 +166,13 @@ void computeProteoformFdr(PrsmStrPtrVec2D& target_proteoforms,
 // (#decoy proteins with a better or equal E-value) / (#target proteins so
 // far). The value is assigned to every PrSM of the protein.
 void computeProteinFdr(PrsmStrPtrVec2D& target_proteins,
-                       PrsmStrPtrVec2D& decoy_proteins) {
+                       PrsmStrPtrVec2D& decoy_proteins, FdrKey key) {
   int n_decoy = 0;
   for (size_t i = 0; i < target_proteins.size(); i++) {
     int n_target = i + 1;
-    double target_evalue = target_proteins[i][0]->getEValue();
+    double target_evalue = key(target_proteins[i][0]);
     for (size_t j = n_decoy; j < decoy_proteins.size(); j++) {
-      if (decoy_proteins[j][0]->getEValue() <= target_evalue) {
+      if (key(decoy_proteins[j][0]) <= target_evalue) {
         n_decoy++;
         double fdr = fdrRatio(n_decoy, n_target);
         for (size_t k = 0; k < decoy_proteins[j].size(); k++) {
@@ -201,9 +204,68 @@ void computeProteinFdr(PrsmStrPtrVec2D& target_proteins,
   }
 }
 
+namespace {
+
+// the targets within a level's cutoff
+struct PassCounts {
+  int prsm = 0;
+  int proteoform = 0;
+  int protein = 0;
+};
+
+// The spectrum-, proteoform- and protein-level FDRs of one search's PrSMs,
+// which are sorted by the key (the order getProteoformGroups needs), and the
+// targets within the cutoffs: target PrSMs, and target proteoforms and
+// proteins (groups of a target best PrSM) by their FDR.
+PassCounts computeFdrs(const PrsmStrPtrVec& prsms, FdrKey key,
+                       const FdrCutoffs& cutoffs) {
+  PrsmStrPtrVec target_prsms;
+  PrsmStrPtrVec decoy_prsms;
+  for (size_t i = 0; i < prsms.size(); i++) {
+    if (isDecoy(prsms[i])) {
+      decoy_prsms.push_back(prsms[i]);
+    } else {
+      target_prsms.push_back(prsms[i]);
+    }
+  }
+  computePrsmFdr(target_prsms, decoy_prsms, key);
+
+  PrsmStrPtrVec2D all_proteoforms = getProteoformGroups(prsms);
+  PrsmStrPtrVec2D target_proteoforms;
+  PrsmStrPtrVec2D decoy_proteoforms;
+  splitTargetDecoyProteoforms(all_proteoforms, target_proteoforms,
+                              decoy_proteoforms);
+  computeProteoformFdr(target_proteoforms, decoy_proteoforms, key);
+
+  PrsmStrPtrVec2D target_proteins = getProteinGroups(target_proteoforms);
+  PrsmStrPtrVec2D decoy_proteins = getProteinGroups(decoy_proteoforms);
+  computeProteinFdr(target_proteins, decoy_proteins, key);
+
+  PassCounts counts;
+  for (const PrsmStrPtr& prsm_ptr : target_prsms) {
+    if (prsm_ptr->getFdr() <= cutoffs.prsm) {
+      counts.prsm++;
+    }
+  }
+  for (const PrsmStrPtrVec& group : target_proteoforms) {
+    if (group[0]->getProteoformFdr() <= cutoffs.proteoform) {
+      counts.proteoform++;
+    }
+  }
+  for (const PrsmStrPtrVec& group : target_proteins) {
+    if (group[0]->getProteinFdr() <= cutoffs.protein) {
+      counts.protein++;
+    }
+  }
+  return counts;
+}
+
+}  // namespace
+
 void process(const std::string& spec_file_name,
              const std::string& input_file_ext,
-             const std::string& output_file_ext) {
+             const std::string& output_file_ext, bool use_rescore,
+             const FdrCutoffs& cutoffs, bool rescore_fallback) {
   std::string base_name = file_util::basename(spec_file_name);
   std::string input_file_name = base_name + "." + input_file_ext;
 
@@ -218,38 +280,96 @@ void process(const std::string& spec_file_name,
       filtered_prsm_str_ptrs.push_back(prsm_str_ptrs[i]);
     }
   }
-  // E-value order, which computePrsmFdr and getProteoformGroups need; the
-  // target and decoy lists inherit it
-  std::sort(filtered_prsm_str_ptrs.begin(), filtered_prsm_str_ptrs.end(),
-            PrsmStr::cmpEValueIncProtInc);
-  PrsmStrPtrVec target_prsms;
-  PrsmStrPtrVec decoy_prsms;
-  for (size_t i = 0; i < filtered_prsm_str_ptrs.size(); i++) {
-    if (isDecoy(filtered_prsm_str_ptrs[i])) {
-      decoy_prsms.push_back(filtered_prsm_str_ptrs[i]);
-    } else {
-      target_prsms.push_back(filtered_prsm_str_ptrs[i]);
+
+  // The E-value round of a rescored FDR computation runs on copies of the
+  // PrSMs, so that the rescore round below writes the PrSMs as a single
+  // rescored round does; the copies are sorted from the input order as the
+  // E-value computation sorts them (the same order without the rescoring).
+  bool two_rounds = use_rescore && rescore_fallback;
+  std::map<std::string, PrsmStrPtrVec> evalue_by_tool;
+  std::map<const PrsmStr*, PrsmStrPtr> evalue_copies;
+  if (two_rounds) {
+    PrsmStrPtrVec copies;
+    for (const PrsmStrPtr& prsm_ptr : filtered_prsm_str_ptrs) {
+      PrsmStrPtr copy = std::make_shared<PrsmStr>(*prsm_ptr);
+      copies.push_back(copy);
+      evalue_copies[prsm_ptr.get()] = copy;
+    }
+    std::sort(copies.begin(), copies.end(), PrsmStr::cmpEValueIncProtInc);
+    for (const PrsmStrPtr& copy : copies) {
+      evalue_by_tool[copy->getTool()].push_back(copy);
     }
   }
-  computePrsmFdr(target_prsms, decoy_prsms);
 
-  PrsmStrPtrVec2D all_proteoforms = getProteoformGroups(filtered_prsm_str_ptrs);
-  PrsmStrPtrVec2D target_proteoforms;
-  PrsmStrPtrVec2D decoy_proteoforms;
-  splitTargetDecoyProteoforms(all_proteoforms, target_proteoforms,
-                              decoy_proteoforms);
-  computeProteoformFdr(target_proteoforms, decoy_proteoforms);
+  // E-value order (with the rescoring the rescoring step's score order),
+  // which computePrsmFdr and getProteoformGroups need; the target and decoy
+  // lists inherit it
+  FdrKey key = eValueKey;
+  if (use_rescore) {
+    key = rescoreKey;
+    std::sort(filtered_prsm_str_ptrs.begin(), filtered_prsm_str_ptrs.end(),
+              PrsmStr::cmpRescoreDecProtInc);
+  } else {
+    std::sort(filtered_prsm_str_ptrs.begin(), filtered_prsm_str_ptrs.end(),
+              PrsmStr::cmpEValueIncProtInc);
+  }
 
-  PrsmStrPtrVec2D target_proteins = getProteinGroups(target_proteoforms);
-  PrsmStrPtrVec2D decoy_proteins = getProteinGroups(decoy_proteoforms);
-  computeProteinFdr(target_proteins, decoy_proteins);
+  // One FDR per search. TopPIC's E-values come from the generating function
+  // and TopMG's from MCMC sampling, so their decoy distributions are not
+  // comparable: mixed in one target and decoy count, whichever search
+  // produces the smallest decoy E-value sets the cutoff for both. Each
+  // search's PrSMs are therefore counted against its own decoys, and the
+  // cutoffs of TopPIC_report then keep the PrSMs that pass in either - the
+  // passing sets merged.
+  std::map<std::string, PrsmStrPtrVec> by_tool;
+  for (size_t i = 0; i < filtered_prsm_str_ptrs.size(); i++) {
+    by_tool[filtered_prsm_str_ptrs[i]->getTool()].push_back(
+        filtered_prsm_str_ptrs[i]);
+  }
+
+  for (auto& tool_prsms : by_tool) {
+    PassCounts evalue_counts;
+    if (two_rounds) {
+      evalue_counts =
+          computeFdrs(evalue_by_tool[tool_prsms.first], eValueKey, cutoffs);
+    }
+    PassCounts counts = computeFdrs(tool_prsms.second, key, cutoffs);
+
+    if (two_rounds) {
+      // at each level the E-value's FDRs when they give more targets
+      bool evalue_prsm = evalue_counts.prsm > counts.prsm;
+      bool evalue_form = evalue_counts.proteoform > counts.proteoform;
+      bool evalue_prot = evalue_counts.protein > counts.protein;
+      for (const PrsmStrPtr& prsm_ptr : tool_prsms.second) {
+        const PrsmStrPtr& copy = evalue_copies[prsm_ptr.get()];
+        if (evalue_prsm && copy->getFdr() != prsm_ptr->getFdr()) {
+          prsm_ptr->setFdr(copy->getFdr());
+        }
+        if (evalue_form &&
+            copy->getProteoformFdr() != prsm_ptr->getProteoformFdr()) {
+          prsm_ptr->setProteoformFdr(copy->getProteoformFdr());
+        }
+        if (evalue_prot &&
+            copy->getProteinFdr() != prsm_ptr->getProteinFdr()) {
+          prsm_ptr->setProteinFdr(copy->getProteinFdr());
+        }
+      }
+      auto by = [](bool evalue) { return evalue ? "E-value" : "rescore"; };
+      std::cout << "FDR computation - " << tool_prsms.first
+                << ": targets within the cutoffs by E-value / rescore: PrSMs "
+                << evalue_counts.prsm << " / " << counts.prsm
+                << ", proteoforms " << evalue_counts.proteoform << " / "
+                << counts.proteoform << ", proteins " << evalue_counts.protein
+                << " / " << counts.protein << "; FDRs by " << by(evalue_prsm)
+                << ", " << by(evalue_form) << ", " << by(evalue_prot) << "."
+                << std::endl;
+    }
+  }
 
   std::string output_file_name = base_name + "." + output_file_ext;
   PrsmXmlWriter writer(output_file_name);
   std::sort(filtered_prsm_str_ptrs.begin(), filtered_prsm_str_ptrs.end(),
             PrsmStr::cmpSpecIncPrecIncEvalueIncProtInc);
-  std::cout << "target_prsms: " << target_prsms.size()
-            << ", decoy_prsms: " << decoy_prsms.size() << std::endl;
   writer.writeVector(filtered_prsm_str_ptrs);
   writer.close();
 }

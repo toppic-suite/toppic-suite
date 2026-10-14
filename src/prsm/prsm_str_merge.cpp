@@ -114,7 +114,7 @@ void PrsmStrMerge::process() {
                   PrsmStr::cmpMatchTheoFragDecMatchExpFragDecProtInc);
       } else {
         std::sort(cur_str_ptrs.begin(), cur_str_ptrs.end(),
-                  PrsmStr::cmpNormMatchTheoFragDecProtInc);
+                  PrsmStr::cmpNormMatchTheoFragDecPtmNumInc);
       }
       if (remove_dup_) {
         // Remove duplicated PrSMs from the same sequence.

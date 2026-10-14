@@ -34,7 +34,7 @@ if(NOT CMAKE_HOST_WIN32)
   endif()
 endif()
 
-project(TopPIC_claude VERSION 2.0.0.0 LANGUAGES C CXX)
+project(TopPIC_claude VERSION 2.1.0 LANGUAGES C CXX)
 message(STATUS "Project name: " ${PROJECT_NAME})
 message(STATUS "System name: " ${CMAKE_SYSTEM_NAME})
 
@@ -219,37 +219,48 @@ if(WIN32)
 endif()
 
 # A trimmed copy of ProteoWizard (pwiz) is vendored under ext/pwiz; ms/mzml's
-# pw_ms_reader uses it to read mzML/mzMLb files. Only the four source
-# directories below are compiled (the rest of the tree is headers). It is built
-# as a static library against Boost + zlib and linked into toppic_common. The
-# vendored sources include themselves as "pwiz/...", so ext/ is the include root.
-# WITHOUT_MZ5 drops the HDF5-backed mz5 format so no HDF5 dependency is needed.
+# pw_ms_reader uses it to read mzML and mzXML files. ext/pwiz holds only the
+# files TopPIC needs (ext/README.md): every .cpp in it is compiled. It is built
+# as a static library against Boost, zlib and zstd and linked into
+# toppic_common. The vendored sources include themselves as "pwiz/...", so ext/
+# is the include root; ext/boost holds the few headers of pwiz's boost_aux that
+# Boost itself does not have (boost::enums, the singleton utility,
+# nowide/system.hpp). WITHOUT_MZ5 and WITHOUT_MZMLB drop the HDF5-backed mz5
+# and mzMLb formats, so no HDF5 dependency is needed (pwiz reports an mzMLb
+# file as not supported).
 #
 # Boost.System is deliberately not a component: it has been header-only since
 # Boost 1.69 (below our 1.74 minimum), and Boost >= 1.90 (Ubuntu 26.04) no
 # longer ships the compiled stub library or its boost_system CMake config, so
 # requesting it makes find_package fail there. Its symbols (error_code etc.,
 # used through Boost.Filesystem) come from the headers on every platform.
-find_package(Boost 1.74 REQUIRED COMPONENTS filesystem iostreams thread chrono serialization program_options)
-file(GLOB PWIZ_SRCS CONFIGURE_DEPENDS
-  ${CMAKE_CURRENT_SOURCE_DIR}/ext/pwiz/utility/minimxml/*.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/ext/pwiz/utility/misc/*.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/ext/pwiz/data/common/*.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/ext/pwiz/data/msdata/*.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/ext/pwiz/data/msdata/mzmlb/*.cpp)
-# pwiz writes its diagnostics through boost::nowide::cerr/cout (utility/misc/
-# Stream.hpp). On Windows the vendored ext/boost/nowide headers declare those
-# as UTF-8 console streams defined in nowide's iostream.cpp, so that source is
-# compiled into pwiz as well (elsewhere it is an empty translation unit: the
-# header just aliases std::cerr etc.). It is the vendored copy, not the
-# system Boost.Nowide, because the vendored headers predate Boost's version.
-list(APPEND PWIZ_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/ext/boost/nowide/iostream.cpp)
+#
+# pwiz reads and writes through Boost.Nowide (part of Boost since 1.73). Off
+# Windows the parts it uses are header-only (they are the std streams), so
+# only Windows needs the compiled nowide library: its UTF-8 console streams
+# (boost::nowide::cerr etc.) and its file buffer.
+set(TOPPIC_BOOST_COMPONENTS filesystem iostreams thread chrono serialization program_options)
+if(WIN32)
+  list(APPEND TOPPIC_BOOST_COMPONENTS nowide)
+endif()
+find_package(Boost 1.74 REQUIRED COMPONENTS ${TOPPIC_BOOST_COMPONENTS})
+# pwiz's BinaryDataEncoder decodes zstd-compressed binary data arrays
+# (pwiz/utility/misc/mzd.hpp, since pwiz 3.0.26278), so pwiz links libzstd.
+find_path(ZSTD_INCLUDE_DIR zstd.h)
+find_library(ZSTD_LIBRARY NAMES zstd)
+if(NOT ZSTD_INCLUDE_DIR OR NOT ZSTD_LIBRARY)
+  message(FATAL_ERROR "zstd not found: install the zstd development package "
+    "(e.g. libzstd-dev, libzstd-devel, mingw-w64-ucrt-x86_64-zstd or brew zstd)")
+endif()
+file(GLOB_RECURSE PWIZ_SRCS CONFIGURE_DEPENDS
+  ${CMAKE_CURRENT_SOURCE_DIR}/ext/pwiz/*.cpp)
 add_library(pwiz STATIC ${PWIZ_SRCS})
 target_include_directories(pwiz SYSTEM PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/ext)
+target_include_directories(pwiz SYSTEM PRIVATE ${ZSTD_INCLUDE_DIR})
 target_link_libraries(pwiz PUBLIC
   Boost::filesystem Boost::iostreams Boost::thread Boost::chrono
-  ZLIB::ZLIB)
-target_compile_definitions(pwiz PUBLIC WITHOUT_MZ5)
+  ZLIB::ZLIB ${ZSTD_LIBRARY})
+target_compile_definitions(pwiz PUBLIC WITHOUT_MZ5 WITHOUT_MZMLB)
 # SpectrumList_mzML.cpp includes <boost/bind.hpp>, whose "#pragma message"
 # about the deprecated global _1/_2 placeholders is not a warning and so is
 # not silenced by -w below; this keeps the old behaviour and quiets it.
@@ -258,8 +269,9 @@ set_target_properties(pwiz PROPERTIES POSITION_INDEPENDENT_CODE ON)
 # Third-party: silence its warnings (the -Wdeprecated noise from Boost especially).
 target_compile_options(pwiz PRIVATE -w)
 if(WIN32)
-  # random_access_compressed_ifstream.cpp uses ntohl()/htonl() from Winsock.
-  target_link_libraries(pwiz PUBLIC ws2_32)
+  # random_access_compressed_ifstream.cpp uses ntohl()/htonl() from Winsock;
+  # Boost.Nowide's console streams and file buffer are compiled code there.
+  target_link_libraries(pwiz PUBLIC Boost::nowide ws2_32)
 endif()
 
 # src for the hand-written headers, and the build-tree gen/ dir for the
@@ -286,9 +298,20 @@ file(GLOB_RECURSE COMMON_SRCS CONFIGURE_DEPENDS
   ${CMAKE_CURRENT_SOURCE_DIR}/src/filter/*.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/search/*.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/stat/*.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/merge/*.cpp)
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/merge/*.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/toplib/*.cpp)
 
 add_library(toppic_common OBJECT ${COMMON_SRCS})
+
+# src/toplib reproduces the arithmetic of TopLib's Python script (numpy,
+# SciPy, numba), none of which fuses a multiply and an add; the only fused
+# multiply-adds there are the explicit std::fma calls that mirror OpenBLAS.
+if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+  file(GLOB TOPLIB_SRCS CONFIGURE_DEPENDS
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/toplib/*.cpp)
+  set_source_files_properties(${TOPLIB_SRCS} PROPERTIES
+    COMPILE_OPTIONS "-ffp-contract=off")
+endif()
 target_include_directories(toppic_common PUBLIC
   ${CMAKE_CURRENT_SOURCE_DIR}/src
   ${CMAKE_CURRENT_BINARY_DIR}/gen)
@@ -315,6 +338,12 @@ target_link_libraries(toppic_common PUBLIC pwiz)
 # filter/massmatch/mass_match (de)serializes its index with Boost.Serialization;
 # its header exposes boost::serialization::access, so link it PUBLIC.
 target_link_libraries(toppic_common PUBLIC Boost::serialization)
+
+# filter/massmatch/mass_match reads and writes the version 2 index files
+# with zstd frames (toppic_test experiment 150); the include path and
+# library found above for pwiz
+target_include_directories(toppic_common SYSTEM PRIVATE ${ZSTD_INCLUDE_DIR})
+target_link_libraries(toppic_common PRIVATE ${ZSTD_LIBRARY})
 
 # ONNX Runtime: topfd/envcnn and topfd/ecscore/score run the EnvCNN / ECScore
 # neural-network models via the ONNX Runtime C++ API. The C/C++ API headers are
@@ -373,6 +402,8 @@ toppic_console_exe(topfd
 toppic_console_exe(topdia
   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topdia.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topdia_argument.cpp)
+toppic_console_exe(topzstd
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topzstd.cpp)
 toppic_console_exe(topindex
   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topindex.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topindex_argument.cpp
@@ -389,6 +420,19 @@ toppic_console_exe(topdiff
   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topdiff.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topdiff_argument.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topdiff_process.cpp)
+toppic_console_exe(toplib_build
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/console/toplib_build.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/console/toplib_build_argument.cpp)
+toppic_console_exe(toplib_search
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/console/toplib_search.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/console/toplib_search_argument.cpp)
+toppic_console_exe(topcalib
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topcalib.cpp)
+# theo_patt_gen writes TopFD's averagine table res/base_data/theo_patt.txt
+# (common/emass). A developer tool: not part of the default target (build it
+# with `make theo_patt_gen`) and not in TOPPIC_EXECUTABLES, so not installed.
+toppic_console_exe(theo_patt_gen EXCLUDE_FROM_ALL
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/console/theo_patt_gen.cpp)
 
 # ---------------------------------------------------------------------------
 # GUI executables (Qt6)
@@ -442,7 +486,7 @@ toppic_gui_exe(topdia_gui   topdia   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/top
 # ---------------------------------------------------------------------------
 # Install the executables
 #
-# All twelve command-line and GUI executables go to <prefix>/bin. Every one of
+# All fifteen command-line and GUI executables go to <prefix>/bin. Every one of
 # them links the ONNX Runtime shared library (through toppic_common). On Linux
 # that is the vendored .so, so it is installed to <prefix>/${CMAKE_INSTALL_LIBDIR}
 # (lib/toppic) and the executables get an $ORIGIN-relative rpath pointing at
@@ -453,7 +497,8 @@ toppic_gui_exe(topdia_gui   topdia   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/top
 # extra is installed there.
 # ---------------------------------------------------------------------------
 set(TOPPIC_EXECUTABLES
-  topfd topdia topindex toppic topmg topdiff
+  topfd topdia topindex toppic topmg topdiff toplib_build toplib_search
+  topcalib topzstd
   topfd_gui topdia_gui topindex_gui toppic_gui topmg_gui topdiff_gui)
 
 install(TARGETS ${TOPPIC_EXECUTABLES}

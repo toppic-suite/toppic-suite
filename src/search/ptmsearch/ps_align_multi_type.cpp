@@ -17,12 +17,11 @@
 
 #include <algorithm>
 #include <limits>
+#include <sstream>
 
-#include "ms/factory/extend_ms_factory.hpp"
 #include "search/diag/diag_header_util.hpp"
-#include "search/diag/diagonal_util.hpp"
+#include "search/diag/second_align_util.hpp"
 #include "search/oneptmsearch/path_type.hpp"
-#include "seq/proteoform_factory.hpp"
 
 namespace toppic {
 
@@ -60,6 +59,8 @@ PsAlignMultiType::PsAlignMultiType(const std::vector<double>& ms_masses,
 }
 
 void PsAlignMultiType::compute(const ProteoformTypePtrVec& type_ptrs) {
+  type_ptrs_ = type_ptrs;
+  second_align_ptrs_.clear();
   dp(type_ptrs);
   backtrace(type_ptrs);
 }
@@ -154,6 +155,28 @@ void PsAlignMultiType::initDpPair() {
       }
     }
   }
+  // The shift predecessor of pair i on diagonal d is the last pair j of d
+  // (in the position order, y then x) with x_j < x_i and y_j < y_i. Along a
+  // diagonal y never decreases and x increases (two positions of one
+  // diagonal cannot share a peak: their masses differ by a residue, far
+  // more than the tolerance), so the pairs of d that qualify are a prefix
+  // of d's list, cut by y and by x, and its last element is found by two
+  // binary searches. This replaces a scan of every earlier pair for every
+  // pair (quadratic in the pair number; toppic_test experiment 150) with
+  // the same result.
+  std::vector<std::vector<int>> diag_idx(diag_num);
+  std::vector<std::vector<int>> diag_x(diag_num);
+  std::vector<std::vector<int>> diag_y(diag_num);
+  for (size_t i = 0; i < pair_num; i++) {
+    int d = pair_diags[i];
+    if (d >= 0) {
+      diag_idx[d].push_back(static_cast<int>(i));
+      diag_x[d].push_back(pair_xs[i]);
+      diag_y[d].push_back(pair_ys[i]);
+    }
+  }
+  idxes_.reserve(pair_num);
+  penalties_.reserve(pair_num);
   for (size_t i = 0; i < pair_num; i++) {
     std::vector<int> ends(diag_num, -1);
     std::vector<bool> large_shifts(diag_num, false);
@@ -165,15 +188,22 @@ void PsAlignMultiType::initDpPair() {
     }
     int cur_x = pair_xs[i];
     int cur_y = pair_ys[i];
-    for (size_t j = 1; j < i; j++) {
-      int prev_diag = pair_diags[j];
-      if (prev_diag < 0 || pair_xs[j] >= cur_x || pair_ys[j] >= cur_y ||
-          !shift_allowed[prev_diag][cur_diag]) {
+    for (size_t d = 0; d < diag_num; d++) {
+      if (!shift_allowed[d][cur_diag] || diag_idx[d].empty()) {
         continue;
       }
-      ends[prev_diag] = j;
-      if (shift_large[prev_diag][cur_diag]) {
-        large_shifts[prev_diag] = true;
+      // the number of pairs of d with y < cur_y, and with x < cur_x
+      size_t n_y = std::lower_bound(diag_y[d].begin(), diag_y[d].end(), cur_y) -
+                   diag_y[d].begin();
+      size_t n_x = std::lower_bound(diag_x[d].begin(), diag_x[d].end(), cur_x) -
+                   diag_x[d].begin();
+      size_t n = n_y < n_x ? n_y : n_x;
+      if (n == 0) {
+        continue;
+      }
+      ends[d] = diag_idx[d][n - 1];
+      if (shift_large[d][cur_diag]) {
+        large_shifts[d] = true;
       }
     }
     idxes_.push_back(ends);
@@ -396,36 +426,79 @@ PrsmPtr PsAlignMultiType::geneResult(const ProteoformTypePtr& type_ptr,
   if (header_ptrs.size() == 0) {
     return nullptr;
   }
-  int first_pos = header_ptrs[0]->getTruncFirstResPos();
-  int last_pos = header_ptrs[header_ptrs.size() - 1]->getTruncLastResPos();
-  ProteoformPtr sub_proteo_ptr = proteoform_factory::geneSubProteoform(
-      proteo_ptr, proteo_ptr->getFastaSeqPtr(), first_pos, last_pos);
-
-  double min_mass = prsm_para_ptr->getSpParaPtr()->getMinMass();
-  double ppo = prsm_para_ptr->getSpParaPtr()->getPrecTolerancePtr()->getPpo();
-
-  double refine_prec_mass = diagonal_util::refinePrecursorAndHeaderShift(
-      proteo_ptr, ms_three_ptr_vec, header_ptrs, ppo, min_mass,
-      para_ptr_->refine_prec_step_width_);
-
-  SpParaPtr sp_para_ptr = prsm_para_ptr->getSpParaPtr();
-  ExtendMsPtrVec refine_ms_ptr_vec = extend_ms_factory::geneMsThreePtrVec(
-      deconv_ms_ptr_vec, sp_para_ptr, refine_prec_mass);
-
-  DiagHeaderPtrVec refined_header_ptrs = diagonal_util::refineHeadersBgnEnd(
-      proteo_ptr, refine_ms_ptr_vec, header_ptrs, min_mass);
-
-  if (refined_header_ptrs.size() == 0) {
-    return nullptr;
+  // the first alignment's PrSM: main's result
+  double refine_prec_mass = 0;
+  ExtendMsPtrVec refine_ms_ptr_vec;
+  PrsmPtr first_prsm_ptr = second_align_util::genePrsm(
+      proteo_ptr, header_ptrs, deconv_ms_ptr_vec, ms_three_ptr_vec,
+      prsm_para_ptr, refine_prec_mass, refine_ms_ptr_vec);
+  if (!prsm_para_ptr->useSecondAlign() || first_prsm_ptr == nullptr) {
+    return first_prsm_ptr;
   }
 
-  MassShiftPtrVec shifts = diag_header_util::getDiagonalMassChanges(
-      refined_header_ptrs, first_pos, last_pos, AlterType::UNEXPECTED);
-  sub_proteo_ptr->addMassShiftPtrVec(shifts);
+  // the second alignment at the refined precursor, shared by the types
+  // whose first results refine the precursor to the same mass
+  double prec_mass =
+      ms_three_ptr_vec[0]->getMsHeaderPtr()->getFirstPrecMonoMass();
+  std::shared_ptr<PsAlignMultiType> second_align_ptr;
+  for (size_t i = 0; i < second_align_ptrs_.size(); i++) {
+    if (second_align_ptrs_[i].first == refine_prec_mass) {
+      second_align_ptr = second_align_ptrs_[i].second;
+      break;
+    }
+  }
+  if (second_align_ptr == nullptr) {
+    SpParaPtr sp_para_ptr = prsm_para_ptr->getSpParaPtr();
+      PrmPeakPtrVec prm_peaks = second_align_util::genePrmPeaks(
+        deconv_ms_ptr_vec, sp_para_ptr, refine_prec_mass);
+    DiagHeaderPtrVec moved_header_ptrs = second_align_util::moveHeaders(
+        diagonal_ptrs_, refine_prec_mass - prec_mass, refine_prec_mass,
+        proteo_ptr);
+    std::vector<double> ms_masses;
+    DiagonalPtrVec diagonal_ptrs = second_align_util::geneDiagonals(
+        moved_header_ptrs, prm_peaks, deconv_ms_ptr_vec.size(), proteo_ptr,
+        ms_masses);
+    second_align_ptr = std::make_shared<PsAlignMultiType>(
+        ms_masses, seq_masses_, diagonal_ptrs, para_ptr_);
+    second_align_ptr->compute(type_ptrs_);
+    second_align_ptrs_.push_back(
+        std::make_pair(refine_prec_mass, second_align_ptr));
+  }
+  DiagHeaderPtrVec second_header_ptrs =
+      second_align_ptr->getDiagHeaders(type_ptr, shift_num);
 
-  return std::make_shared<Prsm>(sub_proteo_ptr, deconv_ms_ptr_vec,
-                                refine_prec_mass,
-                                prsm_para_ptr->getSpParaPtr());
+  PrsmPtr second_prsm_ptr = nullptr;
+  double second_prec_mass = 0;
+  if (second_header_ptrs.size() > 0) {
+    ExtendMsPtrVec second_ms_ptr_vec;
+    second_prsm_ptr = second_align_util::genePrsm(
+        proteo_ptr, second_header_ptrs, deconv_ms_ptr_vec, refine_ms_ptr_vec,
+        prsm_para_ptr, second_prec_mass, second_ms_ptr_vec, true);
+  }
+  if (second_align_util::logEnabled()) {
+    std::ostringstream out;
+    out.precision(4);
+    out << std::fixed;
+    out << "multi\t" << deconv_ms_ptr_vec[0]->getMsHeaderPtr()->getSpecId()
+        << "\t" << type_ptr->getName() << "\t" << shift_num << "\t"
+        << proteo_ptr->getSeqName() << "\t" << prec_mass << "\t"
+        << getAlignScr(type_ptr, shift_num) << "\t"
+        << refine_prec_mass << "\t"
+        << second_align_util::prsmInfo(first_prsm_ptr) << "\t";
+    if (second_header_ptrs.size() > 0) {
+      out << second_align_ptr->getAlignScr(type_ptr, shift_num) << "\t"
+          << second_prec_mass;
+    } else {
+      out << "-\t-";
+    }
+    out << "\t" << second_align_util::prsmInfo(second_prsm_ptr) << "\t"
+        << (second_prsm_ptr == nullptr ? "first" : "second");
+    second_align_util::log(out.str());
+  }
+  if (second_prsm_ptr == nullptr) {
+    return first_prsm_ptr;
+  }
+  return second_prsm_ptr;
 }
 
 } /* namespace toppic */

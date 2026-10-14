@@ -63,6 +63,8 @@ topfd -T [options] peaks.txt           # one MS/MS spectrum as "m/z intensity" l
 ```
 
 Convert vendor files with `msconvert --mzML --filter "peakPicking true 1-"`.
+Bruker TOF `.d` folders (timsTOF / timsOmni TSF or TDF, maXis BAF) need their
+own conversion on Linux and their own TopFD settings: see the `bruker` skill.
 Outputs for `sample.mzML`: `sample_ms1.msalign`, `sample_ms2.msalign`
 (the search input), `sample_ms1.feature`, `sample_ms2.feature`,
 `sample_feature.xml`, `sample.sqlite`. FAIMS files give one set per
@@ -72,12 +74,17 @@ Key options (defaults): `-c` max charge 30, `-m` max mass 50000,
 `-e` m/z error 0.02, `-a` activation FILE, `-u` threads 1,
 `-r`/`-s` MS1/MS2 S/N ratio 3/1, `-t` ECScore cutoff 0.1, `-b` min scans 1,
 `-o` no MS1 scans (no features, precursor set to the `-m`/`-c` limits),
-`-N` no SQLite, `-D` also store raw MS1 peaks for 3D views,
-`-F`/`--ms2-flashdeconv` deconvolute the MS/MS spectra with FLASHDeconv
-instead of TopFD's own algorithm (experimental; MS1 and the features are
-unchanged).
+`-z` (`--no-sql`; `-N` until 2026-10-13) no SQLite, `-D` also store raw MS1 peaks for 3D views,
+`-p`/`--ms1-deconv <greedy|msdeconv>` and `-q`/`--ms2-deconv
+<greedy|msdeconv|flashdeconv>` the deconvolution methods (default greedy
+for both; `msdeconv` is the MS-Deconv dynamic programming of earlier
+versions, `flashdeconv` FLASHDeconv, experimental, not with `-T`). TopDIA
+takes the same two options (`-p`, `-q`) with `msdeconv` as the default.
+`-f`/`-g` the MS1 and MS/MS EnvCNN cutoffs (0.2, 0; greedy and msdeconv
+only), `-n`/`--env-rank <envcnn|msdeconv>` the envelope ranking, `-j` the
+fragment-number filter (topdia has the same `-f`, `-g`, `-n` and `-j`).
 
-- **Do not use `-N` if TopPIC will search the spectra**: TopPIC's default
+- **Do not use `-z` if TopPIC will search the spectra**: TopPIC's default
   post mass matching needs `sample.sqlite` and fails without it (or run
   `toppic -D`).
 - `-T` mode: only the MS/MS options apply; the peak list need not be
@@ -85,7 +92,7 @@ unchanged).
   matched peak, `PEAK_IDX` is the index after sorting by m/z) and
   `peaks.sqlite`. Useful for inspecting one spectrum's deconvolution; the
   reference test is the horse myoglobin list
-  `~/code/mms/data/myoglobin_peaks.txt` with `topfd -T -g`.
+  `~/code/mms/data/myoglobin_peaks.txt` with `topfd -T -j`.
 
 ## topdia
 
@@ -96,12 +103,13 @@ toppic -D ... proteins.fasta sample_ms2.msalign    # search the pseudo spectra
 
 Needs MS1 and DIA MS/MS scans with recorded isolation windows. Writes the
 pseudo spectra as `sample_ms2.msalign` plus `sample_ms2.feature`, the MS1
-files, `sample.sqlite` (always) and intermediates (`_ms2_raw.msalign`,
+files, `sample.sqlite` (not with `-z`) and intermediates (`_ms2_raw.msalign`,
 `*.csv`) that are left in place. Options are TopFD's with different
 defaults (`-w` 4.0, `-t` 0, `-b` 2) plus fragment-feature and pseudo-spectrum
-options: `-T`/`-B` MS2 ECScore cutoff and min scans (0, 1), `-p`/`-P`
-intensity-correlation cutoffs (0.5), `-v` pseudo score cutoff 0.55,
-`-V` fragments always added 25. No `-N`, `-D` or `-T`-peak-list mode.
+options: `-T`/`-B` MS2 ECScore cutoff and min scans (0, 1), `-y`/`-Y`
+MS1/MS2 intensity-correlation cutoffs (0.5), `-v` pseudo score cutoff 0.55,
+`-V` fragments always added 25; `-j` (`--frag-num-filtering`) and `-z`
+(`--no-sql`, no SQLite) as in TopFD. No `-D` or `-T`-peak-list mode.
 **Search pseudo spectra with `toppic -D`** (post mass matching assumes one
 scan per spectrum). Never pass `-o`: the run aborts at the pseudo-spectrum
 step.

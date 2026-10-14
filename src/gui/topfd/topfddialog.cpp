@@ -30,6 +30,7 @@
 #include <map>
 #include <sstream>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include "common/util/file_util.hpp"
@@ -37,6 +38,7 @@
 #include "common/util/version.hpp"
 #include "gui/topfd/ui_topfddialog.h"
 #include "gui/util/command.hpp"
+#include "gui/util/gui_check.hpp"
 #include "gui/util/gui_message.hpp"
 
 TopFDDialog::TopFDDialog(QWidget* parent)
@@ -49,20 +51,27 @@ TopFDDialog::TopFDDialog(QWidget* parent)
   lastDir_ = ".";
   ui->maxChargeEdit->setValidator(new QIntValidator(1, 100, this));
   ui->maxMassEdit->setValidator(new QIntValidator(1, 1000000, this));
-  QRegularExpression rx1("^0\\.[0]\\d{0,2}[1-9]|0.1$");
-  QRegularExpressionValidator* validator1 = new QRegularExpressionValidator(rx1, this);
+  // 0.0001 to 0.1
+  QRegularExpression rx1("0\\.0\\d{0,2}[1-9]|0\\.1");
+  QRegularExpressionValidator* validator1 =
+      new QRegularExpressionValidator(rx1, this);
   ui->mzErrorEdit->setValidator(validator1);
-  QRegularExpression rx2("^\\d{1,6}\\.\\d{0,2}$");
-  QRegularExpressionValidator* validator2 = new QRegularExpressionValidator(rx2, this);
+  // non-negative, the decimal point optional (the defaults are "3" and "1")
+  QRegularExpression rx2("\\d{1,6}(\\.\\d{0,2})?");
+  QRegularExpressionValidator* validator2 =
+      new QRegularExpressionValidator(rx2, this);
   ui->ms1snRatioEdit->setValidator(validator2);
   ui->ms2snRatioEdit->setValidator(validator2);
-  ui->splitRatioEdit->setValidator(validator2);
-  ui->threadNumberEdit->setValidator(new QIntValidator(0, 1000, this));
+  ui->splitRatioEdit->setValidator(
+      new QDoubleValidator(0.01, 1000000, 2, this));
+  ui->threadNumberEdit->setValidator(new QIntValidator(1, 1000, this));
   ui->minScanNumEdit->setValidator(new QIntValidator(1, 3, this));
   ui->ecscoreCutoffEdit->setValidator(new QDoubleValidator(0.0, 1.0, 4, this));
-  QRegularExpression rx3("^\\d{1,4}\\.\\d{0,2}|10000$");
-  QRegularExpressionValidator* validator3 = new QRegularExpressionValidator(rx3, this);
-  ui->windowSizeEdit->setValidator(validator3);
+  ui->ms1EnvCnnCutoffEdit->setValidator(
+      new QDoubleValidator(0.0, 1.0, 4, this));
+  ui->ms2EnvCnnCutoffEdit->setValidator(
+      new QDoubleValidator(0.0, 1.0, 4, this));
+  ui->windowSizeEdit->setValidator(new QDoubleValidator(0.01, 10000, 2, this));
   QFont font;
   QFont outputFont;
 #if defined(_WIN32) || defined(_WIN64) || defined(__MINGW32__) || \
@@ -124,6 +133,10 @@ void TopFDDialog::on_defaultButton_clicked() {
   ui->threadNumberEdit->setText(QString::number(para_ptr->getThreadNum()));
   ui->ecscoreCutoffEdit->setText(
       QString::number(para_ptr->getMs1EcscoreCutoff()));
+  ui->ms1EnvCnnCutoffEdit->setText(
+      QString::number(para_ptr->getMs1EnvCnnScoreCutoff()));
+  ui->ms2EnvCnnCutoffEdit->setText(
+      QString::number(para_ptr->getMs2EnvCnnScoreCutoff()));
   ui->minScanNumEdit->setText(QString::number(para_ptr->getMs1MinScanNum()));
   ui->msDeconvCheckBox->setChecked(para_ptr->isSortUseMsDeconv());
   ui->missLevelOneCheckBox->setChecked(para_ptr->isMissingLevelOne());
@@ -133,9 +146,11 @@ void TopFDDialog::on_defaultButton_clicked() {
   ui->singleScanNoiseLevelCheckBox->setChecked(
       para_ptr->isUseSingleScanNoiseLevel());
   ui->noSqlCheckBox->setChecked(!para_ptr->isGeneSql());
-  ui->sql3dCheckBox->setChecked(para_ptr->isSql3d());
-  ui->sql3dCheckBox->setEnabled(para_ptr->isGeneSql());
-  ui->ms2FlashDeconvCheckBox->setChecked(para_ptr->isUseFlashDeconv());
+  ui->ms1DeconvComboBox->setCurrentText(
+      QString::fromStdString(para_ptr->getMs1DeconvMethod()));
+  ui->ms2DeconvComboBox->setCurrentText(
+      QString::fromStdString(para_ptr->getMs2DeconvMethod()));
+  ui->textPeakListCheckBox->setChecked(para_ptr->isTextPeakList());
 
   ui->outputTextBrowser->clear();
   ui->outputTextBrowser->setText(
@@ -152,9 +167,13 @@ std::vector<std::string> TopFDDialog::getSpecFileList() {
 }
 
 void TopFDDialog::on_addButton_clicked() {
+  // a text peak list may have any extension (topfd --text-peak-list); an
+  // MGF file of one spectrum is read as one
+  QString filter = ui->textPeakListCheckBox->isChecked()
+                       ? "Text peak lists (*.txt *.mgf);;All files (*)"
+                       : "Spectra files (*.mzXML *.mzML *.mzxml *.mzml)";
   QStringList spfiles = QFileDialog::getOpenFileNames(
-      this, "Select spectrum files", lastDir_,
-      "Spectra files (*.mzXML *.mzML *.mzxml *.mzml)");
+      this, "Select spectrum files", lastDir_, filter);
   for (int i = 0; i < spfiles.size(); i++) {
     QString spfile = spfiles.at(i);
     updatedir(spfile);
@@ -191,15 +210,6 @@ bool TopFDDialog::ableToAdd(QString spfile) {
   return able;
 }
 
-// --sql-3d needs the SQLite database, so the option is unavailable (and
-// cleared) while the database output is turned off.
-void TopFDDialog::on_noSqlCheckBox_toggled(bool checked) {
-  if (checked) {
-    ui->sql3dCheckBox->setChecked(false);
-  }
-  ui->sql3dCheckBox->setEnabled(!checked);
-}
-
 void TopFDDialog::on_delButton_clicked() {
   QListWidgetItem* delItem = ui->listWidget->currentItem();
   ui->listWidget->removeItemWidget(delItem);
@@ -207,6 +217,9 @@ void TopFDDialog::on_delButton_clicked() {
 }
 
 void TopFDDialog::on_startButton_clicked() {
+  if (checkError()) {
+    return;
+  }
   lockDialog();
   toppic::TopfdParaPtr paraPtr = this->getParaPtr();
   std::vector<std::string> specFileList = this->getSpecFileList();
@@ -306,11 +319,16 @@ toppic::TopfdParaPtr TopFDDialog::getParaPtr() {
   para_ptr_->setMissingLevelOne(ui->missLevelOneCheckBox->isChecked());
   para_ptr_->setMs1EcscoreCutoff(
       std::stod(ui->ecscoreCutoffEdit->text().toStdString()));
+  para_ptr_->setMs1EnvCnnScoreCutoff(
+      std::stod(ui->ms1EnvCnnCutoffEdit->text().toStdString()));
+  para_ptr_->setMs2EnvCnnScoreCutoff(
+      std::stod(ui->ms2EnvCnnCutoffEdit->text().toStdString()));
   para_ptr_->setMs1MinScanNum(
       std::stoi(ui->minScanNumEdit->text().toStdString()));
   para_ptr_->setThreadNum(
       std::stoi(ui->threadNumberEdit->text().toStdString()));
-  para_ptr_->setSortUseMsDeconv(ui->msDeconvCheckBox->isChecked());
+  para_ptr_->setDeconvScore(
+      ui->msDeconvCheckBox->isChecked() ? "msdeconv" : "envcnn");
   para_ptr_->setActivation(ui->activationComboBox->currentText().toStdString());
   para_ptr_->setAANumBasedFilter(ui->fragNumFilteringCheckBox->isChecked());
 
@@ -319,8 +337,11 @@ toppic::TopfdParaPtr TopFDDialog::getParaPtr() {
   para_ptr_->setUseSingleScanNoiseLevel(
       ui->singleScanNoiseLevelCheckBox->isChecked());
   para_ptr_->setGeneSql(!ui->noSqlCheckBox->isChecked());
-  para_ptr_->setSql3d(ui->sql3dCheckBox->isChecked());
-  para_ptr_->setUseFlashDeconv(ui->ms2FlashDeconvCheckBox->isChecked());
+  para_ptr_->setMs1DeconvMethod(
+      ui->ms1DeconvComboBox->currentText().toStdString());
+  para_ptr_->setMs2DeconvMethod(
+      ui->ms2DeconvComboBox->currentText().toStdString());
+  para_ptr_->setTextPeakList(ui->textPeakListCheckBox->isChecked());
 
   return para_ptr_;
 }
@@ -346,11 +367,14 @@ void TopFDDialog::lockDialog() {
   ui->activationComboBox->setEnabled(false);
   ui->fragNumFilteringCheckBox->setEnabled(false);
   ui->ecscoreCutoffEdit->setEnabled(false);
+  ui->ms1EnvCnnCutoffEdit->setEnabled(false);
+  ui->ms2EnvCnnCutoffEdit->setEnabled(false);
   ui->disableAdditionalFeatureSearchCheckBox->setEnabled(false);
   ui->singleScanNoiseLevelCheckBox->setEnabled(false);
   ui->noSqlCheckBox->setEnabled(false);
-  ui->sql3dCheckBox->setEnabled(false);
-  ui->ms2FlashDeconvCheckBox->setEnabled(false);
+  ui->ms1DeconvComboBox->setEnabled(false);
+  ui->ms2DeconvComboBox->setEnabled(false);
+  ui->textPeakListCheckBox->setEnabled(false);
 }
 
 void TopFDDialog::unlockDialog() {
@@ -375,73 +399,76 @@ void TopFDDialog::unlockDialog() {
   ui->activationComboBox->setEnabled(true);
   ui->fragNumFilteringCheckBox->setEnabled(true);
   ui->ecscoreCutoffEdit->setEnabled(true);
+  ui->ms1EnvCnnCutoffEdit->setEnabled(true);
+  ui->ms2EnvCnnCutoffEdit->setEnabled(true);
   ui->disableAdditionalFeatureSearchCheckBox->setEnabled(true);
   ui->singleScanNoiseLevelCheckBox->setEnabled(true);
   ui->noSqlCheckBox->setEnabled(true);
-  ui->sql3dCheckBox->setEnabled(!ui->noSqlCheckBox->isChecked());
-  ui->ms2FlashDeconvCheckBox->setEnabled(true);
+  ui->ms1DeconvComboBox->setEnabled(true);
+  ui->ms2DeconvComboBox->setEnabled(true);
+  ui->textPeakListCheckBox->setEnabled(true);
 }
 
 bool TopFDDialog::checkError() {
-  if (ui->maxChargeEdit->text().isEmpty()) {
-    QMessageBox::warning(this, tr("Warning"), tr("Maximum charge is empty!"),
-                         QMessageBox::Yes);
-    return true;
-  }
-
-  if (ui->maxMassEdit->text().isEmpty()) {
-    QMessageBox::warning(this, tr("Warning"), tr("Maximum mass is empty!"),
-                         QMessageBox::Yes);
-    return true;
-  }
-
-  if (ui->mzErrorEdit->text().isEmpty()) {
+  if (ui->listWidget->count() == 0) {
     QMessageBox::warning(this, tr("Warning"),
-                         tr("M/z error tolerance is empty!"), QMessageBox::Yes);
-    return true;
-  }
-
-  if (ui->ms1snRatioEdit->text().isEmpty()) {
-    QMessageBox::warning(this, tr("Warning"), tr("MS1 S/N ratio is empty!"),
+                         tr("Please add at least one spectrum file!"),
                          QMessageBox::Yes);
     return true;
   }
-
-  if (ui->ms2snRatioEdit->text().isEmpty()) {
-    QMessageBox::warning(this, tr("Warning"), tr("MS2 S/N ratio is empty!"),
-                         QMessageBox::Yes);
-    return true;
+  for (int i = 0; i < ui->listWidget->count(); i++) {
+    if (toppic::gui_check::pathWithSpace(
+            this, ui->listWidget->item(i)->text(), tr("spectrum file"))) {
+      return true;
+    }
   }
 
-  if (ui->splitRatioEdit->text().isEmpty()) {
-    QMessageBox::warning(this, tr("Warning"),
-                         tr("Split feature ratio is empty!"), QMessageBox::Yes);
-    return true;
+  const std::vector<std::pair<QLineEdit*, QString>> edits = {
+      {ui->maxChargeEdit, tr("Maximum charge")},
+      {ui->maxMassEdit, tr("Maximum mass")},
+      {ui->mzErrorEdit, tr("M/z error")},
+      {ui->windowSizeEdit, tr("Default precursor window")},
+      {ui->ms1snRatioEdit, tr("MS1 S/N ratio")},
+      {ui->ms2snRatioEdit, tr("MS2 S/N ratio")},
+      {ui->threadNumberEdit, tr("Thread number")},
+      {ui->ms1EnvCnnCutoffEdit, tr("MS1 EnvCNN cutoff")},
+      {ui->ms2EnvCnnCutoffEdit, tr("MS2 EnvCNN cutoff")},
+      {ui->ecscoreCutoffEdit, tr("ECScore cutoff")},
+      {ui->splitRatioEdit, tr("Feature split ratio")},
+      {ui->minScanNumEdit, tr("Feature minimum scan number")}};
+  for (const auto& [edit, name] : edits) {
+    if (toppic::gui_check::invalidEdit(this, edit, name)) {
+      return true;
+    }
   }
 
-  if (ui->windowSizeEdit->text().isEmpty()) {
-    QMessageBox::warning(this, tr("Warning"),
-                         tr("Precursor window size is empty!"),
-                         QMessageBox::Yes);
-    return true;
-  }
-  if (ui->threadNumberEdit->text().isEmpty()) {
-    QMessageBox::warning(this, tr("Warning"), tr("Thread number is empty!"),
-                         QMessageBox::Yes);
-    return true;
+  if (ui->textPeakListCheckBox->isChecked()) {
+    // topfd --text-peak-list reads every input file as a peak list; an
+    // mzML/mzXML file has no line that starts with a number and would give
+    // an empty spectrum
+    for (int i = 0; i < ui->listWidget->count(); i++) {
+      QString spfile = ui->listWidget->item(i)->text();
+      if (spfile.endsWith(".mzML", Qt::CaseInsensitive) ||
+          spfile.endsWith(".mzXML", Qt::CaseInsensitive)) {
+        QMessageBox::warning(
+            this, tr("Warning"),
+            tr("Text peak list input is checked, but %1 is an mzML or mzXML "
+               "file. Remove it or uncheck the option.")
+                .arg(spfile),
+            QMessageBox::Yes);
+        return true;
+      }
+    }
+    // the FLASHDeconv process reads mzML files only; topfd refuses the pair
+    if (ui->ms2DeconvComboBox->currentText() == "flashdeconv") {
+      QMessageBox::warning(this, tr("Warning"),
+                           tr("The MS2 deconvolution method flashdeconv "
+                              "cannot be used with text peak list input!"),
+                           QMessageBox::Yes);
+      return true;
+    }
   }
 
-  if (ui->minScanNumEdit->text().isEmpty()) {
-    QMessageBox::warning(this, tr("Warning"),
-                         tr("Minimum scan number is empty!"), QMessageBox::Yes);
-    return true;
-  }
-
-  if (ui->ecscoreCutoffEdit->text().isEmpty()) {
-    QMessageBox::warning(this, tr("Warning"), tr("ECScore cutoff is empty!"),
-                         QMessageBox::Yes);
-    return true;
-  }
   if (ui->threadNumberEdit->text().toInt() >
       toppic::mem_check::getMaxThreads("topfd")) {
     int max_thread = toppic::mem_check::getMaxThreads("topfd");
@@ -450,7 +477,6 @@ bool TopFDDialog::checkError() {
         QString("Thread number is too large! Based on the memory size, up to "
                 "%1 threads can run on this computer. Are you sure you want to "
                 "proceed?")
-            .arg(max_thread)
             .arg(max_thread),
         QMessageBox::Yes | QMessageBox::No);
     if (reply == QMessageBox::No) {

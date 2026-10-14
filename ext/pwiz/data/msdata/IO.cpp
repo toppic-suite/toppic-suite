@@ -26,6 +26,7 @@
 #include "IO.hpp"
 #include "References.hpp"
 #include "pwiz/utility/minimxml/SAXParser.hpp"
+#include "pwiz/utility/misc/Exception.hpp"
 #include "pwiz/utility/misc/Filesystem.hpp"
 #include "pwiz/utility/misc/Std.hpp"
 #include "SpectrumWorkerThreads.hpp"
@@ -1618,6 +1619,7 @@ PWIZ_API_DECL void read(std::istream& is, ScanList& scanList)
 // BinaryData
 //
 
+#ifndef WITHOUT_MZMLB
 template <typename BinaryDataArrayType>
 void writeMzMLbExtra(stream<Connection_mzMLb>* mzMLb_os, string& dataset, size_t& offset, const string& encoded, XMLWriter& writer, const BinaryDataArrayType& binaryDataArray, const BinaryDataEncoder::Config& usedConfig)
 {
@@ -1626,8 +1628,6 @@ void writeMzMLbExtra(stream<Connection_mzMLb>* mzMLb_os, string& dataset, size_t
 template <>
 void writeMzMLbExtra<BinaryDataArray>(stream<Connection_mzMLb>* mzMLb_os, string& dataset, size_t& offset, const string& encoded, XMLWriter& writer, const BinaryDataArray& binaryDataArray, const BinaryDataEncoder::Config& usedConfig)
 {
-#ifndef WITHOUT_MZMLB
-
     size_t encoded_size = encoded.size();
 
     // mzMLb, including truncation and prediction, from andrew.dowsey@bristol.ac.uk
@@ -1644,7 +1644,10 @@ void writeMzMLbExtra<BinaryDataArray>(stream<Connection_mzMLb>* mzMLb_os, string
             else dataset += "_numpress_slof";
 
             offset = (*mzMLb_os)->seek(dataset, 0, std::ios_base::cur);
-            (*mzMLb_os)->write_opaque(dataset, (const unsigned char*)&encoded[0], encoded_size);
+            if (encoded_size > 0)
+            {
+                (*mzMLb_os)->write_opaque(dataset, (const unsigned char*)&encoded[0], encoded_size);
+            }
         }
         else if (usedConfig.precision == BinaryDataEncoder::Precision_32)
         {
@@ -1731,7 +1734,10 @@ void writeMzMLbExtra<BinaryDataArray>(stream<Connection_mzMLb>* mzMLb_os, string
             dataset += "_float";
             offset = (*mzMLb_os)->seek(dataset, 0, std::ios_base::cur);
             encoded_size = float_data.size() * sizeof(float);
-            (*mzMLb_os)->write(dataset, &float_data[0], float_data.size());
+            if (encoded_size > 0)
+            {
+                (*mzMLb_os)->write(dataset, &float_data[0], float_data.size());
+            }
         }
         else
         {
@@ -1810,17 +1816,17 @@ void writeMzMLbExtra<BinaryDataArray>(stream<Connection_mzMLb>* mzMLb_os, string
             dataset += "_double";
             offset = (*mzMLb_os)->seek(dataset, 0, std::ios_base::cur);
             encoded_size = double_data.size() * sizeof(double);
-            (*mzMLb_os)->write(dataset, &double_data[0], double_data.size());
+            if (encoded_size > 0)
+            {
+                (*mzMLb_os)->write(dataset, &double_data[0], double_data.size());
+            }
         }
     }
-#endif
 }
 
 template <>
 void writeMzMLbExtra<IntegerDataArray>(stream<Connection_mzMLb>* mzMLb_os, string& dataset, size_t& offset, const string& encoded, XMLWriter& writer, const IntegerDataArray& binaryDataArray, const BinaryDataEncoder::Config& usedConfig)
 {
-#ifndef WITHOUT_MZMLB
-
     size_t encoded_size = encoded.size();
 
     if (mzMLb_os)
@@ -1836,7 +1842,10 @@ void writeMzMLbExtra<IntegerDataArray>(stream<Connection_mzMLb>* mzMLb_os, strin
             else dataset += "_numpress_slof";
 
             offset = (*mzMLb_os)->seek(dataset, 0, std::ios_base::cur);
-            (*mzMLb_os)->write_opaque(dataset, (const unsigned char*)&encoded[0], encoded_size);
+            if (encoded_size > 0)
+            {
+                (*mzMLb_os)->write_opaque(dataset, (const unsigned char*)&encoded[0], encoded_size);
+            }
         }
         else
         {
@@ -1845,27 +1854,33 @@ void writeMzMLbExtra<IntegerDataArray>(stream<Connection_mzMLb>* mzMLb_os, strin
             dataset += "_int64";
             offset = (*mzMLb_os)->seek(dataset, 0, std::ios_base::cur);
             encoded_size = int_data.size() * sizeof(int64_t);
-            (*mzMLb_os)->write(dataset, &int_data[0], int_data.size());
+            if (encoded_size > 0)
+            {
+                (*mzMLb_os)->write(dataset, &int_data[0], int_data.size());
+            }
         }
     }
-#endif
 }
+#endif
 
 template <typename BinaryDataArrayType>
 void writeBinaryDataArray(minimxml::XMLWriter& writer, const BinaryDataArrayType& binaryDataArray, const BinaryDataEncoder::Config& config)
 {
     BinaryDataEncoder::Config usedConfig = config;
-    auto overrideItr = config.precisionOverrides.find(binaryDataArray.cvParamChild(MS_binary_data_array).cvid);
+    auto term = binaryDataArray.cvParamChild(MS_binary_data_array).cvid;
+    auto overrideItr = config.precisionOverrides.find(term);
     if (overrideItr != config.precisionOverrides.end())
         usedConfig.precision = overrideItr->second;
-    auto n_overrideItr = config.numpressOverrides.find(binaryDataArray.cvParamChild(MS_binary_data_array).cvid);
+    auto n_overrideItr = config.numpressOverrides.find(term);
     if (n_overrideItr != config.numpressOverrides.end())
         usedConfig.numpress = n_overrideItr->second;
-    auto t_overrideItr = config.truncationOverrides.find(binaryDataArray.cvParamChild(MS_binary_data_array).cvid);
+    auto t_overrideItr = config.truncationOverrides.find(term);
     if (t_overrideItr != config.truncationOverrides.end())
         usedConfig.truncation = t_overrideItr->second;
-    
-    string encoded;	
+    auto c_overrideItr = config.compressionOverrides.find(term);
+    if (c_overrideItr != config.compressionOverrides.end())
+        usedConfig.compression = c_overrideItr->second;
+    string encoded;
 
 #ifndef WITHOUT_MZMLB
     stream<Connection_mzMLb>* mzMLb_os = dynamic_cast<stream<Connection_mzMLb>*>(&writer.getOutputStream());
@@ -1873,7 +1888,7 @@ void writeBinaryDataArray(minimxml::XMLWriter& writer, const BinaryDataArrayType
     {
         usedConfig.format = BinaryDataEncoder::Format_MzMLb;
 
-        auto p_overrideItr = config.predictionOverrides.find(binaryDataArray.cvParamChild(MS_binary_data_array).cvid);
+        auto p_overrideItr = config.predictionOverrides.find(term);
         if (p_overrideItr != config.predictionOverrides.end())
             usedConfig.prediction = p_overrideItr->second;
     }
@@ -1893,21 +1908,23 @@ void writeBinaryDataArray(minimxml::XMLWriter& writer, const BinaryDataArrayType
     size_t encoded_size = encoded.size();
 
     string dataset;
+#ifndef WITHOUT_MZMLB        
     size_t offset;
     writeMzMLbExtra(mzMLb_os, dataset, offset, encoded, writer, binaryDataArray, usedConfig);
+#endif        
 
     // primary array types can never override the default array length
     if (!binaryDataArray.hasCVParam(MS_m_z_array) &&
         !binaryDataArray.hasCVParam(MS_time_array) &&
         !binaryDataArray.hasCVParam(MS_intensity_array))
     {
-#ifndef WITHOUT_MZMLB        
+#ifndef WITHOUT_MZMLB
         if (mzMLb_os)
         {
             attributes.add("arrayLength", 0);
         }
         else
-#endif       
+#endif
         {
             attributes.add("arrayLength", binaryDataArray.data.size());
         }
@@ -1934,6 +1951,7 @@ void writeBinaryDataArray(minimxml::XMLWriter& writer, const BinaryDataArrayType
         throw runtime_error("[IO::write()] mzML: must use little endian encoding.");
 
     bool zlib = false; // Handle numpress+zlib
+    bool zstd = false;
 
     if (usedConfig.prediction == BinaryDataEncoder::Prediction_Linear)
         write(writer, MS_truncation__linear_prediction_and_zlib_compression);
@@ -1950,22 +1968,69 @@ void writeBinaryDataArray(minimxml::XMLWriter& writer, const BinaryDataArrayType
             if (BinaryDataEncoder::Numpress_None == usedConfig.numpress)
                 write(writer, MS_zlib_compression);
             break;
+        case BinaryDataEncoder::Compression_Zstd:
+            zstd = true;
+            if (BinaryDataEncoder::Numpress_None == usedConfig.numpress)
+                write(writer, MS_zstd_compression);
+            break;
+        case BinaryDataEncoder::Compression_ByteShuffleZstd:
+            // codec doesn't mix with Numpress
+            zstd = true;
+            if (config.numpress != BinaryDataEncoder::Numpress_None)
+                throw runtime_error("[IO::write()] Cannot combine byte-shuffling encoding Zstd with MS-Numpress.");
+            write(writer, MS_byte_shuffled_zstd_compression);
+            break;
+        case BinaryDataEncoder::Compression_DictZstd:
+            // codec doesn't mix with Numpress
+            zstd = true;
+            if (config.numpress != BinaryDataEncoder::Numpress_None)
+                throw runtime_error("[IO::write()] Cannot combine dictionary encoding Zstd with MS-Numpress.");
+            write(writer, MS_dictionary_encoded_zstd_compression);
+            break;
         default:
             throw runtime_error("[IO::write()] Unsupported compression method.");
             break;
     }
+    CVID numpressTerm;
     switch (usedConfig.numpress) {
         case BinaryDataEncoder::Numpress_Linear:
             write(writer, isIntegerArray ? MS_32_bit_integer : MS_32_bit_float); // This should actually be ignored by any reader since numpress defines word size and format, but it makes output standards-compliant and is pretty close to true anyway
-            write(writer, zlib ? MS_MS_Numpress_linear_prediction_compression_followed_by_zlib_compression : MS_MS_Numpress_linear_prediction_compression);
+            numpressTerm = MS_MS_Numpress_linear_prediction_compression;
+            if (zlib)
+            {
+                numpressTerm = MS_MS_Numpress_linear_prediction_compression_followed_by_zlib_compression;
+            }
+            else if (zstd)
+            {
+                numpressTerm = MS_MS_Numpress_linear_prediction_compression_followed_by_zstd_compression;
+            }
+            write(writer, numpressTerm);
             break;
         case BinaryDataEncoder::Numpress_Pic:
             write(writer, isIntegerArray ? MS_32_bit_integer : MS_32_bit_float); // This should actually be ignored by any reader since numpress defines word size and format, but it makes output standards-compliant and is pretty close to true anyway
-            write(writer, zlib ? MS_MS_Numpress_positive_integer_compression_followed_by_zlib_compression : MS_MS_Numpress_positive_integer_compression);
+            numpressTerm = MS_MS_Numpress_positive_integer_compression;
+            if (zlib)
+            {
+                numpressTerm = MS_MS_Numpress_positive_integer_compression_followed_by_zlib_compression;
+            }
+            else if (zstd)
+            {
+                numpressTerm = MS_MS_Numpress_positive_integer_compression_followed_by_zstd_compression;
+            }
+            write(writer, numpressTerm);
             break;
         case BinaryDataEncoder::Numpress_Slof:
             write(writer, isIntegerArray ? MS_32_bit_integer : MS_32_bit_float); // This should actually be ignored by any reader since numpress defines word size and format, but it makes output standards-compliant and is pretty close to true anyway
-            write(writer, zlib ? MS_MS_Numpress_short_logged_float_compression_followed_by_zlib_compression : MS_MS_Numpress_short_logged_float_compression);
+            numpressTerm = MS_MS_Numpress_short_logged_float_compression;
+            if (zlib)
+            {
+                numpressTerm = MS_MS_Numpress_short_logged_float_compression_followed_by_zlib_compression;
+            }
+            else if (zstd)
+            {
+                numpressTerm = MS_MS_Numpress_short_logged_float_compression_followed_by_zstd_compression;
+            }
+            write(writer, numpressTerm);
             break;
         case BinaryDataEncoder::Numpress_None:
             break;
@@ -1983,7 +2048,7 @@ void writeBinaryDataArray(minimxml::XMLWriter& writer, const BinaryDataArrayType
     }
 #endif
 
-    writeParamContainer(writer, binaryDataArray); 
+    writeParamContainer(writer, binaryDataArray);
 
 #ifndef WITHOUT_MZMLB
     if (mzMLb_os)
@@ -2333,6 +2398,15 @@ struct HandlerBinaryDataArray : public HandlerParamContainer
                 case MS_zlib_compression:
                     config.compression = BinaryDataEncoder::Compression_Zlib;
                     break;
+                case MS_zstd_compression:
+                    config.compression = BinaryDataEncoder::Compression_Zstd;
+                    break;
+                case MS_byte_shuffled_zstd_compression:
+                    config.compression = BinaryDataEncoder::Compression_ByteShuffleZstd;
+                    break;
+                case MS_dictionary_encoded_zstd_compression:
+                    config.compression = BinaryDataEncoder::Compression_DictZstd;
+                    break;
                 case MS_MS_Numpress_linear_prediction_compression:
                     config.numpress = BinaryDataEncoder::Numpress_Linear;
                     break;
@@ -2346,17 +2420,34 @@ struct HandlerBinaryDataArray : public HandlerParamContainer
                     config.numpress = BinaryDataEncoder::Numpress_Linear;
                     config.compression = BinaryDataEncoder::Compression_Zlib;
                     break;
+                case MS_MS_Numpress_linear_prediction_compression_followed_by_zstd_compression:
+                    config.numpress = BinaryDataEncoder::Numpress_Linear;
+                    config.compression = BinaryDataEncoder::Compression_Zstd;
+                    break;
                 case MS_MS_Numpress_positive_integer_compression_followed_by_zlib_compression:
                     config.numpress = BinaryDataEncoder::Numpress_Pic;
                     config.compression = BinaryDataEncoder::Compression_Zlib;
+                    break;
+                case MS_MS_Numpress_positive_integer_compression_followed_by_zstd_compression:
+                    config.numpress = BinaryDataEncoder::Numpress_Pic;
+                    config.compression = BinaryDataEncoder::Compression_Zstd;
                     break;
                 case MS_MS_Numpress_short_logged_float_compression_followed_by_zlib_compression:
                     config.numpress = BinaryDataEncoder::Numpress_Slof;
                     config.compression = BinaryDataEncoder::Compression_Zlib;
                     break;
+                case MS_MS_Numpress_short_logged_float_compression_followed_by_zstd_compression:
+                    config.numpress = BinaryDataEncoder::Numpress_Slof;
+                    config.compression = BinaryDataEncoder::Compression_Zstd;
+                    break;
                 default:
                     throw runtime_error("[IO::HandlerBinaryDataArray] Unknown compression type.");
             }
+        }
+
+        if ((config.compression == BinaryDataEncoder::Compression_DictZstd || config.compression == BinaryDataEncoder::Compression_ByteShuffleZstd)
+            && config.numpress != BinaryDataEncoder::Numpress_None) {
+            throw runtime_error("[IO::HandlerBinaryDataArray] Cannot combine complex Zstd compression with Numpress!");
         }
 
         // with mzMLb, binary data type is used to indicate whether the array should be restored into a BinaryDataArray or an IntegerDataArray
@@ -2364,7 +2455,11 @@ struct HandlerBinaryDataArray : public HandlerParamContainer
         //            when numpress is off, it is used to indicate the original array type
 
         // if numpress is on, make sure Numpress PIC arrays are directed to BinaryDataArray instead of IntegerDataArray
+#ifdef WITHOUT_MZMLB
+        auto mzMLb_is = false;
+#else
         auto mzMLb_is = dynamic_cast<stream<Connection_mzMLb>*>(is_);
+#endif
         if (BinaryDataEncoder::Numpress_None != config.numpress && !mzMLb_is)
             switch (cvidBinaryDataType)
             {
@@ -2379,9 +2474,14 @@ struct HandlerBinaryDataArray : public HandlerParamContainer
                 default:
                     break;
             }
-
-        switch (cvidBinaryDataType)
+        if ((BinaryDataEncoder::Numpress_None != config.numpress || mzMLb_is) &&
+            (config.compression == BinaryDataEncoder::Compression_ByteShuffleZstd || config.compression == BinaryDataEncoder::Compression_DictZstd))
         {
+            throw runtime_error("[IO::HandlerBinaryDataArray] Cannot combine advanced Zstd compression with Numpress or mzMLb.");
+        }
+
+            switch (cvidBinaryDataType)
+            {
             case MS_32_bit_float:
             case MS_32_bit_integer:
                 if (BinaryDataEncoder::Numpress_None == config.numpress)
@@ -2440,10 +2540,12 @@ struct HandlerBinaryDataArray : public HandlerParamContainer
             if (config.numpress != BinaryDataEncoder::Numpress_None)
             {
                 vector<char> buf(encodedLength_);
-                (*mzMLb_is)->read_opaque(external_dataset_, &buf[0], encodedLength_);
+                if (encodedLength_ > 0)
+                    (*mzMLb_is)->read_opaque(external_dataset_, &buf[0], encodedLength_);
                 config.format = BinaryDataEncoder::Format_MzMLb;
                 BinaryDataEncoder encoder(config);
-                encoder.decode(&buf[0], buf.size(), binaryDataArray->data);
+                if (encodedLength_ > 0)
+                    encoder.decode(&buf[0], buf.size(), binaryDataArray->data);
             }
             else
             {
@@ -2912,7 +3014,7 @@ void write(minimxml::XMLWriter& writer, const SpectrumList& spectrumList, const 
                 continue;
             }
             else
-                throw;
+                throw pwiz::util::enumeration_error(e.what());
         }
 
         // save write position
@@ -3044,7 +3146,7 @@ void write(minimxml::XMLWriter& writer, const ChromatogramList& chromatogramList
                     chromatogramPositions->push_back(-1);
                 continue;
             }
-            throw;
+            throw pwiz::util::enumeration_error(e.what());
         }
 
         // save write position

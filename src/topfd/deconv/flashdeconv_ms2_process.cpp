@@ -31,6 +31,7 @@
 #include <utility>
 #include <vector>
 
+#include "common/base/mass_constant.hpp"
 #include "common/thread/simple_thread_pool.hpp"
 #include "common/util/file_util.hpp"
 #include "common/util/logger.hpp"
@@ -85,8 +86,9 @@ namespace flashdeconv_ms2_process {
 // Constants.h)
 // ----------------------------------------------------------------------------
 
-// Constants::PROTON_MASS_U; positive ionization mode
-constexpr double kProtonMass = 1.0072764667710;
+// The proton mass (positive ionization mode) is TopPIC's,
+// mass_constant::getProtonMass() (CODATA 2022), not FLASHDeconv's
+// Constants::PROTON_MASS_U (1.007276466771, CODATA 2006).
 // Constants::ISOTOPE_MASSDIFF_55K_U: the isotope spacing FLASHDeconv uses
 constexpr double kIsoDaDistance = 1.002371;
 // -SD:tol for MS2 (ppm); FLASHDeconv's own tolerance, not TopFD's -e
@@ -296,13 +298,13 @@ struct LogMzPeak {
   LogMzPeak(double mz_value, double inte)
       : mz(mz_value),
         intensity(inte),
-        log_mz(std::log(mz_value - kProtonMass)) {}
+        log_mz(std::log(mz_value - mass_constant::getProtonMass())) {}
 
   double getUnchargedMass() const {
     if (abs_charge == 0) {
       return 0;
     }
-    return (mz - kProtonMass) * abs_charge;
+    return (mz - mass_constant::getProtonMass()) * abs_charge;
   }
 
   bool operator<(const LogMzPeak& a) const {
@@ -565,10 +567,10 @@ LogMzPeakVec PeakGroup::recruitAllPeaksInSpectrum(const PeakPtrVec& peaks,
     if (c <= 0) {
       break;
     }
-    double cmz = mono_mass / c + kProtonMass;
+    double cmz = mono_mass / c + mass_constant::getProtonMass();
     double left_mz =
         (mono_mass - (1 - kMinNegativeIsotopeIndex) * kIsoDaDistance) / c +
-        kProtonMass;
+        mass_constant::getProtonMass();
     int index = findNearest(peaks, left_mz * (1 - tol * mul_tol));
     double iso_delta = kIsoDaDistance / c;
     for (; index < peak_num; index++) {
@@ -1078,7 +1080,8 @@ void PeakGroup::updatePerChargeCos(const Averagine& avg, double tol) {
 
 double PeakGroup::getPpmError(const LogMzPeak& p) const {
   double mass = mono_mass_ + p.isotope_index * kIsoDaDistance;
-  return (mass / p.abs_charge + kProtonMass - p.mz) / p.mz * 1e6;
+  return (mass / p.abs_charge + mass_constant::getProtonMass() - p.mz) /
+         p.mz * 1e6;
 }
 
 // PeakGroup::updateAvgMassError_: the mean, over the isotope indices, of the
@@ -1876,7 +1879,8 @@ void FlashDeconvSingleSp::removeChargeErrorPeakGroups() {
     for (int i : pg_is) {
       bool is_overlap = false;
       double mass1 = peak_groups_[i].getMonoMass();
-      int repz1 = static_cast<int>(std::round(mass1 / (pmz - kProtonMass)));
+      int repz1 = static_cast<int>(
+          std::round(mass1 / (pmz - mass_constant::getProtonMass())));
       // an almost perfect signal is not filtered
       if (peak_groups_[i].getSnr() > high_snr &&
           peak_groups_[i].getChargeSnr(repz1) > high_snr) {
@@ -1887,7 +1891,8 @@ void FlashDeconvSingleSp::removeChargeErrorPeakGroups() {
           continue;
         }
         double mass2 = peak_groups_[j].getMonoMass();
-        int repz2 = static_cast<int>(std::round(mass2 / (pmz - kProtonMass)));
+        int repz2 = static_cast<int>(
+            std::round(mass2 / (pmz - mass_constant::getProtonMass())));
         if (repz1 == repz2) {
           continue;
         }

@@ -86,12 +86,22 @@ TopfdParaPtr Argument::getTopfdParaPtrForTopdia() {
   topfd_para_ptr->setMsTwoRankPeakDistance(TOPDIA_MS2_RANK_PEAK_DISTANCE);
   topfd_para_ptr->setMsTwoHarmonicCheck(false);
   topfd_para_ptr->setMassGroupBoundary(TOPDIA_MASS_GROUP_BOUNDARY);
+  // TopDIA also keeps MS-Deconv's MS1 and MS/MS deconvolution by default:
+  // TopFD's default greedy searches were measured on DDA data only
+  // (toppic_test experiments 104, 106 and 109). --ms1-deconv and
+  // --ms2-deconv select them.
+  topfd_para_ptr->setMs1DeconvMethod("msdeconv");
+  topfd_para_ptr->setMs2DeconvMethod("msdeconv");
+  // nor does it correct precursor isotopes with fragment pairs (TopFD's
+  // default, measured on DDA data in experiment 116): the fragments of a DIA
+  // MS/MS scan come from every co-isolated precursor.
+  topfd_para_ptr->setMs2PrecPairRefine(false);
   return topfd_para_ptr;
 }
 
 void Argument::showUsage(
     const boost::program_options::options_description& desc) {
-  std::cout << "Usage: topdia [options] spectrum-file-name" << std::endl;
+  std::cout << "Usage: topdia [options] spectrum-file-names" << std::endl;
   std::cout << desc << std::endl;
   std::cout << "Version: " << Version::getVersion() << std::endl;
 }
@@ -116,6 +126,14 @@ bool Argument::parse(int argc, char* argv[]) {
   std::string pseudo_min_peaks = "";
   std::string ms1_seed_env_inte_corr_tole_cutoff = "";
   std::string ms2_seed_env_inte_corr_tole_cutoff = "";
+  // deconvolution methods
+  std::string deconv_ms1 = "";
+  std::string deconv_ms2 = "";
+  // the score that ranks the envelopes
+  std::string env_rank = "";
+  // the EnvCNN score cutoffs of the MS1 and MS/MS envelopes
+  std::string ms1_env_cnn_score_cutoff = "";
+  std::string ms2_env_cnn_score_cutoff = "";
 
   // Define and parse the program options
   try {
@@ -124,72 +142,117 @@ bool Argument::parse(int argc, char* argv[]) {
     po::options_description visible_desc("Options");
     visible_desc.add_options()("help,h", "Print this help message.")(
         "activation,a", po::value<std::string>(&activation),
-        "<CID|ETD|HCD|MPD|UVPD|FILE>. Fragmentation method of MS/MS spectra. "
-        "When FILE is used, the fragmentation methods of spectra are given in "
-        "the input spectral data file. Default value: FILE.")(
+        "<CID|ETD|ETCID|ETHCD|HCD|MPD|UVPD|FILE>. Fragmentation method of "
+        "MS/MS spectra. When FILE is used, the fragmentation methods of "
+        "spectra are given in the input spectral data file. ETCID (ETciD) and "
+        "ETHCD (EThcD) have the ion types of ETD. The default value is FILE.")(
         "max-charge,c", po::value<std::string>(&max_charge),
         "<a positive integer>. Set the maximum charge state of precursor and "
         "fragment ions. The default value is 30.")(
         "max-mass,m", po::value<std::string>(&max_mass),
         "<a positive number>. Set the maximum monoisotopic mass of precursor "
-        "and fragment ions. The default value is 50,000 Dalton.")(
+        "and fragment ions. The default value is 50,000 Daltons.")(
         "mz-error,e", po::value<std::string>(&mz_error),
         "<a positive number>. Set the error tolerance of m/z values of "
         "spectral peaks. The default value is 0.02 m/z.")(
-        "ms-one-sn-ratio,r", po::value<std::string>(&ms_one_sn_ratio),
-        "<a positive number>. Set the signal-to-noise ratio for MS1 spectra. "
-        "The default value is 3.")(
-        "ms-two-sn-ratio,s", po::value<std::string>(&ms_two_sn_ratio),
-        "<a positive number>. Set the signal-to-noise ratio for MS/MS "
+        "ms1-sn-ratio,r", po::value<std::string>(&ms_one_sn_ratio),
+        "<a non-negative number>. Set the signal-to-noise ratio for MS1 "
+        "spectra. The default value is 3.")(
+        "ms2-sn-ratio,s", po::value<std::string>(&ms_two_sn_ratio),
+        "<a non-negative number>. Set the signal-to-noise ratio for MS/MS "
         "spectra. The default value is 1.")(
-        "missing-level-one,o", "MS1 spectra are missing in the input file.")(
-        "msdeconv,n", "Use the MS-Deconv score to rank isotopic envelopes.")(
+        "missing-ms1,o", "MS1 spectra are missing in the input file.")(
         "precursor-window,w", po::value<std::string>(&prec_window),
         "<a positive number>. Set the default precursor window size. The "
-        "default value is 4.0 m/z. When the input file contains the "
-        "information of precursor windows, the parameter will be ignored.")(
+        "default value is 4.0 m/z. When the input file contains precursor "
+        "window information, the parameter is ignored.")(
+        "ms1-deconv,p", po::value<std::string>(&deconv_ms1),
+        "<greedy|msdeconv>. Set the deconvolution method of MS1 spectra: "
+        "msdeconv, the MS-Deconv dynamic programming, or greedy, TopFD's "
+        "default greedy search, which decides the charge state of the most "
+        "intense peak with all the charge states of its mass and subtracts "
+        "the mass's envelopes. The default value is msdeconv.")(
+        "ms2-deconv,q", po::value<std::string>(&deconv_ms2),
+        "<greedy|msdeconv|flashdeconv>. Set the deconvolution method of "
+        "MS/MS spectra: msdeconv, the MS-Deconv dynamic programming; greedy, "
+        "TopFD's default greedy search adapted to fragment ions; or "
+        "flashdeconv, the FLASHDeconv algorithm (experimental). The default "
+        "value is msdeconv.")(
+        "ms1-envcnn-cutoff,f",
+        po::value<std::string>(&ms1_env_cnn_score_cutoff),
+        "<a number in [0,1]>. Set the EnvCNN score cutoff for isotopic "
+        "envelopes in MS1 spectra: envelopes with a lower EnvCNN score are "
+        "not reported, except those added for precursor isolation windows. "
+        "Used with the greedy and msdeconv MS1 deconvolution methods. The "
+        "default value is 0.2.")(
+        "ms2-envcnn-cutoff,g",
+        po::value<std::string>(&ms2_env_cnn_score_cutoff),
+        "<a number in [0,1]>. Set the EnvCNN score cutoff for isotopic "
+        "envelopes in MS/MS spectra: envelopes with a lower EnvCNN score are "
+        "not reported. Used with the greedy and msdeconv MS/MS deconvolution "
+        "methods, not with flashdeconv. The default value is 0.")(
+        "env-rank,n", po::value<std::string>(&env_rank),
+        "<envcnn|msdeconv>. Set the score used to rank isotopic envelopes: "
+        "envcnn, the EnvCNN score, or msdeconv, the MS-Deconv score. The "
+        "ranking decides which envelopes -j keeps; the EnvCNN cutoffs (-f "
+        "and -g) use the EnvCNN score with either value. The default value "
+        "is envcnn.")(
+        "frag-num-filtering,j",
+        "Filter fragment ion envelopes in MS/MS scans based on the estimated "
+        "number of fragment ions: the envelopes ranked highest by the score "
+        "of -n are kept. Used with the greedy and msdeconv MS/MS "
+        "deconvolution methods, not with flashdeconv.")(
         "ms1-ecscore-cutoff,t", po::value<std::string>(&ms1_ecscore_cutoff),
         "<a number in [0,1]>. Set the MS1 ECScore cutoff value for proteoform "
         "features. The default value is 0.")(
         "ms2-ecscore-cutoff,T", po::value<std::string>(&ms2_ecscore_cutoff),
-        "<a number in [0,1]>. Set the MS2 ECScore cutoff value for proteoform "
+        "<a number in [0,1]>. Set the MS2 ECScore cutoff value for fragment "
         "features. The default value is 0.")(
         "ms1-min-scan-number,b", po::value<std::string>(&ms1_min_scan_num),
         "<1|2|3>. The minimum number of MS1 scans in which a proteoform "
         "feature is detected. The default value is 2.")(
         "ms2-min-scan-number,B", po::value<std::string>(&ms2_min_scan_num),
-        "<1|2|3>. The minimum number of MS2 scans in which a proteoform "
+        "<1|2|3>. The minimum number of MS2 scans in which a fragment "
         "feature is detected. The default value is 1.")(
         "single-scan-noise,i",
-        "Use the peak intensity noise levels in single MS1 scans to filter "
-        "out low intensity peaks in proteoform feature detection. The default "
-        "method is to use the peak intensity noise level of the whole LC-MS "
-        "map to filter out low intensity peaks.")(
+        "Use the peak intensity noise levels in single scans (MS1 scans in "
+        "proteoform feature detection, MS/MS scans in fragment feature "
+        "detection) to filter out low intensity peaks. The default method is "
+        "to use the peak intensity noise level of the whole LC-MS map (for "
+        "fragment features, of the MS/MS scans of an isolation window) to "
+        "filter out low intensity peaks.")(
         "pseudo-cutoff,v", po::value<std::string>(&pseudo_score_cutoff),
         "<a number in [0,1]>. Set the Pseudo Score cutoff value for "
-        "generating pseudo-MS/MS spectrum. The default value is 0.55.")(
+        "generating pseudo-MS/MS spectra: once a pseudo-MS/MS spectrum has "
+        "the number of peaks of -V, fragment features with a lower Pseudo "
+        "Score are not added. The default value is 0.55.")(
         "pseudo-peak-number,V", po::value<std::string>(&pseudo_min_peaks),
         "<an integer of at least 10>. The minimum number of peaks in a "
-        "pseudo-MS/MS spectrum. The default value is 25.")(
-        "ms1-intensity-correlation-cutoff,p",
+        "pseudo-MS/MS spectrum: until a spectrum has this number of peaks, "
+        "fragment features are added regardless of the Pseudo Score cutoff "
+        "(-v), when available. The default value is 25.")(
+        "ms1-correlation-cutoff,y",
         po::value<std::string>(&ms1_seed_env_inte_corr_tole_cutoff),
         "<a number in [0,1]>. Set the MS1 seed envelope intensity correlation "
         "cutoff value for extracting features. The default value is 0.5.")(
-        "ms2-intensity-correlation-cutoff,P",
+        "ms2-correlation-cutoff,Y",
         po::value<std::string>(&ms2_seed_env_inte_corr_tole_cutoff),
         "<a number in [0,1]>. Set the MS2 seed envelope intensity correlation "
         "cutoff value for extracting features. The default value is 0.5.")(
-        "final-filtering,d",
-        "Filter envelopes in MS/MS scans based on the estimated number of "
-        "fragment ions.")(
         "thread-number,u", po::value<std::string>(&thread_number),
         "<a positive integer>. Number of threads used in spectral "
-        "deconvolution. Default value: 1.");
+        "deconvolution. The default value is 1.")(
+        "no-sql,z", "Do not write the deconvoluted spectra to an SQLite database.");
 
     // Advanced options accepted on the command line but hidden from the help
     // message; the positional spectrum file argument is also hidden here.
     po::options_description hidden_desc("Hidden options");
     hidden_desc.add_options()(
+        "disable-zstd",
+        "Write the SQLite database uncompressed. By default its peak and "
+        "envelope tables are compressed with zstd when it is complete "
+        "(the format of the sqlite-zstd extension; topzstd -d decompresses "
+        "it).")(
         "ms1-rank-peak-distance",
         po::value<std::string>(&ms1_rank_peak_distance),
         "<a positive number>. The window of the filtering-by-mz step for MS1 "
@@ -198,10 +261,11 @@ bool Argument::parse(int argc, char* argv[]) {
         "ms2-rank-peak-distance",
         po::value<std::string>(&ms2_rank_peak_distance),
         "<a positive number>. The same window for MS/MS spectra. The default "
-        "value is 2.")(
+        "value is 12.")(
         "disable-ms2-harmonic-check",
         "Skip the harmonic check of MS/MS spectra, which replaces an envelope "
-        "by a better scoring harmonic parent mass.")(
+        "by a better scoring harmonic parent mass. TopDIA skips it by "
+        "default.")(
         "keep,k",
         "Report monoisotopic masses extracted from low quality isotopic "
         "envelopes.")(
@@ -296,8 +360,46 @@ bool Argument::parse(int argc, char* argv[]) {
       topfd_para_ptr_->setMsTwoHarmonicCheck(false);
     }
 
-    if (vm.count("msdeconv")) {
-      topfd_para_ptr_->setSortUseMsDeconv(true);
+    if (vm.count("env-rank") && !topfd_para_ptr_->setDeconvScore(env_rank)) {
+      LOG_ERROR("Envelope ranking score " << env_rank
+                << " should be envcnn or msdeconv.");
+      return false;
+    }
+
+    if (vm.count("ms1-envcnn-cutoff")) {
+      double cutoff = 0;
+      if (!toDouble(ms1_env_cnn_score_cutoff, cutoff) || cutoff < 0 ||
+          cutoff > 1) {
+        LOG_ERROR("MS1 EnvCNN cutoff " << ms1_env_cnn_score_cutoff
+                                       << " should be a number in [0,1].");
+        return false;
+      }
+      topfd_para_ptr_->setMs1EnvCnnScoreCutoff(cutoff);
+    }
+
+    if (vm.count("ms2-envcnn-cutoff")) {
+      double cutoff = 0;
+      if (!toDouble(ms2_env_cnn_score_cutoff, cutoff) || cutoff < 0 ||
+          cutoff > 1) {
+        LOG_ERROR("MS/MS EnvCNN cutoff " << ms2_env_cnn_score_cutoff
+                                         << " should be a number in [0,1].");
+        return false;
+      }
+      topfd_para_ptr_->setMs2EnvCnnScoreCutoff(cutoff);
+    }
+
+    if (vm.count("ms1-deconv") &&
+        !topfd_para_ptr_->setMs1DeconvMethod(deconv_ms1)) {
+      LOG_ERROR("MS1 deconvolution method " << deconv_ms1
+                << " should be greedy or msdeconv.");
+      return false;
+    }
+
+    if (vm.count("ms2-deconv") &&
+        !topfd_para_ptr_->setMs2DeconvMethod(deconv_ms2)) {
+      LOG_ERROR("MS/MS deconvolution method " << deconv_ms2
+                << " should be greedy, msdeconv or flashdeconv.");
+      return false;
     }
 
     if (vm.count("max-mass")) {
@@ -318,7 +420,7 @@ bool Argument::parse(int argc, char* argv[]) {
       topfd_para_ptr_->setMzError(error);
     }
 
-    if (vm.count("ms-two-sn-ratio")) {
+    if (vm.count("ms2-sn-ratio")) {
       double sn_ratio = 0;
       if (!toDouble(ms_two_sn_ratio, sn_ratio) || sn_ratio < 0) {
         LOG_ERROR("MS/MS S/N ratio " << ms_two_sn_ratio
@@ -328,7 +430,7 @@ bool Argument::parse(int argc, char* argv[]) {
       topfd_para_ptr_->setMsTwoSnRatio(sn_ratio);
     }
 
-    if (vm.count("ms-one-sn-ratio")) {
+    if (vm.count("ms1-sn-ratio")) {
       double sn_ratio = 0;
       if (!toDouble(ms_one_sn_ratio, sn_ratio) || sn_ratio < 0) {
         LOG_ERROR("MS1 S/N ratio " << ms_one_sn_ratio
@@ -338,7 +440,7 @@ bool Argument::parse(int argc, char* argv[]) {
       topfd_para_ptr_->setMsOneSnRatio(sn_ratio);
     }
 
-    if (vm.count("missing-level-one")) {
+    if (vm.count("missing-ms1")) {
       topfd_para_ptr_->setMissingLevelOne(true);
     }
 
@@ -416,7 +518,7 @@ bool Argument::parse(int argc, char* argv[]) {
       topdia_para_ptr_->setPseudoMinPeaks(n);
     }
 
-    if (vm.count("ms1-intensity-correlation-cutoff")) {
+    if (vm.count("ms1-correlation-cutoff")) {
       double cutoff = 0;
       if (!toDouble(ms1_seed_env_inte_corr_tole_cutoff, cutoff) || cutoff < 0 ||
           cutoff > 1) {
@@ -428,7 +530,7 @@ bool Argument::parse(int argc, char* argv[]) {
       topdia_para_ptr_->setMs1SeedEnvInteCorrToleCutoff(cutoff);
     }
 
-    if (vm.count("ms2-intensity-correlation-cutoff")) {
+    if (vm.count("ms2-correlation-cutoff")) {
       double cutoff = 0;
       if (!toDouble(ms2_seed_env_inte_corr_tole_cutoff, cutoff) || cutoff < 0 ||
           cutoff > 1) {
@@ -455,8 +557,16 @@ bool Argument::parse(int argc, char* argv[]) {
       topfd_para_ptr_->setThreadNum(num);
     }
 
-    if (vm.count("final-filtering")) {
+    if (vm.count("frag-num-filtering")) {
       topfd_para_ptr_->setAANumBasedFilter(true);
+    }
+
+    if (vm.count("no-sql")) {
+      topfd_para_ptr_->setGeneSql(false);
+    }
+
+    if (vm.count("disable-zstd")) {
+      topfd_para_ptr_->setZstd(false);
     }
   } catch (std::exception& e) {
     std::cerr << "Unhandled Exception in parsing command line " << e.what()
@@ -495,9 +605,11 @@ bool Argument::validateArguments() {
   // validate activation method
   std::string activation = topfd_para_ptr_->getActivation();
   if (activation != "FILE" && activation != "CID" && activation != "ETD" &&
-      activation != "MPD" && activation != "HCD" && activation != "UVPD") {
+      activation != "ETCID" && activation != "ETHCD" && activation != "MPD" &&
+      activation != "HCD" && activation != "UVPD") {
     LOG_ERROR(
-        "Activation method should be one out of |FILE|CID|ETD|HCD|MPD|UVPD.");
+        "Activation method should be one out of "
+        "|FILE|CID|ETD|ETCID|ETHCD|HCD|MPD|UVPD.");
     return false;
   }
 

@@ -83,6 +83,15 @@ PrecursorPtr MsHeader::getFirstPrecPtr() const {
   }
 }
 
+PrecursorPtr MsHeader::getPrecPtrById(int prec_id) const {
+  for (const PrecursorPtr& prec_ptr : prec_ptr_vec_) {
+    if (prec_ptr->getPrecId() == prec_id) {
+      return prec_ptr;
+    }
+  }
+  return getFirstPrecPtr();
+}
+
 void MsHeader::setScans(const std::string& s) {
   if (s == "") {
     scans_.clear();
@@ -175,13 +184,9 @@ double MsHeader::getFirstPrecMonoMassMinusWater() const {
   return getFirstPrecPtr()->getMonoMassMinusWater();
 }
 
-double MsHeader::getFirstPrecErrorTolerance(double ppo) const {
-  return getFirstPrecPtr()->getErrorTolerance(ppo);
-}
-
 std::pair<int, int> MsHeader::getFirstPrecMonoMassMinusWaterError(
-    double ppo, double scale) const {
-  return getFirstPrecPtr()->getMonoMassMinusWaterError(ppo, scale);
+    double error_tolerance, double scale) const {
+  return getFirstPrecPtr()->getMonoMassMinusWaterError(error_tolerance, scale);
 }
 
 }  // namespace toppic

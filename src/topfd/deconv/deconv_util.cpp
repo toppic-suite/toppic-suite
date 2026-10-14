@@ -16,8 +16,6 @@
 
 #include "topfd/deconv/deconv_util.hpp"
 
-#include <iostream>
-
 #include "common/util/file_util.hpp"
 #include "common/util/str_util.hpp"
 #include "ms/spec/ms_header.hpp"
@@ -54,7 +52,6 @@ void mergeMs1MsalignFiles(const TopfdParaPtr& topfd_para_ptr,
   std::string ms1_prefix =
       file_util::absoluteName(output_base_name) + "_ms1.msalign_";
   file_util::cleanPrefix(output_base_name, ms1_prefix);
-  std::cout << std::endl;
 }
 
 }  // namespace deconv_util

@@ -30,7 +30,7 @@ class VarPtmAlign {
               const std::vector<double>& seq_masses,
               const ResSeqPtr& sub_res_seq_ptr,
               const DiagonalPtrVec& diagonal_ptrs,
-              const VarPtmSearchMngPtr& mng_ptr);
+              const VarPtmSearchMngPtr& mng_ptr, int max_ptm_num);
 
   void initMatchTable();
 
@@ -54,6 +54,13 @@ class VarPtmAlign {
   MassShiftPtrVec geneShiftVec(const ProteoformPtr& sub_proteo_ptr,
                                DiagHeaderPtrVec& ori_header_ptrs,
                                DiagHeaderPtrVec& refined_header_ptrs);
+
+  // A shift whose PTMs have as many candidate residues as alterations (the
+  // residues of its range that a modification of the PTM modifies, none a
+  // candidate of two PTMs) has known sites: it becomes one shift per PTM on
+  // its own residue, e.g. (MAQM)[Oxidation;Oxidation] -> (M)[Oxidation]AQ
+  // (M)[Oxidation]. Any other shift is returned as it is.
+  MassShiftPtrVec splitDeterminedShift(const MassShiftPtr& shift_ptr);
 
   PrsmPtr geneResult(const ProteoformPtr& sub_proteo_ptr,
                      DeconvMsPtrVec& deconv_ms_ptr_vec,
@@ -80,6 +87,11 @@ class VarPtmAlign {
 
   int best_d_;
   int best_ptm_num_;
+
+  // the largest number of variable PTMs of a result: the manager's
+  // var_ptm_num_, less one for a proteoform with a truncation N-terminal
+  // modification
+  int max_ptm_num_;
   int best_score_;
 
   DiagHeaderPtrVec backtrack_diag_header_ptrs_;

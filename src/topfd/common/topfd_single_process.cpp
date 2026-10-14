@@ -16,14 +16,17 @@
 #include "topfd/common/topfd_single_process.hpp"
 
 #include <algorithm>
+#include <cctype>
 #include <fstream>
 #include <iostream>
 #include <memory>
+#include <sstream>
 #include <string>
 #include <vector>
 
 #include "common/base/activation_base.hpp"
 #include "common/base/base_data.hpp"
+#include "common/util/logger.hpp"
 #include "common/util/str_util.hpp"
 #include "common/util/time_util.hpp"
 #include "ms/env/avg_mass_util.hpp"
@@ -35,6 +38,7 @@
 #include "ms/spec/deconv_ms.hpp"
 #include "ms/spec/msalign_writer.hpp"
 #include "topfd/deconv/deconv_single_sp.hpp"
+#include "topfd/deconv/greedy_ms2_deconv.hpp"
 #include "topfd/envcnn/onnx_env_cnn.hpp"
 
 namespace toppic {
@@ -43,23 +47,58 @@ namespace topfd_single_process {
 
 namespace {
 
+// A peak line starts with a digit. The other lines are skipped: blank lines
+// and, in an MGF file, BEGIN IONS, END IONS, the parameter lines (TITLE=,
+// PEPMASS=, CHARGE=, ...) and comments, so that an MGF file holding one
+// spectrum can be read as a peak list.
+bool isPeakLine(const std::string& line) {
+  return !line.empty() && std::isdigit(static_cast<unsigned char>(line[0]));
+}
+
 PeakPtrVec readPeakFile(const std::string& file_name) {
   PeakPtrVec peak_list;
   std::ifstream input;
   input.open(file_name.c_str(), std::ios::in);
   std::string line;
+  int skip_num = 0;
+  int mgf_spec_num = 0;
   while (std::getline(input, line)) {
     str_util::trim(line);
     if (line.length() == 0) {
       continue;
     }
-    std::vector<std::string> strs = str_util::split(line, " ");
-    double mz = std::stod(strs[0]);
-    double inte = std::stod(strs[1]);
+    if (!isPeakLine(line)) {
+      if (line == "BEGIN IONS") {
+        mgf_spec_num++;
+      }
+      skip_num++;
+      continue;
+    }
+    // m/z and intensity separated by spaces or tabs; further columns (the
+    // charge an MGF peak line may carry) are ignored
+    std::istringstream line_stream(line);
+    double mz = 0;
+    double inte = 0;
+    if (!(line_stream >> mz >> inte)) {
+      LOG_WARN("Skipped the peak line without an intensity: " << line);
+      continue;
+    }
     PeakPtr peak_ptr = std::make_shared<Peak>(mz, inte);
     peak_list.push_back(peak_ptr);
   }
   input.close();
+  if (skip_num > 0) {
+    std::cout << "Skipped " << skip_num
+              << " lines that do not start with a number." << std::endl;
+  }
+  // -T deconvolutes one spectrum, so the peaks of all spectra of an MGF
+  // file are read as one
+  if (mgf_spec_num > 1) {
+    LOG_WARN(file_name << " has " << mgf_spec_num
+                       << " MGF spectra (BEGIN IONS lines); their peaks are "
+                          "read as one spectrum. Split the file into one "
+                          "file per spectrum.");
+  }
   // Deconvolution assumes peaks in increasing m/z order; the input file need
   // not be sorted. A stable sort keeps the file order of equal m/z values.
   std::stable_sort(peak_list.begin(), peak_list.end(), Peak::cmpPosInc);
@@ -88,7 +127,11 @@ void processOneFile(const TopfdParaPtr& para_ptr,
     PeakPtrVec peak_list = readPeakFile(spec_file_name);
 
     MatchEnvPtrVec result_envs;
-    if (peak_list.size() > 0) {
+    if (peak_list.size() > 0 && para_ptr->isMs2GreedyDeconv()) {
+      // --ms2-deconv greedy, TopFD's default (msdeconv: below)
+      result_envs = greedy_ms2_deconv::deconv(peak_list, para_ptr, max_mass,
+                                              static_cast<int>(max_charge));
+    } else if (peak_list.size() > 0) {
       DeconvSingleSpPtr deconv_ptr = std::make_shared<DeconvSingleSp>(
           para_ptr, peak_list, ms_level, max_mass, max_charge);
       result_envs = deconv_ptr->deconv();

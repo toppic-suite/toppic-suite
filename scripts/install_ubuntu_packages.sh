@@ -33,6 +33,7 @@ PACKAGES=(
     git
     git-lfs
     zlib1g-dev
+    libzstd-dev
     libsqlite3-dev
     libpugixml-dev
     libboost-filesystem-dev

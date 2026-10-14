@@ -13,16 +13,19 @@ topindex [options] database-file
 `topindex -h` prints the option list. The GUI tool `topindex_gui` offers the
 same function. Avoid spaces in paths (the directory of the `topindex`
 executable must not contain spaces), and the database path must be at most
-200 characters long.
+200 characters long, as must the paths of the cleaned copy and the search
+database that TopIndex writes into the `_idx` directory (section 2, step 2).
 
 ## 1. Input
 
 A protein database in FASTA format (`.fasta`, `.fa`, `.FASTA` or `.FA`).
 If two records share an accession (the header text up to the first
-space), TopIndex writes `<database>_dedup.fasta` next to the input,
-keeping the first record of each accession, prints a notice, and builds
-the indexes for that file in `<database>_dedup.fasta_idx/`. TopPIC and
-TopMG do the same when given the original file, so they find the indexes.
+whitespace), TopIndex writes `<name>_dedup.fasta` next to the input
+(`<name>` is the file name without its extension: `proteins_dedup.fasta`
+for `proteins.fasta`), keeping the first record of each accession, prints
+a notice, and builds the indexes for that file in
+`proteins_dedup.fasta_idx/`. TopPIC and TopMG do the same when given the
+original file, so they find the indexes.
 
 ## 2. What TopIndex does
 
@@ -58,27 +61,38 @@ TopMG do the same when given the original file, so they find the indexes.
    place, which can be deleted) or rename the `one_ptm_diag_index` files to
    `ptm_diag_index` and delete the `multi_ptm_index` files.
 
-Each file name carries the parameters the index depends on, in the form
-`<family>_<fixed mod>_<N-terminal forms>_<error tolerance>_<no_decoy|decoy><block>`,
+Each file name carries the `-f`, `-n`, `-e` and `-d` settings, in the form
+`<index name>_<fixed mod>_<N-terminal forms>_<fragment error tolerance>_<no_decoy|decoy><block>`,
 for example `zero_ptm_term_index_C57_N_NME_NMEA_MA_10_decoy0`. The N-terminal
-forms are abbreviated `N`, `NME`, `NMEA` and `MA`; a fixed-modification file
-appears by its file name without directory or extension (`-f mods/C57.txt`
-gives `C57`).
+forms are abbreviated `N`, `NME`, `NMEA` and `MA`, in the order given to `-n`;
+without `-f` the fixed-modification part is left out; a fixed-modification
+file appears by its file name without directory or extension
+(`-f mods/C57.txt` gives `C57`). The indexes themselves depend on the fixed
+modifications, the N-terminal forms and the decoy database, but on neither
+error tolerance: the fragment tolerance `-e` is in the names only, as the
+whole number of ppm that TopIndex, TopPIC and TopMG use (`-e 7.5` and `-e 07`
+give `7`), and the precursor tolerance `-E` affects neither the files nor
+their names.
 
 ## 3. Using the indexes
 
 TopPIC and TopMG look for index files whose names match their own `-f`,
 `-n`, `-e` and `-d` settings. **Run TopIndex with the same four settings
-as the searches** that should use it; the thread number does not matter.
+as the searches** that should use it (`-n` with the forms in the same
+order); the thread number and the precursor tolerance `-E` do not matter.
 Indexes built with other settings are ignored silently, and the search
 builds its own in memory. TopIndex skips database files that already exist,
 so several parameter sets can be indexed into the same `_idx` directory.
 
-The index files are large: roughly seven thousand times the size of the
+The index files are large: roughly three thousand times the size of the
 FASTA file, spread over the two families, and about twice as much with
-`--decoy` (184 GB for the 14 MB human SwissProt database with `--decoy`). A few-megabyte database can produce tens of gigabytes of index
-files. Delete the `_idx` directory to reclaim the space; the searches then
-fall back to in-memory indexes.
+`--decoy` (93 GB for the 14 MB human SwissProt database with `--decoy`). A
+few-megabyte database can produce tens of gigabytes of index files. The
+files are compressed (zstd) since October 2026; index directories written
+by earlier versions (twice as large) are still read, and running TopIndex
+again after deleting them gives the smaller files. Delete the `_idx`
+directory to reclaim the space; the searches then fall back to in-memory
+indexes.
 
 ## 4. Options
 
@@ -86,16 +100,17 @@ fall back to in-memory indexes.
 |---|---|---|
 | `-f`, `--fixed-mod <C57\|C58\|file>` | none | Fixed modifications: `C57` carbamidomethylation of cysteine, `C58` carboxymethylation, or a modification file (see the [TopPIC manual](toppic_manual.md), section 5). |
 | `-n`, `--n-terminal-form <list>` | NONE,NME,NME_ACETYLATION,M_ACETYLATION | Allowed protein N-terminal forms, comma-separated. |
-| `-d`, `--decoy` | off | Also index a shuffled decoy database. |
-| `-e`, `--frag-error-tolerance <int>` | 10 | Error tolerance of fragment masses (ppm). |
-| `-E`, `--prec-error-tolerance <int>` | 10 | Error tolerance of precursor masses (ppm). |
+| `-d`, `--decoy` | off | Index a database of the target proteins and shuffled decoy proteins, for TopPIC and TopMG searches with `-d`. |
+| `-e`, `--frag-error-tolerance <int>` | 10 | Error tolerance of fragment masses (ppm). The index files do not depend on it, but their names include it: give the `-e` value of the searches that will use them. |
+| `-E`, `--prec-error-tolerance <int>` | 10 | Error tolerance of precursor masses (ppm). Neither the index files nor their names depend on it. |
 | `-u`, `--thread-number <int>` | 1 | Number of threads; database blocks are processed in parallel. Must not exceed the number of hardware threads. Each thread needs about 0.5 GiB of memory; TopIndex warns (but still runs) when the machine has too little for the requested number. The build is limited by memory and disk bandwidth rather than by cores, so more threads than physical cores gain nothing (on an 8-core machine, `-u 8` was faster than `-u 16`). |
 
 
 ## 5. Example
 
 ```sh
-# Index for target-decoy searches with carbamidomethylated cysteines at 15 ppm
+# Index for target-decoy searches with carbamidomethylated cysteines and a
+# fragment error tolerance of 15 ppm
 topindex -d -f C57 -e 15 -u 8 proteins.fasta
 
 # Searches that use the index: same -d, -f and -e

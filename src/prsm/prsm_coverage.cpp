@@ -262,7 +262,11 @@ void PrsmCoverage::compOneCoverage(std::ofstream& file, const PrsmPtr& prsm_ptr,
   file << prsm_para_ptr_->getSpectrumFileName() << "\t" << prsm_ptr->getPrsmId()
        << "\t" << spec_ids << "\t" << spec_activations << "\t" << spec_scans
        << "\t" << peak_num << "\t"
-       << deconv_ms_ptr_vec[0]->getMsHeaderPtr()->getFirstPrecCharge() << "\t"
+       << deconv_ms_ptr_vec[0]
+              ->getMsHeaderPtr()
+              ->getPrecPtrById(prsm_ptr->getPrecursorId())
+              ->getCharge()
+       << "\t"
        << prsm_ptr->getOriPrecMass() << "\t"  // "Precursor_mass"
        << prsm_ptr->getAdjustedPrecMass() << "\t"
        << prsm_ptr->getProteoformPtr()->getProteoClusterId() << "\t"
@@ -310,7 +314,11 @@ void PrsmCoverage::compTwoCoverage(std::ofstream& file, const PrsmPtr& prsm_ptr,
   file << prsm_para_ptr_->getSpectrumFileName() << "\t" << prsm_ptr->getPrsmId()
        << "\t" << spec_ids << "\t" << spec_activations << "\t" << spec_scans
        << "\t" << peak_num << "\t"
-       << deconv_ms_ptr_vec[0]->getMsHeaderPtr()->getFirstPrecCharge() << "\t"
+       << deconv_ms_ptr_vec[0]
+              ->getMsHeaderPtr()
+              ->getPrecPtrById(prsm_ptr->getPrecursorId())
+              ->getCharge()
+       << "\t"
        << prsm_ptr->getOriPrecMass() << "\t"  // "Precursor_mass"
        << prsm_ptr->getAdjustedPrecMass() << "\t"
        << prsm_ptr->getProteoformPtr()->getProteoClusterId() << "\t"

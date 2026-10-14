@@ -51,6 +51,9 @@ OnePtmFilterMng::OnePtmFilterMng(
       min_shift_(min_shift),
       max_shift_(max_shift),
       residueModFileName_(residueModFileName),
-      var_num_(var_num) {}
+      var_num_(var_num),
+      // TopMG's graph alignment searches whole proteins and keeps one
+      // candidate per protein
+      range_candidates_(false) {}
 
 }  // namespace toppic

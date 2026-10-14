@@ -16,6 +16,7 @@
 #ifndef TOPPIC_PRSM_PRSM_HPP_
 #define TOPPIC_PRSM_PRSM_HPP_
 
+#include <limits>
 #include <string>
 #include <utility>
 #include <vector>
@@ -41,6 +42,11 @@ class Prsm {
        const ModPtrVec& fix_mod_list);
 
   std::string getFileName() { return file_name_; }
+
+  // the search that found this PrSM, "toppic" or "topmg": one PrSM file can
+  // hold both, since TopPIC's stages and TopMG's graph alignment merge their
+  // PrSMs before the best one of every spectrum is chosen
+  std::string getTool() { return tool_; }
 
   int getPrsmId() { return prsm_id_; }
 
@@ -69,6 +75,11 @@ class Prsm {
 
   double getAdjustedPrecMass() { return adjusted_prec_mass_; }
 
+  // the N-terminal label mass of the search (-N, e.g. TMT; 0 without a
+  // label): the adjusted precursor mass and the proteoform exclude it, the
+  // original precursor mass includes it
+  double getNTermLabelMass() { return n_term_label_mass_; }
+
   ProteoformPtr getProteoformPtr() { return proteoform_ptr_; }
 
   ExpectedValuePtr getExpectedValuePtr() { return expected_value_ptr_; }
@@ -78,6 +89,10 @@ class Prsm {
   double getProteoformFdr() { return proteoform_fdr_; }
 
   double getProteinFdr() { return protein_fdr_; }
+
+  // the score of the rescoring step (--rescore, prsm/prsm_rescore); NaN
+  // when the PrSM was not rescored
+  double getRescore() { return rescore_; }
 
   DeconvMsPtrVec getDeconvMsPtrVec() { return deconv_ms_ptr_vec_; }
 
@@ -108,6 +123,8 @@ class Prsm {
   // setter
   void setFileName(const std::string& fname) { file_name_ = fname; }
 
+  void setTool(const std::string& tool) { tool_ = tool; }
+
   void setPrsmId(int id) { prsm_id_ = id; }
 
   void setSpectrumId(int spectrum_id) { spectrum_id_ = spectrum_id; }
@@ -137,6 +154,8 @@ class Prsm {
   }
 
   void setProteinFdr(double protein_fdr) { protein_fdr_ = protein_fdr; }
+
+  void setRescore(double rescore) { rescore_ = rescore; }
 
   void setDeconvMsPtrVec(DeconvMsPtrVec ms_vec) {
     deconv_ms_ptr_vec_ = std::move(ms_vec);
@@ -182,6 +201,9 @@ class Prsm {
  private:
   std::string file_name_;
 
+  // "toppic" unless a search sets it; the graph alignment sets "topmg"
+  std::string tool_ = "toppic";
+
   int prsm_id_ = -1;
   // spectrum information
   int spectrum_id_;
@@ -215,6 +237,8 @@ class Prsm {
   /* adjusted precursor mass */
   double adjusted_prec_mass_;
 
+  double n_term_label_mass_ = 0;
+
   /* protein sequence */
   ProteoformPtr proteoform_ptr_;
 
@@ -228,6 +252,9 @@ class Prsm {
   double fdr_ = -1;
   double proteoform_fdr_ = -1;
   double protein_fdr_ = -1;
+  // written to the XML only when set (Prsm::toXmlElement), so that the
+  // files of a run without --rescore are unchanged
+  double rescore_ = std::numeric_limits<double>::quiet_NaN();
   int hit_cnt_ = 0;
 
   /* The following are not saved in xml */

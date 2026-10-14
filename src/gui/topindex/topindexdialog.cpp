@@ -20,6 +20,7 @@
 #include <QElapsedTimer>
 #include <QFileDialog>
 #include <QFontDatabase>
+#include <QIntValidator>
 #include <QMessageBox>
 #include <QScrollBar>
 #include <map>
@@ -33,6 +34,7 @@
 #include "console/topindex_argument.hpp"
 #include "gui/topindex/ui_topindexdialog.h"
 #include "gui/util/command.hpp"
+#include "gui/util/gui_check.hpp"
 #include "gui/util/gui_message.hpp"
 
 TopIndexDialog::TopIndexDialog(QWidget* parent)
@@ -43,6 +45,10 @@ TopIndexDialog::TopIndexDialog(QWidget* parent)
   QString qstr = QString::fromStdString(title);
   this->setWindowTitle(qstr);
   lastDir_ = ".";
+  ui->threadNumberEdit->setValidator(new QIntValidator(1, 1000, this));
+  ui->errorToleranceEdit_2->setValidator(new QIntValidator(1, 1000000, this));
+  ui->precErrorToleranceEdit->setValidator(
+      new QIntValidator(1, 1000000, this));
   QFont font;
   QFont outputFont;
 #if defined(_WIN32) || defined(_WIN64) || defined(__MINGW32__) || \
@@ -130,6 +136,9 @@ void TopIndexDialog::updatedir(QString s) {
   }
 }
 void TopIndexDialog::on_startButton_clicked() {
+  if (checkError()) {
+    return;
+  }
   lockDialog();
 
   std::map<std::string, std::string> argument = this->getArguments();
@@ -245,7 +254,7 @@ std::map<std::string, std::string> TopIndexDialog::getArguments() {
 
   arguments_["allowProtMod"] = "";
   if (ui->NONECheckBox->isChecked()) {
-    arguments_["allowProtMod"] = arguments_["allowProtMod"] + "NONE";
+    arguments_["allowProtMod"] = arguments_["allowProtMod"] + ",NONE";
   }
   if (ui->NMECheckBox->isChecked()) {
     arguments_["allowProtMod"] = arguments_["allowProtMod"] + ",NME";
@@ -257,6 +266,9 @@ std::map<std::string, std::string> TopIndexDialog::getArguments() {
   }
   if (ui->MACCheckBox->isChecked()) {
     arguments_["allowProtMod"] = arguments_["allowProtMod"] + ",M_ACETYLATION";
+  }
+  if (arguments_["allowProtMod"] != "") {
+    arguments_["allowProtMod"] = arguments_["allowProtMod"].substr(1);
   }
   arguments_["threadNumber"] = ui->threadNumberEdit->text().toStdString();
 
@@ -307,7 +319,8 @@ void TopIndexDialog::unlockDialog() {
 
 bool TopIndexDialog::checkError() {
   if (ui->databaseFileEdit->text().isEmpty()) {
-    QMessageBox::warning(this, tr("Warning"), tr("Database file is empty!"),
+    QMessageBox::warning(this, tr("Warning"),
+                         tr("Please select a protein database file!"),
                          QMessageBox::Yes);
     return true;
   }
@@ -317,23 +330,35 @@ bool TopIndexDialog::checkError() {
                          QMessageBox::Yes);
     return true;
   }
-  if (ui->fixedModFileEdit->text().isEmpty() &&
-      ui->fixedModComboBox->currentIndex() == 3) {
+  if (toppic::gui_check::pathWithSpace(this, ui->databaseFileEdit->text(),
+                                       tr("protein database file"))) {
+    return true;
+  }
+  if (ui->fixedModComboBox->currentIndex() == 3) {
+    if (ui->fixedModFileEdit->text().isEmpty()) {
+      QMessageBox::warning(this, tr("Warning"),
+                           tr("Please select a fixed modification file!"),
+                           QMessageBox::Yes);
+      return true;
+    }
+    if (toppic::gui_check::pathWithSpace(this, ui->fixedModFileEdit->text(),
+                                         tr("fixed modification file"))) {
+      return true;
+    }
+  }
+  if (!ui->NONECheckBox->isChecked() && !ui->NMECheckBox->isChecked() &&
+      !ui->NMEACCheckBox->isChecked() && !ui->MACCheckBox->isChecked()) {
     QMessageBox::warning(this, tr("Warning"),
-                         tr("Please select a fixed modification file!"),
+                         tr("Please select at least one N-terminal form!"),
                          QMessageBox::Yes);
     return true;
   }
-  if (ui->errorToleranceEdit_2->text().isEmpty()) {
-    QMessageBox::warning(this, tr("Warning"),
-                         tr("Fragment error tolerance is empty!"),
-                         QMessageBox::Yes);
-    return true;
-  }
-  if (ui->precErrorToleranceEdit->text().isEmpty()) {
-    QMessageBox::warning(this, tr("Warning"),
-                         tr("Precursor error tolerance is empty!"),
-                         QMessageBox::Yes);
+  if (toppic::gui_check::invalidEdit(this, ui->precErrorToleranceEdit,
+                                     tr("Precursor error tolerance")) ||
+      toppic::gui_check::invalidEdit(this, ui->errorToleranceEdit_2,
+                                     tr("Fragment error tolerance")) ||
+      toppic::gui_check::invalidEdit(this, ui->threadNumberEdit,
+                                     tr("Thread number"))) {
     return true;
   }
   if (ui->threadNumberEdit->text().toInt() >
@@ -344,17 +369,11 @@ bool TopIndexDialog::checkError() {
         QString("Thread number is too large! Based on the memory size, up to "
                 "%1 threads can run on this computer. Are you sure you want to "
                 "proceed?")
-            .arg(max_thread)
             .arg(max_thread),
         QMessageBox::Yes | QMessageBox::No);
     if (reply == QMessageBox::No) {
       return true;
     }
-  }
-  if (ui->threadNumberEdit->text().isEmpty()) {
-    QMessageBox::warning(this, tr("Warning"), tr("Thread number is empty!"),
-                         QMessageBox::Yes);
-    return true;
   }
   return false;
 }

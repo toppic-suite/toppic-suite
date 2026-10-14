@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>965</width>
+    <width>1103</width>
     <height>685</height>
    </rect>
   </property>
@@ -18,13 +18,13 @@
   </property>
   <property name="minimumSize">
    <size>
-    <width>965</width>
+    <width>1103</width>
     <height>685</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
-    <width>965</width>
+    <width>1103</width>
     <height>685</height>
    </size>
   </property>
@@ -48,6 +48,9 @@
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
       <widget class="QLabel" name="label">
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The spectrum files to process, one after another: centroided mzML or mzXML files with MS1 scans and DIA MS/MS scans whose isolation windows are recorded in the file. Paths must not contain spaces. The output files of each file are written next to it. (topdia spectrum-file-names)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
        <property name="text">
         <string>Spectrum files: </string>
        </property>
@@ -66,6 +69,9 @@
          <width>100</width>
          <height>16777215</height>
         </size>
+       </property>
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Add spectrum files to the list: centroided mzML or mzXML files (.mzML, .mzml, .mzXML, .mzxml) of top-down DIA data. A file already in the list is not added again, a path longer than 200 characters is refused, and paths must not contain spaces. (topdia spectrum-file-names)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="text">
         <string>Add</string>
@@ -86,6 +92,9 @@
          <height>16777215</height>
         </size>
        </property>
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Remove the selected spectrum file from the list. (topdia spectrum-file-names)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
        <property name="text">
         <string>Remove</string>
        </property>
@@ -98,7 +107,7 @@
      <rect>
       <x>30</x>
       <y>200</y>
-      <width>241</width>
+      <width>305</width>
       <height>42</height>
      </rect>
     </property>
@@ -116,6 +125,9 @@
          <width>0</width>
          <height>0</height>
         </size>
+       </property>
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Maximum charge state of precursor and fragment ions: an integer from 1 to 100. Default: 30. (topdia -c, --max-charge)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="layoutDirection">
         <enum>Qt::LeftToRight</enum>
@@ -142,6 +154,9 @@
          <height>16777215</height>
         </size>
        </property>
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Maximum charge state of precursor and fragment ions: an integer from 1 to 100. Default: 30. (topdia -c, --max-charge)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
        <property name="text">
         <string>30</string>
        </property>
@@ -154,7 +169,7 @@
      <rect>
       <x>30</x>
       <y>240</y>
-      <width>241</width>
+      <width>305</width>
       <height>42</height>
      </rect>
     </property>
@@ -172,6 +187,9 @@
          <width>0</width>
          <height>0</height>
         </size>
+       </property>
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Maximum monoisotopic mass of precursor and fragment ions, in Daltons: an integer from 1 to 1,000,000. Default: 50000. (topdia -m, --max-mass)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="text">
         <string>Maximum mass (Da): </string>
@@ -192,6 +210,9 @@
          <height>16777215</height>
         </size>
        </property>
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Maximum monoisotopic mass of precursor and fragment ions, in Daltons: an integer from 1 to 1,000,000. Default: 50000. (topdia -m, --max-mass)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
        <property name="text">
         <string>50000</string>
        </property>
@@ -204,7 +225,7 @@
      <rect>
       <x>30</x>
       <y>280</y>
-      <width>241</width>
+      <width>305</width>
       <height>42</height>
      </rect>
     </property>
@@ -216,6 +237,9 @@
          <width>0</width>
          <height>0</height>
         </size>
+       </property>
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Error tolerance of the m/z values of spectral peaks, in m/z: a number from 0.0001 to 0.1. Default: 0.02. (topdia -e, --mz-error)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="text">
         <string>M/z error: </string>
@@ -236,6 +260,9 @@
          <height>16777215</height>
         </size>
        </property>
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Error tolerance of the m/z values of spectral peaks, in m/z: a number from 0.0001 to 0.1. Default: 0.02. (topdia -e, --mz-error)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
        <property name="text">
         <string>0.02</string>
        </property>
@@ -246,7 +273,7 @@
    <widget class="QWidget" name="horizontalLayoutWidget_5">
     <property name="geometry">
      <rect>
-      <x>300</x>
+      <x>364</x>
       <y>160</y>
       <width>291</width>
       <height>42</height>
@@ -260,6 +287,9 @@
          <width>110</width>
          <height>0</height>
         </size>
+       </property>
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Signal-to-noise ratio for MS1 spectra, used in MS1 deconvolution and proteoform feature detection: a non-negative number with at most two decimals. Default: 3. (topdia -r, --ms1-sn-ratio)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="text">
         <string>MS1 S/N ratio: </string>
@@ -280,6 +310,9 @@
          <height>16777215</height>
         </size>
        </property>
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Signal-to-noise ratio for MS1 spectra, used in MS1 deconvolution and proteoform feature detection: a non-negative number with at most two decimals. Default: 3. (topdia -r, --ms1-sn-ratio)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
        <property name="text">
         <string>3.0</string>
        </property>
@@ -292,7 +325,7 @@
      <rect>
       <x>30</x>
       <y>630</y>
-      <width>901</width>
+      <width>1039</width>
       <height>50</height>
      </rect>
     </property>
@@ -363,7 +396,7 @@
      <rect>
       <x>30</x>
       <y>160</y>
-      <width>241</width>
+      <width>305</width>
       <height>42</height>
      </rect>
     </property>
@@ -375,6 +408,9 @@
          <width>120</width>
          <height>0</height>
         </size>
+       </property>
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Default width of the precursor isolation windows, in m/z, used only when the input file does not record the isolation windows: a positive number up to 10000 with at most two decimals. Default: 4.0. (topdia -w, --precursor-window)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="text">
         <string>Default precursor window (m/z): </string>
@@ -395,6 +431,9 @@
          <height>16777215</height>
         </size>
        </property>
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Default width of the precursor isolation windows, in m/z, used only when the input file does not record the isolation windows: a positive number up to 10000 with at most two decimals. Default: 4.0. (topdia -w, --precursor-window)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
        <property name="text">
         <string>4.0</string>
        </property>
@@ -407,7 +446,7 @@
      <rect>
       <x>30</x>
       <y>460</y>
-      <width>901</width>
+      <width>1039</width>
       <height>161</height>
      </rect>
     </property>
@@ -425,7 +464,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
    <widget class="QWidget" name="horizontalLayoutWidget_9">
     <property name="geometry">
      <rect>
-      <x>300</x>
+      <x>364</x>
       <y>200</y>
       <width>291</width>
       <height>42</height>
@@ -434,6 +473,9 @@ li.checked::marker { content: &quot;\2612&quot;; }
     <layout class="QHBoxLayout" name="horizontalLayout_8">
      <item>
       <widget class="QLabel" name="label_7">
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Signal-to-noise ratio for MS/MS spectra, used in MS/MS deconvolution and fragment feature detection: a non-negative number with at most two decimals. Default: 1. (topdia -s, --ms2-sn-ratio)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
        <property name="text">
         <string>MS2 S/N ratio:</string>
        </property>
@@ -447,6 +489,9 @@ li.checked::marker { content: &quot;\2612&quot;; }
          <height>16777215</height>
         </size>
        </property>
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Signal-to-noise ratio for MS/MS spectra, used in MS/MS deconvolution and fragment feature detection: a non-negative number with at most two decimals. Default: 1. (topdia -s, --ms2-sn-ratio)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
        <property name="text">
         <string>1.0</string>
        </property>
@@ -459,9 +504,12 @@ li.checked::marker { content: &quot;\2612&quot;; }
      <rect>
       <x>30</x>
       <y>60</y>
-      <width>901</width>
+      <width>1039</width>
       <height>101</height>
      </rect>
+    </property>
+    <property name="toolTip">
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The spectrum files to process, one after another: centroided mzML or mzXML files with MS1 scans and DIA MS/MS scans whose isolation windows are recorded in the file. Paths must not contain spaces. The output files of each file are written next to it. (topdia spectrum-file-names)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
     </property>
    </widget>
    <widget class="QWidget" name="horizontalLayoutWidget_10">
@@ -469,7 +517,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
      <rect>
       <x>30</x>
       <y>360</y>
-      <width>241</width>
+      <width>305</width>
       <height>42</height>
      </rect>
     </property>
@@ -481,6 +529,9 @@ li.checked::marker { content: &quot;\2612&quot;; }
          <width>110</width>
          <height>0</height>
         </size>
+       </property>
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Number of threads used in spectral deconvolution: a positive integer, at most the number of hardware threads of the computer. Default: 1. (topdia -u, --thread-number)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="text">
         <string>Thread number:</string>
@@ -501,6 +552,9 @@ li.checked::marker { content: &quot;\2612&quot;; }
          <height>16777215</height>
         </size>
        </property>
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Number of threads used in spectral deconvolution: a positive integer, at most the number of hardware threads of the computer. Default: 1. (topdia -u, --thread-number)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
        <property name="text">
         <string>1</string>
        </property>
@@ -513,17 +567,48 @@ li.checked::marker { content: &quot;\2612&quot;; }
      <rect>
       <x>30</x>
       <y>410</y>
-      <width>901</width>
+      <width>1039</width>
       <height>51</height>
      </rect>
     </property>
     <property name="title">
      <string>Additional settings</string>
     </property>
+    <widget class="QWidget" name="horizontalLayoutWidget_17">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>20</y>
+       <width>251</width>
+       <height>25</height>
+      </rect>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout_17">
+      <item>
+       <widget class="QCheckBox" name="singleScanNoiseLevelCheckBox">
+        <property name="acceptDrops">
+         <bool>false</bool>
+        </property>
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Filter out low-intensity peaks in feature detection with the noise level of each single scan (MS1 scans for proteoform features, MS/MS scans for fragment features) instead of the noise level of the whole LC-MS map (for fragment features, of the MS/MS scans of an isolation window). Unchecked by default. (topdia -i, --single-scan-noise)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="text">
+         <string>Use single scan noise level</string>
+        </property>
+        <property name="checkable">
+         <bool>true</bool>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
     <widget class="QWidget" name="horizontalLayoutWidget_12">
      <property name="geometry">
       <rect>
-       <x>590</x>
+       <x>654</x>
        <y>20</y>
        <width>301</width>
        <height>25</height>
@@ -535,8 +620,11 @@ li.checked::marker { content: &quot;\2612&quot;; }
         <property name="acceptDrops">
          <bool>false</bool>
         </property>
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Filter the isotopic envelopes of MS/MS scans by the estimated number of fragment ions: the envelopes ranked highest by the score chosen with Use MS-Deconv score are kept. MS1 envelopes are not filtered, and the filter is not used with the flashdeconv MS/MS deconvolution. Unchecked by default. (topdia -j, --frag-num-filtering)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
         <property name="text">
-         <string>Enable final filtering</string>
+         <string>Enable fragment number based filtering</string>
         </property>
         <property name="checkable">
          <bool>true</bool>
@@ -551,7 +639,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
     <widget class="QWidget" name="horizontalLayoutWidget_15">
      <property name="geometry">
       <rect>
-       <x>270</x>
+       <x>334</x>
        <y>20</y>
        <width>291</width>
        <height>25</height>
@@ -568,6 +656,9 @@ li.checked::marker { content: &quot;\2612&quot;; }
         </property>
         <property name="acceptDrops">
          <bool>false</bool>
+        </property>
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Rank isotopic envelopes by the MS-Deconv score when checked, or by the EnvCNN score when unchecked (default). The ranking decides which MS/MS envelopes fragment number based filtering keeps; the EnvCNN score cutoffs of envelopes use the EnvCNN score either way. (topdia -n, --env-rank msdeconv or envcnn)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
         <property name="text">
          <string>Use MS-Deconv score</string>
@@ -586,8 +677,8 @@ li.checked::marker { content: &quot;\2612&quot;; }
    <widget class="QWidget" name="horizontalLayoutWidget_6">
     <property name="geometry">
      <rect>
-      <x>300</x>
-      <y>280</y>
+      <x>364</x>
+      <y>320</y>
       <width>291</width>
       <height>42</height>
      </rect>
@@ -600,6 +691,9 @@ li.checked::marker { content: &quot;\2612&quot;; }
          <width>0</width>
          <height>0</height>
         </size>
+       </property>
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;ECScore cutoff for MS1 proteoform features: features with a lower ECScore are removed. A number in [0, 1]. Default: 0. (topdia -t, --ms1-ecscore-cutoff)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="text">
         <string>MS1 ECScore cutoff:</string>
@@ -620,6 +714,9 @@ li.checked::marker { content: &quot;\2612&quot;; }
          <height>16777215</height>
         </size>
        </property>
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;ECScore cutoff for MS1 proteoform features: features with a lower ECScore are removed. A number in [0, 1]. Default: 0. (topdia -t, --ms1-ecscore-cutoff)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
        <property name="text">
         <string>0</string>
        </property>
@@ -630,9 +727,9 @@ li.checked::marker { content: &quot;\2612&quot;; }
    <widget class="QWidget" name="horizontalLayoutWidget_18">
     <property name="geometry">
      <rect>
-      <x>620</x>
+      <x>684</x>
       <y>160</y>
-      <width>311</width>
+      <width>385</width>
       <height>42</height>
      </rect>
     </property>
@@ -644,6 +741,9 @@ li.checked::marker { content: &quot;\2612&quot;; }
          <width>0</width>
          <height>0</height>
         </size>
+       </property>
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Minimum number of MS1 scans in which a proteoform feature is detected: 1, 2 or 3. Default: 2. (topdia -b, --ms1-min-scan-number)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="text">
         <string>MS1 minimum scan number:</string>
@@ -664,6 +764,9 @@ li.checked::marker { content: &quot;\2612&quot;; }
          <height>16777215</height>
         </size>
        </property>
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Minimum number of MS1 scans in which a proteoform feature is detected: 1, 2 or 3. Default: 2. (topdia -b, --ms1-min-scan-number)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
        <property name="text">
         <string>2</string>
        </property>
@@ -674,9 +777,9 @@ li.checked::marker { content: &quot;\2612&quot;; }
    <widget class="QWidget" name="horizontalLayoutWidget_19">
     <property name="geometry">
      <rect>
-      <x>620</x>
+      <x>684</x>
       <y>360</y>
-      <width>311</width>
+      <width>385</width>
       <height>42</height>
      </rect>
     </property>
@@ -688,6 +791,9 @@ li.checked::marker { content: &quot;\2612&quot;; }
          <width>0</width>
          <height>0</height>
         </size>
+       </property>
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Pseudo score cutoff for generating pseudo-MS/MS spectra: once a pseudo spectrum has the minimum peak number, fragment features with a lower pseudo score are not added. A number in [0, 1]. Default: 0.55. (topdia -v, --pseudo-cutoff)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="text">
         <string>Pseudo spectrum score cutoff:</string>
@@ -708,6 +814,9 @@ li.checked::marker { content: &quot;\2612&quot;; }
          <height>16777215</height>
         </size>
        </property>
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Pseudo score cutoff for generating pseudo-MS/MS spectra: once a pseudo spectrum has the minimum peak number, fragment features with a lower pseudo score are not added. A number in [0, 1]. Default: 0.55. (topdia -v, --pseudo-cutoff)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
        <property name="text">
         <string>0.55</string>
        </property>
@@ -718,9 +827,9 @@ li.checked::marker { content: &quot;\2612&quot;; }
    <widget class="QWidget" name="horizontalLayoutWidget_20">
     <property name="geometry">
      <rect>
-      <x>620</x>
+      <x>684</x>
       <y>320</y>
-      <width>311</width>
+      <width>385</width>
       <height>42</height>
      </rect>
     </property>
@@ -732,6 +841,9 @@ li.checked::marker { content: &quot;\2612&quot;; }
          <width>0</width>
          <height>0</height>
         </size>
+       </property>
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Minimum number of peaks in a pseudo-MS/MS spectrum: until a spectrum has this number of peaks, fragment features are added regardless of the pseudo spectrum score cutoff, when available. An integer from 10 to 1000. Default: 25. (topdia -V, --pseudo-peak-number)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="text">
         <string>Minimum peak number in pseudo spectrum: </string>
@@ -752,6 +864,9 @@ li.checked::marker { content: &quot;\2612&quot;; }
          <height>16777215</height>
         </size>
        </property>
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Minimum number of peaks in a pseudo-MS/MS spectrum: until a spectrum has this number of peaks, fragment features are added regardless of the pseudo spectrum score cutoff, when available. An integer from 10 to 1000. Default: 25. (topdia -V, --pseudo-peak-number)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
        <property name="text">
         <string>25</string>
        </property>
@@ -762,9 +877,9 @@ li.checked::marker { content: &quot;\2612&quot;; }
    <widget class="QWidget" name="horizontalLayoutWidget_21">
     <property name="geometry">
      <rect>
-      <x>620</x>
+      <x>684</x>
       <y>240</y>
-      <width>311</width>
+      <width>385</width>
       <height>42</height>
      </rect>
     </property>
@@ -777,8 +892,11 @@ li.checked::marker { content: &quot;\2612&quot;; }
          <height>0</height>
         </size>
        </property>
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Minimum correlation between the intensities of a seed isotopic envelope and the theoretical ones for starting an MS1 proteoform feature: a number in [0, 1]. Default: 0.5. (topdia -y, --ms1-correlation-cutoff)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
        <property name="text">
-        <string>MS1 isotopic envelope intensity correlation cutoff:</string>
+        <string>MS1 envelope intensity correlation cutoff:</string>
        </property>
       </widget>
      </item>
@@ -796,6 +914,9 @@ li.checked::marker { content: &quot;\2612&quot;; }
          <height>16777215</height>
         </size>
        </property>
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Minimum correlation between the intensities of a seed isotopic envelope and the theoretical ones for starting an MS1 proteoform feature: a number in [0, 1]. Default: 0.5. (topdia -y, --ms1-correlation-cutoff)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
        <property name="text">
         <string>0.5</string>
        </property>
@@ -806,9 +927,9 @@ li.checked::marker { content: &quot;\2612&quot;; }
    <widget class="QWidget" name="horizontalLayoutWidget_22">
     <property name="geometry">
      <rect>
-      <x>620</x>
+      <x>684</x>
       <y>280</y>
-      <width>311</width>
+      <width>385</width>
       <height>42</height>
      </rect>
     </property>
@@ -821,8 +942,11 @@ li.checked::marker { content: &quot;\2612&quot;; }
          <height>0</height>
         </size>
        </property>
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Minimum correlation between the intensities of a seed isotopic envelope and the theoretical ones for starting a fragment feature in an isolation window: a number in [0, 1]. Default: 0.5. (topdia -Y, --ms2-correlation-cutoff)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
        <property name="text">
-        <string>MS2 isotopic envelope intensity correlation cutoff:</string>
+        <string>MS2 envelope intensity correlation cutoff:</string>
        </property>
       </widget>
      </item>
@@ -840,6 +964,9 @@ li.checked::marker { content: &quot;\2612&quot;; }
          <height>16777215</height>
         </size>
        </property>
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Minimum correlation between the intensities of a seed isotopic envelope and the theoretical ones for starting a fragment feature in an isolation window: a number in [0, 1]. Default: 0.5. (topdia -Y, --ms2-correlation-cutoff)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
        <property name="text">
         <string>0</string>
        </property>
@@ -852,7 +979,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
      <rect>
       <x>30</x>
       <y>320</y>
-      <width>241</width>
+      <width>305</width>
       <height>40</height>
      </rect>
     </property>
@@ -865,6 +992,9 @@ li.checked::marker { content: &quot;\2612&quot;; }
      </property>
      <item>
       <widget class="QLabel" name="label_10">
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Fragmentation method of the MS/MS spectra: FILE (default) takes the method of each spectrum from the input file; CID, ETD, ETCID, ETHCD, HCD, MPD or UVPD sets it for all spectra. ETCID (ETciD) and ETHCD (EThcD) have the ion types of ETD. (topdia -a, --activation)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
        <property name="text">
         <string>Fragmentation:</string>
        </property>
@@ -883,9 +1013,12 @@ li.checked::marker { content: &quot;\2612&quot;; }
        </property>
        <property name="maximumSize">
         <size>
-         <width>70</width>
+         <width>80</width>
          <height>16777215</height>
         </size>
+       </property>
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Fragmentation method of the MS/MS spectra: FILE (default) takes the method of each spectrum from the input file; CID, ETD, ETCID, ETHCD, HCD, MPD or UVPD sets it for all spectra. ETCID (ETciD) and ETHCD (EThcD) have the ion types of ETD. (topdia -a, --activation)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="iconSize">
         <size>
@@ -913,6 +1046,16 @@ li.checked::marker { content: &quot;\2612&quot;; }
        </item>
        <item>
         <property name="text">
+         <string>ETCID</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>ETHCD</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
          <string>HCD</string>
         </property>
        </item>
@@ -933,9 +1076,9 @@ li.checked::marker { content: &quot;\2612&quot;; }
    <widget class="QWidget" name="horizontalLayoutWidget_23">
     <property name="geometry">
      <rect>
-      <x>620</x>
+      <x>684</x>
       <y>200</y>
-      <width>311</width>
+      <width>385</width>
       <height>42</height>
      </rect>
     </property>
@@ -947,6 +1090,9 @@ li.checked::marker { content: &quot;\2612&quot;; }
          <width>0</width>
          <height>0</height>
         </size>
+       </property>
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Minimum number of MS/MS scans in which a fragment feature is detected: 1, 2 or 3. Default: 1. (topdia -B, --ms2-min-scan-number)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="text">
         <string>MS2 minimum scan number:</string>
@@ -967,36 +1113,11 @@ li.checked::marker { content: &quot;\2612&quot;; }
          <height>16777215</height>
         </size>
        </property>
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Minimum number of MS/MS scans in which a fragment feature is detected: 1, 2 or 3. Default: 1. (topdia -B, --ms2-min-scan-number)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
        <property name="text">
         <string>1</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </widget>
-   <widget class="QWidget" name="horizontalLayoutWidget_17">
-    <property name="geometry">
-     <rect>
-      <x>300</x>
-      <y>240</y>
-      <width>291</width>
-      <height>41</height>
-     </rect>
-    </property>
-    <layout class="QHBoxLayout" name="horizontalLayout_17">
-     <item>
-      <widget class="QCheckBox" name="singleScanNoiseLevelCheckBox">
-       <property name="acceptDrops">
-        <bool>false</bool>
-       </property>
-       <property name="text">
-        <string>Use single scan noise level</string>
-       </property>
-       <property name="checkable">
-        <bool>true</bool>
-       </property>
-       <property name="checked">
-        <bool>true</bool>
        </property>
       </widget>
      </item>
@@ -1005,8 +1126,8 @@ li.checked::marker { content: &quot;\2612&quot;; }
    <widget class="QWidget" name="horizontalLayoutWidget_14">
     <property name="geometry">
      <rect>
-      <x>300</x>
-      <y>320</y>
+      <x>364</x>
+      <y>360</y>
       <width>291</width>
       <height>42</height>
      </rect>
@@ -1019,6 +1140,9 @@ li.checked::marker { content: &quot;\2612&quot;; }
          <width>0</width>
          <height>0</height>
         </size>
+       </property>
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;ECScore cutoff for the fragment features detected in the MS/MS scans of each isolation window: features with a lower ECScore are removed. A number in [0, 1]. Default: 0. (topdia -T, --ms2-ecscore-cutoff)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="text">
         <string>MS2 ECScore cutoff:</string>
@@ -1039,9 +1163,119 @@ li.checked::marker { content: &quot;\2612&quot;; }
          <height>16777215</height>
         </size>
        </property>
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;ECScore cutoff for the fragment features detected in the MS/MS scans of each isolation window: features with a lower ECScore are removed. A number in [0, 1]. Default: 0. (topdia -T, --ms2-ecscore-cutoff)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
        <property name="text">
         <string>0</string>
        </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+   <widget class="QWidget" name="horizontalLayoutWidget_24">
+    <property name="geometry">
+     <rect>
+      <x>364</x>
+      <y>240</y>
+      <width>291</width>
+      <height>42</height>
+     </rect>
+    </property>
+    <layout class="QHBoxLayout" name="horizontalLayout_24">
+     <property name="spacing">
+      <number>7</number>
+     </property>
+     <property name="sizeConstraint">
+      <enum>QLayout::SetNoConstraint</enum>
+     </property>
+     <item>
+      <widget class="QLabel" name="ms1DeconvLabel">
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Deconvolution method of MS1 spectra: msdeconv (default), the MS-Deconv dynamic programming, or greedy, TopFD's default greedy search, which decides the charge state of the most intense peak with all the charge states of its mass and subtracts the mass's envelopes. (topdia -p, --ms1-deconv)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
+       <property name="text">
+        <string>MS1 deconvolution:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QComboBox" name="ms1DeconvComboBox">
+       <property name="maximumSize">
+        <size>
+         <width>120</width>
+         <height>16777215</height>
+        </size>
+       </property>
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Deconvolution method of MS1 spectra: msdeconv (default), the MS-Deconv dynamic programming, or greedy, TopFD's default greedy search, which decides the charge state of the most intense peak with all the charge states of its mass and subtracts the mass's envelopes. (topdia -p, --ms1-deconv)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
+       <item>
+        <property name="text">
+         <string>greedy</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>msdeconv</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+   <widget class="QWidget" name="horizontalLayoutWidget_25">
+    <property name="geometry">
+     <rect>
+      <x>364</x>
+      <y>280</y>
+      <width>291</width>
+      <height>42</height>
+     </rect>
+    </property>
+    <layout class="QHBoxLayout" name="horizontalLayout_25">
+     <property name="spacing">
+      <number>7</number>
+     </property>
+     <property name="sizeConstraint">
+      <enum>QLayout::SetNoConstraint</enum>
+     </property>
+     <item>
+      <widget class="QLabel" name="ms2DeconvLabel">
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Deconvolution method of MS/MS spectra: msdeconv (default), the MS-Deconv dynamic programming; greedy, TopFD's default greedy search adapted to fragment ions; or flashdeconv, the FLASHDeconv algorithm (experimental). Fragment number based filtering is not used with flashdeconv. (topdia -q, --ms2-deconv)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
+       <property name="text">
+        <string>MS2 deconvolution:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QComboBox" name="ms2DeconvComboBox">
+       <property name="maximumSize">
+        <size>
+         <width>120</width>
+         <height>16777215</height>
+        </size>
+       </property>
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Deconvolution method of MS/MS spectra: msdeconv (default), the MS-Deconv dynamic programming; greedy, TopFD's default greedy search adapted to fragment ions; or flashdeconv, the FLASHDeconv algorithm (experimental). Fragment number based filtering is not used with flashdeconv. (topdia -q, --ms2-deconv)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
+       <item>
+        <property name="text">
+         <string>greedy</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>msdeconv</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>flashdeconv</string>
+        </property>
+       </item>
       </widget>
      </item>
     </layout>

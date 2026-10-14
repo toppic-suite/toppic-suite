@@ -18,6 +18,9 @@
 #include <algorithm>
 #include <map>
 #include <set>
+#include <string>
+#include <utility>
+#include <vector>
 
 #include "common/util/logger.hpp"
 #include "ms/factory/extend_ms_factory.hpp"
@@ -236,6 +239,95 @@ void mergePrsmFiles(const std::vector<std::string>& prsm_file_lst,
   }
 
   prsm_writer->close();
+}
+
+namespace {
+
+// a PrSM of the combined file, as updateProteoClusterIds finds it
+struct CombinedPrsm {
+  std::string seq_name;
+  int start_pos;
+  int end_pos;
+  int proteo_cluster_id;
+  bool used;
+};
+
+}  // namespace
+
+int updateProteoClusterIds(const std::vector<std::string>& prsm_file_lst,
+                           int max_spec_num_per_file,
+                           const std::string& combined_file) {
+  // (spectrum id, precursor id) -> the combined PrSMs; one per key unless
+  // several PrSMs per spectrum are kept
+  std::map<std::pair<int, int>, std::vector<CombinedPrsm>> combined_prsms;
+  int max_cluster_id = -1;
+  {
+    PrsmReader reader(combined_file);
+    PrsmStrPtr prsm = reader.readOnePrsmStr();
+    while (prsm != nullptr) {
+      combined_prsms[{prsm->getSpectrumId(), prsm->getPrecursorId()}]
+          .push_back({prsm->getSeqName(), prsm->getProteoformStartPos(),
+                      prsm->getProteoformEndPos(), prsm->getProteoClusterId(),
+                      false});
+      max_cluster_id = std::max(max_cluster_id, prsm->getProteoClusterId());
+      prsm = reader.readOnePrsmStr();
+    }
+  }
+
+  int missing_num = 0;
+  int new_cluster_id = max_cluster_id + 1;
+  for (size_t i = 0; i < prsm_file_lst.size(); i++) {
+    PrsmStrPtrVec prsms;
+    {
+      PrsmReader reader(prsm_file_lst[i]);
+      PrsmStrPtr prsm = reader.readOnePrsmStr();
+      while (prsm != nullptr) {
+        prsms.push_back(prsm);
+        prsm = reader.readOnePrsmStr();
+      }
+    }
+    // the file's own cluster id -> the new id of its PrSMs without a
+    // combined PrSM
+    std::map<int, int> new_ids;
+    int file_missing_num = 0;
+    for (size_t j = 0; j < prsms.size(); j++) {
+      int spec_id = max_spec_num_per_file * static_cast<int>(i) +
+                    prsms[j]->getSpectrumId();
+      auto it = combined_prsms.find({spec_id, prsms[j]->getPrecursorId()});
+      CombinedPrsm* match = nullptr;
+      if (it != combined_prsms.end()) {
+        for (CombinedPrsm& combined : it->second) {
+          if (!combined.used && combined.seq_name == prsms[j]->getSeqName() &&
+              combined.start_pos == prsms[j]->getProteoformStartPos() &&
+              combined.end_pos == prsms[j]->getProteoformEndPos()) {
+            match = &combined;
+            break;
+          }
+        }
+      }
+      if (match != nullptr) {
+        match->used = true;
+        prsms[j]->setProteoClusterId(match->proteo_cluster_id);
+      } else {
+        int old_id = prsms[j]->getProteoClusterId();
+        if (new_ids.find(old_id) == new_ids.end()) {
+          new_ids[old_id] = new_cluster_id++;
+        }
+        prsms[j]->setProteoClusterId(new_ids[old_id]);
+        file_missing_num++;
+      }
+    }
+    if (file_missing_num > 0) {
+      LOG_WARN(file_missing_num << " PrSMs of " << prsm_file_lst[i]
+                                << " are not in " << combined_file
+                                << ": they get new proteoform ids.");
+    }
+    missing_num += file_missing_num;
+    PrsmXmlWriter writer(prsm_file_lst[i]);
+    writer.writeVector(prsms);
+    writer.close();
+  }
+  return missing_num;
 }
 
 double compClusterInte(const PrsmStrPtrVec& prsm_list) {

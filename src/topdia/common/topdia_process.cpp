@@ -33,6 +33,7 @@
 #include "topdia/pseudo_spec/generate_pseudo_spectrum.hpp"
 #include "topfd/deconv/deconv_ms1_process.hpp"
 #include "topfd/deconv/deconv_ms2_process.hpp"
+#include "topfd/deconv/flashdeconv_ms2_process.hpp"
 #include "topfd/ecscore/env_coll/env_coll_detect.hpp"
 #include "topfd/ecscore/score/onnx_ecscore.hpp"
 #include "topfd/envcnn/onnx_env_cnn.hpp"
@@ -65,10 +66,17 @@ void processOneFileWithFaims(const TopfdParaPtr& topfd_para_ptr,
 
   std::cout << "MS/MS deconvolution started." << std::endl;
   topfd_para_ptr->setMissingLevelOne(true);
-  DeconvMs2ProcessPtr ms2_proc_ptr =
-      std::make_shared<DeconvMs2Process>(topfd_para_ptr, "ms2_raw.msalign");
-  ms2_proc_ptr->process();
-  ms2_proc_ptr = nullptr;
+  if (topfd_para_ptr->isUseFlashDeconv()) {
+    // --ms2-deconv flashdeconv: the FLASHDeconv algorithm
+    FlashDeconvMs2ProcessPtr ms2_proc_ptr =
+        std::make_shared<FlashDeconvMs2Process>(topfd_para_ptr,
+                                                "ms2_raw.msalign");
+    ms2_proc_ptr->process();
+  } else {
+    DeconvMs2ProcessPtr ms2_proc_ptr =
+        std::make_shared<DeconvMs2Process>(topfd_para_ptr, "ms2_raw.msalign");
+    ms2_proc_ptr->process();
+  }
   std::cout << "MS/MS deconvolution finished." << std::endl;
 
   std::cout << "MS/MS feature detection started." << std::endl;
@@ -84,6 +92,7 @@ void processOneFileWithFaims(const TopfdParaPtr& topfd_para_ptr,
   pseudo_genrator_ptr->process(topfd_para_ptr, topdia_para_ptr);
   pseudo_genrator_ptr = nullptr;
   std::cout << "Pseudo spectrum generation finished." << std::endl;
+  topfd_para_ptr->closeSqlDb();
 }
 
 void processOneFile(const TopfdParaPtr& topfd_para_ptr,

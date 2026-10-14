@@ -22,6 +22,7 @@
 #include "common/thread/simple_thread_pool.hpp"
 #include "common/util/file_util.hpp"
 #include "common/util/logger.hpp"
+#include "common/util/stage_profile.hpp"
 #include "ms/factory/spectrum_set_factory.hpp"
 #include "ms/spec/msalign_util.hpp"
 #include "prsm/prsm.hpp"
@@ -52,7 +53,8 @@ std::function<void()> geneTask(const SpectrumSetPtr& spectrum_set_ptr,
     SimplePrsmPtrVec match_prsm_ptrs;
     for (size_t i = 0; i < ori_simple_prsm_ptrs.size(); i++) {
       // check if the simple_prsm has the same precursor +/- 1 Dalton shift
-      if (std::abs(spectrum_set_ptr->getPrecMonoMass() -
+      // (the filtering result holds the label-free precursor mass, -N)
+      if (std::abs(spectrum_set_ptr->getLabelFreePrecMonoMass() -
                    ori_simple_prsm_ptrs[i]->getPrecMass()) < std::pow(10, -4)) {
         match_prsm_ptrs.push_back(ori_simple_prsm_ptrs[i]);
       }
@@ -182,6 +184,7 @@ void PtmSearchProcessor::process() {
     deconv_ms_ptr_vec = ms_reader_ptr->getNextMsPtrVec();
   }
   pool_ptr->shutDown();
+  stage_profile::report("multi_search");
   simple_prsm_reader.close();
   for (int i = 0; i < mng_ptr_->thread_num_; i++) {
     writer_set_ptr_vec[i]->close();

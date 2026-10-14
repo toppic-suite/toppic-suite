@@ -381,7 +381,7 @@ p, li { white-space: pre-wrap; }
           </size>
          </property>
          <property name="text">
-          <string>Missing MS1 feature file</string>
+          <string>No TopFD feature file</string>
          </property>
         </widget>
        </item>
@@ -662,6 +662,16 @@ p, li { white-space: pre-wrap; }
          <item>
           <property name="text">
            <string>ETD</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>ETCID</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>ETHCD</string>
           </property>
          </item>
          <item>

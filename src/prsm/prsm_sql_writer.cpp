@@ -28,6 +28,7 @@
 #include "seq/fasta_seq.hpp"
 #include "seq/mass_shift.hpp"
 #include "seq/proteoform.hpp"
+#include "seq/proteoform_util.hpp"
 #include "sql/sql_util.hpp"
 
 namespace toppic {
@@ -61,6 +62,7 @@ void PrsmSqlWriter::createPrsmTable(const std::string& table_name) {
                                  "("
                                  "prsm_id INTEGER PRIMARY KEY,"
                                  "spectrum_id INT NOT NULL,"
+                                 "precursor_id INT NOT NULL,"
                                  "fragmentation TEXT NOT NULL,"
                                  "scans TEXT NOT NULL,"
                                  "retention_time REAL NOT NULL,"  // seconds
@@ -68,6 +70,7 @@ void PrsmSqlWriter::createPrsmTable(const std::string& table_name) {
                                  "charge INT NOT NULL,"
                                  "precursor_mass REAL NOT NULL,"
                                  "adjusted_precursor_mass REAL NOT NULL,"
+                                 "n_terminal_label_mass REAL NOT NULL,"
                                  "proteoform_id INT NOT NULL,"
                                  "proteoform_intensity REAL NOT NULL,"
                                  "feature_id INT,"
@@ -84,6 +87,7 @@ void PrsmSqlWriter::createPrsmTable(const std::string& table_name) {
                                  "prev_amino_acid TEXT NOT NULL,"
                                  "proteoform TEXT NOT NULL,"
                                  "next_amino_acid TEXT NOT NULL,"
+                                 "proforma TEXT NOT NULL,"
                                  "proteoform_mass REAL NOT NULL,"
                                  "n_terminal_form TEXT NOT NULL,"
                                  "fixed_ptms TEXT NOT NULL,"
@@ -97,7 +101,8 @@ void PrsmSqlWriter::createPrsmTable(const std::string& table_name) {
                                  "e_value REAL NOT NULL,"
                                  "spectrum_fdr REAL,"
                                  "proteoform_fdr REAL,"
-                                 "protein_fdr REAL);");
+                                 "protein_fdr REAL,"
+                                 "proteoform_classification TEXT NOT NULL);");
 }
 
 void PrsmSqlWriter::write(const std::string& input_file_ext,
@@ -111,7 +116,7 @@ void PrsmSqlWriter::write(const std::string& input_file_ext,
       sql_db_, "INSERT INTO " + table_name +
                    " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, "
                    "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, "
-                   "?, ?, ?, ?);");
+                   "?, ?, ?, ?, ?, ?, ?, ?);");
   sqlite3_stmt* shift_stmt = nullptr;
   sqlite3_stmt* match_stmt = nullptr;
   if (write_details) {
@@ -179,13 +184,20 @@ void PrsmSqlWriter::writePrsm(sqlite3_stmt* stmt, const PrsmPtr& prsm_ptr) {
   int idx = 1;
   sqlite3_bind_int(stmt, idx++, prsm_ptr->getPrsmId());
   sqlite3_bind_int(stmt, idx++, prsm_ptr->getSpectrumId());
+  sqlite3_bind_int(stmt, idx++, prsm_ptr->getPrecursorId());
   bindText(stmt, idx++, activations);
   bindText(stmt, idx++, scans);
   sqlite3_bind_double(stmt, idx++, first_header_ptr->getRetentionTime());
   sqlite3_bind_int(stmt, idx++, mass_num);
-  sqlite3_bind_int(stmt, idx++, first_header_ptr->getFirstPrecCharge());
+  // the charge of the PrSM's precursor (the scan's first, or with
+  // --second-precursor the one of its precursor id)
+  sqlite3_bind_int(
+      stmt, idx++,
+      first_header_ptr->getPrecPtrById(prsm_ptr->getPrecursorId())
+          ->getCharge());
   sqlite3_bind_double(stmt, idx++, prsm_ptr->getOriPrecMass());
   sqlite3_bind_double(stmt, idx++, prsm_ptr->getAdjustedPrecMass());
+  sqlite3_bind_double(stmt, idx++, prsm_ptr->getNTermLabelMass());
   sqlite3_bind_int(stmt, idx++, form_ptr->getProteoClusterId());
   sqlite3_bind_double(stmt, idx++, form_ptr->getProteoInte());
   if (prsm_ptr->getFracFeatureInte() > 0) {
@@ -210,13 +222,14 @@ void PrsmSqlWriter::writePrsm(sqlite3_stmt* stmt, const PrsmPtr& prsm_ptr) {
   bindText(stmt, idx++, form_ptr->getPrevAminoAcid());
   bindText(stmt, idx++, form_ptr->getProteoformMatchSeq());
   bindText(stmt, idx++, form_ptr->getNextAminoAcid());
+  bindText(stmt, idx++, proteoform_util::getProFormaStr(form_ptr));
   sqlite3_bind_double(stmt, idx++, form_ptr->getMass());
   bindText(stmt, idx++, form_ptr->getProtModPtr()->getType());
   bindText(stmt, idx++, form_ptr->getAlterStr(AlterType::FIXED));
   sqlite3_bind_int(stmt, idx++, form_ptr->getAlterNum(AlterType::UNEXPECTED));
   bindText(stmt, idx++, form_ptr->getAlterStr(AlterType::UNEXPECTED));
-  sqlite3_bind_int(stmt, idx++, form_ptr->getAlterNum(AlterType::VARIABLE));
-  bindText(stmt, idx++, form_ptr->getAlterStr(AlterType::VARIABLE));
+  sqlite3_bind_int(stmt, idx++, form_ptr->getVarPtmNum());
+  bindText(stmt, idx++, form_ptr->getVarPtmStr());
   bindText(stmt, idx++, form_ptr->getMIScore());
   sqlite3_bind_int(stmt, idx++,
                    static_cast<int>(prsm_ptr->getMatchExpFragNum()));
@@ -226,6 +239,10 @@ void PrsmSqlWriter::writePrsm(sqlite3_stmt* stmt, const PrsmPtr& prsm_ptr) {
   bindFdr(stmt, idx++, prsm_ptr->getFdr());
   bindFdr(stmt, idx++, prsm_ptr->getProteoformFdr());
   bindFdr(stmt, idx++, prsm_ptr->getProteinFdr());
+  // set by the cutoff selection (prsm_cutoff_selector), whose files the
+  // tables read
+  const std::string& classification = form_ptr->getClassification();
+  bindText(stmt, idx++, classification == "" ? "-" : classification);
   sql_util::stepAndReset(sql_db_, stmt);
 }
 
@@ -241,6 +258,22 @@ void PrsmSqlWriter::writeMassShifts(sqlite3_stmt* stmt,
     sqlite3_bind_double(stmt, 5, shifts[i]->getMassShift());
     bindText(stmt, 6, shifts[i]->getTypePtr()->getName());
     bindText(stmt, 7, shifts[i]->getAnnoStr());
+    sql_util::stepAndReset(sql_db_, stmt);
+  }
+  // the truncation N-terminal modification is no mass shift: it is the
+  // residue sequence's N-terminal modification, in the mass of the first
+  // residue; it gets the next index
+  ProteoformPtr form_ptr = prsm_ptr->getProteoformPtr();
+  if (form_ptr->hasTruncNTermMod()) {
+    const ModPtr& mod_ptr = form_ptr->getTruncNTermModPtr();
+    sqlite3_bind_int(stmt, 1, prsm_ptr->getPrsmId());
+    sqlite3_bind_int(stmt, 2, static_cast<int>(shifts.size()));
+    sqlite3_bind_int(stmt, 3, 0);
+    sqlite3_bind_int(stmt, 4, 1);
+    sqlite3_bind_double(stmt, 5, mod_ptr->getShift());
+    bindText(stmt, 6, "N-terminal variable");
+    bindText(stmt, 7,
+             mod_ptr->getModResiduePtr()->getPtmPtr()->getAbbrName());
     sql_util::stepAndReset(sql_db_, stmt);
   }
 }

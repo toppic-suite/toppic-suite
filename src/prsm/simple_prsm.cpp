@@ -15,12 +15,26 @@
 
 #include "prsm/simple_prsm.hpp"
 
+#include <algorithm>
+#include <string>
+#include <vector>
+
 #include "common/util/logger.hpp"
 #include "common/util/str_util.hpp"
 #include "common/xml/xml_dom_document.hpp"
 #include "common/xml/xml_dom_util.hpp"
 
 namespace toppic {
+
+namespace {
+
+// the truncation N-terminal modification shifts of a candidate without one,
+// which the files leave out
+bool isDefaultTruncShifts(const std::vector<double>& shifts) {
+  return shifts.size() == 1 && shifts[0] == 0;
+}
+
+}  // namespace
 
 SimplePrsm::SimplePrsm(const MsHeaderPtr& header_ptr, int spectrum_num,
                        const ProteoformPtr& proteo_ptr, int score)
@@ -48,6 +62,8 @@ SimplePrsm::SimplePrsm(const MsHeaderPtr& header_ptr, int spectrum_num,
   seq_desc_ = proteo_ptr->getSeqDesc();
   prot_mass_ = proteo_ptr->getResSeqPtr()->getSeqMass();
   score_ = cand_ptr->getScore();
+  seq_start_pos_ = cand_ptr->getStartPos();
+  seq_end_pos_ = cand_ptr->getEndPos();
   n_term_shifts_ = cand_ptr->getNTermShifts();
   c_term_shifts_ = cand_ptr->getCTermShifts();
 }
@@ -75,6 +91,11 @@ SimplePrsm::SimplePrsm(XmlDOMElement element) {
       xml_dom_util::getDoubleChildValue(element, "spectrum_number", 0);
   seq_name_ = xml_dom_util::getChildValue(element, "sequence_name", 0);
   seq_desc_ = xml_dom_util::getChildValue(element, "sequence_desc", 0);
+  // files written before the range was added have no range
+  if (xml_dom_util::getChildCount(element, "seq_start_pos") > 0) {
+    seq_start_pos_ = xml_dom_util::getIntChildValue(element, "seq_start_pos", 0);
+    seq_end_pos_ = xml_dom_util::getIntChildValue(element, "seq_end_pos", 0);
+  }
   prot_mass_ = xml_dom_util::getDoubleChildValue(element, "proteoform_mass", 0);
   score_ = xml_dom_util::getDoubleChildValue(element, "score", 0);
   // n term shifts
@@ -98,6 +119,28 @@ SimplePrsm::SimplePrsm(XmlDOMElement element) {
         xml_dom_util::getDoubleChildValue(c_shift_list_element, "shift", i);
     c_term_shifts_.push_back(shift);
   }
+  // truncation N-terminal modification shifts, written only when they are
+  // not {0}
+  if (xml_dom_util::getChildCount(element, "trunc_n_term_mod_shift_list") >
+      0) {
+    XmlDOMElement trunc_list_element = xml_dom_util::getChildElement(
+        element, "trunc_n_term_mod_shift_list", 0);
+    int trunc_shift_num =
+        xml_dom_util::getChildCount(trunc_list_element, "shift");
+    trunc_n_term_mod_shifts_.clear();
+    for (int i = 0; i < trunc_shift_num; i++) {
+      trunc_n_term_mod_shifts_.push_back(
+          xml_dom_util::getDoubleChildValue(trunc_list_element, "shift", i));
+    }
+  }
+}
+
+void SimplePrsm::addTruncNTermModShift(double shift) {
+  if (std::find(trunc_n_term_mod_shifts_.begin(),
+                trunc_n_term_mod_shifts_.end(),
+                shift) == trunc_n_term_mod_shifts_.end()) {
+    trunc_n_term_mod_shifts_.push_back(shift);
+  }
 }
 
 XmlDOMElement SimplePrsm::toXml(XmlDOMDocument* xml_doc, XmlDOMElement parent) {
@@ -115,6 +158,10 @@ XmlDOMElement SimplePrsm::toXml(XmlDOMDocument* xml_doc, XmlDOMElement parent) {
   xml_doc->addElement(element, "spectrum_number", str.c_str());
   xml_doc->addElement(element, "sequence_name", seq_name_.c_str());
   xml_doc->addElement(element, "sequence_desc", seq_desc_.c_str());
+  str = std::to_string(seq_start_pos_);
+  xml_doc->addElement(element, "seq_start_pos", str.c_str());
+  str = std::to_string(seq_end_pos_);
+  xml_doc->addElement(element, "seq_end_pos", str.c_str());
   str = str_util::toString(prot_mass_);
   xml_doc->addElement(element, "proteoform_mass", str.c_str());
   str = str_util::toString(score_);
@@ -132,6 +179,15 @@ XmlDOMElement SimplePrsm::toXml(XmlDOMDocument* xml_doc, XmlDOMElement parent) {
   for (size_t i = 0; i < c_term_shifts_.size(); i++) {
     str = str_util::toString(c_term_shifts_[i]);
     xml_doc->addElement(c_shift_list, "shift", str.c_str());
+  }
+
+  if (!isDefaultTruncShifts(trunc_n_term_mod_shifts_)) {
+    XmlDOMElement trunc_shift_list =
+        xml_doc->addElement(element, "trunc_n_term_mod_shift_list");
+    for (size_t i = 0; i < trunc_n_term_mod_shifts_.size(); i++) {
+      str = str_util::toString(trunc_n_term_mod_shifts_[i]);
+      xml_doc->addElement(trunc_shift_list, "shift", str.c_str());
+    }
   }
   return element;
 }
@@ -151,6 +207,10 @@ std::vector<std::string> SimplePrsm::toStrVec() {
                     "</spectrum_number>");
   str_vec.push_back("<sequence_name>" + getSeqName() + "</sequence_name>");
   str_vec.push_back("<sequence_desc>" + getSeqDesc() + "</sequence_desc>");
+  str_vec.push_back("<seq_start_pos>" + std::to_string(seq_start_pos_) +
+                    "</seq_start_pos>");
+  str_vec.push_back("<seq_end_pos>" + std::to_string(seq_end_pos_) +
+                    "</seq_end_pos>");
   str_vec.push_back("<proteoform_mass>" +
                     str_util::toString(getProteoformMass()) +
                     "</proteoform_mass>");
@@ -176,6 +236,16 @@ std::vector<std::string> SimplePrsm::toStrVec() {
                         "</shift>");
     }
     str_vec.push_back("</c_term_shift_list>");
+  }
+
+  if (!isDefaultTruncShifts(trunc_n_term_mod_shifts_)) {
+    str_vec.push_back("<trunc_n_term_mod_shift_list>");
+    for (size_t i = 0; i < trunc_n_term_mod_shifts_.size(); i++) {
+      str_vec.push_back("<shift>" +
+                        str_util::toString(trunc_n_term_mod_shifts_[i]) +
+                        "</shift>");
+    }
+    str_vec.push_back("</trunc_n_term_mod_shift_list>");
   }
 
   str_vec.push_back("</simple_prsm>");
@@ -211,6 +281,20 @@ bool SimplePrsm::cmpSeqIncScoreDec(const SimplePrsmPtr a,
   } else {
     return a->getScore() > b->getScore();
   }
+}
+
+bool SimplePrsm::cmpSeqRangeIncScoreDec(const SimplePrsmPtr& a,
+                                        const SimplePrsmPtr& b) {
+  if (a->getSeqName() != b->getSeqName()) {
+    return a->getSeqName() < b->getSeqName();
+  }
+  if (a->getSeqStartPos() != b->getSeqStartPos()) {
+    return a->getSeqStartPos() < b->getSeqStartPos();
+  }
+  if (a->getSeqEndPos() != b->getSeqEndPos()) {
+    return a->getSeqEndPos() < b->getSeqEndPos();
+  }
+  return a->getScore() > b->getScore();
 }
 
 /*

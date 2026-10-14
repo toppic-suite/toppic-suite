@@ -30,11 +30,16 @@ int PeakTolerance::getIntPpm() const {
 }
 
 double PeakTolerance::compStrictErrorTole(double mass) const {
-  double tolerance = mass * ppo_;
+  double tolerance =
+      use_dalton_tolerance_ && mass > 0 ? dalton_tolerance_ : mass * ppo_;
   if (use_min_tolerance_ && tolerance < min_tolerance_) {
     tolerance = min_tolerance_;
   }
   return tolerance;
+}
+
+double PeakTolerance::compPrecErrorTole(double prec_mass) const {
+  return use_dalton_tolerance_ ? dalton_tolerance_ : prec_mass * ppo_;
 }
 
 }  // namespace toppic

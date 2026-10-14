@@ -57,6 +57,17 @@ void mergePrsmFiles(const std::vector<std::string>& prsm_file_lst,
                     int max_spec_num_per_file, int max_feat_num_per_file,
                     const std::string& output_file);
 
+// The counterpart of mergePrsmFiles for the proteoform cluster ids of a
+// combined run: every PrSM of the i-th file gets the proteoform cluster id
+// of its PrSM in the combined file, the one with spectrum id
+// max_spec_num_per_file * i + its spectrum id, the same precursor id and
+// the same protein, start and end. The files are rewritten. Returns the
+// number of PrSMs without a combined PrSM; they get new ids above the
+// combined ones, one per proteoform cluster of their file.
+int updateProteoClusterIds(const std::vector<std::string>& prsm_file_lst,
+                           int max_spec_num_per_file,
+                           const std::string& combined_file);
+
 double compClusterInte(const PrsmStrPtrVec& prsm_list);
 
 PrsmPtrVec getTopPrsms(const PrsmPtrVec& prsm_ptrs, int top_num);

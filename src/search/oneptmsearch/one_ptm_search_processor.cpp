@@ -45,7 +45,8 @@ PrsmPtrVec OnePtmSearchProcessor::onePtmSearchOneSpec(
   ProteoformPtrVec proteoform_ptr_vec;
   SimplePrsmPtrVec expand_simple_prsm_vec;
   for (size_t i = 0; i < simple_prsm_ptr_vec.size(); i++) {
-    if (std::abs(spec_set_ptr->getPrecMonoMass() -
+    // the filtering result holds the label-free precursor mass (toppic -N)
+    if (std::abs(spec_set_ptr->getLabelFreePrecMonoMass() -
                  simple_prsm_ptr_vec[i]->getPrecMass()) > std::pow(10, -4)) {
       // When precursor error is allowed, if the adjusted precursor of the
       // spectrum set does not match the adjusted precursor mass in the
@@ -60,6 +61,12 @@ PrsmPtrVec OnePtmSearchProcessor::onePtmSearchOneSpec(
         reader_ptr, seq_name, seq_desc, fix_mod_list);
     if (type_ptr == ProteoformType::COMPLETE ||
         type_ptr == ProteoformType::PREFIX) {
+      // Every N-terminal form is aligned, not only the ones that start where
+      // the candidate's range starts: the unexpected shift can take up an
+      // N-terminal form other than the one of the filter's best pair, and
+      // aligning only the forms of its start gave fewer matched fragments on
+      // 230 spectra of the 480 data set for 3 s of the stage's 19 s
+      // (toppic_test experiment 86).
       ProteoformPtrVec mod_form_ptr_vec =
           proteoform_factory::geneProtModProteoform(proteo_ptr,
                                                     prot_mod_ptr_vec);

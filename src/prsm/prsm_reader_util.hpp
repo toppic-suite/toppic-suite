@@ -40,10 +40,16 @@ PrsmPtrVec readAllPrsms(const std::string& prsm_file_name,
 // its deconvoluted spectra (from the msalign file) and refined spectra, as the
 // table and SQL writers need them. Masses whose EnvCNN score is below
 // env_cnn_cutoff are left out; the default 0 keeps every mass (the reader
-// gives a mass without a score the score 1).
+// gives a mass without a score the score 1). A PrSM gets the spectra of its
+// spectrum id; with second_sp_file_name (the residual spectra of toppic
+// --second-precursor, whose first precursor is the second precursor of the
+// scan) it gets, from either file, the spectra of its spectrum id whose
+// first precursor has its precursor id. The PrSMs are returned in the
+// file's order, without those whose spectra are not found.
 PrsmPtrVec readPrsmsWithSpectra(const PrsmParaPtr& prsm_para_ptr,
                                 const std::string& input_file_ext,
-                                double env_cnn_cutoff = 0.0);
+                                double env_cnn_cutoff = 0.0,
+                                const std::string& second_sp_file_name = "");
 
 }  // namespace prsm_reader_util
 

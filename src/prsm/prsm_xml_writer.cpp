@@ -18,6 +18,7 @@
 #include "common/util/file_util.hpp"
 #include "common/util/logger.hpp"
 #include "common/xml/xml_dom_document.hpp"
+#include "common/util/str_util.hpp"
 #include "common/xml/xml_dom_util.hpp"
 #include "prsm/prsm_util.hpp"
 
@@ -59,17 +60,43 @@ void PrsmXmlWriter::writeVector(const PrsmStrPtrVec& prsm_str_ptr_vec) {
 
 void PrsmXmlWriter::write(const PrsmPtr& prsm_ptr) {
   if (prsm_ptr != nullptr) {
-    // pugixml has no detached nodes, so build the prsm element under a
-    // throwaway document root and serialize just that element.
-    XmlDOMDocument doc("prsm_list");
-    XmlDOMElement root = doc.getDocumentElement();
-    if (prsm_ptr->getFileName() == "") {
-      prsm_ptr->setFileName(file_name_);
-    }
-    XmlDOMElement element = prsm_ptr->toXmlElement(&doc, root);
-    std::string str = xml_dom_util::writeToString(element);
-    xml_dom_util::writeToStreamByRemovingDoubleLF(file_, str);
+    writeXmlString(toXmlString(prsm_ptr));
   }
+}
+
+std::string PrsmXmlWriter::toXmlString(const PrsmPtr& prsm_ptr) {
+  // pugixml has no detached nodes, so build the prsm element under a
+  // throwaway document root and serialize just that element.
+  XmlDOMDocument doc("prsm_list");
+  XmlDOMElement root = doc.getDocumentElement();
+  if (prsm_ptr->getFileName() == "") {
+    prsm_ptr->setFileName(file_name_);
+  }
+  XmlDOMElement element = prsm_ptr->toXmlElement(&doc, root);
+  return xml_dom_util::writeToString(element);
+}
+
+void PrsmXmlWriter::writeTrimmedLines(const PrsmPtr& prsm_ptr) {
+  if (prsm_ptr == nullptr) {
+    return;
+  }
+  std::string str = toXmlString(prsm_ptr);
+  std::size_t pos = 0;
+  while (pos < str.size()) {
+    std::size_t end = str.find('\n', pos);
+    std::string line =
+        str.substr(pos, end == std::string::npos ? std::string::npos
+                                                 : end - pos);
+    str_util::trim(line);
+    if (!line.empty()) {
+      file_ << line << std::endl;
+    }
+    pos = end == std::string::npos ? str.size() : end + 1;
+  }
+}
+
+void PrsmXmlWriter::writeXmlString(const std::string& str) {
+  xml_dom_util::writeToStreamByRemovingDoubleLF(file_, str);
 }
 
 void PrsmXmlWriter::writeVector(const PrsmPtrVec& prsm_ptrs) {

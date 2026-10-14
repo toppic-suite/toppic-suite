@@ -20,6 +20,7 @@
 #include <string>
 #include <vector>
 
+#include "common/base/mod.hpp"
 #include "common/base/prot_mod.hpp"
 #include "common/base/proteoform_type.hpp"
 #include "common/base/ptm.hpp"
@@ -57,6 +58,22 @@ class Proteoform {
 
   ProtModPtr getProtModPtr() const { return prot_mod_ptr_; }
 
+  // The variable PTM of the proteoform N-terminus (the alpha-amine of its
+  // first residue), for a truncated proteoform; ModBase::getNTermNoneModPtr()
+  // without one.
+  const ModPtr& getTruncNTermModPtr() const { return trunc_n_term_mod_ptr_; }
+
+  bool hasTruncNTermMod() const;
+
+  // Sets the truncation N-terminal modification, which also becomes the N-
+  // terminal modification of the residue sequence (its mass is in the
+  // sequence mass and the prefix masses). Only a proteoform without a
+  // protein N-terminal form (NONE) that starts at the third residue of the
+  // protein or later can have one, and only on its first residue's amino
+  // acid; otherwise nothing is changed and false is returned. The N-terminal
+  // none modification removes it.
+  bool setTruncNTermModPtr(const ModPtr& mod_ptr);
+
   ResSeqPtr getResSeqPtr() const { return residue_seq_ptr_; }
 
   BpSpecPtr getBpSpecPtr() const { return bp_spec_ptr_; }
@@ -69,9 +86,28 @@ class Proteoform {
 
   int getAlterNum(const AlterTypePtr& type_ptr);
 
+  // the number of variable PTMs: the variable mass shifts' and the
+  // truncation N-terminal modification
   int getVarPtmNum();
 
   const MassShiftPtrVec& getMassShiftPtrVec() const { return mass_shift_list_; }
+
+  // The alternative explanations of an unexpected shift by the PTM
+  // localization (stat/local_align): one complete mass shift list per
+  // alternative, with the proteoform's other shifts (fixed, protein
+  // variable, input and variable PTMs), the alternative's variable PTMs in
+  // place of the shift, and any other unexpected shift as it is. Positions
+  // are the proteoform's. Empty when the shift had one explanation.
+  const MassShiftPtrVec2D& getAlternativeMassShiftPtrVec2D() const {
+    return alternative_mass_shift_list_;
+  }
+  void setAlternativeMassShiftPtrVec2D(const MassShiftPtrVec2D& lists) {
+    alternative_mass_shift_list_ = lists;
+  }
+  // the TSV column "Alternative PTM explanation": each alternative's
+  // variable PTMs and unexpected shifts in position order ("Name:[a-b]",
+  // "+mass:[a-b]", joined by ';'), the alternatives joined by " | "
+  std::string getAlternativePtmStr();
 
   MassShiftPtrVec getMassShiftPtrVec(const AlterTypePtr& type_ptr);
 
@@ -110,15 +146,56 @@ class Proteoform {
 
   std::string getAlterStr(const AlterTypePtr& type_ptr);
 
+  // the variable PTMs as name:[position] (the Variable PTMs column): the
+  // truncation N-terminal modification first, as name:[N-term], then the
+  // variable mass shifts
+  std::string getVarPtmStr();
+
   void appendXml(XmlDOMDocument* xml_doc, XmlDOMElement parent);
 
   void parseXml(XmlDOMElement element, const ProteoformPtr& db_proteoform);
 
   static std::string getXmlElementName() { return "proteoform"; }
+  static std::string getAlternativeXmlElementName() {
+    return "alternative_mass_shift_lists";
+  }
 
   PtmPtrVec getPtmVec(const AlterTypePtr& type);
 
   std::string getMIScore();
+
+  // The level of the proteoform in the five-level classification of
+  // proteoform identifications (Smith et al., Nat. Methods 16:939-940, 2019),
+  // from its unexpected mass shifts, prot_hit_num, the number of database
+  // proteins containing its sequence (the # Protein hits column), and its
+  // variable PTM sites (hasUndecidedVarPtmSite with var_mod_ptrs):
+  //                                           one protein   several proteins
+  //   no unexpected shift, sites decided      "1"           "2D"
+  //   no unexpected shift, a site undecided   "2A"          "3"
+  //   unexpected shift(s)                     "4"           "5"
+  // Protein N-terminal forms and fixed PTMs leave the level as it is; 0 hits
+  // count as one protein.
+  std::string getClassification(int prot_hit_num,
+                                const ModPtrVec& var_mod_ptrs);
+
+  // Whether the site of a variable PTM is undecided: a variable mass shift
+  // covers more than one residue, and for one of its PTMs the residues of
+  // its range that a modification of the PTM in var_mod_ptrs modifies are
+  // not as many as the shift's alterations of the PTM, or one residue could
+  // carry two of its PTMs. A shift on one residue is decided. toppic writes
+  // a shift whose sites are decided one PTM per residue
+  // (VarPtmAlign::splitDeterminedShift); TopMG's shifts span the gaps
+  // between matched fragments, which may hold one candidate residue.
+  bool hasUndecidedVarPtmSite(const ModPtrVec& var_mod_ptrs);
+
+  // The level stored by setClassification, "" until set: the report stage
+  // sets it from the protein hits (prsm_cutoff_selector), and the XML has it
+  // as <classification>.
+  const std::string& getClassification() const { return classification_; }
+
+  void setClassification(const std::string& classification) {
+    classification_ = classification;
+  }
 
   void setStartPos(int start_pos) { start_pos_ = start_pos; }
 
@@ -132,6 +209,10 @@ class Proteoform {
   FastaSeqPtr fasta_seq_ptr_;
 
   ProtModPtr prot_mod_ptr_;
+
+  // the variable PTM of the N-terminus of a truncated proteoform (see
+  // setTruncNTermModPtr); ModBase::getNTermNoneModPtr() without one
+  ModPtr trunc_n_term_mod_ptr_;
 
   // start and end positions are relative to the
   // database sequence
@@ -152,7 +233,12 @@ class Proteoform {
 
   double proteo_inte_ = -1;
 
+  // the stored level of the proteoform classification, "" until set
+  std::string classification_;
+
   MassShiftPtrVec mass_shift_list_;
+
+  MassShiftPtrVec2D alternative_mass_shift_list_;
 };
 
 using ProteoformPtrVec = std::vector<ProteoformPtr>;

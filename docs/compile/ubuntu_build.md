@@ -10,7 +10,7 @@ Debian-based distributions with the matching package names.
 * CMake >= 3.16
 * Boost >= 1.74 (filesystem, iostreams, thread, chrono, serialization,
   program_options; Boost.System is header-only and not needed as a library)
-* pugixml, SQLite3 and zlib development libraries
+* pugixml, SQLite3, zlib and zstd development libraries
 * Qt6 (Core, Gui, Widgets) for the GUI tools
 * Git LFS, for the model files under `res/` and the vendored ONNX Runtime
   library under `ext/onnx/`; the vendored library is a Linux x86-64 binary,
@@ -25,7 +25,7 @@ sudo apt-get update
 # build tools and libraries (Git LFS is needed for the model files under res/
 # and the ONNX Runtime library under ext/onnx/)
 sudo apt-get install build-essential cmake clang git git-lfs \
-    zlib1g-dev libsqlite3-dev libpugixml-dev \
+    zlib1g-dev libzstd-dev libsqlite3-dev libpugixml-dev \
     libboost-filesystem-dev libboost-iostreams-dev libboost-thread-dev \
     libboost-chrono-dev libboost-serialization-dev \
     libboost-program-options-dev \
@@ -70,10 +70,12 @@ cmake ..
 make -j$(nproc)
 ```
 
-The build type defaults to `Release`. The executables (`topfd`, `topdia`,
-`topindex`, `toppic`, `topmg`, `topdiff` and their `*_gui` counterparts) are
-placed in the repository's `bin/` directory. To build just one tool, e.g.
-TopFD:
+The build type defaults to `Release`. The executables are placed in the
+repository's `bin/` directory: the ten command-line tools (`topfd`, `topdia`,
+`topindex`, `toppic`, `topmg`, `topdiff`, `toplib_build`, `toplib_search`,
+`topcalib` and `topzstd`) and the six GUI tools (`topfd_gui`, `topdia_gui`,
+`topindex_gui`, `toppic_gui`, `topmg_gui` and `topdiff_gui`). To build just
+one tool, e.g. TopFD:
 
 ```sh
 make -j$(nproc) topfd

@@ -15,12 +15,15 @@
 
 #include "search/graph/proteo_anno.hpp"
 
+#include <memory>
 #include <string>
 #include <vector>
 
+#include "common/base/amino_acid_base.hpp"
 #include "common/base/prot_mod_base.hpp"
 #include "common/base/prot_mod_util.hpp"
 #include "common/base/ptm_base.hpp"
+#include "common/base/residue.hpp"
 #include "common/base/residue_base.hpp"
 #include "common/base/residue_util.hpp"
 #include "common/util/logger.hpp"
@@ -49,12 +52,20 @@ ProteoAnno::ProteoAnno(const ModPtrVec& fix_mod_ptr_vec,
   }
 }
 
-void ProteoAnno::anno(const std::string& seq, bool is_complete) {
+// The residues come from the sequence's residue/PTM pairs: a PTM written in
+// the FASTA sequence (M[Oxidation]) makes the modified residue, as
+// proteoform_factory::geneDbProteoformPtr makes it for the database
+// proteoform. The raw string used to be read instead, whose brackets were
+// dropped and whose PTM name became residues (M[Oxidation] as M and O).
+void ProteoAnno::anno(const StringPairVec& acid_ptm_pairs, bool is_complete) {
   ResiduePtrVec residue_ptr_vec =
-      residue_util::convertStrToResiduePtrVec(seq, fix_mod_ptr_vec_);
+      residue_util::convertStrToResiduePtrVec(acid_ptm_pairs, fix_mod_ptr_vec_);
   res_vec_2d_.clear();
   shift_vec_2d_.clear();
-  // input and fixed mod
+  // A residue with a PTM, of a fixed modification or of the FASTA sequence,
+  // is FIXED: its one edge, which getMassGraphPtr keeps alone, so that it
+  // takes no variable PTM or protein N-terminal form. An unmodified residue
+  // is marked INPUT.
   for (size_t i = 0; i < residue_ptr_vec.size(); i++) {
     ResiduePtrVec cur_res_vec;
     std::vector<int> cur_shift_vec;
@@ -70,49 +81,54 @@ void ProteoAnno::anno(const std::string& seq, bool is_complete) {
   }
   LOG_DEBUG("input complete");
 
-  // protein mod
-  for (size_t i = 0; i < prot_mod_ptr_vec_.size(); i++) {
+  // protein N-terminal forms, of the protein's N-terminal sequence only and
+  // those allowMod accepts for it. Their edges are at residue 0, so that
+  // only an alignment that starts at the protein N-terminus (vertex 0) can
+  // use them; GraphPostProcessor reads the form back from the first
+  // variable shift and the start. NME is the start at vertex 1, and is_nme_
+  // tells whether that start is the protein N-terminus.
+  // A first residue with a PTM keeps its one edge, so M_ACETYLATION, which
+  // would modify it, is not open to it. The forms that remove it are: NME (a
+  // start, not an edge) and NME_ACETYLATION, whose edge in place of the M is
+  // kept by getMassGraphPtr as a PROTEIN_VARIABLE edge.
+  is_nme_ = false;
+  bool first_fixed = !residue_ptr_vec.empty() &&
+                     !PtmBase::isEmptyPtmPtr(residue_ptr_vec[0]->getPtmPtr());
+  for (size_t i = 0; is_complete && i < prot_mod_ptr_vec_.size(); i++) {
     ProtModPtr mod_ptr = prot_mod_ptr_vec_[i];
     if (!prot_mod_util::allowMod(mod_ptr, residue_ptr_vec)) {
       continue;
     }
     LOG_DEBUG("i " << i << " mod " << mod_ptr);
-    /*
-    if (is_complete && mod_ptr->getType() == ProtModBase::getType_NME()) {
-      LOG_DEBUG("NME");
-      // add empty residue to the first methinine residue
+    if (mod_ptr->getType() == ProtModBase::getType_NME()) {
       is_nme_ = true;
-      ResiduePtr empty_residue_ptr = ResidueBase::getEmptyResiduePtr();
-      // LOG_DEBUG("empty acid mass " << acid_ptr->getMonoMass());
-      // LOG_DEBUG("empty ptm mass " << ptm_ptr->getMonoMass());
-      LOG_DEBUG("empty residue mass " <<
-    empty_residue_ptr->getMonoNeutralMass()); if (empty_residue_ptr == nullptr)
-    { LOG_ERROR("Proteoform:: residue not found"); throw("Residue not found");
+    } else if (mod_ptr->getType() == ProtModBase::getType_M_ACETYLATION()) {
+      if (first_fixed) {
+        continue;
       }
-      res_vec_2d_[0].push_back(empty_residue_ptr);
-      shift_vec_2d_[0].push_back(AlterType::PROTEIN_VARIABLE->getId());
-    }
-    */
-    if (is_complete &&
-        mod_ptr->getType() == ProtModBase::getType_M_ACETYLATION()) {
+      // the acetylated M
       ResiduePtr mut_residue_ptr = mod_ptr->getModPtr()->getModResiduePtr();
       res_vec_2d_[0].push_back(mut_residue_ptr);
       shift_vec_2d_[0].push_back(AlterType::PROTEIN_VARIABLE->getId());
-    } else if (is_complete &&
-               mod_ptr->getType() == ProtModBase::getType_NME_ACETYLATION()) {
-      LOG_DEBUG("NME_ACETYLATION");
-      // add acetylation to the second residue
-      is_nme_ = true;
-      ResiduePtr mut_residue_ptr = mod_ptr->getModPtr()->getModResiduePtr();
-      res_vec_2d_[1].push_back(mut_residue_ptr);
-      shift_vec_2d_[1].push_back(AlterType::PROTEIN_VARIABLE->getId());
+    } else if (mod_ptr->getType() == ProtModBase::getType_NME_ACETYLATION()) {
+      // the M removed and residue 1 acetylated: an edge in place of the M
+      // that weighs the acetyl group alone. It used to be an acetylated
+      // residue 1, which an alignment keeping the M could use too.
+      PtmPtr ptm_ptr = mod_ptr->getModPtr()->getModResiduePtr()->getPtmPtr();
+      ResiduePtr acetyl_ptr = std::make_shared<Residue>(
+          AminoAcidBase::getEmptyAminoAcidPtr(), ptm_ptr);
+      res_vec_2d_[0].push_back(acetyl_ptr);
+      shift_vec_2d_[0].push_back(AlterType::PROTEIN_VARIABLE->getId());
     }
     LOG_DEBUG("round complete");
   }
   LOG_DEBUG("protein mod complete");
 
-  // variable ptms
+  // variable ptms, of the residues without a PTM
   for (size_t i = 0; i < residue_ptr_vec.size(); i++) {
+    if (!PtmBase::isEmptyPtmPtr(residue_ptr_vec[i]->getPtmPtr())) {
+      continue;
+    }
     AminoAcidPtr acid_ptr = residue_ptr_vec[i]->getAminoAcidPtr();
     // if exist modified residues
     if (ptm_map_.count(acid_ptr)) {

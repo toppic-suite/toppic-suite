@@ -38,9 +38,17 @@ class SpectrumSet {
               const PrmMsPtrVec& srm_ms_two_ptr_vec,
               const PrmMsPtrVec& prm_ms_six_ptr_vec);
 
+  // the observed precursor mass, with the N-terminal label if there is one
   double getPrecMonoMass() const { return prec_mono_mass_; }
 
   double getNTermLabelMass() const { return n_term_label_mass_; }
+
+  // The precursor mass without the N-terminal label (toppic -N): the mass of
+  // the label-free proteoform, which the PRM spectra, the extended spectra
+  // and the filtering results are built for.
+  double getLabelFreePrecMonoMass() const {
+    return prec_mono_mass_ - n_term_label_mass_;
+  }
 
   bool isValid() const { return valid_; }
 

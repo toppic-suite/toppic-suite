@@ -121,6 +121,8 @@ void MsAlignReader::readNext() {
   std::string prec_feat_id_list = "";
   std::string prec_charge_list = "";
   std::string prec_inte_list = "";
+  // the precursor ids when the list is not in id order (MsAlignWriter)
+  std::string prec_id_list = "";
 
   std::vector<std::string> strs;
   for (size_t i = 1; i < spectrum_str_vec_.size() - 1; i++) {
@@ -157,6 +159,8 @@ void MsAlignReader::readNext() {
         prec_inte_list = strs[1];
       } else if (strs[0] == "PRECURSOR_FEATURE_ID") {
         prec_feat_id_list = strs[1];
+      } else if (strs[0] == "PRECURSOR_ID") {
+        prec_id_list = strs[1];
       }
     }
   }
@@ -215,14 +219,19 @@ void MsAlignReader::readNext() {
       std::vector<std::string> charge_strs =
           str_util::split(prec_charge_list, ":");
       std::vector<std::string> inte_strs = str_util::split(prec_inte_list, ":");
+      std::vector<std::string> id_strs = str_util::split(prec_id_list, ":");
+      bool use_id_list =
+          prec_id_list != "" && id_strs.size() == mass_strs.size();
       for (size_t id = 0; id < mass_strs.size(); id++) {
         double prec_mass = std::stod(mass_strs[id]);
         int prec_feat_id = std::stoi(feat_id_strs[id]);
         int prec_charge = std::stoi(charge_strs[id]);
         double prec_inte = std::stod(inte_strs[id]);
         double prec_mono_mz = peak_util::compMz(prec_mass, prec_charge);
+        int prec_id = use_id_list ? std::stoi(id_strs[id])
+                                  : static_cast<int>(id);
         PrecursorPtr prec_ptr = std::make_shared<Precursor>(
-            id, prec_feat_id, prec_mono_mz, prec_charge, prec_inte);
+            prec_id, prec_feat_id, prec_mono_mz, prec_charge, prec_inte);
         prec_ptr_vec.push_back(prec_ptr);
       }
     }

@@ -81,6 +81,8 @@ class ToppicWindow : public QMainWindow {
 
   void on_decoyCheckBox_clicked(bool checked);
 
+  void on_rescoreCheckBox_clicked(bool checked);
+
 
   void on_addButton_clicked();
 
@@ -122,8 +124,6 @@ class ToppicWindow : public QMainWindow {
   bool nterminalError();
 
   bool protTypeError();
-
-  bool event(QEvent* event);
 
   bool ableToAdd(QString spfile);
 };

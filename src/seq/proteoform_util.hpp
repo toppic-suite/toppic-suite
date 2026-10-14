@@ -16,6 +16,7 @@
 #ifndef TOPPIC_SEQ_PROTEOFORM_UTIL_HPP_
 #define TOPPIC_SEQ_PROTEOFORM_UTIL_HPP_
 
+#include <string>
 #include <vector>
 
 #include "seq/proteoform.hpp"
@@ -53,6 +54,42 @@ std::vector<double> getNTermAcets(const ProteoformPtr& db_form_ptr,
 std::vector<std::vector<double> > getNTermAcet2D(
     const ProteoformPtrVec& db_form_ptr_vec,
     const ProtModPtrVec& prot_mod_ptrs);
+
+// The ProForma string of a proteoform (HUPO-PSI ProForma 2.1,
+// https://github.com/HUPO-PSI/ProForma): its residues (first to last
+// residue, no flanking residues) with the modifications in square brackets.
+//   - A PTM with a Unimod id is written as its Unimod name and accession,
+//     joined with "|" as synonyms (Level 2), [Oxidation|UNIMOD:35],
+//     [Cation:Na|UNIMOD:30]: the name of the id in ptm_base.xml, which
+//     holds every Unimod modification (PtmBase::getUnimodName), whatever a
+//     modification file calls the PTM. An id without a name there (newer
+//     than the file) gives the accession alone. A PTM without a Unimod id
+//     is written as its mass with its name as information,
+//     [+12.3457|INFO:MyPTM]. A name with "|", "#" or unpaired
+//     brackets is left out.
+//   - The protein N-terminal acetylations (M_ACETYLATION, NME_ACETYLATION)
+//     and the truncation N-terminal modification are N-terminal
+//     modifications: [Acetyl|UNIMOD:1]-SEQ.
+//   - Fixed PTMs, the PTMs written in the FASTA sequence and the variable
+//     PTMs follow their residue when they are localized to one:
+//     C[Carbamidomethyl|UNIMOD:4].
+//   - Unexpected mass shifts are masses with 4 decimals (sign included) on
+//     their residue, or on their range of residues in parentheses,
+//     (PEP)[+12.3456]; variable PTMs not localized to one residue likewise,
+//     with all the PTMs of the range:
+//     (MAM)[Oxidation|UNIMOD:35][Oxidation|UNIMOD:35].
+//   - A PTM localized by MIScore (-l) is written at its best site with the
+//     site scores of the positive sites (Level 2), the label after the
+//     tag's first part: S[Phospho#s1(0.900)|UNIMOD:21] T[#s1(0.100)].
+//   - A range that would overlap a range already written (ProForma does
+//     not allow it) is written as a set of positions instead, the first
+//     residue preferred: P[+12.3456#g1]E[#g1]P[#g1].
+//   - The residues of a modification are those of its alteration, or those
+//     of its mass shift when the alteration has none within them; a
+//     modification without a residue (an empty range) is written as of
+//     unknown position: [+12.3456]?SEQ.
+// Everything else is Level 1 ProForma.
+std::string getProFormaStr(const ProteoformPtr& form_ptr);
 
 }  // namespace proteoform_util
 

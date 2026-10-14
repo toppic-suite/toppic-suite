@@ -45,8 +45,10 @@ MzmlMsGroupReader::MzmlMsGroupReader(const std::string& file_name,
 
   if (!missing_level_one_) {
     initMs2Ms1Map();
-    reader_ptr_->resetIndexes();
   }
+  // rewind after the probe read above (and initMs2Ms1Map): without it, a
+  // file without MS1 spectra (-o) lost its first MS/MS spectrum
+  reader_ptr_->resetIndexes();
   cur_ms_one_idx_ = 0;
   ms_one_cnt_ = 0;
   ms_two_cnt_ = 0;
@@ -77,13 +79,31 @@ MzmlMsPtr MzmlMsGroupReader::readNextMzmlMs() {
   return ms_ptr;
 }
 
+namespace {
+
+// The MS/MS spectra TopFD deconvolutes: MS2 scans, and MSn scans (n > 2)
+// with a proton transfer stage, such as the MS3 scan "X@cid60 Y@ptr10" (the
+// fragments of X, charge-reduced; MsHeader::isFragPtcr), "X@ptr5 Y@hcd80"
+// (the dissociation of a charge-reduced precursor; isReducedPrec) or PTCR of
+// a PTCR product (isPtcr). Other MSn scans, a dissociation of fragments, are
+// skipped as before: their precursor is a fragment, not the window's
+// proteoform.
+bool isMsTwo(const MsHeaderPtr& header_ptr) {
+  int level = header_ptr->getMsLevel();
+  return level == 2 ||
+         (level > 2 && (header_ptr->isFragPtcr() || header_ptr->isPtcr() ||
+                        header_ptr->isReducedPrec()));
+}
+
+}  // namespace
+
 MzmlMsPtr MzmlMsGroupReader::readNextMs2MzmlMs() {
   while (true) {
     MzmlMsPtr ms_ptr = readNextMzmlMs();
     if (ms_ptr == nullptr) {
       return nullptr;
     }
-    if (ms_ptr->getMsHeaderPtr()->getMsLevel() == 2) {
+    if (isMsTwo(ms_ptr->getMsHeaderPtr())) {
       return ms_ptr;
     }
   }
@@ -102,7 +122,7 @@ void MzmlMsGroupReader::initMs2Ms1Map() {
       ms_one_scans_.push_back(ms1_scan);
       ms_one_scan_idx_map_[ms1_scan] = idx;
       idx = idx + 1;
-    } else if (header_ptr->getMsLevel() == 2) {
+    } else if (isMsTwo(header_ptr)) {
       int ms2_scan = header_ptr->getFirstScanNum();
       int ms1_scan = header_ptr->getMsOneScan();
       last_ms_two_scan_map_[ms1_scan] = ms2_scan;
@@ -166,7 +186,7 @@ MzmlMsGroupPtr MzmlMsGroupReader::getMs1Ms2MsGroupPtr() {
         int cur_ms1_scan = header_ptr->getFirstScanNum();
         ms_one_ptr_map_[cur_ms1_scan] = ms_ptr;
         cur_last_ms_two_scan_map_[cur_ms1_scan] = -1;
-      } else {
+      } else if (isMsTwo(header_ptr)) {
         int cur_ms1_scan = header_ptr->getMsOneScan();
         int cur_ms2_scan = header_ptr->getFirstScanNum();
         if (ms_two_ptr_vec_map_.count(cur_ms1_scan) == 0) {

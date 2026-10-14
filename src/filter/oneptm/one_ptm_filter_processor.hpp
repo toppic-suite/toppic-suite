@@ -16,11 +16,34 @@
 #ifndef TOPPIC_FILTER_ONEPTM_ONE_PTM_FILTER_PROCESSOR_HPP_
 #define TOPPIC_FILTER_ONEPTM_ONE_PTM_FILTER_PROCESSOR_HPP_
 
+#include "filter/massmatch/filter_spec.hpp"
 #include "filter/mng/one_ptm_filter_mng.hpp"
+#include "filter/oneptm/one_ptm_filter.hpp"
+#include "para/prsm_para.hpp"
+#include "prsm/simple_prsm_mem_merge.hpp"
 
 namespace toppic {
 
 namespace one_ptm_filter_processor {
+
+// the spectrum sets of the stage (the one-shift precursor offsets),
+// converted once
+FilterSpecPtrVec readSpectra(const OnePtmFilterMngPtr& mng_ptr);
+
+// the candidates of the filter's last computeBestMatch into the combiner
+void addCands(const OnePtmFilterPtr& filter_ptr,
+              const PrsmParaPtr& prsm_para_ptr, int block_idx, int add_idx,
+              SimplePrsmMemMerge* combiner);
+
+// the stage's progress line after spectrum i of the block's spectra
+void reportProgress(const OnePtmFilterMngPtr& mng_ptr, int block_idx,
+                    size_t i, size_t spectra_num);
+
+// scores the spectra against one block's filter and adds the candidates to
+// the combiner (also used by zero_var_ptm_filter_processor)
+void scoreBlock(const OnePtmFilterPtr& filter_ptr, int block_idx,
+                const OnePtmFilterMngPtr& mng_ptr,
+                const FilterSpecPtrVec& spectra, SimplePrsmMemMerge* combiner);
 
 void process(const OnePtmFilterMngPtr& mng_ptr);
 

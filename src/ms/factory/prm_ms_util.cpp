@@ -22,6 +22,7 @@
 #include <vector>
 
 #include "ms/factory/prm_peak_factory.hpp"
+#include "ms/spec/base_peak_type.hpp"
 
 namespace toppic {
 
@@ -56,24 +57,51 @@ std::pair<int, int> getMassError(const PrmPeakPtr& peak_ptr, double scale,
 
 std::vector<std::pair<int, int> > getIntMassErrorList(
     const PrmMsPtrVec& prm_ms_ptr_vec, const PeakTolerancePtr& tole_ptr,
-    double scale, bool n_strict, bool c_strict) {
+    double scale, bool n_strict, bool c_strict,
+    SpPara::FilterMassListMode mode) {
   bool prec_n_strict = true;
   bool prec_c_strict = true;
   double default_score = 1.0;
   std::vector<std::pair<int, int> > mass_errors;
   for (size_t i = 0; i < prm_ms_ptr_vec.size(); i++) {
-    PrmMsPtr prm_ms_ptr = prm_ms_ptr_vec[i];
-    std::pair<int, int> last_mass_error(-1, 0);
-    for (size_t j = 0; j < prm_ms_ptr->size(); j++) {
-      std::pair<int, int> cur_m_e =
-          getMassError(prm_ms_ptr->getPeakPtr(j), scale, n_strict, c_strict);
-      if (cur_m_e.first != last_mass_error.first) {
-        mass_errors.push_back(cur_m_e);
-        last_mass_error = cur_m_e;
-      } else if (cur_m_e.second > last_mass_error.second) {
-        mass_errors.pop_back();
-        mass_errors.push_back(cur_m_e);
-        last_mass_error = cur_m_e;
+    const PrmPeakPtrVec& peak_ptrs = prm_ms_ptr_vec[i]->getPeakPtrVec();
+    // kFragment (the default): one entry per integer mass and base type. Of
+    // the peaks of one type with the same integer mass, the one with the
+    // largest error is kept; an ORIGINAL and a REVERSED peak with the same
+    // integer mass stay two entries. Such a pair is mostly an ion and the
+    // PRM of its complementary ion (b and P - y), two matches of one prefix
+    // mass of the proteoform when the precursor mass is accurate. As one
+    // entry it scored one match, but two when a bin boundary fell between
+    // the two peaks (toppic_test experiment 138).
+    // kMerge: one entry per integer mass, whatever the type (all peaks in
+    // slot 0). kSingle: one entry per peak; the peaks of one type with the
+    // same integer mass are mostly one fragment mass at several charge
+    // states, which TopFD lists separately (toppic_test experiment 142,
+    // amendment 1).
+    if (mode == SpPara::FilterMassListMode::kSingle) {
+      for (size_t j = 0; j < peak_ptrs.size(); j++) {
+        mass_errors.push_back(
+            getMassError(peak_ptrs[j], scale, n_strict, c_strict));
+      }
+    } else {
+      bool by_type = mode == SpPara::FilterMassListMode::kFragment;
+      int last_mass[2] = {-1, -1};
+      size_t last_index[2] = {0, 0};
+      for (size_t j = 0; j < peak_ptrs.size(); j++) {
+        std::pair<int, int> cur_m_e =
+            getMassError(peak_ptrs[j], scale, n_strict, c_strict);
+        int t = 0;
+        if (by_type &&
+            peak_ptrs[j]->getBaseTypePtr() == BasePeakType::REVERSED) {
+          t = 1;
+        }
+        if (cur_m_e.first != last_mass[t]) {
+          last_mass[t] = cur_m_e.first;
+          last_index[t] = mass_errors.size();
+          mass_errors.push_back(cur_m_e);
+        } else if (cur_m_e.second > mass_errors[last_index[t]].second) {
+          mass_errors[last_index[t]] = cur_m_e;
+        }
       }
     }
     // add zero mass for each spectrum to increase the score for zero mass

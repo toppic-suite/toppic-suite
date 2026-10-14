@@ -15,6 +15,7 @@
 
 #include "seq/mass_shift.hpp"
 
+#include <algorithm>
 #include <cstdlib>
 #include <string>
 
@@ -45,6 +46,26 @@ MassShift::MassShift(const MassShiftPtr& shift_ptr, int start) {
 
 MassShift::MassShift(int left_bp_pos, int right_bp_pos, double shift)
     : left_bp_pos_(left_bp_pos), right_bp_pos_(right_bp_pos), shift_(shift) {}
+
+void MassShift::narrowRangeToAlters() {
+  bool found = false;
+  int left = 0;
+  int right = 0;
+  for (size_t i = 0; i < alter_vec_.size(); i++) {
+    int alter_left = alter_vec_[i]->getLeftBpPos();
+    int alter_right = alter_vec_[i]->getRightBpPos();
+    if (alter_left >= alter_right) {
+      continue;
+    }
+    left = found ? std::min(left, alter_left) : alter_left;
+    right = found ? std::max(right, alter_right) : alter_right;
+    found = true;
+  }
+  if (found) {
+    left_bp_pos_ = left;
+    right_bp_pos_ = right;
+  }
+}
 
 AlterTypePtr MassShift::getTypePtr() const {
   if (alter_vec_.size() == 0) {

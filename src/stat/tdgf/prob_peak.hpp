@@ -21,10 +21,19 @@
 
 namespace toppic {
 
+// A PRM peak of the generating function: its integer mass and tolerance.
+// strict: the strict tolerance of every peak (the separate mode, the PRM
+// spectra at the PrSM's precursor). Otherwise the peak's N-strict-C-relax
+// tolerance: the strict one (ppm x m) of an ORIGINAL peak (a b-ion mass m)
+// and the relaxed one (ppm x (m + P), the precursor's error added) of a
+// REVERSED peak (the complementary mass P - m of a y-ion, P the observed
+// precursor) - unless strict_complement, when a REVERSED peak gets its strict
+// tolerance too (PrsmPara::useEvalueStrictComplement, toppic hidden
+// --evalue-complement-tolerance strict, issue #616; off by default).
 class ProbPeak {
  public:
   ProbPeak(const PrmPeakPtr& peak_ptr, int spectrum_id, int height, bool strict,
-           double convert_ratio);
+           bool strict_complement, double convert_ratio);
   int mass_;
   int tolerance_;
   BasePeakTypePtr base_type_ptr_;

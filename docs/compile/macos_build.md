@@ -12,7 +12,7 @@ supported.
 * CMake >= 3.16
 * Boost >= 1.74 (filesystem, iostreams, thread, chrono, serialization,
   program_options)
-* pugixml, SQLite3 and zlib development libraries
+* pugixml, SQLite3, zlib and zstd development libraries
 * ONNX Runtime from Homebrew (the vendored library under `ext/onnx/` is for
   Linux only)
 * Qt6 (Core, Gui, Widgets) for the GUI tools
@@ -43,7 +43,7 @@ source ~/.zshrc
 
 ```sh
 # build tools and libraries (Git LFS is needed for the model files under res/)
-brew install cmake git git-lfs boost pugixml sqlite zlib onnxruntime
+brew install cmake git git-lfs boost pugixml sqlite zlib zstd onnxruntime
 
 # Qt6 for the GUI tools
 brew install qt
@@ -94,9 +94,11 @@ make -j$(sysctl -n hw.ncpu)
 ```
 
 The build type defaults to `Release` and the compiler to clang. The
-executables (`topfd`, `topdia`, `topindex`, `toppic`, `topmg`, `topdiff` and
-their `*_gui` counterparts) are placed in the repository's `bin/` directory.
-To build just one tool, e.g. TopFD:
+executables are placed in the repository's `bin/` directory: the ten
+command-line tools (`topfd`, `topdia`, `topindex`, `toppic`, `topmg`,
+`topdiff`, `toplib_build`, `toplib_search`, `topcalib` and `topzstd`) and the
+six GUI tools (`topfd_gui`, `topdia_gui`, `topindex_gui`, `toppic_gui`,
+`topmg_gui` and `topdiff_gui`). To build just one tool, e.g. TopFD:
 
 ```sh
 make -j$(sysctl -n hw.ncpu) topfd

@@ -15,23 +15,43 @@
 
 #include "console/toppic_argument.hpp"
 
+#include <cmath>
+#include <cstddef>
 #include <exception>
 #include <filesystem>
 #include <iomanip>
+#include <set>
+#include <sstream>
 #include <string>
 #include <utility>
 
 #include "common/base/mod_util.hpp"
+#include "common/base/ptm_base.hpp"
 #include "common/util/file_util.hpp"
 #include "common/util/logger.hpp"
 #include "common/util/mem_check.hpp"
 #include "common/util/str_util.hpp"
 #include "common/util/version.hpp"
 #include "common/xml/xml_dom_util.hpp"
+#include "filter/tag/tag_filter_mng.hpp"
+#include "filter/tag/tag_index.hpp"
+#include "para/sp_para.hpp"
 #include "prsm/prsm_post_mass_match.hpp"
 #include "seq/fasta_util.hpp"
 
 namespace toppic {
+
+namespace {
+
+// A built-in PTM's mass as ptm_base.xml gives it: 15 significant digits
+// write each mass of the file back exactly
+std::string ptmMassStr(const PtmPtr& ptm_ptr) {
+  std::ostringstream stream;
+  stream << std::setprecision(15) << ptm_ptr->getMonoMass();
+  return stream.str();
+}
+
+}  // namespace
 
 ToppicArgument::ToppicArgument() { arguments_ = initArguments(); }
 
@@ -53,6 +73,25 @@ std::map<std::string, std::string> ToppicArgument::initArguments() {
   arguments["useApproxSpectra"] = "false";
   arguments["variablePtmNum"] = "3";
   arguments["variablePtmFileName"] = "";
+  // TopMG's identification hosted in toppic, behind the hidden --topmg
+  // option: "disabled", "pipeline" (after toppic's own identification
+  // stages) or "topmg-only" (the only database search: toppic's own
+  // identification stages are skipped). Its options below take TopMG's own
+  // defaults, so that the two agree when neither is set.
+  arguments["topmgMode"] = "disabled";
+  // the E-values of that stage: the generating function of toppic's own
+  // stages, or with the hidden --topmg-use-mcmc TopMG's MCMC
+  arguments["topmgUseMcmc"] = "false";
+  arguments["topmgShiftNumber"] = "1";
+  // the error tolerance (Da) of that stage's graph alignment
+  // (GraphAlignMng::topmg_align_error_tolerance_), TopMG's own default
+  arguments["topmgAlignErrorTolerance"] = "0.1";
+  // the results the ASF filtering of that stage keeps per spectrum, TopMG's
+  // own number; toppic's own stages keep filteringResultNumber
+  arguments["asfFilteringResultNumber"] = "15";
+  arguments["proteoGraphGap"] = "40";
+  arguments["varPtmNumInGap"] = "5";
+  arguments["useAsfDiag"] = "false";
   arguments["shiftNumber"] = "1";
   arguments["minShiftMass"] = "-500";
   arguments["maxShiftMass"] = "500";
@@ -61,6 +100,9 @@ std::map<std::string, std::string> ToppicArgument::initArguments() {
   arguments["numOfTopPrsms"] = "1";
   arguments["filteringResultNumber"] = "20";
   arguments["precErrorTolerance"] = "10";
+  // a precursor error tolerance in Dalton (hidden --prec-dalton-error) in
+  // place of precErrorTolerance's ppm; empty: the ppm tolerance
+  arguments["precDaltonError"] = "";
   arguments["fragErrorTolerance"] = "10";
   arguments["envCnnCutoff"] = "0.4";
   arguments["proteoformPpmError"] = "false";
@@ -73,6 +115,11 @@ std::map<std::string, std::string> ToppicArgument::initArguments() {
   arguments["cutoffProteinValue"] = "0.01";
   arguments["localPtmFileName"] = "";
   arguments["localThreshold"] = "0.15";
+  // the localization of -B by the variable PTM search of stat/local_align
+  // (the default since toppic_test experiment 140); hidden --local-original
+  // selects the MIScore candidate search of stat/local (hidden --local-align
+  // is accepted and selects the default)
+  arguments["localAlign"] = "true";
 
   arguments["groupSpectrumNumber"] = "1";
   arguments["combinedOutputName"] = "";
@@ -81,10 +128,42 @@ std::map<std::string, std::string> ToppicArgument::initArguments() {
   arguments["keepTempFiles"] = "false";
   arguments["keepDecoyResults"] = "false";
   arguments["useFdrGroups"] = "false";
+  // -q (--rescore): the FDR ranks the PrSMs by a semi-supervised rescoring
+  // (stat/rescore/prsm_rescore) instead of the E-value; off by default,
+  // refused without a target-decoy search (-d) and with --fdr-groups
+  arguments["rescore"] = "false";
+  // with the rescoring, the FDRs of each level by the E-value when they give
+  // more identifications than the rescore's (prsm_fdr); off with the hidden
+  // --disable-rescore-fallback
+  arguments["rescoreFallback"] = "true";
+  // with the rescoring, the PrSMs with the maximum E-value get the lowest
+  // rescore and are left out of the training (prsm_rescore::EValueFloor);
+  // off with the hidden --disable-rescore-evalue-floor
+  arguments["rescoreEvalueFloor"] = "true";
+  // hidden --second-precursor: the spectra with two or more precursors are
+  // searched again with the second one, without the first pass's matched
+  // masses, and the two passes are reported together (prsm_second_prec)
+  arguments["secondPrecursor"] = "false";
+  // hidden --mass-calib: the two-pass m/z recalibration (ms/calib,
+  // prsm/prsm_mass_calib): a zero-shift calibration search, the MS1 and MS/MS
+  // error models fitted on its confident PrSMs, and the search on the
+  // corrected spectra (<base>_calib_ms2.msalign) with toppic's database
+  // <base>_toppic.sqlite, the corrected copy of TopFD's, for the post mass
+  // matching and the PrSM tables.
+  arguments["massCalib"] = "false";
   arguments["combineResultOnly"] = "false";
   arguments["outputRawPrsmTable"] = "false";
   arguments["outputPrsmCoverage"] = "false";
   arguments["postMassMatch"] = "true";
+  // --no-sql: no SQLite file is written or changed: no <base>_toppic.sqlite,
+  // no post-matched envelopes and no PrSM tables in a database (toppic_test
+  // experiment 164); the post mass matching reads TopFD's database read only
+  // in any case
+  arguments["noSql"] = "false";
+  // the hidden --disable-zstd: <base>_toppic.sqlite is written uncompressed
+  // (by default it is compressed at the end of the run, sql/zstd_db;
+  // toppic_test experiment 172)
+  arguments["disableZstd"] = "false";
   arguments["averageMass"] = "false";
   arguments["postMinPeakNum"] = "1";
   arguments["zeroShiftPrecOneDaError"] = "true";
@@ -92,9 +171,35 @@ std::map<std::string, std::string> ToppicArgument::initArguments() {
   arguments["varPtmPrecOneDaError"] = "false";
   arguments["fragMassExtension"] = "true";
   arguments["fragExtendMinMass"] = "5000";
+  arguments["varPtmFilterCandNum"] = "";
+  arguments["deamidSelector"] = "false";
+  arguments["varPtmEvalueModResidues"] = "true";
   arguments["fragMassDedup"] = "false";
   arguments["multiSkipEvalue"] = "";
   arguments["multiTypeAlign"] = "true";
+  // the second alignment of the shift searches at the refined precursor
+  // (hidden --second-align): disabled, strict (the fragment tolerance on
+  // every peak) or relax (the first alignment's tolerances)
+  arguments["secondAlign"] = "true";
+  // the zero-shift and variable PTM filters as one pass over the index
+  // (hidden --separate-var-ptm-filter runs them one after the other;
+  // toppic_test experiment 150)
+  arguments["separateVarPtmFilter"] = "false";
+  // the tolerance of the complementary (REVERSED) PRM peaks in the E-values'
+  // generating function (hidden --evalue-complement-tolerance): relax (the
+  // default), strict or separate (PrsmPara::useEvalueStrictComplement,
+  // useEvalueSeparate; toppic_test experiment 146)
+  arguments["evalueComplementTolerance"] = "relax";
+  // the filters' mass list (hidden --filter-mass-list): merge, fragment or
+  // single (SpPara::FilterMassListMode)
+  arguments["filterMassList"] = "fragment";
+  // the tag filter (hidden --tag-filter): the stages whose candidate lists
+  // it joins (var, one, multi, topmg or all; empty = off), the tag length
+  // and the proteins kept per spectrum (filter/tag; toppic_test experiment
+  // 150)
+  arguments["tagFilterStages"] = "";
+  arguments["tagFilterLength"] = "4";
+  arguments["tagFilterCandNum"] = "10";
 
   arguments["version"] = "";
   return arguments;
@@ -125,14 +230,14 @@ void ToppicArgument::outputArguments(
       output << std::setw(gap) << std::left << "Fixed modifications BEGIN"
              << std::endl;
       output << std::setw(gap) << std::left << "Carbamidomethylation" << sep
-             << 57.021464 << sep << "C" << std::endl;
+             << ptmMassStr(PtmBase::getPtmPtr_C57()) << sep << "C" << std::endl;
       output << std::setw(gap) << std::left << "Fixed modifications END"
              << std::endl;
     } else if (arguments["fixedMod"] == "C58") {
       output << std::setw(gap) << std::left << "Fixed modifications BEGIN"
              << std::endl;
       output << std::setw(gap) << std::left << "Carboxymethylation" << sep
-             << 58.005479 << sep << "C" << std::endl;
+             << ptmMassStr(PtmBase::getPtmPtr_C58()) << sep << "C" << std::endl;
       output << std::setw(gap) << std::left << "Fixed modifications END"
              << std::endl;
     } else {
@@ -158,6 +263,32 @@ void ToppicArgument::outputArguments(
   output << std::setw(gap) << std::left << "Allowed proteoform types:" << sep
          << arguments["allowProtType"] << std::endl;
 
+  // the FDR computation, with or without a variable PTM file
+  if (arguments.at("useFdrGroups") == "true") {
+    output << std::setw(gap) << std::left << "FDR computation:" << sep
+           << "separate PrSM groups" << std::endl;
+  }
+  if (arguments.count("rescore") > 0 && arguments.at("rescore") == "true" &&
+      arguments.at("searchType") == "TARGET+DECOY" &&
+      arguments.at("useFdrGroups") != "true") {
+    bool fallback = arguments.count("rescoreFallback") == 0 ||
+                    arguments.at("rescoreFallback") != "false";
+    bool floor = arguments.count("rescoreEvalueFloor") == 0 ||
+                 arguments.at("rescoreEvalueFloor") != "false";
+    output << std::setw(gap) << std::left << "FDR computation:" << sep
+           << "rescored PrSMs (linear SVM, 3-fold cross-validation"
+           << (floor ? "; the maximum E-value last" : "") << ")"
+           << (fallback ? ", the E-value at a level where it gives more"
+                        : "")
+           << std::endl;
+  }
+  // printed only when set, so that the default parameter block is unchanged
+  if (arguments.count("massCalib") > 0 &&
+      arguments.at("massCalib") == "true") {
+    output << std::setw(gap) << std::left << "Mass calibration:" << sep
+           << "two-pass (zero-shift calibration search)" << std::endl;
+  }
+
   if (arguments["variablePtmFileName"] != "" &&
       arguments["variablePtmNum"] != "0") {
     output << std::setw(gap) << std::left
@@ -165,10 +296,29 @@ void ToppicArgument::outputArguments(
            << arguments["variablePtmNum"] << std::endl;
     output << std::setw(gap) << std::left
            << "Use approximate spectra in protein filtering:" << sep
-           << arguments["useApproxSpectra"] << std::endl;
-    if (arguments.at("useFdrGroups") == "true") {
-      output << std::setw(gap) << std::left << "FDR computation:" << sep
-             << "separate PrSM groups" << std::endl;
+           << (arguments["useApproxSpectra"] == "true" ? "True" : "False")
+           << std::endl;
+    if (arguments.count("secondPrecursor") > 0 &&
+        arguments.at("secondPrecursor") == "true") {
+      output << std::setw(gap) << std::left << "Second precursor search:"
+             << sep << "yes" << std::endl;
+    }
+    // printed only when set, so that the default parameter block is
+    // unchanged
+    if (arguments["varPtmFilterCandNum"] != "") {
+      output << std::setw(gap) << std::left
+             << "Variable PTM filter candidates per spectrum:" << sep
+             << arguments["varPtmFilterCandNum"]
+             << " (complete,prefix/suffix,internal)" << std::endl;
+    }
+    if (arguments["deamidSelector"] == "true") {
+      output << std::setw(gap) << std::left
+             << "Deamidation PrSM selection:" << sep << "True" << std::endl;
+    }
+    if (arguments["varPtmEvalueModResidues"] == "false") {
+      output << std::setw(gap) << std::left
+             << "Variable PTM E-values with modified residues:" << sep
+             << "False" << std::endl;
     }
     output << std::setw(gap) << std::left
            << "Variable modifications file name:" << sep
@@ -209,18 +359,56 @@ void ToppicArgument::outputArguments(
   output << std::setw(gap) << std::left << "Protein-level cutoff value:" << sep
          << arguments["cutoffProteinValue"] << std::endl;
 
-  output << std::setw(gap) << std::left
-         << "Error tolerance for precursor masses:" << sep
-         << arguments["precErrorTolerance"] << " ppm" << std::endl;
+  if (arguments["secondAlign"] == "false") {
+    output << std::setw(gap) << std::left
+           << "Second alignment at the refined precursor:" << sep << "false"
+           << std::endl;
+  }
+  if (arguments["separateVarPtmFilter"] == "true") {
+    output << std::setw(gap) << std::left
+           << "Zero-shift and variable PTM filters:" << sep << "separate"
+           << std::endl;
+  }
+  if (arguments["evalueComplementTolerance"] != "relax") {
+    output << std::setw(gap) << std::left
+           << "E-value tolerance of complementary ions:" << sep
+           << arguments["evalueComplementTolerance"] << std::endl;
+  }
+  if (arguments["precDaltonError"] != "") {
+    output << std::setw(gap) << std::left
+           << "Error tolerance for precursor masses:" << sep
+           << arguments["precDaltonError"] << " Da" << std::endl;
+  } else {
+    output << std::setw(gap) << std::left
+           << "Error tolerance for precursor masses:" << sep
+           << arguments["precErrorTolerance"] << " ppm" << std::endl;
+  }
   output << std::setw(gap) << std::left
          << "Error tolerance for fragment masses:" << sep
          << arguments["fragErrorTolerance"] << " ppm" << std::endl;
-  output << std::setw(gap) << std::left << "EnvCNN score cutoff:" << sep
+  output << std::setw(gap) << std::left << "Confidence score cutoff:" << sep
          << arguments["envCnnCutoff"] << std::endl;
   output << std::setw(gap) << std::left
          << "Fragment mass deduplication:" << sep
          << (arguments["fragMassDedup"] == "true" ? "True" : "False")
          << std::endl;
+  // printed only when it is not the default, so that the default parameter
+  // block is unchanged
+  if (arguments["filterMassList"] != "" &&
+      arguments["filterMassList"] != "fragment") {
+    output << std::setw(gap) << std::left << "Filter mass list:" << sep
+           << arguments["filterMassList"] << std::endl;
+  }
+  // printed only when the tag filter is on
+  if (arguments["tagFilterStages"] != "") {
+    output << std::setw(gap) << std::left << "Tag filter stages:" << sep
+           << arguments["tagFilterStages"] << std::endl;
+    output << std::setw(gap) << std::left << "Tag filter tag length:" << sep
+           << arguments["tagFilterLength"] << std::endl;
+    output << std::setw(gap) << std::left
+           << "Tag filter candidates per spectrum:" << sep
+           << arguments["tagFilterCandNum"] << std::endl;
+  }
   if (arguments["postMassMatch"] == "true") {
     output << std::setw(gap) << std::left << "Post mass matching:" << sep
            << "True" << std::endl;
@@ -230,6 +418,11 @@ void ToppicArgument::outputArguments(
   } else {
     output << std::setw(gap) << std::left << "Post mass matching:" << sep
            << "False" << std::endl;
+  }
+  // printed only when set, so that the default output files do not change
+  if (arguments["noSql"] == "true") {
+    output << std::setw(gap) << std::left << "SQLite database output:" << sep
+           << "No" << std::endl;
   }
   if (arguments["proteoformPpmError"] == "false") {
     output << std::setw(gap) << std::left
@@ -257,6 +450,11 @@ void ToppicArgument::outputArguments(
            << "True" << std::endl;
     output << std::setw(gap) << std::left << "MIScore threshold:" << sep
            << arguments["localThreshold"] << std::endl;
+    output << std::setw(gap) << std::left << "Localization method:" << sep
+           << (arguments["localAlign"] == "true"
+                   ? "Variable PTM search (local_align)"
+                   : "MIScore candidate search (local, --local-original)")
+           << std::endl;
     output << std::setw(gap) << std::left
            << "Localization modification file name:" << sep
            << arguments["localPtmFileName"] << std::endl;
@@ -302,7 +500,7 @@ std::string ToppicArgument::outputTsvArguments(
 
 void ToppicArgument::showUsage(
     boost::program_options::options_description& desc) {
-  std::cout << "Usage: toppic [options] database-file-name spectrum-file-name"
+  std::cout << "Usage: toppic [options] database-file-name spectrum-file-names"
             << std::endl;
   std::cout << desc << std::endl;
   std::cout << "Version: " << Version::getVersion() << std::endl;
@@ -319,6 +517,10 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
   std::string variable_ptm_num = "";
   std::string variable_ptm_file_name = "";
   std::string shift_num = "";
+  std::string topmg_mode = "";
+  std::string topmg_shift_num = "";
+  std::string topmg_align_error_tole = "";
+  std::string asf_filtering_result_num = "";
   std::string min_shift_mass = "";
   std::string max_shift_mass = "";
   std::string frag_error_tole = "";
@@ -340,7 +542,14 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
   std::string top_prsm_number = "";
   std::string post_min_peak_num = "";
   std::string frag_extend_min_mass = "";
+  std::string prec_dalton_error = "";
   std::string multi_skip_evalue = "";
+  std::string var_ptm_filter_cand_num = "";
+  std::string filter_mass_list = "";
+  std::string evalue_complement_tolerance = "";
+  std::string tag_filter_stages = "";
+  std::string tag_filter_length = "";
+  std::string tag_filter_cand_num = "";
 
   /** Define and parse the program options*/
   try {
@@ -349,9 +558,11 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
 
     display_desc.add_options()("help,h", "Print the help message.")(
         "activation,a", po::value<std::string>(&activation),
-        "<CID|ETD|HCD|UVPD|FILE>. Fragmentation method of MS/MS spectra. When "
-        "FILE is used, fragmentation methods of spectra are given in the input "
-        "spectral data file. Default value: FILE.")(
+        "<CID|ETD|ETCID|ETHCD|HCD|MPD|UVPD|FILE>. Fragmentation method of "
+        "MS/MS spectra. When FILE is used, fragmentation methods of spectra "
+        "are given in the input spectral data file. ETCID (ETciD) and ETHCD "
+        "(EThcD) are searched with the ion types of ETD (c and z-dot). Default "
+        "value: FILE.")(
         "fixed-mod,f", po::value<std::string>(&fixed_mod),
         "<C57|C58|a fixed modification file>. Fixed modifications. Three "
         "available options: C57, C58, or the name of a text file containing "
@@ -368,6 +579,13 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
         "M_ACETYLATION for N-terminal methionine acetylation. When multiple "
         "forms are allowed, they are separated by commas. Default value: "
         "NONE,NME,NME_ACETYLATION,M_ACETYLATION.")(
+        "n-terminal-label,N", po::value<std::string>(&n_term_label_mass),
+        "<a non-negative number>. Mass of a label on the N-terminus of every "
+        "proteoform, for example 229.162932 for TMT. The label is added to "
+        "the N-terminal fragment ions and removed from the precursor mass; "
+        "the reported proteoforms and adjusted precursor masses are "
+        "label-free, and the result tables give the label in the column "
+        "N-terminal label mass. Default value: 0 Dalton.")(
         "proteoform-type,R", po::value<std::string>(&allow_prot_type),
         "<a list of allowed types of proteoforms>. Four types of proteoforms "
         "can be selected: COMPLETE, PREFIX, SUFFIX, and INTERNAL. COMPLETE "
@@ -386,9 +604,6 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
         "max-shift,M", po::value<std::string>(&max_shift_mass),
         "Maximum value of the mass shift of an unexpected modification. "
         "Default value: 500 Dalton.")
-        //("n-terminal-label,N", po::value<std::string> (&n_term_label_mass),
-        //"N-terminal modification mass for iTRAQ or TMT labeling. Default
-        // value: 0")
         ("variable-ptm-num,S", po::value<std::string>(&variable_ptm_num),
          "Maximum number of variable modifications in a "
          "proteoform-spectrum-match. Default value: 3.")(
@@ -405,18 +620,20 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
             "prec-error-tolerance,E", po::value<std::string>(&prec_error_tole),
             "<a positive integer>. Error tolerance for precursor masses in "
             "PPM. Default value: 10.")(
-            "filter-by-env-cnn,F", po::value<std::string>(&env_cnn_cutoff),
+            "filter-by-score,F", po::value<std::string>(&env_cnn_cutoff),
             "<a number between 0 and 1>. Remove the deconvoluted masses whose "
-            "EnvCNN score is below the cutoff before spectral filtering, "
-            "database search and E-value computation. Default value: 0.4.")(
-            "proteoform-error-tolerance,p",
+            "confidence score (e.g., EnvCNN score) is below the cutoff before "
+            "spectral filtering, database search and E-value computation. "
+            "Default value: 0.4.")(
+            "cluster-error-tolerance,p",
             po::value<std::string>(&form_error_tole),
             "<a positive number>. Error tolerance for identifying PrSM "
             "clusters. Default value: 1.2 Dalton.")(
             "spectrum-cutoff-type,t",
             po::value<std::string>(&cutoff_spectral_type),
             "<EVALUE|FDR>. Spectrum-level cutoff type for filtering identified "
-            "proteoform-spectrum-matches. Default value: EVALUE.")(
+            "proteoform-spectrum-matches. FDR requires -d. Default value: "
+            "EVALUE.")(
             "spectrum-cutoff-value,v",
             po::value<std::string>(&cutoff_spectral_value),
             "<a positive number>. Spectrum-level cutoff value for filtering "
@@ -424,7 +641,8 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
             "proteoform-cutoff-type,T",
             po::value<std::string>(&cutoff_proteoform_type),
             "<EVALUE|FDR>. Proteoform-level cutoff type for filtering "
-            "identified proteoform-spectrum-matches. Default value: EVALUE.")(
+            "identified proteoform-spectrum-matches. FDR requires -d. Default "
+            "value: EVALUE.")(
             "proteoform-cutoff-value,V",
             po::value<std::string>(&cutoff_proteoform_value),
             "<a positive number>. Proteoform-level cutoff value for filtering "
@@ -432,16 +650,25 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
             "protein-cutoff-type,y",
             po::value<std::string>(&cutoff_protein_type),
             "<EVALUE|FDR>. Protein-level cutoff type for filtering identified "
-            "proteoform-spectrum-matches. With FDR, a protein is represented "
-            "by its best proteoform (the lowest E-value). Default value: "
-            "EVALUE.")(
+            "proteoform-spectrum-matches. FDR requires -d. With FDR, a "
+            "protein is represented by its best proteoform (the lowest "
+            "E-value, or with -q the highest rescore when the protein-level "
+            "FDRs are the rescored ones). Default value: EVALUE.")(
             "protein-cutoff-value,Y",
             po::value<std::string>(&cutoff_protein_value),
             "<a positive number>. Protein-level cutoff value for filtering "
             "identified proteoform-spectrum-matches. Default value: 0.01.")(
-            "approximate-spectra,A",
-            "Use approximate spectra to increase the sensitivity in protein "
-            "filtering. Default value: false.")(
+            "rescore,q",
+            "Rank the PrSMs by a rescore instead of the E-value in the FDR "
+            "computation: the best PrSM of every spectrum gets a score from a "
+            "linear support vector machine trained on the target and decoy "
+            "PrSMs with 3-fold cross-validation. At each level, the E-value "
+            "is used instead when it gives more identifications within the "
+            "FDR cutoff. Note that the rescoring may underestimate the FDRs. "
+            "Requires -d. Default value: false.")(
+            "approximate-spectra,X",
+            "Use approximate spectra to increase the sensitivity of the "
+            "variable PTM filtering (with -b). Default value: false.")(
             "local-ptm-file-name,B",
             po::value<std::string>(&local_ptm_file_name),
             "<a common modification file>. Specify a text file containing the "
@@ -449,16 +676,21 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
             "unexpected shifts.")(
             "miscore-threshold,H", po::value<std::string>(&local_threshold),
             "<a positive number between 0 and 1>. Score threshold "
-            "(modification identification score) for filtering results of "
-            "modification characterization. Default value: 0.15.")(
+            "(modification identification score, MIScore) of the modification "
+            "characterization (-B): a characterized modification is reported "
+            "on the range of its sites whose MIScore is above the threshold, "
+            "or, when no site reaches it, on the range of its sites with a "
+            "positive MIScore. Default value: 0.15.")(
             "thread-number,u", po::value<std::string>(&thread_number),
-            "<a positive integer>. Number of threads used in the computation. "
-            "Default value: 1.")(
+            "<a positive integer>. Number of threads used in the computation, "
+            "at most the number of hardware threads; the protein filtering "
+            "steps may use fewer to fit the available memory. Default value: "
+            "1.")(
             "num-combined-spectra,r", po::value<std::string>(&group_num),
             "<a positive integer>. Number of combined spectra. The parameter "
             "is set to 2 (or 3) for combining spectral pairs (or triplets) "
             "generated by the alternating fragmentation mode. Default value: "
-            "1")("combined-file-name,c",
+            "1.")("combined-file-name,c",
                  po::value<std::string>(&combined_output_name),
                  "Specify a file name for the combined spectrum data file and "
                  "analysis results.")(
@@ -469,19 +701,25 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
             "disable-post-match,D",
             "Disable post mass matching. By default, after the search, the "
             "theoretical fragment masses of each PrSM that no deconvoluted "
-            "mass matched are matched against the centroided MS/MS peaks in "
-            "the TopFD SQLite database (run topfd without -N) with the method "
-            "of MSPathFinderT, and the matched masses are added to the "
-            "spectra (written to <name>_post_ms2.msalign).")(
+            "mass matched are matched against the centroided MS/MS peaks of "
+            "the TopFD SQLite database <name>.sqlite (run topfd without -z) "
+            "with the method of MSPathFinderT, and the matched masses are "
+            "added to the spectra (written to <name>_post_ms2.msalign).")(
             "post-min-peak-num,I", po::value<std::string>(&post_min_peak_num),
             "<a positive integer>. Minimum number of observed isotopic peaks "
             "of a fragment mass matched by the post mass matching. Default "
             "value: 1.")(
-            "average-mass,g",
+            "average-mass,A",
             "The spectrum files report average masses of precursor and "
             "fragment ions (topfd --average-mass). Before the search, each "
             "file is converted to <name>_mono_ms2.msalign with monoisotopic "
-            "masses, which is then searched.");
+            "masses, which is then searched.")(
+            "no-sql,z",
+            "Do not write an SQLite database. By default, toppic writes "
+            "<name>_toppic.sqlite with the MS/MS envelope tables of the TopFD "
+            "database <name>.sqlite, the envelopes of the masses added by the "
+            "post mass matching, and the PrSM, proteoform and protein tables. "
+            "With this option, no SQLite file is written or changed.");
 
     po::options_description desc("Options");
 
@@ -496,11 +734,12 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
         "variable-ptm-num,S", po::value<std::string>(&variable_ptm_num), "")(
         "variable-ptm-file-name,b",
         po::value<std::string>(&variable_ptm_file_name),
-        "")("approximate-spectra,A", "")("decoy,d", "")(
+        "")("approximate-spectra,X", "")("decoy,d", "")(
         "frag-error-tolerance,e", po::value<std::string>(&frag_error_tole), "")(
         "prec-error-tolerance,E", po::value<std::string>(&prec_error_tole), "")(
-        "filter-by-env-cnn,F", po::value<std::string>(&env_cnn_cutoff), "")(
-        "proteoform-ppm-error,P", "")("proteoform-error-tolerance,p",
+        "prec-dalton-error", po::value<std::string>(&prec_dalton_error), "")(
+        "filter-by-score,F", po::value<std::string>(&env_cnn_cutoff), "")(
+        "proteoform-ppm-error,P", "")("cluster-error-tolerance,p",
                                       po::value<std::string>(&form_error_tole),
                                       "")(
         "proteoform-type,R", po::value<std::string>(&allow_prot_type), "")(
@@ -526,13 +765,36 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
         "output-raw-prsm-table,o", "")("output-prsm-coverage,O", "")(
         "disable-post-match,D", "")(
         "post-min-peak-num,I", po::value<std::string>(&post_min_peak_num), "")(
-        "average-mass,g", "")("disable-zero-shift-prec-error", "")(
+        "average-mass,A", "")("no-sql,z", "")("disable-zstd", "")("disable-zero-shift-prec-error", "")(
         "enable-one-shift-prec-error", "")("enable-var-ptm-prec-error", "")(
-        "fdr-groups", "")("disable-frag-mass-extension", "")(
+        "fdr-groups", "")("rescore,q", "")(
+        "disable-rescore-fallback", "")("disable-rescore-evalue-floor", "")(
+        "second-precursor", "")(
+        "mass-calib", "")(
+        "local-align", "")(
+        "local-original", "")(
+        "disable-frag-mass-extension", "")(
         "frag-mass-dedup", "")(
         "frag-extend-min-mass", po::value<std::string>(&frag_extend_min_mass),
-        "")("multi-skip-evalue", po::value<std::string>(&multi_skip_evalue),
+        "")("var-ptm-filter-cand-num",
+            po::value<std::string>(&var_ptm_filter_cand_num), "")(
+        "deamid-selector", "")("disable-var-ptm-evalue-mod-residues", "")(
+        "multi-skip-evalue", po::value<std::string>(&multi_skip_evalue),
             "")("disable-multi-type-align", "")(
+        "disable-second-align", "")("separate-var-ptm-filter", "")(
+        "evalue-complement-tolerance",
+        po::value<std::string>(&evalue_complement_tolerance), "")(
+        "filter-mass-list", po::value<std::string>(&filter_mass_list), "")(
+        "tag-filter", po::value<std::string>(&tag_filter_stages), "")(
+        "tag-filter-length", po::value<std::string>(&tag_filter_length), "")(
+        "tag-filter-cand-num", po::value<std::string>(&tag_filter_cand_num),
+        "")("topmg", po::value<std::string>(&topmg_mode), "")(
+        "topmg-use-mcmc", "")(
+        "topmg-num-shift", po::value<std::string>(&topmg_shift_num), "")(
+        "topmg-align-error-tolerance",
+        po::value<std::string>(&topmg_align_error_tole), "")(
+        "asf-filtering-result-number",
+        po::value<std::string>(&asf_filtering_result_num), "")(
         "filtering-result-number",
         po::value<std::string>(&filtering_result_num),
         "Filtering result number. Default value: 20.")(
@@ -648,7 +910,14 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
       arguments_["precErrorTolerance"] = prec_error_tole;
     }
 
-    if (vm.count("filter-by-env-cnn")) {
+    // hidden: a precursor error tolerance in Dalton, used for every
+    // precursor tolerance in place of -E's ppm (issue #563, toppic_test
+    // experiment 133)
+    if (vm.count("prec-dalton-error")) {
+      arguments_["precDaltonError"] = prec_dalton_error;
+    }
+
+    if (vm.count("filter-by-score")) {
       arguments_["envCnnCutoff"] = env_cnn_cutoff;
     }
 
@@ -656,7 +925,7 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
       arguments_["proteoformPpmError"] = "true";
     }
 
-    if (vm.count("proteoform-error-tolerance")) {
+    if (vm.count("cluster-error-tolerance")) {
       arguments_["proteoformErrorTolerance"] = form_error_tole;
     }
 
@@ -721,6 +990,21 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
     if (vm.count("fdr-groups")) {
       arguments_["useFdrGroups"] = "true";
     }
+    if (vm.count("rescore")) {
+      arguments_["rescore"] = "true";
+    }
+    if (vm.count("disable-rescore-fallback")) {
+      arguments_["rescoreFallback"] = "false";
+    }
+    if (vm.count("disable-rescore-evalue-floor")) {
+      arguments_["rescoreEvalueFloor"] = "false";
+    }
+    if (vm.count("second-precursor")) {
+      arguments_["secondPrecursor"] = "true";
+    }
+    if (vm.count("mass-calib")) {
+      arguments_["massCalib"] = "true";
+    }
     // hidden: by default, the multiple-unexpected-shift search computes
     // COMPLETE/PREFIX/SUFFIX/INTERNAL with one fused dynamic program instead
     // of one PsAlign pass per type (PrsmPara::useMultiTypeAlign);
@@ -728,6 +1012,63 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
     // PsAlign search.
     if (vm.count("disable-multi-type-align")) {
       arguments_["multiTypeAlign"] = "false";
+    }
+
+    // hidden: the one-shift and multiple-shift searches repeat their
+    // alignment at the refined precursor of the first alignment's result,
+    // with the fragment tolerance on every peak, and keep that precursor
+    // (search/diag/second_align_util, issue #614, toppic_test experiment
+    // 144); --disable-second-align keeps the first alignment's PrSM.
+    if (vm.count("disable-second-align")) {
+      arguments_["secondAlign"] = "false";
+    }
+
+    // hidden: the zero-shift and variable PTM filters one after the other
+    // instead of one pass over the index files (toppic_test experiment 150)
+    if (vm.count("separate-var-ptm-filter")) {
+      arguments_["separateVarPtmFilter"] = "true";
+    }
+
+    // hidden: the tolerance of the complementary (REVERSED, P - m) PRM
+    // peaks in the generating function of the E-values: relax (the
+    // default, the precursor's error added), strict (the fragment
+    // tolerance on the fragment mass) or separate (one generating function
+    // per PrSM on PRM spectra at its own precursor, every peak strict;
+    // issue #616, toppic_test experiment 146, report 0146: strict and
+    // separate move the E-value scale without more identifications)
+    if (vm.count("evalue-complement-tolerance")) {
+      arguments_["evalueComplementTolerance"] = evalue_complement_tolerance;
+    }
+
+    // hidden: TopMG's identification - the ASF filtering with the variable
+    // modification file, the graph alignment, its post-processing, the
+    // E-value and the top PrSM selection. "pipeline" runs it after toppic's
+    // own identification stages, on the spectra they left unidentified;
+    // "topmg-only" runs it alone, on every spectrum, and skips toppic's own
+    // identification stages (zero, variable-PTM, one and multiple unexpected
+    // shift searches); "disabled", the default, does not run it.
+    if (vm.count("topmg")) {
+      arguments_["topmgMode"] = topmg_mode;
+    }
+    // hidden: compute the E-values of that stage with TopMG's MCMC instead
+    // of the generating function (TDGF)
+    if (vm.count("topmg-use-mcmc")) {
+      arguments_["topmgUseMcmc"] = "true";
+    }
+    // hidden: the unexpected shifts of that graph alignment, TopMG's own
+    // number, which --num-shift does not change
+    if (vm.count("topmg-num-shift")) {
+      arguments_["topmgShiftNumber"] = topmg_shift_num;
+    }
+    // hidden: the error tolerance (Da) of that graph alignment, TopMG's
+    // hidden --align-error-tolerance
+    if (vm.count("topmg-align-error-tolerance")) {
+      arguments_["topmgAlignErrorTolerance"] = topmg_align_error_tole;
+    }
+    // hidden: the ASF filtering result number of that stage, TopMG's own,
+    // which --filtering-result-number does not change
+    if (vm.count("asf-filtering-result-number")) {
+      arguments_["asfFilteringResultNumber"] = asf_filtering_result_num;
     }
 
     if (vm.count("combine-result-only")) {
@@ -744,6 +1085,25 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
 
     if (vm.count("disable-post-match")) {
       arguments_["postMassMatch"] = "false";
+    }
+
+    if (vm.count("no-sql")) {
+      arguments_["noSql"] = "true";
+    }
+
+    if (vm.count("disable-zstd")) {
+      arguments_["disableZstd"] = "true";
+    }
+
+    // hidden: the PTM localization of -B by the MIScore candidate search of
+    // stat/local (the method before toppic_test experiment 140) instead of
+    // the default variable PTM search of stat/local_align; --local-align
+    // (the old switch for the default) is still accepted
+    if (vm.count("local-original")) {
+      arguments_["localAlign"] = "false";
+    }
+    if (vm.count("local-align")) {
+      arguments_["localAlign"] = "true";
     }
 
     if (vm.count("post-min-peak-num")) {
@@ -770,8 +1130,46 @@ bool ToppicArgument::parse(int argc, char* argv[]) {
     if (vm.count("frag-extend-min-mass")) {
       arguments_["fragExtendMinMass"] = frag_extend_min_mass;
     }
+    if (vm.count("var-ptm-filter-cand-num")) {
+      arguments_["varPtmFilterCandNum"] = var_ptm_filter_cand_num;
+    }
+    // hidden: with a deamidation in the variable PTM file, choose between a
+    // spectrum's zero-PTM and deamidation PrSMs of the same protein and
+    // positions before the top PrSM selection (prsm_deamid_selector,
+    // toppic_test experiment 123)
+    if (vm.count("deamid-selector")) {
+      arguments_["deamidSelector"] = "true";
+    }
+    // hidden: by default the variable PTM PrSMs' E-values come from a
+    // generating function whose residues are the residues and their forms
+    // with the variable PTMs, a residue's frequency shared equally by its
+    // forms (toppic_test experiment 129); this option gives them the
+    // residues without variable PTMs, as every other PrSM
+    if (vm.count("disable-var-ptm-evalue-mod-residues")) {
+      arguments_["varPtmEvalueModResidues"] = "false";
+    }
     if (vm.count("multi-skip-evalue")) {
       arguments_["multiSkipEvalue"] = multi_skip_evalue;
+    }
+    // hidden: the entries of the filters' mass list
+    // (prm_ms_util::getIntMassErrorList), for the one-shift, variable PTM and
+    // multi-shift filters, the shift searches' diagonal finder and TopMG's
+    // one-shift filter: "merge", one per integer mass (main up to
+    // 7b5112c2); "fragment", one per integer mass and base type (the
+    // default); "single", one per peak (toppic_test experiment 142)
+    if (vm.count("filter-mass-list")) {
+      arguments_["filterMassList"] = filter_mass_list;
+    }
+    // hidden: the tag filter (filter/tag), whose candidate proteins join
+    // the lists of the named stages (toppic_test experiment 150)
+    if (vm.count("tag-filter")) {
+      arguments_["tagFilterStages"] = tag_filter_stages;
+    }
+    if (vm.count("tag-filter-length")) {
+      arguments_["tagFilterLength"] = tag_filter_length;
+    }
+    if (vm.count("tag-filter-cand-num")) {
+      arguments_["tagFilterCandNum"] = tag_filter_cand_num;
     }
 
     if (vm.count("filtering-result-number")) {
@@ -856,7 +1254,7 @@ bool ToppicArgument::validateArguments() {
                   << sql_file_name << " for " << spec_file_list_[k]
                   << " is missing! Post mass matching needs the centroided "
                      "MS/MS peaks stored in it: run TopFD without disabling "
-                     "its SQLite database output (without -N) to deconvolute "
+                     "its SQLite database output (without -z) to deconvolute "
                      "the spectra, or run TopPIC with --disable-post-match.");
         return false;
       }
@@ -875,10 +1273,12 @@ bool ToppicArgument::validateArguments() {
 
   std::string activation = arguments_["activation"];
   if (activation != "CID" && activation != "HCD" && activation != "MPD" &&
-      activation != "ETD" && activation != "FILE" && activation != "UVPD") {
+      activation != "ETD" && activation != "ETCID" && activation != "ETHCD" &&
+      activation != "FILE" && activation != "UVPD") {
     LOG_ERROR("Activation type "
               << activation
-              << " error! The value should be CID|ETD|HCD|MPD|UVPD|FILE!");
+              << " error! The value should be "
+                 "CID|ETD|ETCID|ETHCD|HCD|MPD|UVPD|FILE!");
     return false;
   }
 
@@ -888,6 +1288,32 @@ bool ToppicArgument::validateArguments() {
               << search_type
               << " error! The value should be TARGET|TARGET+DECOY!");
     return false;
+  }
+
+  if (arguments_["rescore"] == "true") {
+    // the rescoring trains on the decoys and replaces the E-value in the
+    // FDR; the separate FDRs of --fdr-groups rank by the E-value
+    if (search_type != "TARGET+DECOY") {
+      LOG_ERROR("--rescore needs a target-decoy search (-d)!");
+      return false;
+    }
+    if (arguments_["useFdrGroups"] == "true") {
+      LOG_ERROR("--rescore cannot be combined with --fdr-groups!");
+      return false;
+    }
+  }
+
+  if (arguments_["secondPrecursor"] == "true") {
+    // the second pass runs on one spectrum per set and its PrSMs are
+    // merged with the first pass's before the report of the file
+    if (arguments_["combinedOutputName"] != "") {
+      LOG_ERROR("--second-precursor cannot be combined with -c!");
+      return false;
+    }
+    if (arguments_["groupSpectrumNumber"] != "1") {
+      LOG_ERROR("--second-precursor needs one spectrum per set (-r 1)!");
+      return false;
+    }
   }
 
   std::string shift_number = arguments_["shiftNumber"];
@@ -907,6 +1333,56 @@ bool ToppicArgument::validateArguments() {
           "NME or NME_ACETYLATION.");
       return false;
     }
+  }
+
+  // -R: PrsmPara skips a name it does not know, so a misspelt type would
+  // silently leave the type out of the search
+  std::string allow_type = arguments_["allowProtType"];
+  std::vector<std::string> type_strs = str_util::split(allow_type, ",");
+  std::set<std::string> type_set;
+  for (size_t i = 0; i < type_strs.size(); i++) {
+    if (type_strs[i] != "COMPLETE" && type_strs[i] != "PREFIX" &&
+        type_strs[i] != "SUFFIX" && type_strs[i] != "INTERNAL") {
+      LOG_ERROR("Proteoform type "
+                << allow_type
+                << " error! The value should be a comma-separated list of "
+                   "COMPLETE, PREFIX, SUFFIX and INTERNAL.");
+      return false;
+    }
+    if (!type_set.insert(type_strs[i]).second) {
+      LOG_ERROR("Proteoform type " << allow_type << " error! "
+                                   << type_strs[i] << " is listed twice.");
+      return false;
+    }
+  }
+
+  std::string local_threshold = arguments_["localThreshold"];
+  try {
+    double th = std::stod(local_threshold);
+    if (th < 0 || th > 1) {
+      LOG_ERROR("MIScore threshold "
+                << local_threshold
+                << " error! The value should be between 0 and 1.");
+      return false;
+    }
+  } catch (const std::exception& ex) {
+    LOG_ERROR("MIScore threshold " << local_threshold
+                                   << " should be a number.");
+    return false;
+  }
+
+  std::string group_num = arguments_["groupSpectrumNumber"];
+  try {
+    if (std::stoi(group_num) <= 0) {
+      LOG_ERROR("Number of combined spectra "
+                << group_num << " error! The value should be a positive "
+                   "integer.");
+      return false;
+    }
+  } catch (const std::exception& ex) {
+    LOG_ERROR("Number of combined spectra "
+              << group_num << " should be a positive integer.");
+    return false;
   }
 
   std::string variable_ptm_num = arguments_["variablePtmNum"];
@@ -1000,7 +1476,7 @@ bool ToppicArgument::validateArguments() {
     if (mass < 0.0) {
       LOG_ERROR("N-terminal label mass "
                 << n_term_label_mass
-                << " error! The value should be positive.");
+                << " error! The value should not be negative.");
       return false;
     }
   } catch (const std::exception& ex) {
@@ -1028,17 +1504,35 @@ bool ToppicArgument::validateArguments() {
     }
   }
 
+  std::string prec_dalton_error = arguments_["precDaltonError"];
+  if (prec_dalton_error != "") {
+    bool valid = false;
+    try {
+      std::size_t end = 0;
+      double tole = std::stod(prec_dalton_error, &end);
+      valid = end == prec_dalton_error.size() && std::isfinite(tole) &&
+              tole > 0;
+    } catch (const std::exception& ex) {
+      valid = false;
+    }
+    if (!valid) {
+      LOG_ERROR("Precursor error tolerance in Dalton (--prec-dalton-error) "
+                << prec_dalton_error << " should be a positive number.");
+      return false;
+    }
+  }
+
   std::string env_cnn_cutoff_value = arguments_["envCnnCutoff"];
   try {
     double cutoff = std::stod(env_cnn_cutoff_value);
     if (cutoff < 0 || cutoff > 1) {
-      LOG_ERROR("EnvCNN score cutoff: "
+      LOG_ERROR("Confidence score cutoff: "
                 << env_cnn_cutoff_value
                 << " error! The value should be between 0 and 1.");
       return false;
     }
   } catch (const std::exception& ex) {
-    LOG_ERROR("EnvCNN score cutoff: " << env_cnn_cutoff_value
+    LOG_ERROR("Confidence score cutoff: " << env_cnn_cutoff_value
                                       << " should be a number.");
     return false;
   }
@@ -1138,6 +1632,120 @@ bool ToppicArgument::validateArguments() {
   } catch (const std::exception& ex) {
     LOG_ERROR("Fragment extension minimum mass " << frag_extend_min_mass
                                                  << " should be a number.");
+    return false;
+  }
+
+  // the variable PTM filter's candidates kept per spectrum, for complete,
+  // prefix and suffix, and internal proteoforms (VarPtmFilterMng)
+  std::string var_cand_num = arguments_["varPtmFilterCandNum"];
+  if (var_cand_num != "") {
+    std::vector<std::string> nums = str_util::split(var_cand_num, ",");
+    bool valid = nums.size() == 3;
+    for (size_t i = 0; valid && i < nums.size(); i++) {
+      valid = !nums[i].empty() &&
+              nums[i].find_first_not_of("0123456789") == std::string::npos &&
+              nums[i].size() <= 6 && std::stoi(nums[i]) > 0;
+    }
+    if (!valid) {
+      LOG_ERROR("--var-ptm-filter-cand-num "
+                << var_cand_num
+                << " should be three positive integers separated by commas "
+                   "(complete,prefix/suffix,internal).");
+      return false;
+    }
+  }
+
+  if (arguments_["evalueComplementTolerance"] != "strict" &&
+      arguments_["evalueComplementTolerance"] != "relax" &&
+      arguments_["evalueComplementTolerance"] != "separate") {
+    LOG_ERROR("--evalue-complement-tolerance "
+              << arguments_["evalueComplementTolerance"]
+              << " is not strict, relax or separate");
+    return false;
+  }
+  if (!SpPara::isFilterMassListModeName(arguments_["filterMassList"])) {
+    LOG_ERROR("--filter-mass-list " << arguments_["filterMassList"]
+                                    << " error! The value should be merge, "
+                                       "fragment or single!");
+    return false;
+  }
+
+  // the tag filter: the stages, the tag length (at least the index's K-mer
+  // length) and the candidates per spectrum
+  std::set<TagFilterMng::Stage> tag_stages;
+  if (!TagFilterMng::parseStages(arguments_["tagFilterStages"], &tag_stages)) {
+    LOG_ERROR("--tag-filter " << arguments_["tagFilterStages"]
+                              << " error! The value should be a "
+                                 "comma-separated list of var, one, multi "
+                                 "and topmg, or all!");
+    return false;
+  }
+  auto isPositiveInt = [](const std::string& str, int min_value) {
+    return !str.empty() && str.size() <= 6 &&
+           str.find_first_not_of("0123456789") == std::string::npos &&
+           std::stoi(str) >= min_value;
+  };
+  if (!isPositiveInt(arguments_["tagFilterLength"], TagIndex::K)) {
+    LOG_ERROR("--tag-filter-length " << arguments_["tagFilterLength"]
+                                     << " error! The value should be an "
+                                        "integer of at least "
+                                     << TagIndex::K << ".");
+    return false;
+  }
+  if (!isPositiveInt(arguments_["tagFilterCandNum"], 1)) {
+    LOG_ERROR("--tag-filter-cand-num " << arguments_["tagFilterCandNum"]
+                                       << " error! The value should be a "
+                                          "positive integer.");
+    return false;
+  }
+
+  std::string topmg_mode = arguments_["topmgMode"];
+  if (topmg_mode != "disabled" && topmg_mode != "pipeline" &&
+      topmg_mode != "topmg-only") {
+    LOG_ERROR("--topmg " << topmg_mode
+                         << " error! The value should be disabled, pipeline "
+                            "or topmg-only!");
+    return false;
+  }
+  // TopMG's identification (hidden --topmg pipeline or topmg-only) searches
+  // whole proteins or whole proteins and their fragments; no other
+  // combination of the proteoform types is meaningful for its proteoform
+  // graphs
+  if (topmg_mode != "disabled") {
+    std::string prot_type = arguments_["allowProtType"];
+    if (prot_type != "COMPLETE,PREFIX,SUFFIX,INTERNAL" &&
+        prot_type != "COMPLETE") {
+      LOG_ERROR("Proteoform type "
+                << prot_type
+                << " error! With TopMG's identification, the value should be "
+                   "COMPLETE,PREFIX,SUFFIX,INTERNAL or COMPLETE!");
+      return false;
+    }
+  }
+  // TopMG's identification needs the variable modifications; as the only
+  // search, a run without them would search nothing
+  if (topmg_mode == "topmg-only" && arguments_["variablePtmFileName"] == "") {
+    LOG_ERROR("--topmg topmg-only error! It needs a variable modification "
+              "file (-b).");
+    return false;
+  }
+  std::string topmg_align_error_tole = arguments_["topmgAlignErrorTolerance"];
+  try {
+    if (std::stod(topmg_align_error_tole) <= 0) {
+      LOG_ERROR("--topmg-align-error-tolerance " << topmg_align_error_tole
+                << " error! The value should be positive.");
+      return false;
+    }
+  } catch (const std::exception& ex) {
+    LOG_ERROR("--topmg-align-error-tolerance " << topmg_align_error_tole
+              << " should be a number.");
+    return false;
+  }
+
+  // the E-value method of TopMG's identification means nothing without it
+  if (arguments_["topmgUseMcmc"] == "true" && topmg_mode == "disabled") {
+    LOG_ERROR("--topmg-use-mcmc error! It needs --topmg pipeline or "
+              "topmg-only.");
     return false;
   }
 

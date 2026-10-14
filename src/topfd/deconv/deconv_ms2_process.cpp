@@ -18,7 +18,11 @@
 #include <algorithm>
 #include <atomic>
 #include <cstddef>
+#include <cmath>
+#include <cstdlib>
+#include <deque>
 #include <memory>
+#include <mutex>
 #include <string>
 #include <utility>
 #include <vector>
@@ -34,6 +38,9 @@
 #include "ms/spec/msalign_thread_merge.hpp"
 #include "ms/spec/msalign_writer.hpp"
 #include "topfd/deconv/deconv_single_sp.hpp"
+#include "topfd/deconv/greedy_ms2_deconv.hpp"
+#include "topfd/deconv/prec_pair_refine.hpp"
+#include "topfd/deconv/ptcr_ms2_deconv.hpp"
 
 namespace toppic {
 
@@ -58,6 +65,25 @@ struct Ms2SqlBuffer {
   std::atomic<std::size_t> bytes{0};
 };
 using Ms2SqlBufferPtr = std::shared_ptr<Ms2SqlBuffer>;
+
+// The deconvoluted PTCR spectra (ptcr_ms2_deconv), collected from the worker
+// threads under a lock and written after the deconvolution; they go to their
+// own files, not to the MS/MS msalign file or the SQLite database.
+struct PtcrBuffer {
+  std::mutex mutex;
+  ptcr_ms2_deconv::PtcrSpecPtrVec specs;
+  // the fragment PTCR spectra of the charge-series search (switch frag=2),
+  // for <base>_ptcr_fragment.tsv (their masses are in the MS/MS msalign
+  // file)
+  ptcr_ms2_deconv::PtcrSpecPtrVec frag_specs;
+  // the number of fragment PTCR spectra
+  std::atomic<int> frag_num{0};
+  // the number of dissociation spectra of charge-reduced precursors, and of
+  // those whose precursor comes from their parent PTCR spectrum
+  std::atomic<int> reduced_num{0};
+  std::atomic<int> reduced_parent_num{0};
+};
+using PtcrBufferPtr = std::shared_ptr<PtcrBuffer>;
 
 // Approximate bytes held per buffered peak (the Peak/EnvPeak object, its
 // shared_ptr control block, and the vector slot). Used only to bound the
@@ -95,11 +121,82 @@ std::string updateMsTwoMsg(const MsHeaderPtr& header_ptr, int scan_cnt,
   return msg;
 }
 
+// The parent PTCR spectrum of the dissociation of a charge-reduced precursor
+// (MsHeader::isReducedPrec): the PTCR spectrum its precursor references
+// (getParentScan), else the last PTCR spectrum before it with the same
+// isolation target (0.01 m/z; the target of its first stage, the proton
+// transfer); nullptr when there is none among ptcr_ptrs, the PTCR spectra
+// read last
+MzmlMsPtr findPtcrParent(const std::deque<MzmlMsPtr>& ptcr_ptrs,
+                         const MsHeaderPtr& header_ptr) {
+  int parent_scan = header_ptr->getParentScan();
+  if (parent_scan >= 0) {
+    for (auto it = ptcr_ptrs.rbegin(); it != ptcr_ptrs.rend(); ++it) {
+      if ((*it)->getMsHeaderPtr()->getFirstScanNum() == parent_scan) {
+        return *it;
+      }
+    }
+  }
+  double target = header_ptr->getPrecTargetMz();
+  for (auto it = ptcr_ptrs.rbegin(); it != ptcr_ptrs.rend(); ++it) {
+    if (std::abs((*it)->getMsHeaderPtr()->getPrecTargetMz() - target) <=
+        0.01) {
+      return *it;
+    }
+  }
+  return nullptr;
+}
+
+// ms1_ptr: the MS1 spectrum of the MS/MS spectrum's group (nullptr without
+// MS1 spectra), used by the precursor isotope correction; parent_ptr: the
+// parent PTCR spectrum of a dissociation of a charge-reduced precursor
+// (findPtcrParent), nullptr for other spectra or when there is none
 void deconvMsTwo(const MzmlMsPtr& ms_ptr, SpecFeaturePtrVec sp_feat_ptr_vec,
+                 const MzmlMsPtr& ms1_ptr, const MzmlMsPtr& parent_ptr,
                  const TopfdParaPtr& topfd_para_ptr,
                  const MsAlignWriterPtrVec& ms2_writer_ptr_vec,
                  const SimpleThreadPoolPtr& pool_ptr,
-                 const Ms2SqlBufferPtr& sql_buffer_ptr) {
+                 const Ms2SqlBufferPtr& sql_buffer_ptr,
+                 const PtcrBufferPtr& ptcr_buffer_ptr) {
+  // the MS1 features of the precursor window (not the dummy of the
+  // missing-MS1 mode), most intense first
+  SpecFeaturePtrVec ms1_feat_ptrs;
+  if (!topfd_para_ptr->isMissingLevelOne()) {
+    ms1_feat_ptrs = sp_feat_ptr_vec;
+    std::sort(ms1_feat_ptrs.begin(), ms1_feat_ptrs.end(),
+              SpecFeature::cmpPrecInteDec);
+  }
+  // 0. A PTCR spectrum: intact species at reduced charges, no fragments; its
+  // precursor comes from its own deconvolution, linked to the MS1 features
+  if (ms_ptr->getMsHeaderPtr()->isPtcr()) {
+    ptcr_ms2_deconv::PtcrSpecPtr spec_ptr =
+        ptcr_ms2_deconv::deconv(ms_ptr, topfd_para_ptr, ms1_feat_ptrs);
+    std::lock_guard<std::mutex> lock(ptcr_buffer_ptr->mutex);
+    ptcr_buffer_ptr->specs.push_back(spec_ptr);
+    return;
+  }
+  // 0b. The dissociation of a charge-reduced precursor (proton transfer of
+  // the isolated ions, then the isolation of one charge-reduced ion and its
+  // dissociation): its precursor is the species of the parent PTCR spectrum
+  // at the dissociation stage's target (step 1c); without one, the MS1
+  // features of the window with an envelope at that target (all of them when
+  // none has one)
+  MsHeaderPtr header_ptr = ms_ptr->getMsHeaderPtr();
+  PrecursorPtr reduced_prec_ptr;
+  if (header_ptr->isReducedPrec()) {
+    ptcr_buffer_ptr->reduced_num++;
+    reduced_prec_ptr = ptcr_ms2_deconv::getReducedPrec(
+        parent_ptr, header_ptr, topfd_para_ptr, ms1_feat_ptrs);
+    if (reduced_prec_ptr != nullptr) {
+      ptcr_buffer_ptr->reduced_parent_num++;
+    } else if (!ms1_feat_ptrs.empty()) {
+      SpecFeaturePtrVec feat_ptrs =
+          ptcr_ms2_deconv::getReducedPrecFeatures(header_ptr, sp_feat_ptr_vec);
+      if (!feat_ptrs.empty()) {
+        sp_feat_ptr_vec = feat_ptrs;
+      }
+    }
+  }
   // 1. Find max_mass and max_charge
   double max_mass = 0;
   int max_charge = 1;
@@ -121,21 +218,102 @@ void deconvMsTwo(const MzmlMsPtr& ms_ptr, SpecFeaturePtrVec sp_feat_ptr_vec,
   if (arg_max_charge < max_charge) {
     max_charge = arg_max_charge;
   }
+  // 1b. A fragment PTCR spectrum (a dissociation, then proton transfer charge
+  // reduction of the fragments): the selected ion bounds the fragments too
+  // (a feature of the window need not be the isolated ion), and without
+  // MS1 features of the precursor window it is the precursor
+  int frag_mode =
+      header_ptr->isFragPtcr() ? ptcr_ms2_deconv::getFragMode() : 0;
+  if (header_ptr->isFragPtcr()) {
+    ptcr_buffer_ptr->frag_num++;
+  }
+  PrecursorPtr sel_prec_ptr;
+  if (frag_mode == 1) {
+    double sel_max_mass = 0;
+    int sel_max_charge = 0;
+    PrecursorPtr prec_ptr = ptcr_ms2_deconv::getSelectedIonPrec(
+        header_ptr, sel_max_mass, sel_max_charge);
+    if (prec_ptr != nullptr && ms1_feat_ptrs.empty()) {
+      sel_prec_ptr = prec_ptr;
+      max_mass = sel_max_mass;
+      max_charge = sel_max_charge;
+    } else if (prec_ptr != nullptr) {
+      max_mass = std::max(max_mass, sel_max_mass);
+      max_charge = std::max(max_charge, sel_max_charge);
+    }
+  } else if (frag_mode == 2) {
+    // research switch: the charge-series search, one mass per fragment
+    ptcr_ms2_deconv::PtcrSpecPtr spec_ptr = ptcr_ms2_deconv::deconvFragments(
+        ms_ptr, topfd_para_ptr, max_mass, max_charge, ms1_feat_ptrs);
+    DeconvMsPtr deconv_ms_ptr = ptcr_ms2_deconv::getDeconvMs(spec_ptr);
+    if (topfd_para_ptr->isOutputAvgMass()) {
+      deconv_ms_ptr = avg_mass_util::getAvgMassMs(deconv_ms_ptr);
+    }
+    std::thread::id thread_id = std::this_thread::get_id();
+    int writer_id = pool_ptr->getId(thread_id);
+    ms2_writer_ptr_vec[writer_id]->writeMs(deconv_ms_ptr);
+    if (sql_buffer_ptr != nullptr) {
+      MatchEnvPtrVec envs;
+      for (const ptcr_ms2_deconv::Species& s : spec_ptr->species) {
+        envs.insert(envs.end(), s.envs.begin(), s.envs.end());
+      }
+      Ms2SqlRecord record{ms_ptr, std::move(envs)};
+      sql_buffer_ptr->bytes += estimateRecordBytes(record);
+      sql_buffer_ptr->thread_records[writer_id].push_back(std::move(record));
+    }
+    std::lock_guard<std::mutex> lock(ptcr_buffer_ptr->mutex);
+    ptcr_buffer_ptr->frag_specs.push_back(spec_ptr);
+    return;
+  }
+  // 1c. The dissociation of a charge-reduced precursor (step 0b): the
+  // parent's species is the precursor, and its mass and charge bound the
+  // fragments; without it and without MS1 features, the selected ion (as for
+  // fragment PTCR spectra)
+  if (reduced_prec_ptr != nullptr) {
+    sel_prec_ptr = reduced_prec_ptr;
+    max_mass = reduced_prec_ptr->getMonoMass();
+    max_charge = reduced_prec_ptr->getCharge();
+  } else if (header_ptr->isReducedPrec() && ms1_feat_ptrs.empty()) {
+    double sel_max_mass = 0;
+    int sel_max_charge = 0;
+    PrecursorPtr prec_ptr = ptcr_ms2_deconv::getSelectedIonPrec(
+        header_ptr, sel_max_mass, sel_max_charge);
+    if (prec_ptr != nullptr) {
+      sel_prec_ptr = prec_ptr;
+      max_mass = sel_max_mass;
+      max_charge = sel_max_charge;
+    }
+  }
   // 2. Deconv the whole spectrum with filtering
   PeakPtrVec peak_list = ms_ptr->getPeakPtrVec();
   MatchEnvPtrVec deconv_envs;
-  if (peak_list.size() > 0) {
+  if (peak_list.size() > 0 && topfd_para_ptr->isMs2GreedyDeconv()) {
+    // --ms2-deconv greedy, TopFD's default (DeconvSingleSp with msdeconv,
+    // TopDIA's default); research aid: the decisions of one scan
+    // (TOPFD_GREEDY_MS2_DEBUG_SCAN)
+    std::string debug_name;
+    const char* debug_scan = std::getenv("TOPFD_GREEDY_MS2_DEBUG_SCAN");
+    int scan = ms_ptr->getMsHeaderPtr()->getFirstScanNum();
+    if (debug_scan != nullptr && std::atoi(debug_scan) == scan) {
+      debug_name = "greedy_ms2_scan" + std::to_string(scan) + ".txt";
+    }
+    deconv_envs = greedy_ms2_deconv::deconv(peak_list, topfd_para_ptr,
+                                            max_mass, max_charge, debug_name);
+  } else if (peak_list.size() > 0) {
     int ms_level = 2;
     DeconvSingleSpPtr deconv_ptr = std::make_shared<DeconvSingleSp>(
         topfd_para_ptr, peak_list, ms_level, max_mass, max_charge);
     deconv_envs = deconv_ptr->deconv();
   }
   // 3. Add precuror information
-  MsHeaderPtr header_ptr = ms_ptr->getMsHeaderPtr();
   std::sort(sp_feat_ptr_vec.begin(), sp_feat_ptr_vec.end(),
             SpecFeature::cmpPrecInteDec);
   PrecursorPtrVec prec_ptr_vec;
-  for (std::size_t i = 0; i < sp_feat_ptr_vec.size(); i++) {
+  if (sel_prec_ptr != nullptr) {
+    prec_ptr_vec.push_back(sel_prec_ptr);
+  }
+  for (std::size_t i = 0; sel_prec_ptr == nullptr && i < sp_feat_ptr_vec.size();
+       i++) {
     int prec_id = i;
     int feat_id = sp_feat_ptr_vec[i]->getFracFeatureId();
     double mono_mz = sp_feat_ptr_vec[i]->getPrecMonoMz();
@@ -144,6 +322,14 @@ void deconvMsTwo(const MzmlMsPtr& ms_ptr, SpecFeaturePtrVec sp_feat_ptr_vec,
     PrecursorPtr prec_ptr =
         std::make_shared<Precursor>(prec_id, feat_id, mono_mz, charge, inte);
     prec_ptr_vec.push_back(prec_ptr);
+  }
+  if (topfd_para_ptr->isMs2PrecPairRefine() && ms1_ptr != nullptr) {
+    // the precursor isotope correction, on by default
+    // (--skip-ms2-prec-pair-refine turns it off); not run without an MS1
+    // spectrum, as with the pairs alone it moves more right precursors away
+    // than it fixes (toppic_test experiment 116)
+    prec_pair_refine::correctIsotopes(deconv_envs, ms1_ptr->getPeakPtrVec(),
+                                      prec_ptr_vec);
   }
   header_ptr->setPrecPtrVec(prec_ptr_vec);
 
@@ -173,14 +359,16 @@ void deconvMsTwo(const MzmlMsPtr& ms_ptr, SpecFeaturePtrVec sp_feat_ptr_vec,
 
 std::function<void()> geneMsTwoTask(
     const MzmlMsPtr& ms_ptr, const SpecFeaturePtrVec& feat_ptr_vec,
+    const MzmlMsPtr& ms1_ptr, const MzmlMsPtr& parent_ptr,
     const TopfdParaPtr& topfd_para_ptr,
     const MsAlignWriterPtrVec& ms2_writer_ptr_vec,
     const SimpleThreadPoolPtr& pool_ptr,
-    const Ms2SqlBufferPtr& sql_buffer_ptr) {
-  return [ms_ptr, feat_ptr_vec, topfd_para_ptr, ms2_writer_ptr_vec, pool_ptr,
-          sql_buffer_ptr]() {
-    deconvMsTwo(ms_ptr, feat_ptr_vec, topfd_para_ptr, ms2_writer_ptr_vec,
-                pool_ptr, sql_buffer_ptr);
+    const Ms2SqlBufferPtr& sql_buffer_ptr,
+    const PtcrBufferPtr& ptcr_buffer_ptr) {
+  return [ms_ptr, feat_ptr_vec, ms1_ptr, parent_ptr, topfd_para_ptr,
+          ms2_writer_ptr_vec, pool_ptr, sql_buffer_ptr, ptcr_buffer_ptr]() {
+    deconvMsTwo(ms_ptr, feat_ptr_vec, ms1_ptr, parent_ptr, topfd_para_ptr,
+                ms2_writer_ptr_vec, pool_ptr, sql_buffer_ptr, ptcr_buffer_ptr);
   };
 }
 
@@ -263,6 +451,9 @@ void DeconvMs2Process::process() {
     sql_buffer_ptr->bytes = 0;
   };
 
+  deconv_ms2_process::PtcrBufferPtr ptcr_buffer_ptr =
+      std::make_shared<deconv_ms2_process::PtcrBuffer>();
+
   // init msalign writer vector for multiple threads
   std::string output_base_name = topfd_para_ptr_->getOutputBaseName();
   std::string ms2_msalign_name = output_base_name + "_" + output_filename_ext_;
@@ -286,6 +477,10 @@ void DeconvMs2Process::process() {
     std::string feat_file_name = output_base_name + "_ms2.feature";
     readSpecFeature(feat_file_name, feat_map);
   }
+  // the PTCR spectra read last, the parents of the dissociation spectra of
+  // charge-reduced precursors that follow them (findPtcrParent)
+  std::deque<MzmlMsPtr> ptcr_ptrs;
+  const std::size_t max_ptcr_ptrs = 64;
   // counter for processed spectra
   int spec_cnt = 0;
   // total spectrum number
@@ -325,9 +520,23 @@ void DeconvMs2Process::process() {
                                 << " features.");
         }
       }
+      // the MS1 spectrum is kept only for the precursor isotope correction
+      MzmlMsPtr ms1_ptr = topfd_para_ptr_->isMs2PrecPairRefine()
+                              ? ms_group_ptr->getMsOnePtr()
+                              : nullptr;
+      MzmlMsPtr parent_ptr = nullptr;
+      if (ms_ptr->getMsHeaderPtr()->isPtcr()) {
+        ptcr_ptrs.push_back(ms_ptr);
+        if (ptcr_ptrs.size() > max_ptcr_ptrs) {
+          ptcr_ptrs.pop_front();
+        }
+      } else if (ms_ptr->getMsHeaderPtr()->isReducedPrec()) {
+        parent_ptr = deconv_ms2_process::findPtcrParent(
+            ptcr_ptrs, ms_ptr->getMsHeaderPtr());
+      }
       pool_ptr->enqueue(deconv_ms2_process::geneMsTwoTask(
-          ms_ptr, sp_feat_ptr_vec, topfd_para_ptr_, ms2_writer_ptr_vec,
-          pool_ptr, sql_buffer_ptr));
+          ms_ptr, sp_feat_ptr_vec, ms1_ptr, parent_ptr, topfd_para_ptr_,
+          ms2_writer_ptr_vec, pool_ptr, sql_buffer_ptr, ptcr_buffer_ptr));
       std::string msg = deconv_ms2_process::updateMsTwoMsg(
           ms_ptr->getMsHeaderPtr(), spec_cnt, total_spec_num);
       std::cout << "\r" << msg << std::flush;
@@ -365,6 +574,57 @@ void DeconvMs2Process::process() {
   std::string ms2_prefix = file_util::absoluteName(output_base_name) + "_" +
                            output_filename_ext_ + "_";
   file_util::cleanPrefix(output_base_name, ms2_prefix);
+
+  // the PTCR spectra: <base>_ptcr.msalign and <base>_ptcr.tsv (FAIMS:
+  // <base>_<voltage>_ptcr.*), only when there are any
+  if (!ptcr_buffer_ptr->specs.empty()) {
+    std::string ptcr_ext = output_filename_ext_;
+    std::size_t pos = ptcr_ext.rfind("ms2.msalign");
+    if (pos != std::string::npos) {
+      ptcr_ext.replace(pos, std::string("ms2.msalign").size(), "ptcr.msalign");
+    } else {
+      ptcr_ext = "ptcr.msalign";
+    }
+    std::string ptcr_msalign = output_base_name + "_" + ptcr_ext;
+    std::string ptcr_tsv =
+        ptcr_msalign.substr(0, ptcr_msalign.size() - std::string(".msalign").size()) +
+        ".tsv";
+    ptcr_ms2_deconv::write(ptcr_buffer_ptr->specs, ptcr_msalign, ptcr_tsv,
+                           topfd_para_ptr_->getParaStr("#", "\t", ptcr_ext),
+                           topfd_para_ptr_->isOutputAvgMass());
+    std::cout << std::endl
+              << "PTCR spectra: " << ptcr_buffer_ptr->specs.size()
+              << " (written to " << ptcr_msalign << ")";
+  }
+  // the fragment species of the fragment PTCR spectra: <base>_ptcr_fragment.tsv
+  if (!ptcr_buffer_ptr->frag_specs.empty()) {
+    std::string frag_ext = output_filename_ext_;
+    std::size_t pos = frag_ext.rfind("ms2.msalign");
+    if (pos != std::string::npos) {
+      frag_ext.replace(pos, std::string("ms2.msalign").size(),
+                       "ptcr_fragment.tsv");
+    } else {
+      frag_ext = "ptcr_fragment.tsv";
+    }
+    std::string frag_tsv = output_base_name + "_" + frag_ext;
+    ptcr_ms2_deconv::writeTsv(ptcr_buffer_ptr->frag_specs, frag_tsv);
+    std::cout << std::endl
+              << "Fragment species of the charge-series search in "
+              << frag_tsv;
+  }
+  if (ptcr_buffer_ptr->frag_num > 0) {
+    std::cout << std::endl
+              << "Fragment PTCR spectra: " << ptcr_buffer_ptr->frag_num
+              << " (written to " << ms2_msalign_name << ")";
+  }
+  if (ptcr_buffer_ptr->reduced_num > 0) {
+    std::cout << std::endl
+              << "Dissociation spectra of charge-reduced precursors: "
+              << ptcr_buffer_ptr->reduced_num << ", "
+              << ptcr_buffer_ptr->reduced_parent_num
+              << " with the precursor from a PTCR spectrum (written to "
+              << ms2_msalign_name << ")";
+  }
   std::cout << std::endl;
 }
 

@@ -19,6 +19,7 @@
 #include <memory>
 #include <mutex>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 #include "prsm/simple_prsm.hpp"
@@ -50,18 +51,32 @@ namespace toppic {
 // serialized, instead of serializing every candidate of every block.
 class SimplePrsmMemMerge {
  public:
-  // spec_num: the number of spectra of the file, so that the per-spectrum
-  // lists are allocated once and never grow while the block threads add to
-  // them (a resize would invalidate the references the other threads hold).
+  // spec_ids: the spectrum ids of the file in file order
+  // (msalign_util::readSpIds). The per-spectrum lists are allocated once, one
+  // per spectrum, and never grow while the block threads add to them (a
+  // resize would invalidate the references the other threads hold). A
+  // spectrum's list is found by its position in the file, not by its id: the
+  // ids need not start at 0 or be consecutive, and a list indexed by id up to
+  // the number of spectra dropped every candidate of a larger id without a
+  // word (issue #598). The lists are written in file order, the order in
+  // which the searches read the spectra and the filter file side by side.
+  // group_num: the number of candidate groups (the variable PTM filter's
+  // rounds), each kept with its own top_nums; the written list of a spectrum
+  // is the first group's best, then each later group's best whose protein
+  // and range are not listed already (a listed one takes the later
+  // candidate's truncation N-terminal modification shifts). One group is
+  // the merge above.
   SimplePrsmMemMerge(const std::string& sp_file_name,
                      const std::string& output_file_ext,
-                     const std::vector<int>& top_nums, int spec_num);
+                     const std::vector<int>& top_nums,
+                     const std::vector<int>& spec_ids, int group_num = 1);
 
   // type_idx: 0 complete, 1 prefix, 2 suffix, 3 internal
   // block_idx and call_idx give the position the records had in the block
   // files the merge read: block file order, then write order inside a block.
+  // group: the candidate group, 0 to group_num - 1
   void add(int type_idx, int block_idx, int call_idx,
-           const SimplePrsmPtrVec& prsm_ptrs);
+           const SimplePrsmPtrVec& prsm_ptrs, int group = 0);
 
   void write();
 
@@ -80,7 +95,12 @@ class SimplePrsmMemMerge {
   // the order the candidates of a spectrum are trimmed and written in
   static bool cmpEntry(const Entry& a, const Entry& b);
 
-  // results_[type][spectrum id]
+  // spectrum id -> position of the spectrum in the file; read only once the
+  // block threads run
+  std::unordered_map<int, int> spec_pos_;
+  int group_num_ = 1;
+  // results_[group * type number + type][position of the spectrum in the
+  // file]
   std::vector<std::vector<std::vector<Entry>>> results_;
   std::vector<std::unique_ptr<std::mutex>> mutexes_;
 };

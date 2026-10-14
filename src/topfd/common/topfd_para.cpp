@@ -17,17 +17,22 @@
 
 #include <sqlite3.h>
 
+#include <algorithm>
 #include <cstdlib>
 #include <filesystem>
 #include <iomanip>
+#include <iostream>
 #include <ostream>
 #include <sstream>
 #include <string>
+#include <vector>
 
 #include "common/util/file_util.hpp"
 #include "common/util/logger.hpp"
 #include "common/util/time_util.hpp"
+#include "sql/sql_db_copy.hpp"
 #include "sql/sql_util.hpp"
+#include "sql/zstd_db.hpp"
 
 namespace toppic {
 
@@ -49,6 +54,49 @@ TopfdPara::~TopfdPara() {
   }
 }
 
+const std::vector<std::string>& TopfdPara::getMs1DeconvMethods() {
+  static const std::vector<std::string> methods = {"greedy", "msdeconv"};
+  return methods;
+}
+
+const std::vector<std::string>& TopfdPara::getMs2DeconvMethods() {
+  static const std::vector<std::string> methods = {"greedy", "msdeconv",
+                                                   "flashdeconv"};
+  return methods;
+}
+
+const std::vector<std::string>& TopfdPara::getDeconvScores() {
+  static const std::vector<std::string> scores = {"envcnn", "msdeconv"};
+  return scores;
+}
+
+bool TopfdPara::setDeconvScore(const std::string& score) {
+  const std::vector<std::string>& scores = getDeconvScores();
+  if (std::find(scores.begin(), scores.end(), score) == scores.end()) {
+    return false;
+  }
+  deconv_score_ = score;
+  return true;
+}
+
+bool TopfdPara::setMs1DeconvMethod(const std::string& method) {
+  const std::vector<std::string>& methods = getMs1DeconvMethods();
+  if (std::find(methods.begin(), methods.end(), method) == methods.end()) {
+    return false;
+  }
+  ms1_deconv_method_ = method;
+  return true;
+}
+
+bool TopfdPara::setMs2DeconvMethod(const std::string& method) {
+  const std::vector<std::string>& methods = getMs2DeconvMethods();
+  if (std::find(methods.begin(), methods.end(), method) == methods.end()) {
+    return false;
+  }
+  ms2_deconv_method_ = method;
+  return true;
+}
+
 void TopfdPara::setMzmlFileNameAndFaims(const std::string& mzml_file_name,
                                         bool is_faims, double voltage) {
   mzml_file_name_ = mzml_file_name;
@@ -63,6 +111,48 @@ void TopfdPara::setMzmlFileNameAndFaims(const std::string& mzml_file_name,
   sql_file_name_ = output_base_name_ + ".sqlite";
   if (gene_sql_) {
     createSqlDb(sql_file_name_);
+  } else if (sql_db_copy::removeDb(sql_file_name_)) {
+    // --no-sql: no database of an earlier run is left next to the new
+    // results, where toppic's post mass matching would read it (as toppic
+    // --no-sql deletes its earlier <base>_toppic.sqlite; toppic_test
+    // experiment 166)
+    std::cout << "Deleted the earlier database " << sql_file_name_ << "."
+              << std::endl;
+  }
+}
+
+// SQLite fills the pages of a WITHOUT ROWID table such as ms1_peak only
+// about 88% on appends, also in key order, and VACUUM rewrites the file
+// packed (toppic_test experiment 165: 894 -> 843 MB on 480_F3_02 with -D,
+// 3 s). Its copy is built in a temporary file, not in memory
+// (MzmlMsSqlWriter sets temp_store = MEMORY). A failed VACUUM leaves the
+// database as it was, so it is reported and the file closed.
+void TopfdPara::closeSqlDb() {
+  if (sql_db_ == nullptr) {
+    return;
+  }
+  std::string path = sqlite3_db_filename(sql_db_, "main");
+  std::string name = std::filesystem::path(path).filename().string();
+  std::cout << "Compacting the SQLite database " << name << " started."
+            << std::endl;
+  char* err = nullptr;
+  int rc = sqlite3_exec(sql_db_, "PRAGMA temp_store = FILE; VACUUM;", nullptr,
+                        nullptr, &err);
+  if (rc == SQLITE_OK) {
+    std::cout << "Compacting the SQLite database " << name << " finished."
+              << std::endl;
+  } else {
+    LOG_WARN("VACUUM of the SQLite database " << name << " failed: "
+                                             << (err != nullptr ? err : ""));
+  }
+  sqlite3_free(err);
+  sqlite3_close(sql_db_);
+  sql_db_ = nullptr;
+  // the per-spectrum tables as zstd-compressed BLOB rows (toppic_test
+  // experiment 172): readers load the sqlite-zstd extension (TopMSV) or
+  // decode them (toppic, topmg)
+  if (zstd_) {
+    zstd_db::compressInPlace(path);
   }
 }
 
@@ -72,9 +162,9 @@ void TopfdPara::createSqlDb(const std::string& sql_db_name) {
   if (sql_db_ != nullptr) {
     sqlite3_close(sql_db_);
   }
-  if (std::filesystem::exists(sql_db_name)) {
-    file_util::delFile(sql_db_name);
-  }
+  // an earlier database with its -journal, -wal and -shm files, whose pages
+  // must not be applied to the new one
+  sql_db_copy::removeDb(sql_db_name);
   rc = sqlite3_open(sql_db_name.c_str(), &sql_db_);
   if (rc) {
     LOG_ERROR("Can't open database: " << sqlite3_errmsg(sql_db_));
@@ -91,11 +181,15 @@ void TopfdPara::createSqlDb(const std::string& sql_db_name) {
       "min_ref_inte REAL);";
   LOG_DEBUG("SQL: " << sql);
   sql_util::execSql(sql_db_, sql);
+  // LEVEL: the highest 3D level that keeps the peak, -1 for a peak of
+  // intensity <= 0 (MsSqlWriter; toppic_test experiments 165 and 169)
   sql =
-      "CREATE TABLE IF NOT EXISTS ms1_peak(spec_id INTEGER NOT NULL,"
+      "CREATE TABLE IF NOT EXISTS ms1_peak(LEVEL INTEGER NOT NULL,"
+      "spec_id INTEGER NOT NULL,"
       "peak_id INTEGER NOT NULL,"
       "mz REAL NOT NULL,"
-      "intensity REAL NOT NULL);";
+      "intensity REAL NOT NULL,"
+      "PRIMARY KEY(LEVEL, spec_id, peak_id)) WITHOUT ROWID;";
   LOG_DEBUG("SQL: " << sql);
   sql_util::execSql(sql_db_, sql);
   sql = "DELETE from ms1_peak;";
@@ -202,14 +296,17 @@ std::string TopfdPara::getTopfdParaStr(const std::string& prefix,
   }
   kv("Number of MS1 scans:") << ms_1_scan_num_ << std::endl;
   kv("Number of MS/MS scans:") << ms_2_scan_num_ << std::endl;
+  if (ms_3_scan_num_ > 0) {
+    kv("Number of MS3 scans:") << ms_3_scan_num_ << std::endl;
+    kv("MS3 spectral deconvolution:") << (ms3_deconv_ ? "on" : "off")
+                                      << std::endl;
+  }
   kv("Spectral data type:") << "Centroid" << std::endl;
   kv("Maximum charge:") << max_charge_ << std::endl;
   kv("Maximum monoisotopic mass:") << max_mass_ << " Dalton" << std::endl;
   kv("Peak m/z error tolerance:") << mz_error_ << " m/z" << std::endl;
   kv("Thread number:") << thread_num_ << std::endl;
   kv("SQLite database output:") << (gene_sql_ ? "Yes" : "No") << std::endl;
-  kv("MS1 peaks for 3D visualization:")
-      << (gene_sql_ && sql_3d_ ? "Yes" : "No") << std::endl;
 
   if (missing_level_one_) {
     kv("Miss MS1 spectra:") << "Yes" << std::endl;
@@ -220,7 +317,20 @@ std::string TopfdPara::getTopfdParaStr(const std::string& prefix,
            << banner(prefix, "MS1 spectral deconvolution parameters")
            << std::endl;
     kv("MS1 signal/noise ratio:") << ms_one_sn_ratio_ << std::endl;
-    if (run_filter_by_mz_) {
+    kv("MS1 envelope EnvCNN score cutoff:")
+        << ms1_env_cnn_score_cutoff_ << std::endl;
+    // printed only for the greedy search (TopFD's default), so that the
+    // output files of --ms1-deconv msdeconv (TopDIA's default) keep the
+    // parameter block of earlier versions
+    if (isMs1GreedyDeconv()) {
+      kv("MS1 deconvolution:") << "Greedy" << std::endl;
+      // the hidden shared-peak limit only when set (the default -1 is no
+      // limit), so that the block stays that of earlier versions
+      if (ms1_max_shared_peak_num_ >= 0) {
+        kv("MS1 maximum shared peak number (same charge):")
+            << ms1_max_shared_peak_num_ << std::endl;
+      }
+    } else if (run_filter_by_mz_) {
       kv("Precursor envelope ranking window:")
           << ms1_rank_peak_distance_ << " Dalton" << std::endl;
     }
@@ -250,19 +360,40 @@ std::string TopfdPara::getTopfdParaStr(const std::string& prefix,
   kv("Activation type:") << activation_ << std::endl;
   kv("MS/MS signal/noise ratio:") << ms_two_sn_ratio_ << std::endl;
   kv("Fragment envelope ranking:")
-      << (sort_use_msdeconv_ ? "MS-Deconv score" : "EnvCNN score") << std::endl;
+      << (isSortUseMsDeconv() ? "MS-Deconv score" : "EnvCNN score")
+      << std::endl;
   kv("Fragment envelope EnvCNN score cutoff:")
       << ms2_env_cnn_score_cutoff_ << std::endl;
-  // both steps belong to TopFD's own MS/MS deconvolution: the FLASHDeconv
-  // path (--ms2-flashdeconv) does not run them, and the ranking window has no
-  // meaning when the filtering-by-mz step is disabled
-  if (!use_flashdeconv_) {
+  // the ranking window and the harmonic check belong to MS-Deconv's MS/MS
+  // deconvolution (--ms2-deconv msdeconv, TopDIA's default): the greedy
+  // search (TopFD's default) and FLASHDeconv do not run them, and the ranking
+  // window has no meaning when the filtering-by-mz step is disabled. The
+  // method's line is printed only for the other two, so that the output
+  // files of --ms2-deconv msdeconv keep the block of earlier versions.
+  if (isMs2GreedyDeconv()) {
+    kv("MS/MS deconvolution:") << "Greedy" << std::endl;
+    // the hidden shared-peak limit only when set, as for MS1
+    if (ms2_max_shared_peak_num_ >= 0) {
+      kv("MS/MS maximum shared peak number (same charge):")
+          << ms2_max_shared_peak_num_ << std::endl;
+    }
+  } else if (isUseFlashDeconv()) {
+    kv("MS/MS deconvolution:") << "FLASHDeconv" << std::endl;
+  } else {
     if (run_filter_by_mz_) {
       kv("Fragment envelope ranking window:")
           << ms2_rank_peak_distance_ << " Dalton" << std::endl;
     }
     kv("Fragment harmonic check:")
         << (ms2_harmonic_check_ ? "Yes" : "No") << std::endl;
+  }
+  // printed only when the correction runs (not with
+  // --skip-ms2-prec-pair-refine, without MS1 spectra, with FLASHDeconv or in
+  // TopDIA), so that those output files keep the parameter block of earlier
+  // versions
+  if (ms2_prec_pair_refine_ && !missing_level_one_ && !isUseFlashDeconv()) {
+    kv("Precursor isotope correction from fragment pairs:") << "Yes"
+                                                            << std::endl;
   }
   kv("Filtering fragments using estimated fragment number:")
       << (aa_num_based_filter_ ? "Yes" : "No") << std::endl;

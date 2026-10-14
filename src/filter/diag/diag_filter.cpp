@@ -22,6 +22,7 @@
 #include <utility>
 
 #include "common/util/file_util.hpp"
+#include "common/util/stage_profile.hpp"
 #include "filter/massmatch/mass_match_factory.hpp"
 #include "filter/massmatch/index_load_gate.hpp"
 #include "filter/massmatch/mass_match_util.hpp"
@@ -77,6 +78,7 @@ DiagFilter::DiagFilter(const ProteoformPtrVec& proteo_ptrs,
           lock.unlock();
         }
       }
+      stage_profile::Timer load_timer("diag.load");
       IndexLoadGate::Slot load_slot(index_load_gate);
       index_ptr_->deserializeMassMatch(file_name, index_dir);
       if (lock.owns_lock()) {
@@ -103,11 +105,12 @@ DiagFilter::DiagFilter(const ProteoformPtrVec& proteo_ptrs,
 
 DiagFilterSpectrumPtr DiagFilter::convert(const PrmMsPtrVec& ms_ptr_vec,
                                           const DiagFilterMngPtr& mng_ptr) {
-  PeakTolerancePtr tole_ptr =
-      mng_ptr->prsm_para_ptr_->getSpParaPtr()->getPrecTolerancePtr();
+  const SpParaPtr& sp_para_ptr = mng_ptr->prsm_para_ptr_->getSpParaPtr();
+  PeakTolerancePtr tole_ptr = sp_para_ptr->getPrecTolerancePtr();
   std::vector<std::pair<int, int> > mass_errors =
       prm_ms_util::getIntMassErrorList(ms_ptr_vec, tole_ptr,
-                                       mng_ptr->filter_scale_, true, false);
+                                       mng_ptr->filter_scale_, true, false,
+                                       sp_para_ptr->getFilterMassListMode());
   return std::make_shared<DiagFilterSpectrum>(
       ms_ptr_vec[0]->getMsHeaderPtr(), static_cast<int>(ms_ptr_vec.size()),
       std::move(mass_errors));
@@ -118,6 +121,12 @@ SimplePrsmPtrVec DiagFilter::getBestMatch(const PrmMsPtrVec& ms_ptr_vec) {
 }
 
 SimplePrsmPtrVec DiagFilter::getBestMatch(const DiagFilterSpectrum& spectrum) {
+  stage_profile::Timer score_timer("diag.score");
+  if (stage_profile::enabled()) {
+    long n = static_cast<long>(spectrum.getMassErrors().size());
+    stage_profile::add("diag.masses", 0, n);
+    stage_profile::add("diag.masses_sq", 0, n * n);
+  }
   SimplePrsmPtrVec match_ptrs = compute(spectrum);
   SimplePrsmPtrVec unique_match_ptrs =
       simple_prsm_util::getUniqueMatches(match_ptrs);
