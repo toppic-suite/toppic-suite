@@ -388,8 +388,9 @@ docs are hand-written and nothing checks them against the build.
 One manual per command-line tool, linked from README.md's "Manuals" section:
 `topfd_manual.md`, `topdia_manual.md`, `topindex_manual.md`,
 `toppic_manual.md`, `topmg_manual.md`, `topdiff_manual.md`,
-`toplib_build_manual.md`, `toplib_search_manual.md`,
-`topcalib_manual.md`, `topzstd_manual.md`. Each follows the
+`topzstd_manual.md`. toplib_build, toplib_search and topcalib have no
+manual and are not in README.md (their manuals were removed on
+2026-10-14); their `-h` text documents them. Each follows the
 same layout: overview and usage line, input (including the companion files a
 tool needs, e.g. TopPIC's `_ms2.feature` and `.sqlite`), the pipeline steps
 as the console prints them, the output files with their columns, option
