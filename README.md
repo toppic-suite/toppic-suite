@@ -18,12 +18,8 @@ TopPIC Suite consists of six software tools for the analysis of top-down mass sp
 
 * **TopDiff** (Top-down mass spectrometry-based identification of Differentially expressed proteoforms) compares the abundances of proteoforms and finds differentially expressed proteoforms by using identifications of top-down mass spectrometry data of several protein samples.
 
-The suite also includes four command-line utilities: **toplib_build** and
-**toplib_search** build a spectral library of identified MS/MS spectra and
-identify spectra by searching it, **topcalib** recalibrates the m/z values
-of TopFD's MS/MS spectra with the identifications of a first TopPIC search,
-and **topzstd** compresses and decompresses the SQLite databases of the
-suite.
+The suite also includes a command-line utility, **topzstd**, which
+compresses and decompresses the SQLite databases of the suite.
 
 ## Manuals
 
@@ -35,9 +31,6 @@ The command-line tools are documented in `docs/manual/`:
 - [TopPIC](docs/manual/toppic_manual.md) — proteoform identification and characterization
 - [TopMG](docs/manual/topmg_manual.md) — identification of highly modified proteoforms with mass graphs
 - [TopDiff](docs/manual/topdiff_manual.md) — differential abundance of proteoforms across samples
-- [toplib_build](docs/manual/toplib_build_manual.md) — a spectral library of identified MS/MS spectra (the C++ port of TopLib's library building)
-- [toplib_search](docs/manual/toplib_search_manual.md) — identification of MS/MS spectra by searching a spectral library (the C++ port of TopLib's library search)
-- [topcalib](docs/manual/topcalib_manual.md) — two-pass m/z recalibration of TopFD's MS/MS msalign files from a first TopPIC search
 - [topzstd](docs/manual/topzstd_manual.md) — compression (and decompression) of the SQLite databases of TopFD, TopDIA, TopPIC and TopMG
 - [Proteoform annotation](docs/manual/proteoform.md) — how to read the annotated proteoform strings in TopPIC and TopMG results
 
